@@ -64,6 +64,16 @@ public class PresenterWindow: Gtk.Window {
      */
     protected uint presentation_time;
 
+    /**
+     * Fixed layout to position all the elements inside the window
+     */
+    protected Fixed fixedLayout = null;
+
+    /**
+     * The geometry data of the screen this window is on
+     */
+    protected Rectangle screen_geometry;
+
 	/**
 	 * Base constructor instantiating a new presenter window
 	 */
@@ -80,32 +90,31 @@ public class PresenterWindow: Gtk.Window {
 
         var screen = Screen.get_default();
 
-        Rectangle geometry;
-        screen.get_monitor_geometry( screen_num, out geometry );
+        screen.get_monitor_geometry( screen_num, out this.screen_geometry );
 
-        var fixedLayout = new Fixed();
-        this.add( fixedLayout );
+        this.fixedLayout = new Fixed();
+        this.add( this.fixedLayout );
 
         // We need the value of 90% height a lot of times. Therefore store it
         // in advance
-        var bottom_position = (int)Math.floor( geometry.height * 0.9 );
-        var bottom_height = geometry.height - bottom_position;
+        var bottom_position = (int)Math.floor( this.screen_geometry.height * 0.9 );
+        var bottom_height = this.screen_geometry.height - bottom_position;
 
         // The currentslide needs to be bigger than the next one it, It takes
         // two third of of the available screen width while max taking 90 percent of the height
         this.current_slide = new PdfImage.from_pdf( 
             pdf_filename,
-            (int)Math.floor( geometry.width * 0.6 ),
+            (int)Math.floor( this.screen_geometry.width * 0.6 ),
             bottom_position,
             !Application.disable_caching,
             !Application.disable_pre_render
         );
         // Position it in the top left corner
-        fixedLayout.put( this.current_slide, 0, 0 );
+        this.fixedLayout.put( this.current_slide, 0, 0 );
 
         //The next slide is next to the current one and takes up the remaining
         //width
-        var next_slideWidth = geometry.width - this.current_slide.get_scaled_width();
+        var next_slideWidth = this.screen_geometry.width - this.current_slide.get_scaled_width();
         this.next_slide = new PdfImage.from_pdf( 
             pdf_filename,
             next_slideWidth,
@@ -114,7 +123,7 @@ public class PresenterWindow: Gtk.Window {
             !Application.disable_pre_render
         );
         // Position it at the top besides the current slide
-        fixedLayout.put( this.next_slide, this.current_slide.get_scaled_width(), 0 );
+        this.fixedLayout.put( this.next_slide, this.current_slide.get_scaled_width(), 0 );
 
         // Color needed for the labels
         Color white;
@@ -134,10 +143,10 @@ public class PresenterWindow: Gtk.Window {
         this.countdown.modify_fg( StateType.NORMAL, white );
         this.countdown.modify_font( font );
         this.countdown.set_size_request( 
-            (int)Math.floor( geometry.width * 0.75 ),
+            (int)Math.floor( this.screen_geometry.width * 0.75 ),
             bottom_height - 10
         );
-        fixedLayout.put( this.countdown, 0, bottom_position - 10 );
+        this.fixedLayout.put( this.countdown, 0, bottom_position - 10 );
 
 
         // The slide counter is centered in the 90% bottom part of the screen
@@ -147,18 +156,18 @@ public class PresenterWindow: Gtk.Window {
         this.slide_progress.modify_fg( StateType.NORMAL, white );
         this.slide_progress.modify_font( font );
         this.slide_progress.set_size_request( 
-            (int)Math.floor( geometry.width * 0.25 ),
+            (int)Math.floor( this.screen_geometry.width * 0.25 ),
             bottom_height - 10 
         );
-        fixedLayout.put(
+        this.fixedLayout.put(
             this.slide_progress,
-            (int)Math.ceil( geometry.width * 0.75 ),
+            (int)Math.ceil( this.screen_geometry.width * 0.75 ),
             bottom_position - 10
         );
 
 		this.key_press_event += this.on_key_pressed;
 
-        this.move( geometry.x, geometry.y );
+        this.move( this.screen_geometry.x, this.screen_geometry.y );
         this.fullscreen();
 
         this.reset();
@@ -273,5 +282,20 @@ public class PresenterWindow: Gtk.Window {
                 this.current_slide.get_page_count()
             )        
         );
+    }
+
+    public void set_cache_observer( CacheStatus observer ) {
+        observer.monitor_pdf_image( this.current_slide );
+        observer.monitor_pdf_image( this.next_slide );
+
+        // Add the cache status widget to be displayed
+        observer.set_height( 6 );
+        observer.set_width( this.screen_geometry.width );
+        this.fixedLayout.put( 
+            observer,
+            0,
+            this.screen_geometry.height - 6 
+        );
+        observer.show();
     }
 }

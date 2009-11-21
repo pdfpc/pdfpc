@@ -82,7 +82,13 @@ public class PdfImage: Gtk.Image
     /**
      * Should all pdfs be prerendered before actually displaying anything?
      */
-    bool pre_rendered;
+    protected bool pre_rendered;
+
+    /**
+     * CacheStatus widget which is informed about the creation of cached
+     * elements
+     */
+    protected CacheStatus cache_observer = null;
 
     /**
      * Create a new pdf image from a given pdf filename
@@ -137,8 +143,6 @@ public class PdfImage: Gtk.Image
 			}
         }
 		
-		stdout.printf("map\n");
-
         this.blitToScreen( this.get_rendered_page( 0 ) );
 	}
 
@@ -239,7 +243,7 @@ public class PdfImage: Gtk.Image
         var gc = new GC( background_pixmap );
         Color white;
         Color.parse( "white", out white );
-        gc.set_foreground( white );
+        gc.set_rgb_fg_color( white );
         background_pixmap.draw_rectangle( gc, true, 0, 0, this.scaled_width, this.scaled_height );
 
         var pdf_pixbuf = new Pixbuf( 
@@ -288,18 +292,17 @@ public class PdfImage: Gtk.Image
 	 */
 	protected void* render_all_pages_thread() 
 	{
-		stdout.printf("render_thread: started\n" );
 		var page_count = this.page_count;
         for( var i=0; i<page_count; ++i ) {
-			stdout.printf("render_thread: waiting for rendered_pages_lock %d\n", i);
 			Gdk.threads_enter();
 			this.rendered_pages_mutex.lock();
-			stdout.printf("render_thread: render %d\n", i);
 			if ( this.rendered_pages[i] == null ) {
-				stdout.printf("render_thread: not yet rendered %d\n", i);
 				this.rendered_pages[i] = this.render_page( i );
 			}
 			this.rendered_pages_mutex.unlock();
+            if ( this.cache_observer != null ) {
+                this.cache_observer.new_cache_entry_created();
+            }
 			Gdk.threads_leave();
 			Thread.self().yield();
         }
@@ -333,6 +336,14 @@ public class PdfImage: Gtk.Image
 		this.rendered_pages_mutex.unlock();
 		return this.rendered_pages[page];
     }
+
+    /**
+     * Set the cache observer element which is informed about new cached items
+     */
+    public void set_cache_observer( CacheStatus observer ) {
+        this.cache_observer = observer;
+    }
+
 }
 
 errordomain PdfImageError {

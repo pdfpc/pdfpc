@@ -115,4 +115,11 @@ public class PresentationWindow: Gtk.Window {
     public void reset() {
         this.pdf.goto_page( 0 );
     }
+
+    /**
+     * Set the cache observer for the PdfImages on this window
+     */
+    public void set_cache_observer( CacheStatus observer ) {
+        observer.monitor_pdf_image( this.pdf );
+    }
 }

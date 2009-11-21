@@ -62,7 +62,7 @@ public class Application: GLib.Object {
 
         this.parse_command_line_options( args );
 
-        stdout.printf( "Initializing pdf rendering...\nIf pre-rendering is enabled this might take some time.\n" );
+        stdout.printf( "Initializing pdf rendering...\n" );
         
         int presenter_monitor, presentation_monitor;
         if ( Application.display_switch != true ) {
@@ -75,11 +75,13 @@ public class Application: GLib.Object {
         }
 
         var controller = new PresentationController();
+        var cache_status = new CacheStatus();
 
         if ( Gdk.Screen.get_default().get_n_monitors() > 1 ) {
             this.presenter_window = new PresenterWindow( args[1], presenter_monitor );
             controller.set_presenter_window( this.presenter_window );
             this.presenter_window.set_presentation_controller( controller );
+            this.presenter_window.set_cache_observer( cache_status );
         }
         else {
             stdout.printf( "Only one screen detected falling back to simple presentation mode.\n" );
@@ -90,7 +92,7 @@ public class Application: GLib.Object {
 
         controller.set_presentation_window( this.presentation_window );
         this.presentation_window.set_presentation_controller( controller );
-
+        this.presentation_window.set_cache_observer( cache_status );
 
 		// The windows are always displayed at last to be sure all caches have
 		// been created at this point.
