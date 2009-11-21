@@ -80,11 +80,6 @@ public class PdfImage: Gtk.Image
     protected bool cached;
 
     /**
-     * Should all pdfs be prerendered before actually displaying anything?
-     */
-    protected bool pre_rendered;
-
-    /**
      * CacheStatus widget which is informed about the creation of cached
      * elements
      */
@@ -93,7 +88,7 @@ public class PdfImage: Gtk.Image
     /**
      * Create a new pdf image from a given pdf filename
      */
-	public PdfImage.from_pdf( string filename, int width, int height, bool cached, bool pre_rendered ) 
+	public PdfImage.from_pdf( string filename, int width, int height, bool cached ) 
 	{
 		this.pdf_file = File.new_for_path( filename );
 
@@ -115,7 +110,6 @@ public class PdfImage: Gtk.Image
 
         this.calculate_scaleing( width, height );
 
-        this.pre_rendered = pre_rendered;
         this.cached = cached;
 
 		this.add_events( EventMask.STRUCTURE_MASK );
@@ -124,24 +118,13 @@ public class PdfImage: Gtk.Image
 
 	protected void on_realize( PdfImage source ) {
 		unowned Thread render_thread = null;
-        if ( this.cached == false ) {
-            // No caching disables pre-rendering
-            this.pre_rendered = false;
-        }
-		else {
+        if ( this.cached == true ) {
 			// Start the rendering thread
 			render_thread = Thread.create( 
 				this.render_all_pages_thread,
 				true
 			);
 		}
-
-        if ( this.pre_rendered == true ) {
-			// Wait until the render thread is finished
-			if ( render_thread != null ) {
-				render_thread.join();
-			}
-        }
 		
         this.blitToScreen( this.get_rendered_page( 0 ) );
 	}

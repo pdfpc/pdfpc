@@ -29,15 +29,13 @@ public class Application: GLib.Object {
 	public static GLib.Mutex poppler_mutex = new GLib.Mutex();
 
     protected static bool display_switch = false;
-    protected static bool disable_pre_render = false;
     protected static bool disable_caching = false;
     protected static uint duration = 45;
 
     const OptionEntry[] options = {
         { "duration", 'd', 0, OptionArg.INT, ref Application.duration, "Duration in minutes of the presentation used for timer display. (Default 45 minutes)", "N" },
         { "switch-screens", 's', 0, 0, ref Application.display_switch, "Switch the presentation and the presenter screen.", null },
-        { "disable-pre-rendering", 'r', 0, 0, ref Application.disable_pre_render, "Disable pre-rendering of all slides to save memory on cost of speed.", null },
-        { "disable-cache", 'c', 0, 0, ref Application.disable_caching, "Disable caching of already rendered slides to save memory on cost of speed. (Disables pre-rendering as well).", null },
+        { "disable-cache", 'c', 0, 0, ref Application.disable_caching, "Disable caching and pre-rendering of slides to save memory on cost of speed.", null },
         { null }
     };
 
@@ -45,8 +43,15 @@ public class Application: GLib.Object {
         var context = new OptionContext( "<pdf-file>" );
 
         context.add_main_entries( options, null );
-		//@todo: handle errors
-        context.parse( ref args );
+        
+        try {
+            context.parse( ref args );
+        }
+        catch( OptionError e ) {
+            stderr.printf( "\n%s\n\n", e.message );
+            stderr.printf( "%s", context.get_help( true, null ) );
+            Posix.exit( 1 );
+        }
 
         if ( args.length != 2 ) {
             stderr.printf( "%s", context.get_help( true, null ) );

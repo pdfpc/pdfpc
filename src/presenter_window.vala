@@ -106,8 +106,7 @@ public class PresenterWindow: Gtk.Window {
             pdf_filename,
             (int)Math.floor( this.screen_geometry.width * 0.6 ),
             bottom_position,
-            !Application.disable_caching,
-            !Application.disable_pre_render
+            !Application.disable_caching
         );
         // Position it in the top left corner
         this.fixedLayout.put( this.current_slide, 0, 0 );
@@ -119,8 +118,7 @@ public class PresenterWindow: Gtk.Window {
             pdf_filename,
             next_slideWidth,
             bottom_position,
-            !Application.disable_caching,
-            !Application.disable_pre_render
+            !Application.disable_caching
         );
         // Position it at the top besides the current slide
         this.fixedLayout.put( this.next_slide, this.current_slide.get_scaled_width(), 0 );

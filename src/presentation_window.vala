@@ -57,8 +57,7 @@ public class PresentationWindow: Gtk.Window {
             pdf_filename, 
             geometry.width, 
             geometry.height,
-            !Application.disable_caching,
-            !Application.disable_pre_render
+            !Application.disable_caching
         );
         // Center the scaled pdf on the monitor
         // In most cases it will however fill the full screen
