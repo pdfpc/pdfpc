@@ -20,6 +20,8 @@
 using Gtk;
 using Gdk;
 
+namespace org.westhoffswelt.pdfpresenter {
+
 /**
  * Window showing the currently active slide to be presented on a beamer
  */
@@ -121,4 +123,6 @@ public class PresentationWindow: Gtk.Window {
     public void set_cache_observer( CacheStatus observer ) {
         observer.monitor_pdf_image( this.pdf );
     }
+}
+
 }

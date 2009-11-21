@@ -20,6 +20,8 @@
 
 using Gtk;
 
+namespace org.westhoffswelt.pdfpresenter {
+
 public class Application: GLib.Object {
 	
 	private PresentationWindow presentation_window;
@@ -120,3 +122,4 @@ public class Application: GLib.Object {
     }
 }
 
+}

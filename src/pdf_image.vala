@@ -21,6 +21,8 @@ using Gtk;
 using Gdk;
 using Poppler;
 
+namespace org.westhoffswelt.pdfpresenter {
+
 /**
  * Generic GTK image widget which is capable of displaying a pdf file using the
  * Poppler library.
@@ -331,4 +333,6 @@ public class PdfImage: Gtk.Image
 
 errordomain PdfImageError {
     PAGE_DOES_NOT_EXIST;
+}
+
 }

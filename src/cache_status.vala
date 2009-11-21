@@ -20,6 +20,8 @@
 using Gtk;
 using Gdk;
 
+namespace org.westhoffswelt.pdfpresenter {
+
 /**
  * Really simple status widget showing the status of the current image cache
  */
@@ -103,4 +105,6 @@ public class CacheStatus: Gtk.Image
         this.maxValue += pdf_image.get_page_count();
         pdf_image.set_cache_observer( this );
     }
+}
+
 }

@@ -19,6 +19,8 @@
 
 using GLib;
 
+namespace org.westhoffswelt.pdfpresenter {
+
 /**
  * Controller handling all the triggered events/signals
  */
@@ -72,4 +74,6 @@ public class PresentationController: Object {
     public void set_presenter_window( PresenterWindow window ) {
         this.presenter_window = window;
     }
+}
+
 }

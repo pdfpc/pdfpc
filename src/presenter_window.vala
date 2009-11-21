@@ -20,6 +20,8 @@
 using Gtk;
 using Gdk;
 
+namespace org.westhoffswelt.pdfpresenter {
+
 /**
  * Window showing the currently active and next slide.
  *
@@ -296,4 +298,6 @@ public class PresenterWindow: Gtk.Window {
         );
         observer.show();
     }
+}
+
 }
