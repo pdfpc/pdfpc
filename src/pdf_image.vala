@@ -277,6 +277,10 @@ public class PdfImage: Gtk.Image
 	 */
 	protected void* render_all_pages_thread() 
 	{
+        // After the initial call sleep for 2.5 seconds to allow the normal
+        // redering windows to handle their initialization fast and efficient.
+        Thread.self().usleep( 2500000 );
+
 		var page_count = this.page_count;
         for( var i=0; i<page_count; ++i ) {
 			Gdk.threads_enter();
