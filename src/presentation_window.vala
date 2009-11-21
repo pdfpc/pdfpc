@@ -114,7 +114,12 @@ public class PresentationWindow: Gtk.Window {
      * Reset to the initial presentation state
      */
     public void reset() {
-        this.pdf.goto_page( 0 );
+        try {
+            this.pdf.goto_page( 0 );
+        }
+        catch( PdfImageError e ) {
+            GLib.error( "The pdf page 0 could not be rendered: %s", e.message );
+        }
     }
 
     /**

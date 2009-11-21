@@ -122,10 +122,15 @@ public class PdfImage: Gtk.Image
 		unowned Thread render_thread = null;
         if ( this.cached == true ) {
 			// Start the rendering thread
-			render_thread = Thread.create( 
-				this.render_all_pages_thread,
-				true
-			);
+            try {
+                render_thread = Thread.create( 
+                    this.render_all_pages_thread,
+                    true
+                );
+            }
+            catch ( ThreadError e ) {
+                GLib.error( "Rendering thread could not be spawned: %s", e.message );
+            }
 		}
 		
         this.blitToScreen( this.get_rendered_page( 0 ) );

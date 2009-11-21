@@ -213,8 +213,13 @@ public class PresenterWindow: Gtk.Window {
      * Reset the presentation display to the initial status
      */
     public void reset() {
-        this.current_slide.goto_page( 0 );
-        this.next_slide.goto_page( 1 );
+        try {
+            this.current_slide.goto_page( 0 );
+            this.next_slide.goto_page( 1 );
+        }
+        catch( PdfImageError e ) {
+            GLib.error( "The pdf page could not be rendered: %s", e.message );
+        }
 
         if ( this.timer != 0 ) {
             Source.remove( this.timer );
