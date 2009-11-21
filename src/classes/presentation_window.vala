@@ -82,6 +82,17 @@ public class PresentationWindow: Gtk.Window {
 	}
 
 	/**
+	 * Handle keypress events on the window and, if neccessary send them to the
+	 * presentation controller
+	 */
+	protected bool on_key_pressed( PresentationWindow source, EventKey key ) {
+        if ( this.presentation_controller != null ) {
+            this.presentation_controller.key_press( key );
+        }
+        return false;
+	}
+
+	/**
      * Set the presentation controller which is notified of keypresses and
      * other observed events
 	 */
@@ -102,17 +113,6 @@ public class PresentationWindow: Gtk.Window {
     public void previous_page() {
         this.pdf.previous_page();
     }
-
-	/**
-	 * Handle keypress events on the window and, if neccessary send them to the
-	 * presentation controller
-	 */
-	protected bool on_key_pressed( PresentationWindow source, EventKey key ) {
-        if ( this.presentation_controller != null ) {
-            this.presentation_controller.key_press( key );
-        }
-        return false;
-	}
 
     /**
      * Reset to the initial presentation state

@@ -29,7 +29,6 @@ namespace org.westhoffswelt.pdfpresenter {
  * well.
  */
 public class PresenterWindow: Gtk.Window {
-	
 	/**
 	 * Controller handling all the events which might happen. Furthermore it is
 	 * responsible to update all the needed visual stuff if needed
@@ -174,6 +173,63 @@ public class PresenterWindow: Gtk.Window {
 	}
 
 	/**
+	 * Handle keypress events on the window and, if neccessary send them to the
+	 * presentation controller
+	 */
+	protected bool on_key_pressed( PresenterWindow source, EventKey key ) {
+        if ( this.presentation_controller != null ) {
+            this.presentation_controller.key_press( key );
+        }
+        return false;
+	}
+
+    /**
+     * Handle the timeout which is registered for every second to show the left
+     * duration time of the presentation.
+     */
+    protected bool on_timeout() {
+        --this.presentation_time;
+
+        this.update_duration();
+
+        if ( this.presentation_time <= 0 ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Update the duration timer
+     */
+    protected void update_duration() {
+        uint hours, minutes, seconds;
+
+        hours = this.presentation_time / 60 / 60;
+        minutes = this.presentation_time / 60 % 60;
+        seconds = this.presentation_time % 60 % 60;
+        
+        this.countdown.set_text( 
+            "%.2u:%.2u:%.2u".printf( 
+                hours,
+                minutes,
+                seconds
+            )
+        );
+    }
+
+    /**
+     * Update the slide count view
+     */
+    protected void update_slide_count() {
+        this.slide_progress.set_text( 
+            "%d/%d".printf( 
+                this.current_slide.get_page() + 1, 
+                this.current_slide.get_page_count()
+            )        
+        );
+    }
+
+	/**
      * Set the presentation controller which is notified of keypresses and
      * other observed events
 	 */
@@ -230,63 +286,6 @@ public class PresenterWindow: Gtk.Window {
 
         this.update_duration();
         this.update_slide_count();
-    }
-
-	/**
-	 * Handle keypress events on the window and, if neccessary send them to the
-	 * presentation controller
-	 */
-	protected bool on_key_pressed( PresenterWindow source, EventKey key ) {
-        if ( this.presentation_controller != null ) {
-            this.presentation_controller.key_press( key );
-        }
-        return false;
-	}
-
-    /**
-     * Handle the timeout which is registered for every second to show the left
-     * duration time of the presentation.
-     */
-    protected bool on_timeout() {
-        --this.presentation_time;
-
-        this.update_duration();
-
-        if ( this.presentation_time <= 0 ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Update the duration timer
-     */
-    protected void update_duration() {
-        uint hours, minutes, seconds;
-
-        hours = this.presentation_time / 60 / 60;
-        minutes = this.presentation_time / 60 % 60;
-        seconds = this.presentation_time % 60 % 60;
-        
-        this.countdown.set_text( 
-            "%.2u:%.2u:%.2u".printf( 
-                hours,
-                minutes,
-                seconds
-            )
-        );
-    }
-
-    /**
-     * Update the slide count view
-     */
-    protected void update_slide_count() {
-        this.slide_progress.set_text( 
-            "%d/%d".printf( 
-                this.current_slide.get_page() + 1, 
-                this.current_slide.get_page_count()
-            )        
-        );
     }
 
     /** 

@@ -155,6 +155,139 @@ public class PdfImage: Gtk.Image
 	}
 
 	/**
+	 * Render all pdf pages to memory pixmaps
+	 * 
+     * This is done in a seperate thread to allow the presentation to already
+     * run during this time
+	 */
+	protected void* render_all_pages_thread() 
+	{
+        // After the initial call sleep for 2.5 seconds to allow the normal
+        // redering windows to handle their initialization fast and efficient.
+        Thread.self().usleep( 2500000 );
+
+		var page_count = this.page_count;
+        for( var i=0; i<page_count; ++i ) {
+			Gdk.threads_enter();
+			this.rendered_pages_mutex.lock();
+			if ( this.rendered_pages[i] == null ) {
+				this.rendered_pages[i] = this.render_page( i );
+			}
+			this.rendered_pages_mutex.unlock();
+            if ( this.cache_observer != null ) {
+                this.cache_observer.new_cache_entry_created();
+            }
+			Gdk.threads_leave();
+			Thread.self().yield();
+        }
+
+		return null;
+	}
+
+    /**
+     * Calculate the scaling and position of the pdf to fill the provided
+     * space.
+     */
+    protected void calculate_scaleing( int width, int height ) {
+		var page = this.document.get_page( this.page );
+
+		double page_width, page_height;
+		page.get_size( out page_width, out page_height );
+
+		double scale_width = width / page_width;
+		double scale_height = height / page_height;
+
+        this.scale_factor = ( scale_width > scale_height ) ? scale_height : scale_width;
+
+        this.scaled_width = (int)Math.ceil( page_width * this.scale_factor );
+        this.scaled_height = (int)Math.ceil( page_height * this.scale_factor );
+    }
+
+    /**
+     * Blit a given pixmap to screen, displaying it.
+     */
+    protected void blitToScreen( Pixmap pixmap ) {
+        this.set_from_pixmap( pixmap, null );
+    }
+
+    /**
+     * Provide the pixmap of a rendered page, by using the cache or rendering
+     * it directly.
+     *
+     * This function takes care of correctly caching the rendered page and
+     * should therefore always be used instead of calling render_page directly.
+     */
+    protected Pixmap get_rendered_page( int page ) {
+        if ( this.cached != true ) {
+            // Caching is fully disabled
+            return this.render_page( page );
+        }
+
+		this.rendered_pages_mutex.lock();
+		if ( this.rendered_pages[page] == null ) {
+			this.rendered_pages[page] = this.render_page( page );
+		}
+		this.rendered_pages_mutex.unlock();
+		return this.rendered_pages[page];
+    }
+
+    /**
+     * Render the given pdf document page to a pixmap
+     *
+     * This method should not be used directly as it circumvents the cache
+     * completely. To get the pixmap of a specific page use get_rendered_page
+     * instead, which handles all the caching automagically for you.
+     */
+    protected Pixmap render_page( int page_number ) {
+        var background_pixmap = new Pixmap( null, this.scaled_width, this.scaled_height, 24 );
+        var gc = new GC( background_pixmap );
+        Color white;
+        Color.parse( "white", out white );
+        gc.set_rgb_fg_color( white );
+        background_pixmap.draw_rectangle( gc, true, 0, 0, this.scaled_width, this.scaled_height );
+
+        var pdf_pixbuf = new Pixbuf( 
+            Colorspace.RGB, 
+            false, 
+            8, 
+            this.scaled_width,
+            this.scaled_height
+        );
+		
+        // Poppler isn't thread-safe, therefore every call to it needs to be
+        // mutually exclusive.
+		Application.poppler_mutex.lock();
+		var page = this.document.get_page( page_number );
+		page.render_to_pixbuf( 
+			0,
+			0,
+			this.scaled_width,
+			this.scaled_height,
+			this.scale_factor,
+			0,
+			pdf_pixbuf
+		);
+		Application.poppler_mutex.unlock();
+	
+        background_pixmap.draw_pixbuf( 
+            gc,
+            pdf_pixbuf,
+            0, /* srcx */
+            0, /* srcy */
+            0, /* dstx */
+            0, /* dsty */
+            this.scaled_width,
+            this.scaled_height,
+            RgbDither.NONE,
+            0,
+            0
+        );
+
+        return background_pixmap;
+    }
+
+
+	/**
      * Render and display a specific page of the pdf document
 	 */
 	public void goto_page( int page ) 
@@ -227,138 +360,6 @@ public class PdfImage: Gtk.Image
      */
     public int get_scaled_height() {
         return this.scaled_height;
-    }
-
-    /**
-     * Calculate the scaling and position of the pdf to fill the provided
-     * space.
-     */
-    protected void calculate_scaleing( int width, int height ) {
-		var page = this.document.get_page( this.page );
-
-		double page_width, page_height;
-		page.get_size( out page_width, out page_height );
-
-		double scale_width = width / page_width;
-		double scale_height = height / page_height;
-
-        this.scale_factor = ( scale_width > scale_height ) ? scale_height : scale_width;
-
-        this.scaled_width = (int)Math.ceil( page_width * this.scale_factor );
-        this.scaled_height = (int)Math.ceil( page_height * this.scale_factor );
-    }
-
-    /**
-     * Render the given pdf document page to a pixmap
-     *
-     * This method should not be used directly as it circumvents the cache
-     * completely. To get the pixmap of a specific page use get_rendered_page
-     * instead, which handles all the caching automagically for you.
-     */
-    protected Pixmap render_page( int page_number ) {
-        var background_pixmap = new Pixmap( null, this.scaled_width, this.scaled_height, 24 );
-        var gc = new GC( background_pixmap );
-        Color white;
-        Color.parse( "white", out white );
-        gc.set_rgb_fg_color( white );
-        background_pixmap.draw_rectangle( gc, true, 0, 0, this.scaled_width, this.scaled_height );
-
-        var pdf_pixbuf = new Pixbuf( 
-            Colorspace.RGB, 
-            false, 
-            8, 
-            this.scaled_width,
-            this.scaled_height
-        );
-		
-        // Poppler isn't thread-safe, therefore every call to it needs to be
-        // mutually exclusive.
-		Application.poppler_mutex.lock();
-		var page = this.document.get_page( page_number );
-		page.render_to_pixbuf( 
-			0,
-			0,
-			this.scaled_width,
-			this.scaled_height,
-			this.scale_factor,
-			0,
-			pdf_pixbuf
-		);
-		Application.poppler_mutex.unlock();
-	
-        background_pixmap.draw_pixbuf( 
-            gc,
-            pdf_pixbuf,
-            0, /* srcx */
-            0, /* srcy */
-            0, /* dstx */
-            0, /* dsty */
-            this.scaled_width,
-            this.scaled_height,
-            RgbDither.NONE,
-            0,
-            0
-        );
-
-        return background_pixmap;
-    }
-
-	/**
-	 * Render all pdf pages to memory pixmaps
-	 * 
-     * This is done in a seperate thread to allow the presentation to already
-     * run during this time
-	 */
-	protected void* render_all_pages_thread() 
-	{
-        // After the initial call sleep for 2.5 seconds to allow the normal
-        // redering windows to handle their initialization fast and efficient.
-        Thread.self().usleep( 2500000 );
-
-		var page_count = this.page_count;
-        for( var i=0; i<page_count; ++i ) {
-			Gdk.threads_enter();
-			this.rendered_pages_mutex.lock();
-			if ( this.rendered_pages[i] == null ) {
-				this.rendered_pages[i] = this.render_page( i );
-			}
-			this.rendered_pages_mutex.unlock();
-            if ( this.cache_observer != null ) {
-                this.cache_observer.new_cache_entry_created();
-            }
-			Gdk.threads_leave();
-			Thread.self().yield();
-        }
-
-		return null;
-	}
-
-    /**
-     * Blit a given pixmap to screen, displaying it.
-     */
-    protected void blitToScreen( Pixmap pixmap ) {
-        this.set_from_pixmap( pixmap, null );
-    }
-
-    /**
-     * Provide the pixmap of a rendered page, by using the cache or rendering
-     * it directly.
-     *
-     * This function takes care of correctly caching the rendered page and
-     * should therefore always be used instead of calling render_page directly.
-     */
-    protected Pixmap get_rendered_page( int page ) {
-        if ( this.cached != true ) {
-            // Caching is fully disabled
-            return this.render_page( page );
-        }
-
-		this.rendered_pages_mutex.lock();
-		if ( this.rendered_pages[page] == null ) {
-			this.rendered_pages[page] = this.render_page( page );
-		}
-		this.rendered_pages_mutex.unlock();
-		return this.rendered_pages[page];
     }
 
     /**
