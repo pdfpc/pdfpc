@@ -289,6 +289,12 @@ public class PresenterWindow: Gtk.Window {
         );
     }
 
+    /** 
+     * Take a cache observer and register it with all PdfImage shown on the window.
+     *
+     * Furthermore it is taken care of to add the cache observer to this window
+     * for display, as it is a Image widget after all.
+     */
     public void set_cache_observer( CacheStatus observer ) {
         observer.monitor_pdf_image( this.current_slide );
         observer.monitor_pdf_image( this.next_slide );

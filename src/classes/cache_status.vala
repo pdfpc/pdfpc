@@ -23,7 +23,7 @@ using Gdk;
 namespace org.westhoffswelt.pdfpresenter {
 
 /**
- * Really simple status widget showing the status of the current image cache
+ * Status widget showing the fill status of all registered pdf image caches
  */
 public class CacheStatus: Gtk.Image
 {

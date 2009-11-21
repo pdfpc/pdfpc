@@ -33,6 +33,10 @@ public class PresentationWindow: Gtk.Window {
 	 */
 	protected PresentationController presentation_controller = null;
 
+    /**
+     * Pdf image which will actually provide the display of the presentation
+     * slide
+     */
     protected PdfImage pdf;
 
 	/**
@@ -124,6 +128,10 @@ public class PresentationWindow: Gtk.Window {
 
     /**
      * Set the cache observer for the PdfImages on this window
+     *
+     * This method takes care of registering all PdfImages used by this window
+     * correctly with the CacheStatus object to provide acurate cache status
+     * measurements.
      */
     public void set_cache_observer( CacheStatus observer ) {
         observer.monitor_pdf_image( this.pdf );

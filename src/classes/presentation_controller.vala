@@ -26,10 +26,23 @@ namespace org.westhoffswelt.pdfpresenter {
  */
 public class PresentationController: Object {
 
+    /**
+     * Presentation window showing the main presentation slide
+     */
     protected PresentationWindow presentation_window = null;
 
+    /**
+     * Presenter window, which shows all the neat little metadata required
+     */
     protected PresenterWindow presenter_window = null;
 
+    /**
+     * Handle keypresses to each of the windows
+     *
+     * This seperate handling is needed because keypresses from any of the
+     * window have implications on the behaviour of both of them. Therefore
+     * this controller is needed to take care of the needed actions.
+     */
     public void key_press( Gdk.EventKey key ) {
         switch( key.keyval ) {
             case 0xff53: /* Cursor right */
@@ -67,10 +80,16 @@ public class PresentationController: Object {
         }
     }
 
+    /**
+     * Set the presentation window to use
+     */
     public void set_presentation_window( PresentationWindow window ) {
         this.presentation_window = window;
     }
 
+    /**
+     * Set the presenter window to use
+     */
     public void set_presenter_window( PresenterWindow window ) {
         this.presenter_window = window;
     }
