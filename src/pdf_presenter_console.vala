@@ -22,18 +22,55 @@ using Gtk;
 
 namespace org.westhoffswelt.pdfpresenter {
 
+/**
+ * Pdf Presenter Console main application class
+ *
+ * This class contains the main method as well as all the logic needed for
+ * initializing the application, like commandline parsing and window creation.
+ */
 public class Application: GLib.Object {
 	
+    /**
+     * Window which shows the current slide in fullscreen
+     *
+     * This window is supposed to be shown on the beamer
+     */
 	private PresentationWindow presentation_window;
 
+    /**
+     * Presenter window showing the current and the next slide as well as
+     * different other meta information useful for the person giving the
+     * presentation.
+     */
 	private PresenterWindow presenter_window;
 
+    /**
+     * Global mutex used by all threads, to lock the operations on the poppler
+     * library, which is unfortunately not threadsafe, therefore only one
+     * poppler call at a time is possible.
+     */
 	public static GLib.Mutex poppler_mutex = new GLib.Mutex();
 
+    /**
+     * Commandline option specifying if the presenter and presentation screen
+     * should be switched.
+     */
     protected static bool display_switch = false;
+    
+    /**
+     * Commandline option which allows the complete disabling of slide caching
+     */
     protected static bool disable_caching = false;
+
+    /**
+     * Commandline option providing the talk duration, which will be used to
+     * display a timer
+     */
     protected static uint duration = 45;
 
+    /**
+     * Commandline option parser entry definitions
+     */
     const OptionEntry[] options = {
         { "duration", 'd', 0, OptionArg.INT, ref Application.duration, "Duration in minutes of the presentation used for timer display. (Default 45 minutes)", "N" },
         { "switch-screens", 's', 0, 0, ref Application.display_switch, "Switch the presentation and the presenter screen.", null },
@@ -41,6 +78,13 @@ public class Application: GLib.Object {
         { null }
     };
 
+    /**
+     * Parse the commandline and apply all found options to there according
+     * static class members.
+     *
+     * On error the usage help is shown and the application terminated with an
+     * errorcode 1
+     */
     protected void parse_command_line_options( string[] args ) {
         var context = new OptionContext( "<pdf-file>" );
 
@@ -61,6 +105,10 @@ public class Application: GLib.Object {
         }
     }
 
+    /**
+     * Main application function, which instantiates the windows and
+     * initializes the Gtk system.
+     */
     public void run( string[] args ) {
         stdout.printf( "Pdf-Presenter-Console Version 1.0 Copyright 2009 Jakob Westhoff\n" );
 
@@ -114,6 +162,9 @@ public class Application: GLib.Object {
 		Gdk.threads_leave();
     }
 
+    /**
+     * Basic application entry point
+     */
     public static int main ( string[] args ) {
         var application = new Application();
 		application.run( args );
