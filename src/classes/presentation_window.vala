@@ -61,6 +61,7 @@ public class PresentationWindow: Gtk.Window {
 
         this.pdf = new PdfImage.from_pdf( 
             pdf_filename, 
+            0,
             geometry.width, 
             geometry.height,
             !Application.disable_caching
