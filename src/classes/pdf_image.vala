@@ -91,6 +91,11 @@ public class PdfImage: Gtk.Image
     protected CacheStatus cache_observer = null;
 
     /**
+     * Page to be initially loaded
+     */
+    protected int initial_page = 0;
+
+    /**
      * Create a new pdf image from a given pdf filename
      *
      * The supplied width and height values are used to calculate a scaled
@@ -101,7 +106,7 @@ public class PdfImage: Gtk.Image
      * If caching is disabled pre-rendering will not be done for any page, as
      * well as no page will be cached after rendering for faster redisplay.
      */
-	public PdfImage.from_pdf( string filename, int width, int height, bool cached ) 
+	public PdfImage.from_pdf( string filename, int initial_page, int width, int height, bool cached ) 
 	{
 		this.pdf_file = File.new_for_path( filename );
 
@@ -124,6 +129,8 @@ public class PdfImage: Gtk.Image
         this.calculate_scaleing( width, height );
 
         this.cached = cached;
+
+        this.initial_page = initial_page;
 
 		this.add_events( EventMask.STRUCTURE_MASK );
 		Signal.connect_after( this, "realize", (GLib.Callback)this.on_realize, this );
@@ -151,7 +158,7 @@ public class PdfImage: Gtk.Image
 		}
 		
         // Render initial page
-        this.blitToScreen( this.get_rendered_page( 0 ) );
+        this.blitToScreen( this.get_rendered_page( this.initial_page ) );
 	}
 
 	/**

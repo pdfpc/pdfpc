@@ -105,6 +105,7 @@ public class PresenterWindow: Gtk.Window {
         // two third of of the available screen width while max taking 90 percent of the height
         this.current_slide = new PdfImage.from_pdf( 
             pdf_filename,
+            0,
             (int)Math.floor( this.screen_geometry.width * 0.6 ),
             bottom_position,
             !Application.disable_caching
@@ -117,6 +118,7 @@ public class PresenterWindow: Gtk.Window {
         var next_slideWidth = this.screen_geometry.width - this.current_slide.get_scaled_width();
         this.next_slide = new PdfImage.from_pdf( 
             pdf_filename,
+            1,
             next_slideWidth,
             bottom_position,
             !Application.disable_caching
