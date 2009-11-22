@@ -32,6 +32,12 @@ set(VALA_SRC
 	classes/cache_status.vala
 )
 
+# Vala segfaults if its output dirs are not existant. Therefore make sure they
+# are there.
+if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
+	make_directory("${CMAKE_CURRENT_BINARY_DIR}/classes")
+endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
+
 vala_precompile(VALA_C
 	${VALA_SRC}
 PACKAGES 
@@ -44,3 +50,9 @@ OPTIONS
 )
 
 add_executable(pdf_presenter_console ${VALA_C})
+
+install(FILES 
+	${CMAKE_CURRENT_BINARY_DIR}/pdf_presenter_console
+DESTINATION
+	bin
+)
