@@ -1,3 +1,8 @@
+##
+# The Vala Macros have been created by Florian Sowade
+# Thanks for your help :)
+##
+
 # - Find vala compiler
 # This module finds if vala compiler is installed and determines where the
 # executables are. This code sets the following variables:
