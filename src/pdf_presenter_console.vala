@@ -16,7 +16,6 @@
  * pdf-presenter-console; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-/* Using Poppler for PDF rendering in Vala sample code */
 
 using Gtk;
 
