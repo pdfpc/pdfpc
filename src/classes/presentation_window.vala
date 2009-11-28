@@ -77,7 +77,12 @@ public class PresentationWindow: Gtk.Window, Controllable {
 		this.key_press_event += this.on_key_pressed;
 
         this.move( geometry.x, geometry.y );
+
         this.fullscreen();
+
+        this.set_decorated( false );
+        this.set_keep_above( true );
+        this.set_size_request( geometry.width, geometry.height );
 
         this.reset();
 	}
