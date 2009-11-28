@@ -30,6 +30,7 @@ set(VALA_SRC
 	classes/presentation_controller.vala
 	classes/presenter_window.vala
 	classes/cache_status.vala
+	interfaces/controllable.vala
 )
 
 # Vala segfaults if its output dirs are not existant. Therefore make sure they
@@ -37,6 +38,9 @@ set(VALA_SRC
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
 	make_directory("${CMAKE_CURRENT_BINARY_DIR}/classes")
 endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
+if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/interfaces")
+	make_directory("${CMAKE_CURRENT_BINARY_DIR}/interfaces")
+endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/interfaces")
 
 vala_precompile(VALA_C
 	${VALA_SRC}

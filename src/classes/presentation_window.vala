@@ -25,7 +25,7 @@ namespace org.westhoffswelt.pdfpresenter {
 /**
  * Window showing the currently active slide to be presented on a beamer
  */
-public class PresentationWindow: Gtk.Window {
+public class PresentationWindow: Gtk.Window, Controllable {
 	
 	/**
 	 * Controller handling all the events which might happen. Furthermore it is
@@ -97,7 +97,7 @@ public class PresentationWindow: Gtk.Window {
      * Set the presentation controller which is notified of keypresses and
      * other observed events
 	 */
-	public void set_presentation_controller( PresentationController controller ) {
+	public void set_controller( PresentationController controller ) {
 		this.presentation_controller = controller;
 	}
 

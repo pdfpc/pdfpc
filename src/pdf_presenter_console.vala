@@ -133,8 +133,7 @@ public class Application: GLib.Object {
 
         if ( Gdk.Screen.get_default().get_n_monitors() > 1 ) {
             this.presenter_window = new PresenterWindow( args[1], presenter_monitor );
-            controller.set_presenter_window( this.presenter_window );
-            this.presenter_window.set_presentation_controller( controller );
+            controller.register_controllable( this.presenter_window );
             this.presenter_window.set_cache_observer( cache_status );
         }
         else {
@@ -144,8 +143,7 @@ public class Application: GLib.Object {
 
         this.presentation_window = new PresentationWindow( args[1], presentation_monitor );
 
-        controller.set_presentation_window( this.presentation_window );
-        this.presentation_window.set_presentation_controller( controller );
+        controller.register_controllable( this.presentation_window );
         this.presentation_window.set_cache_observer( cache_status );
 
 		// The windows are always displayed at last to be sure all caches have

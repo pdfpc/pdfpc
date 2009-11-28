@@ -27,17 +27,19 @@ namespace org.westhoffswelt.pdfpresenter {
 public class PresentationController: Object {
 
     /**
-     * Presentation window showing the main presentation slide
+     * Controllables which are registered with this presentation controller.
      */
-    protected PresentationWindow presentation_window = null;
+    protected List<Controllable> controllables;
 
     /**
-     * Presenter window, which shows all the neat little metadata required
+     * Instantiate a new controller
      */
-    protected PresenterWindow presenter_window = null;
+    public PresentationController() {
+        this.controllables = new List<Controllable>();
+    }
 
     /**
-     * Handle keypresses to each of the windows
+     * Handle keypresses to each of the controllables
      *
      * This seperate handling is needed because keypresses from any of the
      * window have implications on the behaviour of both of them. Therefore
@@ -47,51 +49,64 @@ public class PresentationController: Object {
         switch( key.keyval ) {
             case 0xff53: /* Cursor right */
             case 0xff56: /* Page down */
-                if ( this.presentation_window != null ) {
-                    this.presentation_window.next_page();
-                }
-
-                if ( this.presenter_window != null ) {
-                    this.presenter_window.next_page();
-                }
+                this.controllables_next_page();
             break;
             case 0xff51: /* Cursor left */
             case 0xff55: /* Page Up */
-                if ( this.presentation_window != null ) {
-                    this.presentation_window.previous_page();
-                }
-
-                if ( this.presenter_window != null ) {
-                    this.presenter_window.previous_page();
-                }
+                this.controllables_previous_page();
             break;
             case 0xff1b: /* Escape */
                 Gtk.main_quit();
             break;
             case 0xff50: /* Home */
-                if ( this.presentation_window != null ) {
-                    this.presentation_window.reset();
-                }
-
-                if ( this.presenter_window != null ) {
-                    this.presenter_window.reset();
-                }
+                this.controllables_reset();
             break;
         }
     }
 
     /**
-     * Set the presentation window to use
+     * Register a new Controllable instance on this controller. 
+     *
+     * On success true is returned, in case the controllable has already been
+     * registered false is returned.
      */
-    public void set_presentation_window( PresentationWindow window ) {
-        this.presentation_window = window;
+    public bool register_controllable( Controllable controllable ) {
+        if ( this.controllables.find( controllable ) != null ) {
+            // The controllable has already been added.
+            return false;
+        }
+
+        controllable.set_controller( this );
+        this.controllables.append( controllable );
+        
+        return true;
+    }
+    
+    /**
+     * Move all registered controllables to the next page
+     */
+    protected void controllables_next_page() {
+        foreach( Controllable c in this.controllables ) {
+            c.next_page();
+        }
     }
 
     /**
-     * Set the presenter window to use
+     * Move all registered controllables to the previous page
      */
-    public void set_presenter_window( PresenterWindow window ) {
-        this.presenter_window = window;
+    protected void controllables_previous_page() {
+        foreach( Controllable c in this.controllables ) {
+            c.previous_page();
+        }
+    }
+
+    /**
+     * Reset all registered controllables to their initial state
+     */
+    protected void controllables_reset() {
+        foreach( Controllable c in this.controllables ) {
+            c.reset();
+        }
     }
 }
 
