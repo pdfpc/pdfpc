@@ -55,8 +55,9 @@ OPTIONS
 
 add_executable(pdf_presenter_console ${VALA_C})
 
-install(FILES 
-	${CMAKE_CURRENT_BINARY_DIR}/pdf_presenter_console
+install(TARGETS 
+	pdf_presenter_console
+RUNTIME
 DESTINATION
 	bin
 )
