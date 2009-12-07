@@ -73,6 +73,11 @@ public class CacheStatus: Gtk.Image
      * Draw the current state to the widgets surface
      */
     public void redraw() {
+        // Only draw if the widget is actually added to some parent
+        if ( this.get_parent() == null ) {
+            return;
+        }
+
         var background_pixmap = new Pixmap( null, this.width, this.height, 24 );
         var gc = new GC( background_pixmap );
         
