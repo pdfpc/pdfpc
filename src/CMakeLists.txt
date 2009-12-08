@@ -30,6 +30,7 @@ set(VALA_SRC
 	classes/presentation_controller.vala
 	classes/presenter_window.vala
 	classes/cache_status.vala
+	classes/timer_label.vala
 	interfaces/controllable.vala
 )
 

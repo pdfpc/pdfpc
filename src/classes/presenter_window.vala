@@ -48,22 +48,12 @@ public class PresenterWindow: Gtk.Window, Controllable {
     /**
      * Countdown until the presentation ends
      */
-    protected Label countdown;
+    protected TimerLabel timer;
 
     /**
      * Slide progress label ( eg. "23/42" )
      */
     protected Label slide_progress;
-
-    /**
-     * Timer used to measure the duration
-     */
-    protected uint timer = 0;
-
-    /**
-     * The left duration of the presentation
-     */
-    protected uint presentation_time;
 
     /**
      * Fixed layout to position all the elements inside the window
@@ -82,8 +72,6 @@ public class PresenterWindow: Gtk.Window, Controllable {
         this.destroy += (source) => {
             Gtk.main_quit();
         };
-
-        this.presentation_time = Application.duration * 60;
 
         Color black;
         Color.parse( "black", out black );
@@ -139,15 +127,14 @@ public class PresenterWindow: Gtk.Window, Controllable {
 
         // The countdown timer is centered in the 90% bottom part of the screen
         // It takes 3/4 of the available width
-        this.countdown = new Label( "00:00" );
-        this.countdown.set_justify( Justification.CENTER );
-        this.countdown.modify_fg( StateType.NORMAL, white );
-        this.countdown.modify_font( font );
-        this.countdown.set_size_request( 
+        this.timer = new TimerLabel( (int)Application.duration * 60 );
+        this.timer.set_justify( Justification.CENTER );
+        this.timer.modify_font( font );
+        this.timer.set_size_request( 
             (int)Math.floor( this.screen_geometry.width * 0.75 ),
             bottom_height - 10
         );
-        this.fixedLayout.put( this.countdown, 0, bottom_position - 10 );
+        this.fixedLayout.put( this.timer, 0, bottom_position - 10 );
 
 
         // The slide counter is centered in the 90% bottom part of the screen
@@ -191,40 +178,6 @@ public class PresenterWindow: Gtk.Window, Controllable {
 	}
 
     /**
-     * Handle the timeout which is registered for every second to show the left
-     * duration time of the presentation.
-     */
-    protected bool on_timeout() {
-        --this.presentation_time;
-
-        this.update_duration();
-
-        if ( this.presentation_time <= 0 ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Update the duration timer
-     */
-    protected void update_duration() {
-        uint hours, minutes, seconds;
-
-        hours = this.presentation_time / 60 / 60;
-        minutes = this.presentation_time / 60 % 60;
-        seconds = this.presentation_time % 60 % 60;
-        
-        this.countdown.set_text( 
-            "%.2u:%.2u:%.2u".printf( 
-                hours,
-                minutes,
-                seconds
-            )
-        );
-    }
-
-    /**
      * Update the slide count view
      */
     protected void update_slide_count() {
@@ -252,10 +205,7 @@ public class PresenterWindow: Gtk.Window, Controllable {
         this.next_slide.next_page();
         this.update_slide_count();
 
-        // Initialize timer on first slide change
-        if ( this.timer == 0 ) {
-            this.timer = Timeout.add( 1000, this.on_timeout );
-        }
+        this.timer.start();
     }
 
     /**
@@ -284,14 +234,8 @@ public class PresenterWindow: Gtk.Window, Controllable {
             GLib.error( "The pdf page could not be rendered: %s", e.message );
         }
 
-        if ( this.timer != 0 ) {
-            Source.remove( this.timer );
-            this.timer = 0;
-        }
+        this.timer.reset();
 
-        this.presentation_time = Application.duration * 60;
-
-        this.update_duration();
         this.update_slide_count();
     }
 
