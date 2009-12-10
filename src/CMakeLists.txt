@@ -23,6 +23,15 @@ set(LIBS
 )
 link_libraries(${LIBS})
 
+set(LIB_PATHS
+	${GOBJECT_LIBRARY_DIRS}
+	${GIO_LIBRARY_DIRS}
+	${POPPLER_LIBRARY_DIRS}
+	${GTK_LIBRARY_DIRS}
+	${GTHREAD_LIBRARY_DIRS}
+)
+link_directories(${LIB_PATHS})
+
 set(VALA_SRC
 	pdf_presenter_console.vala
 	classes/pdf_image.vala
