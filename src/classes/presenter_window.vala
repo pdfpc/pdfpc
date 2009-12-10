@@ -159,10 +159,6 @@ public class PresenterWindow: Gtk.Window, Controllable {
 
         this.fullscreen();
 
-        this.set_decorated( false );
-        this.set_keep_above( true );
-        this.set_size_request( this.screen_geometry.width, this.screen_geometry.height );
-
         this.reset();
 	}
 

@@ -80,10 +80,6 @@ public class PresentationWindow: Gtk.Window, Controllable {
 
         this.fullscreen();
 
-        this.set_decorated( false );
-        this.set_keep_above( true );
-        this.set_size_request( geometry.width, geometry.height );
-
         this.reset();
 	}
 
