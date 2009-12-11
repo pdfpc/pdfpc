@@ -25,7 +25,7 @@ namespace org.westhoffswelt.pdfpresenter {
 /**
  * Window showing the currently active slide to be presented on a beamer
  */
-public class PresentationWindow: Gtk.Window, Controllable {
+public class PresentationWindow: FullscreenWindow, Controllable {
 	
 	/**
 	 * Controller handling all the events which might happen. Furthermore it is
@@ -43,6 +43,8 @@ public class PresentationWindow: Gtk.Window, Controllable {
 	 * Base constructor instantiating a new presentation window
 	 */
 	public PresentationWindow( string pdf_filename, int screen_num ) {
+        base( screen_num );
+
         this.destroy += (source) => {
             Gtk.main_quit();
         };
@@ -51,34 +53,25 @@ public class PresentationWindow: Gtk.Window, Controllable {
         Color.parse( "black", out black );
         this.modify_bg( StateType.NORMAL, black );
 
-        var screen = Screen.get_default();
-
-        Rectangle geometry;
-        screen.get_monitor_geometry( screen_num, out geometry );
-
         var fixedLayout = new Fixed();
         this.add( fixedLayout );
 
         this.pdf = new PdfImage.from_pdf( 
             pdf_filename, 
             0,
-            geometry.width, 
-            geometry.height,
+            this.screen_geometry.width, 
+            this.screen_geometry.height,
             !Application.disable_caching
         );
         // Center the scaled pdf on the monitor
         // In most cases it will however fill the full screen
         fixedLayout.put(
             this.pdf,
-            (int)Math.floor( ( geometry.width - this.pdf.get_scaled_width() ) / 2.0 ),
-            (int)Math.floor( ( geometry.height - this.pdf.get_scaled_height() ) / 2.0 )
+            (int)Math.floor( ( this.screen_geometry.width - this.pdf.get_scaled_width() ) / 2.0 ),
+            (int)Math.floor( ( this.screen_geometry.height - this.pdf.get_scaled_height() ) / 2.0 )
         );
 
 		this.key_press_event += this.on_key_pressed;
-
-        this.move( geometry.x, geometry.y );
-
-        this.fullscreen();
 
         this.reset();
 	}

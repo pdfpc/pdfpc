@@ -28,7 +28,7 @@ namespace org.westhoffswelt.pdfpresenter {
  * Other useful information like time slide count, ... can be displayed here as
  * well.
  */
-public class PresenterWindow: Gtk.Window, Controllable {
+public class PresenterWindow: FullscreenWindow, Controllable {
 	/**
 	 * Controller handling all the events which might happen. Furthermore it is
 	 * responsible to update all the needed visual stuff if needed
@@ -60,15 +60,12 @@ public class PresenterWindow: Gtk.Window, Controllable {
      */
     protected Fixed fixedLayout = null;
 
-    /**
-     * The geometry data of the screen this window is on
-     */
-    protected Rectangle screen_geometry;
-
 	/**
 	 * Base constructor instantiating a new presenter window
 	 */
 	public PresenterWindow( string pdf_filename, int screen_num ) {
+        base( screen_num );
+
         this.destroy += (source) => {
             Gtk.main_quit();
         };
@@ -76,10 +73,6 @@ public class PresenterWindow: Gtk.Window, Controllable {
         Color black;
         Color.parse( "black", out black );
         this.modify_bg( StateType.NORMAL, black );
-
-        var screen = Screen.get_default();
-
-        screen.get_monitor_geometry( screen_num, out this.screen_geometry );
 
         this.fixedLayout = new Fixed();
         this.add( this.fixedLayout );
@@ -155,12 +148,8 @@ public class PresenterWindow: Gtk.Window, Controllable {
 
 		this.key_press_event += this.on_key_pressed;
 
-        this.move( this.screen_geometry.x, this.screen_geometry.y );
-
-        this.fullscreen();
-
         this.reset();
-	}
+    }
 
 	/**
 	 * Handle keypress events on the window and, if neccessary send them to the
