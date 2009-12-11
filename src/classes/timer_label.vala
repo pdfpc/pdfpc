@@ -152,6 +152,10 @@ public class TimerLabel: Gtk.Label {
         uint time;
         uint hours, minutes, seconds;
 
+        // The default prefix is an empty string, as the time is normally not
+        // negative ;)
+        string prefix = "";
+
         if ( this._time >= 0 ) {
             // Time is positive
             if ( this._time < this.last_minutes * 60 ) {
@@ -176,6 +180,9 @@ public class TimerLabel: Gtk.Label {
                 this.negative_color
             );
             time = this._time * (-1);
+
+            // The prefix used for negative time values is a simple minus sign.
+            prefix = "-";
         }
 
         hours = time / 60 / 60;
@@ -183,7 +190,8 @@ public class TimerLabel: Gtk.Label {
         seconds = time % 60 % 60;
         
         this.set_text( 
-            "%.2u:%.2u:%.2u".printf( 
+            "%s%.2u:%.2u:%.2u".printf(
+                prefix,
                 hours,
                 minutes,
                 seconds
