@@ -1,6 +1,8 @@
 project("pdf-presenter-console" C)
 cmake_minimum_required(VERSION 2.6)
 
+enable_testing()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/conf)
 
 find_package(Vala)
@@ -11,3 +13,4 @@ if(${VALA_VERSION} VERSION_LESS "0.7.8")
 endif(${VALA_VERSION} VERSION_LESS "0.7.8")
 
 add_subdirectory(src)
+add_subdirectory(tests)

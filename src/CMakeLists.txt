@@ -68,11 +68,20 @@ GENERATE_VAPI
 	presenter
 )
 
-add_executable(pdf_presenter_console ${VALA_C})
+add_executable(pdf_presenter_console
+  	${VALA_C}
+)
 
 install(TARGETS 
 	pdf_presenter_console
 RUNTIME
 DESTINATION
 	bin
+)
+
+# The tests need a library version of all the pdf_presenter_stuff
+add_library(pdf_presenter_console_test_library 
+	SHARED
+	EXCLUDE_FROM_ALL
+	${VALA_C} presenter.h presenter.vapi
 )
