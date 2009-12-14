@@ -62,6 +62,10 @@ PACKAGES
 	posix
 OPTIONS 
 	--thread
+GENERATE_HEADER
+	presenter
+GENERATE_VAPI
+	presenter
 )
 
 add_executable(pdf_presenter_console ${VALA_C})
