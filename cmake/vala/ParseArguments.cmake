@@ -1,5 +1,9 @@
+##
 # This is a helper Macro to parse optional arguments in Macros/Functions
-# See http://www.cmake.org/Wiki/CMakeMacroParseArguments for documentation
+# It has been taken from the public CMake wiki.  
+# See http://www.cmake.org/Wiki/CMakeMacroParseArguments for documentation and
+# licensing.
+##
 macro(parse_arguments prefix arg_names option_names)
   set(DEFAULT_ARGS)
   foreach(arg_name ${arg_names})

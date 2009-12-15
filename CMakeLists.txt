@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 enable_testing()
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/conf)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 include(ValaPrecompile)
 
 find_package(Vala)
