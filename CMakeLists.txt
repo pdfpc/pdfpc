@@ -5,13 +5,12 @@ enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 include(ValaPrecompile)
+include(ValaVersion)
 
 find_package(Vala)
 
-message(STATUS "Checking for Vala version 0.7.8 or greater")
-if(${VALA_VERSION} VERSION_LESS "0.7.8")
-	message(FATAL_ERROR "Vala version 0.7.8 or greater is required.")
-endif(${VALA_VERSION} VERSION_LESS "0.7.8")
+		
+ensure_vala_version("0.7.10" MINIMUM)
 
 add_subdirectory(src)
 add_subdirectory(tests)

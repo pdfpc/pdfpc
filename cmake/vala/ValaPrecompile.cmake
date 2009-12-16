@@ -28,7 +28,7 @@
 ##
 
 include(ParseArguments)
-find_package(Vala)
+find_package(Vala REQUIRED)
 
 ##
 # Compile vala files to their c equivalents for further processing. 
