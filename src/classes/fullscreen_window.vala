@@ -35,6 +35,10 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected Rectangle screen_geometry;
 
+		protected uint hide_cursor_timeout = 0;
+
+		protected Color col_black;
+
         public FullscreenWindow( int screen_num ) {
             var screen = Screen.get_default();
             screen.get_monitor_geometry( screen_num, out this.screen_geometry );
@@ -50,6 +54,14 @@ namespace org.westhoffswelt.pdfpresenter {
             // before the window is initially moved and set up we need to
             // listen to this event.
             this.size_allocate.connect( this.on_size_allocate );
+
+			this.add_events(EventMask.POINTER_MOTION_MASK);
+			this.add_events(EventMask.POINTER_MOTION_HINT_MASK);
+			this.motion_notify_event += this.on_pointer_motion;
+
+			Color.parse( "black", out this.col_black );
+
+			this.restart_hide_cursor_timer();
         }
 
         /**
@@ -90,5 +102,32 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.fullscreen();
             }
         }
+
+		protected bool on_pointer_motion(FullscreenWindow w, EventMotion event) {
+			//GLib.message("motion: %f %f", event.x, event.y);
+			this.window.set_cursor(null);
+			this.restart_hide_cursor_timer();
+			
+			return false;
+		}
+
+		protected void restart_hide_cursor_timer(){
+			if (this.hide_cursor_timeout != 0) {
+				Source.remove(this.hide_cursor_timeout);
+			}
+
+			this.hide_cursor_timeout = Timeout.add_seconds(5, this.on_hide_cursor_timeout);
+		}
+
+		protected bool on_hide_cursor_timeout() {
+			this.hide_cursor_timeout = 0;
+
+			var pix_data = "#define invisible_cursor_width 1\n#define invisible_cursor_height 1\n#define invisible_cursor_x_hot 0\n#define invisible_cursor_y_hot 0\nstatic unsigned short invisible_cursor_bits[] = {\n0x0000 };";
+			// this.window refers to a Gdk.Window, which is available after show_all is called
+			var pix = Gdk.Pixmap.create_from_data(this.window, pix_data, 1, 1, 1, this.col_black, this.col_black);
+			this.window.set_cursor(new Cursor.from_pixmap(pix, pix, this.col_black, this.col_black, 0, 0));
+
+			return false; // run once only
+		}
     }
 }
