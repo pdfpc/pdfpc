@@ -21,7 +21,6 @@ using Gtk;
 using Gdk;
 
 namespace org.westhoffswelt.pdfpresenter {
-
     /**
      * Window extension implementing all the needed functionality, to be
      * displayed fullscreen.

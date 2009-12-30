@@ -21,95 +21,93 @@ using Gtk;
 using Gdk;
 
 namespace org.westhoffswelt.pdfpresenter {
+    /**
+     * Status widget showing the fill status of all registered pdf image caches
+     */
+    public class CacheStatus: Gtk.Image
+    {
+        /**
+         * The number of entries currently inside the cache
+         */
+        protected int currentValue = 0;
 
-/**
- * Status widget showing the fill status of all registered pdf image caches
- */
-public class CacheStatus: Gtk.Image
-{
-    /**
-     * The number of entries currently inside the cache
-     */
-    protected int currentValue = 0;
+        /**
+         * The value which indicates a fully primed cache
+         */
+        protected int maxValue = 0;
 
-    /**
-     * The value which indicates a fully primed cache
-     */
-    protected int maxValue = 0;
+        /**
+         * Width of the widget
+         */
+        protected int width = 0;
 
-    /**
-     * Width of the widget
-     */
-    protected int width = 0;
-
-    /**
-     * Height of the widget
-     */
-    protected int height = 0;
-    
-    /**
-     * Set the height of the widget
-     */
-    public void set_height( int height ) {
-        this.height = height;
-    }
-
-    /**
-     * Set the width of the widget
-     */
-    public void set_width( int width ) {
-        this.width = width;
-    }
-
-    /**
-     * Called whenever a new entry has been added to the cache
-     */
-    public void new_cache_entry_created() {
-        ++this.currentValue;
-        this.redraw();
-    }
-
-    /**
-     * Draw the current state to the widgets surface
-     */
-    public void redraw() {
-        // Only draw if the widget is actually added to some parent
-        if ( this.get_parent() == null ) {
-            return;
+        /**
+         * Height of the widget
+         */
+        protected int height = 0;
+        
+        /**
+         * Set the height of the widget
+         */
+        public void set_height( int height ) {
+            this.height = height;
         }
 
-        var background_pixmap = new Pixmap( null, this.width, this.height, 24 );
-        var gc = new GC( background_pixmap );
-        
-        Color white;
-        Color.parse( "white", out white );
-        Color black;
-        Color.parse( "black", out black );
+        /**
+         * Set the width of the widget
+         */
+        public void set_width( int width ) {
+            this.width = width;
+        }
 
-        gc.set_rgb_fg_color( black );
-        background_pixmap.draw_rectangle( gc, true, 0, 0, this.width, this.height );
+        /**
+         * Called whenever a new entry has been added to the cache
+         */
+        public void new_cache_entry_created() {
+            ++this.currentValue;
+            this.redraw();
+        }
 
-        gc.set_rgb_fg_color( white );
+        /**
+         * Draw the current state to the widgets surface
+         */
+        public void redraw() {
+            // Only draw if the widget is actually added to some parent
+            if ( this.get_parent() == null ) {
+                return;
+            }
 
-        background_pixmap.draw_rectangle( 
-            gc,
-            true,
-            0,
-            0,
-            (int)Math.ceil( this.width * ( (double)this.currentValue / this.maxValue ) ),
-            this.height
-        );
-        
-        this.set_from_pixmap( background_pixmap, null );
+            var background_pixmap = new Pixmap( null, this.width, this.height, 24 );
+            var gc = new GC( background_pixmap );
+            
+            Color white;
+            Color.parse( "white", out white );
+            Color black;
+            Color.parse( "black", out black );
+
+            gc.set_rgb_fg_color( black );
+            background_pixmap.draw_rectangle( gc, true, 0, 0, this.width, this.height );
+
+            gc.set_rgb_fg_color( white );
+
+            background_pixmap.draw_rectangle( 
+                gc,
+                true,
+                0,
+                0,
+                (int)Math.ceil( this.width * ( (double)this.currentValue / this.maxValue ) ),
+                this.height
+            );
+            
+            this.set_from_pixmap( background_pixmap, null );
+        }
+
+        /**
+         * Add a new pdf_image to the cache monitoring
+         */
+        public void monitor_pdf_image( PdfImage pdf_image ) {
+            this.maxValue += pdf_image.get_page_count();
+            pdf_image.set_cache_observer( this );
+        }
     }
-
-    /**
-     * Add a new pdf_image to the cache monitoring
-     */
-    public void monitor_pdf_image( PdfImage pdf_image ) {
-        this.maxValue += pdf_image.get_page_count();
-        pdf_image.set_cache_observer( this );
-    }
-}
-
 }

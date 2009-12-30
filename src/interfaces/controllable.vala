@@ -18,32 +18,30 @@
  */
 
 namespace org.westhoffswelt.pdfpresenter {
-
-/**
- * Every window or object which wants to be controlled by the
- * PresentationController needs to implement this interface.
- */
-public interface Controllable: GLib.Object {
     /**
-     * Set the presentation controller which needs to be informed of key
-     * presses and such.
+     * Every window or object which wants to be controlled by the
+     * PresentationController needs to implement this interface.
      */
-    public abstract void set_controller( PresentationController controller ) ;
+    public interface Controllable: GLib.Object {
+        /**
+         * Set the presentation controller which needs to be informed of key
+         * presses and such.
+         */
+        public abstract void set_controller( PresentationController controller ) ;
 
-    /**
-     * Change the presentation slide to the next page if applicable
-     */
-    public abstract void next_page();
+        /**
+         * Change the presentation slide to the next page if applicable
+         */
+        public abstract void next_page();
 
-    /**
-     * Change the presentation slide to the previous page if applicable.
-     */
-    public abstract void previous_page();
+        /**
+         * Change the presentation slide to the previous page if applicable.
+         */
+        public abstract void previous_page();
 
-    /**
-     * Reset the presentation to it's initial state
-     */
-    public abstract void reset();
-}
-
+        /**
+         * Reset the presentation to it's initial state
+         */
+        public abstract void reset();
+    }
 }

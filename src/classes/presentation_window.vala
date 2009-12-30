@@ -21,116 +21,114 @@ using Gtk;
 using Gdk;
 
 namespace org.westhoffswelt.pdfpresenter {
-
-/**
- * Window showing the currently active slide to be presented on a beamer
- */
-public class PresentationWindow: FullscreenWindow, Controllable {
-	
-	/**
-	 * Controller handling all the events which might happen. Furthermore it is
-	 * responsible to update all the needed visual stuff if needed
-	 */
-	protected PresentationController presentation_controller = null;
-
     /**
-     * Pdf image which will actually provide the display of the presentation
-     * slide
+     * Window showing the currently active slide to be presented on a beamer
      */
-    protected PdfImage pdf;
+    public class PresentationWindow: FullscreenWindow, Controllable {
+        
+        /**
+         * Controller handling all the events which might happen. Furthermore it is
+         * responsible to update all the needed visual stuff if needed
+         */
+        protected PresentationController presentation_controller = null;
 
-	/**
-	 * Base constructor instantiating a new presentation window
-	 */
-	public PresentationWindow( string pdf_filename, int screen_num ) {
-        base( screen_num );
+        /**
+         * Pdf image which will actually provide the display of the presentation
+         * slide
+         */
+        protected PdfImage pdf;
 
-        this.destroy += (source) => {
-            Gtk.main_quit();
-        };
+        /**
+         * Base constructor instantiating a new presentation window
+         */
+        public PresentationWindow( string pdf_filename, int screen_num ) {
+            base( screen_num );
 
-        Color black;
-        Color.parse( "black", out black );
-        this.modify_bg( StateType.NORMAL, black );
+            this.destroy += (source) => {
+                Gtk.main_quit();
+            };
 
-        var fixedLayout = new Fixed();
-        this.add( fixedLayout );
+            Color black;
+            Color.parse( "black", out black );
+            this.modify_bg( StateType.NORMAL, black );
 
-        this.pdf = new PdfImage.from_pdf( 
-            pdf_filename, 
-            0,
-            this.screen_geometry.width, 
-            this.screen_geometry.height,
-            !Application.disable_caching
-        );
-        // Center the scaled pdf on the monitor
-        // In most cases it will however fill the full screen
-        fixedLayout.put(
-            this.pdf,
-            (int)Math.floor( ( this.screen_geometry.width - this.pdf.get_scaled_width() ) / 2.0 ),
-            (int)Math.floor( ( this.screen_geometry.height - this.pdf.get_scaled_height() ) / 2.0 )
-        );
+            var fixedLayout = new Fixed();
+            this.add( fixedLayout );
 
-		this.key_press_event += this.on_key_pressed;
+            this.pdf = new PdfImage.from_pdf( 
+                pdf_filename, 
+                0,
+                this.screen_geometry.width, 
+                this.screen_geometry.height,
+                !Application.disable_caching
+            );
+            // Center the scaled pdf on the monitor
+            // In most cases it will however fill the full screen
+            fixedLayout.put(
+                this.pdf,
+                (int)Math.floor( ( this.screen_geometry.width - this.pdf.get_scaled_width() ) / 2.0 ),
+                (int)Math.floor( ( this.screen_geometry.height - this.pdf.get_scaled_height() ) / 2.0 )
+            );
 
-        this.reset();
-	}
+            this.key_press_event += this.on_key_pressed;
 
-	/**
-	 * Handle keypress events on the window and, if neccessary send them to the
-	 * presentation controller
-	 */
-	protected bool on_key_pressed( PresentationWindow source, EventKey key ) {
-        if ( this.presentation_controller != null ) {
-            this.presentation_controller.key_press( key );
+            this.reset();
         }
-        return false;
-	}
 
-	/**
-     * Set the presentation controller which is notified of keypresses and
-     * other observed events
-	 */
-	public void set_controller( PresentationController controller ) {
-		this.presentation_controller = controller;
-	}
-
-    /**
-     * Switch the shown pdf to the next page
-     */
-    public void next_page() {
-        this.pdf.next_page();
-    }
-
-    /**
-     * Switch the shown pdf to the previous page
-     */
-    public void previous_page() {
-        this.pdf.previous_page();
-    }
-
-    /**
-     * Reset to the initial presentation state
-     */
-    public void reset() {
-        try {
-            this.pdf.goto_page( 0 );
+        /**
+         * Handle keypress events on the window and, if neccessary send them to the
+         * presentation controller
+         */
+        protected bool on_key_pressed( PresentationWindow source, EventKey key ) {
+            if ( this.presentation_controller != null ) {
+                this.presentation_controller.key_press( key );
+            }
+            return false;
         }
-        catch( PdfImageError e ) {
-            GLib.error( "The pdf page 0 could not be rendered: %s", e.message );
+
+        /**
+         * Set the presentation controller which is notified of keypresses and
+         * other observed events
+         */
+        public void set_controller( PresentationController controller ) {
+            this.presentation_controller = controller;
+        }
+
+        /**
+         * Switch the shown pdf to the next page
+         */
+        public void next_page() {
+            this.pdf.next_page();
+        }
+
+        /**
+         * Switch the shown pdf to the previous page
+         */
+        public void previous_page() {
+            this.pdf.previous_page();
+        }
+
+        /**
+         * Reset to the initial presentation state
+         */
+        public void reset() {
+            try {
+                this.pdf.goto_page( 0 );
+            }
+            catch( PdfImageError e ) {
+                GLib.error( "The pdf page 0 could not be rendered: %s", e.message );
+            }
+        }
+
+        /**
+         * Set the cache observer for the PdfImages on this window
+         *
+         * This method takes care of registering all PdfImages used by this window
+         * correctly with the CacheStatus object to provide acurate cache status
+         * measurements.
+         */
+        public void set_cache_observer( CacheStatus observer ) {
+            observer.monitor_pdf_image( this.pdf );
         }
     }
-
-    /**
-     * Set the cache observer for the PdfImages on this window
-     *
-     * This method takes care of registering all PdfImages used by this window
-     * correctly with the CacheStatus object to provide acurate cache status
-     * measurements.
-     */
-    public void set_cache_observer( CacheStatus observer ) {
-        observer.monitor_pdf_image( this.pdf );
-    }
-}
-
 }
