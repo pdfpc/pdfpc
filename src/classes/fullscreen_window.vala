@@ -35,9 +35,11 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected Rectangle screen_geometry;
 
-		protected uint hide_cursor_timeout = 0;
-
-		protected Color col_black;
+        /**
+         * Timer id which monitors mouse motion to hide the cursor after 5
+         * seconds of inactivity
+         */
+        protected uint hide_cursor_timeout = 0;
 
         public FullscreenWindow( int screen_num ) {
             var screen = Screen.get_default();
@@ -55,13 +57,13 @@ namespace org.westhoffswelt.pdfpresenter {
             // listen to this event.
             this.size_allocate.connect( this.on_size_allocate );
 
-			this.add_events(EventMask.POINTER_MOTION_MASK);
-			this.add_events(EventMask.POINTER_MOTION_HINT_MASK);
-			this.motion_notify_event += this.on_pointer_motion;
+            this.add_events(EventMask.POINTER_MOTION_MASK);
+            this.add_events(EventMask.POINTER_MOTION_HINT_MASK);
+            this.motion_notify_event += this.on_mouse_move;
 
-			Color.parse( "black", out this.col_black );
-
-			this.restart_hide_cursor_timer();
+            // Start the 5 seconds timeout after which the mouse curosr is
+            // hidden
+            this.restart_hide_cursor_timer();
         }
 
         /**
@@ -103,31 +105,83 @@ namespace org.westhoffswelt.pdfpresenter {
             }
         }
 
-		protected bool on_pointer_motion(FullscreenWindow w, EventMotion event) {
-			//GLib.message("motion: %f %f", event.x, event.y);
-			this.window.set_cursor(null);
-			this.restart_hide_cursor_timer();
-			
-			return false;
-		}
+        /**
+         * Called every time the mouse cursor is moved
+         */
+        protected bool on_mouse_move( FullscreenWindow w, EventMotion event ) {
+            // Restore the mouse cursor to its default value
+            this.window.set_cursor( null );
 
-		protected void restart_hide_cursor_timer(){
-			if (this.hide_cursor_timeout != 0) {
-				Source.remove(this.hide_cursor_timeout);
-			}
+            this.restart_hide_cursor_timer();
+            
+            return false;
+        }
 
-			this.hide_cursor_timeout = Timeout.add_seconds(5, this.on_hide_cursor_timeout);
-		}
+        /**
+         * Restart the 5 seconds timeout before hiding the mouse cursor
+         */
+        protected void restart_hide_cursor_timer(){
+            if ( this.hide_cursor_timeout != 0 ) {
+                Source.remove( this.hide_cursor_timeout );
+            }
 
-		protected bool on_hide_cursor_timeout() {
-			this.hide_cursor_timeout = 0;
+            this.hide_cursor_timeout = Timeout.add_seconds(
+                5,
+                this.on_hide_cursor_timeout
+            );
+        }
 
-			var pix_data = "#define invisible_cursor_width 1\n#define invisible_cursor_height 1\n#define invisible_cursor_x_hot 0\n#define invisible_cursor_y_hot 0\nstatic unsigned short invisible_cursor_bits[] = {\n0x0000 };";
-			// this.window refers to a Gdk.Window, which is available after show_all is called
-			var pix = Gdk.Pixmap.create_from_data(this.window, pix_data, 1, 1, 1, this.col_black, this.col_black);
-			this.window.set_cursor(new Cursor.from_pixmap(pix, pix, this.col_black, this.col_black, 0, 0));
+        /**
+         * Timeout method called if the mouse pointer has not been moved for 5
+         * seconds
+         */
+        protected bool on_hide_cursor_timeout() {
+            this.hide_cursor_timeout = 0;
 
-			return false; // run once only
-		}
+            // Pixmap definition data to be assigned as an "invisbile" cursor.
+            var pix_data = """#define invisible_cursor_width 1
+                #define invisible_cursor_height 1
+                #define invisible_cursor_x_hot 0
+                #define invisible_cursor_y_hot 0
+                static unsigned short invisible_cursor_bits[] = { 0x0000 };
+            """;
+
+            // Color needed for the "invisible" cursor
+            Gdk.Color black;
+            Gdk.Color.parse( "black", out black );
+
+            // Window might be null in case it has not been mapped
+            if ( this.window != null ) {
+                var cursor_pixmap = Gdk.Pixmap.create_from_data(
+                    this.window,
+                    pix_data,
+                    1,
+                    1,
+                    1,
+                    black,
+                    black
+                );
+                
+                this.window.set_cursor(
+                    new Cursor.from_pixmap(
+                        cursor_pixmap, 
+                        cursor_pixmap, 
+                        black, 
+                        black, 
+                        0, 
+                        0
+                    )
+                );
+
+                // After the timeout disabled the cursor do not run it again
+                return false;
+            }
+            else {
+                // The window was not available. Possibly it was not mapped
+                // yet. We simply try it again if the mouse isn't moved for
+                // another five seconds.
+                return true;
+            }
+        }
     }
 }
