@@ -44,11 +44,17 @@ public class PresentationController: Object {
      * This seperate handling is needed because keypresses from any of the
      * window have implications on the behaviour of both of them. Therefore
      * this controller is needed to take care of the needed actions.
+     *
+     * There are no Vala bindings for gdk/gdkkeysyms.h
+     * https://bugzilla.gnome.org/show_bug.cgi?id=551184
+     *
      */
     public void key_press( Gdk.EventKey key ) {
         switch( key.keyval ) {
+            case 0xff0d: /* Return */
             case 0xff53: /* Cursor right */
             case 0xff56: /* Page down */
+            case 0x020:  /* Space */
                 this.controllables_next_page();
             break;
             case 0xff51: /* Cursor left */
@@ -56,6 +62,7 @@ public class PresentationController: Object {
                 this.controllables_previous_page();
             break;
             case 0xff1b: /* Escape */
+            case 0x071:  /* q */
                 Gtk.main_quit();
             break;
             case 0xff50: /* Home */
