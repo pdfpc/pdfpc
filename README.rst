@@ -168,10 +168,9 @@ The most recent release can always be obtained from:
     http://westhoffswelt.de
 
 The latest and bleeding edge development version can be obtained by checking
-out the development subversion repository which is readable using the following
-url::
+out the development git repository using the following command::
 
-    svn://svn.pureenergy.cc/pdf_presenter_console/trunk
+    $ git clone git://github.com/jakobwesthoff/Pdf-Presenter-Console.git
 
 The trunk version is not guaranteed to build or be working correctly. So be
 warned if you use it. 
