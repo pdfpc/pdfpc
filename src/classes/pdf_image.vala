@@ -195,7 +195,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * space.
          */
         protected void calculate_scaleing( int width, int height ) {
-            var page = this.document.get_page( this.page );
+            var page = this.get_page();
 
             double page_width, page_height;
             page.get_size( out page_width, out page_height );
@@ -341,6 +341,13 @@ namespace org.westhoffswelt.pdfpresenter {
         public int get_page_number() 
         {
             return this.page;
+        }
+
+        /**
+         * Return the poppler page currently displayed.
+         */
+        public Poppler.Page get_page() {
+            return this.document.get_page( this.get_page_number() );
         }
 
         /**
