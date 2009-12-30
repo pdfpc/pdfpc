@@ -68,10 +68,17 @@ public class Application: GLib.Object {
     protected static uint duration = 45;
 
     /**
+     * Commandline option providing the size of the current slide in
+     * the presenter window
+     */
+    protected static uint current_size = 60;
+
+    /**
      * Commandline option parser entry definitions
      */
     const OptionEntry[] options = {
         { "duration", 'd', 0, OptionArg.INT, ref Application.duration, "Duration in minutes of the presentation used for timer display. (Default 45 minutes)", "N" },
+        { "current-size", 'u', 0, OptionArg.INT, ref Application.current_size, "Percentage of the presenter screen to be used for the current slide. (Default 60)", "N" },
         { "switch-screens", 's', 0, 0, ref Application.display_switch, "Switch the presentation and the presenter screen.", null },
         { "disable-cache", 'c', 0, 0, ref Application.disable_caching, "Disable caching and pre-rendering of slides to save memory on cost of speed.", null },
         { null }

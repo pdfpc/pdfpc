@@ -87,7 +87,7 @@ public class PresenterWindow: FullscreenWindow, Controllable {
         this.current_slide = new PdfImage.from_pdf( 
             pdf_filename,
             0,
-            (int)Math.floor( this.screen_geometry.width * 0.6 ),
+            (int)Math.floor( this.screen_geometry.width * Application.current_size / (double)100 ),
             bottom_position,
             !Application.disable_caching
         );
