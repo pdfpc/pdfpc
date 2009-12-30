@@ -167,7 +167,7 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void update_slide_count() {
             this.slide_progress.set_text( 
                 "%d/%d".printf( 
-                    this.current_slide.get_page() + 1, 
+                    this.current_slide.get_page_number() + 1, 
                     this.current_slide.get_page_count()
                 )        
             );
@@ -196,8 +196,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Switch to the previous page
          */
         public void previous_page() {
-            if ( (int)Math.fabs( (double)( this.current_slide.get_page() - this.next_slide.get_page() ) ) >= 1
-              && this.current_slide.get_page() != 0 ) {
+            if ( (int)Math.fabs( (double)( this.current_slide.get_page_number() - this.next_slide.get_page_number() ) ) >= 1
+              && this.current_slide.get_page_number() != 0 ) {
                 // Only move the next slide back if there is a difference of at
                 // least one slide between current and next
                 this.next_slide.previous_page();

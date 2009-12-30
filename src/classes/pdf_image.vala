@@ -338,7 +338,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Return the currently displayed page number
          */
-        public int get_page() 
+        public int get_page_number() 
         {
             return this.page;
         }
