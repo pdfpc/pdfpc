@@ -345,6 +345,10 @@ namespace org.westhoffswelt.pdfpresenter {
 
         /**
          * Return the poppler page currently displayed.
+         *
+         * Be careful when interfacing with this object. Make sure you apply
+         * the Application.poppler_mutex correctly, as poppler is not
+         * threadsafe.
          */
         public Poppler.Page get_page() {
             return this.document.get_page( this.get_page_number() );
@@ -373,6 +377,17 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public int get_scaled_height() {
             return this.scaled_height;
+        }
+
+        /**
+         * Return the poppler document currently displayed.
+         *
+         * Be careful when interfacing with this object. Make sure you apply
+         * the Application.poppler_mutex correctly, as poppler is not
+         * threadsafe.
+         */
+        public Poppler.Document get_document() {
+            return this.document;
         }
 
         /**
