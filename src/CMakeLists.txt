@@ -35,6 +35,7 @@ link_directories(${LIB_PATHS})
 set(VALA_SRC
 	pdf_presenter_console.vala
 	classes/pdf_image.vala
+	classes/pdf_event_box.vala
 	classes/fullscreen_window.vala
 	classes/presentation_window.vala
 	classes/presentation_controller.vala
