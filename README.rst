@@ -115,6 +115,7 @@ your likings::
 
     Application Options:
       -d, --duration=N         Duration in minutes of the presentation used for timer display. (Default 45 minutes)
+      -u, --current-size=N     Percentage of the presenter screen to be used for the current slide. (Default 60)
       -s, --switch-screens     Switch the presentation and the presenter screen.
       -c, --disable-cache      Disable caching and pre-rendering of slides to save memory on cost of speed.
 
@@ -141,11 +142,11 @@ During the presentation the following key strokes are detected and interpreted:
 
 - Left cursor key / Page up
     - Go back one slide
-- Right cursor key / Page down
+- Right cursor key / Page down / Return / Space
     - Go forward one slide
 - Home
     - Go back to the first slide and reset the timer
-- Escape / Alt+F4
+- Escape / q /Alt+F4
     - Quit the presentation viewer
 
 
