@@ -136,38 +136,11 @@ namespace org.westhoffswelt.pdfpresenter {
         protected bool on_hide_cursor_timeout() {
             this.hide_cursor_timeout = 0;
 
-            // Pixmap definition data to be assigned as an "invisbile" cursor.
-            var pix_data = """#define invisible_cursor_width 1
-                #define invisible_cursor_height 1
-                #define invisible_cursor_x_hot 0
-                #define invisible_cursor_y_hot 0
-                static unsigned short invisible_cursor_bits[] = { 0x0000 };
-            """;
-
-            // Color needed for the "invisible" cursor
-            Gdk.Color black;
-            Gdk.Color.parse( "black", out black );
-
             // Window might be null in case it has not been mapped
             if ( this.window != null ) {
-                var cursor_pixmap = Gdk.Pixmap.create_from_data(
-                    this.window,
-                    pix_data,
-                    1,
-                    1,
-                    1,
-                    black,
-                    black
-                );
-                
                 this.window.set_cursor(
-                    new Cursor.from_pixmap(
-                        cursor_pixmap, 
-                        cursor_pixmap, 
-                        black, 
-                        black, 
-                        0, 
-                        0
+                    new Gdk.Cursor( 
+                        Gdk.CursorType.BLANK_CURSOR
                     )
                 );
 
