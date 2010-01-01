@@ -47,12 +47,41 @@ namespace org.westhoffswelt.pdfpresenter {
         public signal void clicked_external_command( Gdk.Rectangle link_rect, uint source_page_number, string command, string arguments );
 
         /**
+         * Emitted whenever the mouse entered a pdf link
+         */
+        public signal void link_mouse_enter( Gdk.Rectangle link_rect, Poppler.LinkMapping mapping );
+
+        /**
+         * Emitted whenever the mouse left a pdf link
+         */
+        public signal void link_mouse_leave( Gdk.Rectangle link_rect, Poppler.LinkMapping mapping );
+
+        /**
+         * The LinkMapping which is currently beneath the mouse cursor or null
+         * if there is none.
+         */
+        protected unowned LinkMapping active_mapping = null;
+
+        /**
+         * LinkMappings of the current page
+         */
+        protected unowned GLib.List<unowned LinkMapping> page_link_mappings = null;
+
+        /**
+         * Precalculated Gdk.Rectangles for every link mapping
+         */
+        protected Gdk.Rectangle[] precalculated_mapping_rectangles = null;
+
+        /**
          * Base constructor taking care of correct initialization
          */
         public PdfEventBox() {
             // Needed to handle link clicks correctly
             this.add_events( EventMask.BUTTON_RELEASE_MASK );
             this.button_release_event.connect( this.on_button_release );
+
+            this.add_events( EventMask.POINTER_MOTION_MASK );
+            this.motion_notify_event += this.on_mouse_move;
         }
 
         /**
@@ -60,11 +89,14 @@ namespace org.westhoffswelt.pdfpresenter {
          * in one call.
          */
         public PdfEventBox.with_pdf_image( PdfImage pdf_image ) {
-            this.add( pdf_image );
-
             // Needed to handle link clicks correctly
             this.add_events( EventMask.BUTTON_RELEASE_MASK );
             this.button_release_event.connect( this.on_button_release );
+            
+            this.add_events( EventMask.POINTER_MOTION_MASK );
+            this.motion_notify_event.connect( this.on_mouse_move );
+
+            this.add( pdf_image );
         }
 
         /**
@@ -73,7 +105,15 @@ namespace org.westhoffswelt.pdfpresenter {
          * Overridden to only accept PdfImage objects
          */
         public new void add( PdfImage pdf_image ) {
+            if ( this.get_child() != null ) {
+                return;
+            }
+
             base.add( pdf_image );
+
+            // Monitor page transitions to handle the link mappings correctly.
+            pdf_image.page_entered.connect( this.on_page_entered );
+            pdf_image.page_leaving.connect( this.on_page_leaving );
         }
 
         /**
@@ -104,7 +144,7 @@ namespace org.westhoffswelt.pdfpresenter {
           
             // In case the coords belong to a link we will get its action. If
             // they are pointing nowhere we just get null.
-            LinkMapping mapping = this.get_link_mapping_by_coordinates( e.x, e.y );
+            unowned LinkMapping mapping = this.get_link_mapping_by_coordinates( e.x, e.y );
 
             if ( mapping == null ) {
                 return false;
@@ -117,6 +157,94 @@ namespace org.westhoffswelt.pdfpresenter {
             return false;
         }
 
+        /**
+         * Called whenever the mouse is moved on the surface of the widget
+         *
+         * This method changes the mouse cursor if the pointer enters or leaves
+         * a link
+         */
+        protected bool on_mouse_move( EventMotion event ) {
+            unowned LinkMapping link_mapping = this.get_link_mapping_by_coordinates( event.x, event.y );
+
+            if ( link_mapping == null ) {
+                // We may have left a link
+                if ( this.active_mapping != null ) {
+                    this.link_mouse_leave( 
+                        this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                        this.active_mapping
+                    );
+                    this.active_mapping = null;
+                }
+                return false;
+            }
+
+            if ( link_mapping != null && link_mapping == this.active_mapping ) {
+                // We are still inside the current active link
+                // Therefore we do nothing
+                return false;
+            }
+
+            if ( link_mapping != null && this.active_mapping == null ) {
+                // We just entered a new link
+                this.active_mapping = link_mapping;
+                this.link_mouse_enter( 
+                    this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                    this.active_mapping
+                );
+                return false;
+            }
+
+            // We "jumped" from one link to another. Therefore enter and leave signals are needed.
+            this.link_mouse_leave( 
+                this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                this.active_mapping
+            );
+            this.active_mapping = link_mapping;
+            this.link_mouse_enter( 
+                this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                this.active_mapping
+            );
+            return false;
+        }
+
+        /**
+         * Handle newly entered pdf pages to create a link mapping table for
+         * further requests and checks.
+         */
+        public void on_page_entered( uint page_number ) {
+            // Get the link mapping table
+            Application.poppler_mutex.lock();
+            var page = this.get_child().get_page();
+            this.page_link_mappings = page.get_link_mapping();
+            Application.poppler_mutex.unlock();
+
+            // Precalculate the a Gdk.Rectangle for every link mapping area
+            if ( this.page_link_mappings.length() > 0 ) {
+                this.precalculated_mapping_rectangles = new Gdk.Rectangle[this.page_link_mappings.length()];
+                int i=0;
+                foreach( var mapping in this.page_link_mappings ) {
+                    this.precalculated_mapping_rectangles[i++] = this.convert_poppler_rectangle_to_gdk_rectangle( 
+                        mapping.area
+                    );
+                }
+            }
+        }
+
+        /**
+         * Free the allocated link mapping tables, which were created on page
+         * entering
+         */
+        public void on_page_leaving( uint from, uint to ) {
+            // Free memory of precalculated rectangles
+            this.precalculated_mapping_rectangles = null;
+
+            // Free the mapping memory
+            Application.poppler_mutex.lock();
+            Poppler.Page.free_link_mapping(  
+                this.page_link_mappings
+            );
+            Application.poppler_mutex.unlock();
+        }
 
         /**
          * Return the LinkMapping associated with link for the given
@@ -125,65 +253,20 @@ namespace org.westhoffswelt.pdfpresenter {
          * If there is no link for the given coordinates null is returned
          * instead.
          */
-        protected LinkMapping? get_link_mapping_by_coordinates( double x, double y ) {
-            // Get the link mapping table
-            Application.poppler_mutex.lock();
-            var page = this.get_child().get_page();
-            unowned GLib.List<unowned LinkMapping> link_mappings = page.get_link_mapping();
-            Application.poppler_mutex.unlock();
-
-            // The rectangle conversion method is not used here, because that
-            // would cause a poppler_mutex lock for every loop iteration, which
-            // is simply not necessary here.
-
-            // We need to map projection space to pdf space, therefore we
-            // normalize the coordinates
-            Gtk.Requisition requisition;
-            this.get_child().size_request( out requisition );
-            double normalized_x = x / (double)requisition.width;
-            double normalized_y = y / (double)requisition.height;
-            
-            // We need the page dimensions for coordinate conversion between
-            // screen coordinates ((0,0) is in the upper left) and pdf
-            // coordinates ((0,0) is in the bottom left). Furthermore they are
-            // needed for normalization.
-            double page_width;
-            double page_height;
-            Application.poppler_mutex.lock();
-            page.get_size( out page_width, out page_height );
-            Application.poppler_mutex.unlock();
-
+        protected unowned LinkMapping? get_link_mapping_by_coordinates( double x, double y ) {
             // Try to find a matching link mapping on the page.
-            LinkMapping result_mapping = null; 
-            foreach( var mapping in link_mappings ) {
-                // Normalize the x coordinates of the link area
-                var normalized_area_x1 = mapping.area.x1 / page_width;
-                var normalized_area_x2 = mapping.area.x2 / page_width;
-
-                // Normalize and transform the y area coordinates from pdf to
-                // screen space. 
-                // To allow for a clean mapping we need to "flip" the
-                // coordinates as well as subtract them from the page height.
-                var normalized_area_y1 = ( page_height - mapping.area.y2 ) / page_height;
-                var normalized_area_y2 = ( page_height - mapping.area.y1 ) / page_height;
-
+            for( var i=0; i<this.precalculated_mapping_rectangles.length; ++i ) {
+                Gdk.Rectangle r = this.precalculated_mapping_rectangles[i];
                 // A simple bounding box check tells us if the given point lies
                 // within the link area.
-                if ( ( normalized_x >= normalized_area_x1 )
-                  && ( normalized_x <= normalized_area_x2 )
-                  && ( normalized_y >= normalized_area_y1 )
-                  && ( normalized_y <= normalized_area_y2 ) ) {
-                    result_mapping = mapping.copy();
-                    break;
+                if ( ( x >= r.x )
+                  && ( x <= r.x + r.width )
+                  && ( y >= r.y )
+                  && ( y <= r.y + r.height ) ) {
+                    return this.page_link_mappings.nth_data( i );
                 }
             }
-
-            // Free the allocated mapping structure
-            Application.poppler_mutex.lock();
-            page.free_link_mapping( link_mappings );
-            Application.poppler_mutex.unlock();
-
-            return result_mapping;
+            return null;
         }
     
         /**
