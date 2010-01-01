@@ -32,6 +32,16 @@ namespace org.westhoffswelt.pdfpresenter {
     public class PdfImage: Gtk.Image 
     {
         /**
+         * Signal fired every time a page is left
+         */
+        public signal void page_left( uint page_number );
+
+        /**
+         * Signal fired every time a page is entered
+         */
+        public signal void page_entered( uint page_number );
+        
+        /**
          * File object representing the pdf file to be displayed
          */
         protected GLib.File pdf_file;
@@ -49,7 +59,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Currently displayed page
          */
-        protected int page = 0;
+        protected int page = -1;
 
         /**
          * Factor the pdf needs to be scaled with to fillup the widget
@@ -157,7 +167,12 @@ namespace org.westhoffswelt.pdfpresenter {
             }
             
             // Render initial page
-            this.blitToScreen( this.get_rendered_page( this.initial_page ) );
+            try {
+                this.goto_page( this.initial_page );
+            }
+            catch( PdfImageError e ) {
+                error( "Initial page rendering failed: %s", e.message );
+            }
         }
 
         /**
@@ -195,7 +210,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * space.
          */
         protected void calculate_scaleing( int width, int height ) {
-            var page = this.get_page();
+            var page = this.document.get_page( 0 );
 
             double page_width, page_height;
             page.get_size( out page_width, out page_height );
@@ -302,8 +317,13 @@ namespace org.westhoffswelt.pdfpresenter {
              if ( page >= this.page_count || page < 0 ) {
                  throw new PdfImageError.PAGE_DOES_NOT_EXIST( "The requested page does not exist in the document." );
              }
+
+             if ( this.page >= 0 ) {
+                this.page_left( this.page );
+             }
              this.page = page;
              this.blitToScreen( this.get_rendered_page( page ) );
+             this.page_entered( this.page );
         }
 
         /**
