@@ -68,14 +68,32 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Add a PdfImage as child of this EventBox
+         *
+         * Overridden to only accept PdfImage objects
+         */
+        public new void add( PdfImage pdf_image ) {
+            base.add( pdf_image );
+        }
+
+        /**
+         * Return the PdfImage associated with this EventBox.
+         *
+         * Overridden to return correctly casted PdfImage object.
+         */
+        public new PdfImage get_child() {
+            return base.get_child() as PdfImage;
+        }
+
+        /**
          * Called whenever a mouse button is released inside the EventBox
          *
          * Maybe a link has been clicked. Therefore we need to handle this.
          */
         protected bool on_button_release( EventButton e ) {
-            // If there is no child or we do not have a PdfImage as child we do
-            // not need to do any further processing.
-            if ( this.get_child() == null || !( this.get_child() is PdfImage ) ){
+            // If there is no child we do not need to do any further
+            // processing.
+            if ( this.get_child() == null ){
                 return false;
             }
 
@@ -108,20 +126,18 @@ namespace org.westhoffswelt.pdfpresenter {
          * instead.
          */
         protected LinkMapping? get_link_mapping_by_coordinates( double x, double y ) {
-            var child = this.get_child() as PdfImage;
             // Get the link mapping table
             Application.poppler_mutex.lock();
-            var page = child.get_page();
+            var page = this.get_child().get_page();
             unowned GLib.List<unowned LinkMapping> link_mappings = page.get_link_mapping();
             Application.poppler_mutex.unlock();
 
             // We need to map projection space to pdf space, therefore we
             // normalize the coordinates
-            int pdf_image_width;
-            int pdf_image_height;
-            child.get_size_request( out pdf_image_width, out pdf_image_height );
-            double normalized_x = x / (double)pdf_image_width;
-            double normalized_y = y / (double)pdf_image_height;
+            Gtk.Requisition requisition;
+            this.get_child().size_request( out requisition );
+            double normalized_x = x / (double)requisition.width;
+            double normalized_y = y / (double)requisition.height;
             
             // We need the page dimensions for coordinate conversion between
             // screen coordinates ((0,0) is in the upper left) and pdf
@@ -129,7 +145,7 @@ namespace org.westhoffswelt.pdfpresenter {
             // needed for normalization.
             double page_width;
             double page_height;
-            Application.poppler_mutex.unlock();
+            Application.poppler_mutex.lock();
             page.get_size( out page_width, out page_height );
             Application.poppler_mutex.unlock();
 
@@ -173,7 +189,25 @@ namespace org.westhoffswelt.pdfpresenter {
          * needed in the given case.
          */
         protected void handle_link_mapping( LinkMapping mapping ) {
-            //@TODO: Implement
+            switch( mapping.action.type ) {
+                case ActionType.GOTO_DEST:
+                    // There are different goto destination types we need to
+                    // handle correctly.
+                    unowned ActionGotoDest action = (ActionGotoDest)mapping.action;
+                    switch( action.dest.type ) {
+                        case DestType.NAMED:
+                            Application.poppler_mutex.lock();
+                            var document = this.get_child().get_document();
+                            unowned Poppler.Dest destination = document.find_dest( 
+                                action.dest.named_dest
+                            );
+                            Application.poppler_mutex.unlock();
+
+                            GLib.message( "named link: %s (page: %d)", action.dest.named_dest, destination.page_num );
+                        break;
+                    }
+                break;
+            }
         }
     }
 }
