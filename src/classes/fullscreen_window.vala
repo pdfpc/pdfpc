@@ -57,7 +57,6 @@ namespace org.westhoffswelt.pdfpresenter {
             this.size_allocate.connect( this.on_size_allocate );
 
             this.add_events(EventMask.POINTER_MOTION_MASK);
-            this.add_events(EventMask.POINTER_MOTION_HINT_MASK);
             this.motion_notify_event += this.on_mouse_move;
 
             // Start the 5 seconds timeout after which the mouse curosr is
