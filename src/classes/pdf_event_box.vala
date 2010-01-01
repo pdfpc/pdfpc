@@ -44,7 +44,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Be careful while handling these, as requested code to be execute may
          * be malicious.
          */
-        public signal void clicked_external_command( Gdk.Rectangle link_rect, uint source_page_number, string command );
+        public signal void clicked_external_command( Gdk.Rectangle link_rect, uint source_page_number, string command, string arguments );
 
         /**
          * Base constructor taking care of correct initialization
@@ -132,6 +132,10 @@ namespace org.westhoffswelt.pdfpresenter {
             unowned GLib.List<unowned LinkMapping> link_mappings = page.get_link_mapping();
             Application.poppler_mutex.unlock();
 
+            // The rectangle conversion method is not used here, because that
+            // would cause a poppler_mutex lock for every loop iteration, which
+            // is simply not necessary here.
+
             // We need to map projection space to pdf space, therefore we
             // normalize the coordinates
             Gtk.Requisition requisition;
@@ -190,6 +194,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected void handle_link_mapping( LinkMapping mapping ) {
             switch( mapping.action.type ) {
+                // Internal goto link
                 case ActionType.GOTO_DEST:
                     // There are different goto destination types we need to
                     // handle correctly.
@@ -203,11 +208,58 @@ namespace org.westhoffswelt.pdfpresenter {
                             );
                             Application.poppler_mutex.unlock();
 
-                            GLib.message( "named link: %s (page: %d)", action.dest.named_dest, destination.page_num );
+                            // Fire the correct signal for this
+                            this.clicked_internal_link( 
+                                this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                                this.get_child().get_page_number(),
+                                /* We use zero based indexing. Pdf links use one based indexing */ 
+                                destination.page_num - 1
+                            );
                         break;
                     }
                 break;
+                // External launch link
+                case ActionType.LAUNCH:
+                    unowned ActionLaunch action = (ActionLaunch)mapping.action;
+                    // Fire the appropriate signal
+                    this.clicked_external_command( 
+                        this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                        this.get_child().get_page_number(),
+                        action.file_name,
+                        action.params
+                    );
+                break;
             }
+        }
+
+        /**
+         * Convert an arbitrary Poppler.Rectangle struct into a Gdk.Rectangle
+         * struct taking into account the measurement differences between pdf
+         * space and screen space.
+         */
+        protected Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle( Poppler.Rectangle poppler_rectangle ) {
+            Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
+
+            Gtk.Requisition requisition;
+            this.get_child().size_request( out requisition );
+
+            // We need the page dimensions for coordinate conversion between
+            // pdf coordinates and screen coordinates
+            double page_width;
+            double page_height;
+            Application.poppler_mutex.lock();
+            this.get_child().get_page().get_size( out page_width, out page_height );
+            Application.poppler_mutex.unlock();
+
+            gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / page_width ) * requisition.width );
+            gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / page_width ) * requisition.width );
+
+            // Gdk has its coordinate origin in the upper left, while Poppler
+            // has its origin in the lower left.
+            gdk_rectangle.y = (int)Math.ceil( ( ( page_height - poppler_rectangle.y2 ) / page_height ) * requisition.height );
+            gdk_rectangle.height = (int)Math.floor( ( ( poppler_rectangle.y2 - poppler_rectangle.y1 ) / page_height ) * requisition.height );
+
+            return gdk_rectangle;
         }
     }
 }
