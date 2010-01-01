@@ -32,9 +32,9 @@ namespace org.westhoffswelt.pdfpresenter {
     public class PdfImage: Gtk.Image 
     {
         /**
-         * Signal fired every time a page is left
+         * Signal fired every time a page is about to being left
          */
-        public signal void page_left( uint page_number );
+        public signal void page_leaving( uint from, uint to );
 
         /**
          * Signal fired every time a page is entered
@@ -57,9 +57,9 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int page_count;
 
         /**
-         * Currently displayed page
+         * Currently displayed page number
          */
-        protected int page = -1;
+        protected int page_number = -1;
 
         /**
          * Factor the pdf needs to be scaled with to fillup the widget
@@ -318,12 +318,13 @@ namespace org.westhoffswelt.pdfpresenter {
                  throw new PdfImageError.PAGE_DOES_NOT_EXIST( "The requested page does not exist in the document." );
              }
 
-             if ( this.page >= 0 ) {
-                this.page_left( this.page );
+             if ( this.page_number >= 0 ) {
+                this.page_leaving( this.page_number, page );
              }
-             this.page = page;
+
+             this.page_number = page;
              this.blitToScreen( this.get_rendered_page( page ) );
-             this.page_entered( this.page );
+             this.page_entered( this.page_number );
         }
 
         /**
@@ -334,7 +335,7 @@ namespace org.westhoffswelt.pdfpresenter {
         public void next_page() 
         {
             try {
-                this.goto_page( this.page + 1 );
+                this.goto_page( this.page_number + 1 );
             }
             catch( PdfImageError e ) {
                 // Do nothing
@@ -348,7 +349,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void previous_page() {
             try {
-                this.goto_page( this.page - 1 );
+                this.goto_page( this.page_number - 1 );
             }
             catch( PdfImageError e ) {
                 // Do nothing
@@ -360,7 +361,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public int get_page_number() 
         {
-            return this.page;
+            return this.page_number;
         }
 
         /**
@@ -371,7 +372,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * threadsafe.
          */
         public Poppler.Page get_page() {
-            return this.document.get_page( this.get_page_number() );
+            return this.document.get_page( this.page_number );
         }
 
         /**
