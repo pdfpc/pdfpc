@@ -223,6 +223,23 @@ namespace org.westhoffswelt.pdfpresenter {
             this.update_slide_count();
         }
 
+        /**
+         * Display a specific page
+         */
+        public void goto_page( int page_number ) {
+            try {
+                this.current_slide.goto_page( page_number );
+                this.next_slide.goto_page( 
+                    ( page_number == this.next_slide.get_page_count() ) 
+                    ? ( page_number )
+                    : ( page_number + 1 )
+                );
+            }
+            catch( PdfImageError e ) {
+                GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
+            }
+        }
+
         /** 
          * Take a cache observer and register it with all PdfImage shown on the window.
          *

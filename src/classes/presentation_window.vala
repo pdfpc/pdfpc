@@ -121,6 +121,18 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Display a specific page
+         */
+        public void goto_page( int page_number ) {
+            try {
+                this.pdf.goto_page( page_number );
+            }
+            catch( PdfImageError e ) {
+                GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
+            }
+        }
+
+        /**
          * Set the cache observer for the PdfImages on this window
          *
          * This method takes care of registering all PdfImages used by this window

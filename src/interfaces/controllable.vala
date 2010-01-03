@@ -43,5 +43,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * Reset the presentation to it's initial state
          */
         public abstract void reset();
+
+        /**
+         * Display a certain page
+         */
+        public abstract void goto_page( int page_number );
     }
 }
