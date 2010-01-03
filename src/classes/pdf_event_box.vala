@@ -60,7 +60,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * The LinkMapping which is currently beneath the mouse cursor or null
          * if there is none.
          */
-        protected unowned LinkMapping active_mapping = null;
+        protected LinkMapping active_mapping = null;
 
         /**
          * LinkMappings of the current page
@@ -186,7 +186,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
             if ( link_mapping != null && this.active_mapping == null ) {
                 // We just entered a new link
-                this.active_mapping = link_mapping;
+                this.active_mapping = link_mapping.copy();
                 this.link_mouse_enter( 
                     this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                     this.active_mapping
@@ -199,7 +199,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                 this.active_mapping
             );
-            this.active_mapping = link_mapping;
+            this.active_mapping = link_mapping.copy();
             this.link_mouse_enter( 
                 this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                 this.active_mapping
