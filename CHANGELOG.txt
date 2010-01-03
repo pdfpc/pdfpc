@@ -1,0 +1,50 @@
+===============================
+Pdf Presenter Console Changelog
+===============================
+
+Version 1.1
+===========
+
+- Implemented: Controllable interface for cleaner controller code.
+
+- Fixed: Install target is now executable.
+
+- Fixed: Warnings shown in one-screen-presentation-mode, due to non existant
+  process indicator.
+
+- Implemented: Presentation timer as its own GTK Widget
+
+- Implemented: Support for negative timer values (aka overtime)
+
+- Implemented: Different Timer colors for normal time, the last x minutes and
+  overtime
+
+- Implemented: Made last-minutes time configurable
+
+- Fixed: Library paths were not used correctly for compilation
+
+- Implemented: Fullscreen window as own Gtk class
+
+- Fixed: Problem which caused the windows not be displayed on the correct
+  displays using the Xfce4 Xfwm window mananger.
+
+- Implemented: Command line option to set the size of the current slide in the
+  presenter screen
+
+- Implemented: A few more common key bindings
+
+- Implemented: Hide cursor after 5 seconds timeout
+
+
+Version 1.0
+===========
+
+- Initial release
+
+
+..
+   Local Variables:
+   mode: rst
+   fill-column: 79
+   End: 
+   vim: et syn=rst tw=79
