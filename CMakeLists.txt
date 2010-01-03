@@ -1,8 +1,6 @@
 project("pdf-presenter-console" C)
 cmake_minimum_required(VERSION 2.6)
 
-enable_testing()
-
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 include(ValaPrecompile)
 include(ValaVersion)
@@ -13,4 +11,3 @@ find_package(Vala)
 ensure_vala_version("0.7.8" MINIMUM)
 
 add_subdirectory(src)
-add_subdirectory(tests)
