@@ -32,6 +32,16 @@ namespace org.westhoffswelt.pdfpresenter {
     public class PdfImage: Gtk.Image 
     {
         /**
+         * Signal fired every time a page is about to being left
+         */
+        public signal void page_leaving( uint from, uint to );
+
+        /**
+         * Signal fired every time a page is entered
+         */
+        public signal void page_entered( uint page_number );
+        
+        /**
          * File object representing the pdf file to be displayed
          */
         protected GLib.File pdf_file;
@@ -47,9 +57,9 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int page_count;
 
         /**
-         * Currently displayed page
+         * Currently displayed page number
          */
-        protected int page = 0;
+        protected int page_number = -1;
 
         /**
          * Factor the pdf needs to be scaled with to fillup the widget
@@ -157,7 +167,12 @@ namespace org.westhoffswelt.pdfpresenter {
             }
             
             // Render initial page
-            this.blitToScreen( this.get_rendered_page( this.initial_page ) );
+            try {
+                this.goto_page( this.initial_page );
+            }
+            catch( PdfImageError e ) {
+                error( "Initial page rendering failed: %s", e.message );
+            }
         }
 
         /**
@@ -195,7 +210,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * space.
          */
         protected void calculate_scaleing( int width, int height ) {
-            var page = this.document.get_page( this.page );
+            var page = this.document.get_page( 0 );
 
             double page_width, page_height;
             page.get_size( out page_width, out page_height );
@@ -302,8 +317,14 @@ namespace org.westhoffswelt.pdfpresenter {
              if ( page >= this.page_count || page < 0 ) {
                  throw new PdfImageError.PAGE_DOES_NOT_EXIST( "The requested page does not exist in the document." );
              }
-             this.page = page;
+
+             if ( this.page_number >= 0 ) {
+                this.page_leaving( this.page_number, page );
+             }
+
+             this.page_number = page;
              this.blitToScreen( this.get_rendered_page( page ) );
+             this.page_entered( this.page_number );
         }
 
         /**
@@ -314,7 +335,7 @@ namespace org.westhoffswelt.pdfpresenter {
         public void next_page() 
         {
             try {
-                this.goto_page( this.page + 1 );
+                this.goto_page( this.page_number + 1 );
             }
             catch( PdfImageError e ) {
                 // Do nothing
@@ -328,7 +349,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void previous_page() {
             try {
-                this.goto_page( this.page - 1 );
+                this.goto_page( this.page_number - 1 );
             }
             catch( PdfImageError e ) {
                 // Do nothing
@@ -338,9 +359,20 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Return the currently displayed page number
          */
-        public int get_page() 
+        public int get_page_number() 
         {
-            return this.page;
+            return this.page_number;
+        }
+
+        /**
+         * Return the poppler page currently displayed.
+         *
+         * Be careful when interfacing with this object. Make sure you apply
+         * the Application.poppler_mutex correctly, as poppler is not
+         * threadsafe.
+         */
+        public Poppler.Page get_page() {
+            return this.document.get_page( this.page_number );
         }
 
         /**
@@ -366,6 +398,17 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public int get_scaled_height() {
             return this.scaled_height;
+        }
+
+        /**
+         * Return the poppler document currently displayed.
+         *
+         * Be careful when interfacing with this object. Make sure you apply
+         * the Application.poppler_mutex correctly, as poppler is not
+         * threadsafe.
+         */
+        public Poppler.Document get_document() {
+            return this.document;
         }
 
         /**

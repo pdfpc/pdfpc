@@ -71,6 +71,13 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * A request to change the page has been issued
+         */
+        public void page_change_request( int page_number ) {
+            this.controllables_goto_page( page_number );
+        }
+
+        /**
          * Register a new Controllable instance on this controller. 
          *
          * On success true is returned, in case the controllable has already been
@@ -112,6 +119,15 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_reset() {
             foreach( Controllable c in this.controllables ) {
                 c.reset();
+            }
+        }
+
+        /**
+         * Have all controllables display a certain page
+         */
+        protected void controllables_goto_page( int page_number ) {
+            foreach( Controllable c in this.controllables ) {
+                c.goto_page( page_number );
             }
         }
     }
