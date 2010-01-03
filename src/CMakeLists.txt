@@ -34,13 +34,14 @@ link_directories(${LIB_PATHS})
 
 set(VALA_SRC
 	pdf_presenter_console.vala
-	classes/pdf_image.vala
-	classes/pdf_event_box.vala
-	classes/fullscreen_window.vala
-	classes/presentation_window.vala
-	classes/presentation_controller.vala
-	classes/presenter_window.vala
 	classes/cache_status.vala
+	classes/default_link_handler.vala
+	classes/fullscreen_window.vala
+	classes/pdf_event_box.vala
+	classes/pdf_image.vala
+	classes/presentation_controller.vala
+	classes/presentation_window.vala
+	classes/presenter_window.vala
 	classes/timer_label.vala
 	interfaces/controllable.vala
 	interfaces/link_handler.vala
