@@ -113,8 +113,12 @@ your likings::
     Usage:
       pdf_presenter_console [OPTION...] <pdf-file>
 
+    Help Options:
+      -h, --help               Show help options
+
     Application Options:
       -d, --duration=N         Duration in minutes of the presentation used for timer display. (Default 45 minutes)
+      -l, --last-minutes=N     Time in minutes, from which on the timer changes its color. (Default 5 minutes)
       -u, --current-size=N     Percentage of the presenter screen to be used for the current slide. (Default 60)
       -s, --switch-screens     Switch the presentation and the presenter screen.
       -c, --disable-cache      Disable caching and pre-rendering of slides to save memory on cost of speed.
@@ -160,6 +164,12 @@ presentation hasn't really begun yet. If you want to start over you can use the
 *Home* key which will make the presenter go back to the first page and reset
 the timer as well.
 
+At the moment the timer reaches the defined ``last-minutes`` value it will
+change color to indicate your talk is nearing its end.
+
+As soon as the timer reaches the zero mark (00:00:00) it will turn red and
+count further down showing a negative time, to provide information on how many
+minutes you are overtime.
 
 Download
 ========
