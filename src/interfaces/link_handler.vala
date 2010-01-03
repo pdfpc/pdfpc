@@ -33,6 +33,19 @@ namespace org.westhoffswelt.pdfpresenter {
         protected List<PdfEventBox> event_boxes = new List<PdfEventBox>();
 
         /**
+         * Presentation controller queried to handle the appropriate link
+         * actions
+         */
+        protected PresentationController controller = null;
+
+        /**
+         * Constructor taking the main PresentationController as an argument
+         */
+        public LinkHandler( PresentationController controller ) {
+            this.controller = controller;
+        }
+
+        /**
          * Add a PdfEventBox to the link handler
          *
          * The link handler takes care of handling all the link specific stuff
