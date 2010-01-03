@@ -43,6 +43,7 @@ set(VALA_SRC
 	classes/cache_status.vala
 	classes/timer_label.vala
 	interfaces/controllable.vala
+	interfaces/link_handler.vala
 )
 
 # Vala segfaults if its output dirs are not existant. Therefore make sure they
