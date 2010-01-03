@@ -126,6 +126,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 (int)Math.floor( this.screen_geometry.width * 0.75 ),
                 bottom_height - 10
             );
+            this.timer.set_last_minutes( Application.last_minutes );
             this.fixedLayout.put( this.timer, 0, bottom_position - 10 );
 
 
