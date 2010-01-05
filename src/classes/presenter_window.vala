@@ -92,9 +92,9 @@ namespace org.westhoffswelt.pdfpresenter {
                 new PdfImage.from_pdf( 
                     pdf_filename,
                     0,
-                    (int)Math.floor( this.screen_geometry.width * Application.current_size / (double)100 ),
+                    (int)Math.floor( this.screen_geometry.width * Options.current_size / (double)100 ),
                     bottom_position,
-                    !Application.disable_caching
+                    !Options.disable_caching
                 )
             );
             // Position it in the top left corner
@@ -109,7 +109,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     1,
                     next_slide_width,
                     bottom_position,
-                    !Application.disable_caching
+                    !Options.disable_caching
                 )
             );
             // Position it at the top besides the current slide
@@ -128,14 +128,14 @@ namespace org.westhoffswelt.pdfpresenter {
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
-            this.timer = new TimerLabel( (int)Application.duration * 60 );
+            this.timer = new TimerLabel( (int)Options.duration * 60 );
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
             this.timer.set_size_request( 
                 (int)Math.floor( this.screen_geometry.width * 0.75 ),
                 bottom_height - 10
             );
-            this.timer.set_last_minutes( Application.last_minutes );
+            this.timer.set_last_minutes( Options.last_minutes );
             this.fixedLayout.put( this.timer, 0, bottom_position - 10 );
 
 

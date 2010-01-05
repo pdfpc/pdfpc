@@ -49,43 +49,14 @@ namespace org.westhoffswelt.pdfpresenter {
         public static GLib.Mutex poppler_mutex = new GLib.Mutex();
 
         /**
-         * Commandline option specifying if the presenter and presentation screen
-         * should be switched.
-         */
-        protected static bool display_switch = false;
-        
-        /**
-         * Commandline option which allows the complete disabling of slide caching
-         */
-        protected static bool disable_caching = false;
-
-        /**
-         * Commandline option providing the talk duration, which will be used to
-         * display a timer
-         */
-        protected static uint duration = 45;
-
-        /**
-         * Commandline option providing the time from which on the timer should
-         * change its color.
-         */
-        protected static uint last_minutes = 5;
-
-        /**
-         * Commandline option providing the size of the current slide in
-         * the presenter window
-         */
-        protected static uint current_size = 60;
-
-        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
-            { "duration", 'd', 0, OptionArg.INT, ref Application.duration, "Duration in minutes of the presentation used for timer display. (Default 45 minutes)", "N" },
-            { "last-minutes", 'l', 0, OptionArg.INT, ref Application.last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5 minutes)", "N" },
-            { "current-size", 'u', 0, OptionArg.INT, ref Application.current_size, "Percentage of the presenter screen to be used for the current slide. (Default 60)", "N" },
-            { "switch-screens", 's', 0, 0, ref Application.display_switch, "Switch the presentation and the presenter screen.", null },
-            { "disable-cache", 'c', 0, 0, ref Application.disable_caching, "Disable caching and pre-rendering of slides to save memory on cost of speed.", null },
+            { "duration", 'd', 0, OptionArg.INT, ref Options.duration, "Duration in minutes of the presentation used for timer display. (Default 45 minutes)", "N" },
+            { "last-minutes", 'l', 0, OptionArg.INT, ref Options.last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5 minutes)", "N" },
+            { "current-size", 'u', 0, OptionArg.INT, ref Options.current_size, "Percentage of the presenter screen to be used for the current slide. (Default 60)", "N" },
+            { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
+            { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory on cost of speed.", null },
             { null }
         };
 
@@ -131,7 +102,7 @@ namespace org.westhoffswelt.pdfpresenter {
             stdout.printf( "Initializing pdf rendering...\n" );
             
             int presenter_monitor, presentation_monitor;
-            if ( Application.display_switch != true ) {
+            if ( Options.display_switch != true ) {
                 presenter_monitor    = 0;
                 presentation_monitor = 1;
             }

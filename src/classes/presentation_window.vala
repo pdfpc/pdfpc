@@ -66,7 +66,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     0,
                     this.screen_geometry.width, 
                     this.screen_geometry.height,
-                    !Application.disable_caching
+                    !Options.disable_caching
                 )
             );
             // Center the scaled pdf on the monitor

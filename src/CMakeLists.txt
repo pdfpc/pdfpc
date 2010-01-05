@@ -38,6 +38,7 @@ set(VALA_SRC
 	classes/fullscreen_window.vala
 	classes/link_handler.vala
 	classes/link_handler/default_link_handler.vala
+	classes/options.vala
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
@@ -52,6 +53,9 @@ set(VALA_SRC
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
 	make_directory("${CMAKE_CURRENT_BINARY_DIR}/classes")
 endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
+if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes/link_handler")
+	make_directory("${CMAKE_CURRENT_BINARY_DIR}/classes/link_handler")
+endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes/link_handler")
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/interfaces")
 	make_directory("${CMAKE_CURRENT_BINARY_DIR}/interfaces")
 endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/interfaces")
