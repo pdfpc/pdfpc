@@ -33,19 +33,22 @@ set(LIB_PATHS
 link_directories(${LIB_PATHS})
 
 set(VALA_SRC
-	pdf_presenter_console.vala
 	classes/cache_status.vala
-	classes/window/fullscreen.vala
 	classes/link_handler/base.vala
 	classes/link_handler/default.vala
 	classes/options.vala
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
+	classes/slide/metadata.vala
+	classes/slide/renderer.vala
+	classes/slide/view.vala
+	classes/timer_label.vala
+	classes/window/fullscreen.vala
 	classes/window/presentation.vala
 	classes/window/presenter.vala
-	classes/timer_label.vala
 	interfaces/controllable.vala
+	pdf_presenter_console.vala
 )
 
 # Vala segfaults if its output dirs are not existant. Therefore make sure they
@@ -58,6 +61,7 @@ endmacro(make_compile_directory)
 
 make_compile_directory("classes")
 make_compile_directory("classes/link_handler")
+make_compile_directory("classes/slide")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
 

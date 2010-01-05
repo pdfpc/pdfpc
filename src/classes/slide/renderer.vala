@@ -1,0 +1,90 @@
+/**
+ * Slide renderer
+ *
+ * This file is part of pdf-presenter-console.
+ *
+ * pdf-presenter-console is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 3 of the License.
+ *
+ * pdf-presenter-console is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * pdf-presenter-console; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+using GLib;
+
+namespace org.westhoffswelt.pdfpresenter.slide {
+    /**
+     * Renderer base class needed to be extended by every slide renderer.
+     */
+    public abstract class Renderer: Object
+    {
+        /**
+         * Metadata object to render slides for
+         */
+        protected Metadata metadata;
+
+        /**
+         * Width to render to
+         */
+        protected uint width;
+
+        /**
+         * Height to render to
+         */
+        protected uint height;
+
+        /**
+         * Base constructor taking a metadata object as well as the desired
+         * render width and height as parameters.
+         */
+        public Renderer( Metadata metadata, uint width, uint height ) {
+            this.metadata = metadata;
+            this.width = width;
+            this.height = height;
+        }
+
+        /**
+         * Return the registered metadata object
+         */
+        public Metadata get_metadata() {
+            return this.metadata;
+        }
+
+        /**
+         * Return the desired render width
+         */
+        public uint get_width() {
+            return this.width;
+        }
+
+        /**
+         * Return the desired render height
+         */
+        public uint get_height() {
+            return this.height;
+        }
+
+        /**
+         * Render the given slide_number to a Gdk.Pixbuf and return it.
+         *
+         * If the requested slide is not available an
+         * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
+         */
+        public abstract Gdk.Pixbuf render_to_pixbuf( uint slide_number ) 
+            throws RenderError;
+    }
+
+    /**
+     * Error domain used for every render error, which might occur
+     */
+    errordomain RenderError {
+        SLIDE_DOES_NOT_EXIST;
+    }
+}
