@@ -40,9 +40,9 @@ set(VALA_SRC
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
-	classes/slide/metadata.vala
-	classes/slide/renderer.vala
-	classes/slide/view.vala
+	classes/slide/metadata/base.vala
+	classes/slide/renderer/base.vala
+	classes/slide/view/base.vala
 	classes/timer_label.vala
 	classes/window/fullscreen.vala
 	classes/window/presentation.vala
@@ -63,6 +63,9 @@ endmacro(make_compile_directory)
 make_compile_directory("classes")
 make_compile_directory("classes/link_handler")
 make_compile_directory("classes/slide")
+make_compile_directory("classes/slide/metadata")
+make_compile_directory("classes/slide/renderer")
+make_compile_directory("classes/slide/view")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
 make_compile_directory("interfaces/slide")

@@ -23,16 +23,16 @@ namespace org.westhoffswelt.pdfpresenter.slide {
     /**
      * Base class for every slide view
      */
-    public abstract class View: Gtk.DrawingArea {
+    public abstract class View.Base: Gtk.DrawingArea {
         /**
          * Renderer to be used for rendering the slides
          */
-        protected Renderer renderer;
+        protected Renderer.Base renderer;
 
         /**
          * Base constructor taking the renderer to use as an argument
          */
-        protected View( Renderer renderer ) {
+        protected Base( Renderer.Base renderer ) {
             this.renderer = renderer;
             this.set_size_request( 
                 (int)renderer.get_width(),
@@ -43,7 +43,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         /**
          * Return the used renderer object
          */
-        public Renderer get_renderer() {
+        public Renderer.Base get_renderer() {
             return this.renderer;
         }
 
@@ -69,6 +69,6 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
         public abstract void display( uint slide_number )
-            throws RenderError;
+            throws Renderer.RenderError;
     }
 }

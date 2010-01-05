@@ -24,7 +24,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
      * Metadata base class describing the basic metadata needed for every
      * slideset
      */
-    public abstract class Metadata: Object
+    public abstract class Metadata.Base: Object
     {
         /**
          * Unique Resource Locator for the given slideset
@@ -34,7 +34,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         /**
          * Base constructor taking the url to specifiy the slideset as argument
          */
-        public Metadata( string url ) {
+        public Base( string url ) {
             this.url = url;
         }
 

@@ -23,12 +23,12 @@ namespace org.westhoffswelt.pdfpresenter.slide {
     /**
      * Renderer base class needed to be extended by every slide renderer.
      */
-    public abstract class Renderer: Object
+    public abstract class Renderer.Base: Object
     {
         /**
          * Metadata object to render slides for
          */
-        protected Metadata metadata;
+        protected Metadata.Base metadata;
 
         /**
          * Width to render to
@@ -44,7 +44,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          * Base constructor taking a metadata object as well as the desired
          * render width and height as parameters.
          */
-        public Renderer( Metadata metadata, uint width, uint height ) {
+        public Base( Metadata.Base metadata, uint width, uint height ) {
             this.metadata = metadata;
             this.width = width;
             this.height = height;
@@ -53,7 +53,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         /**
          * Return the registered metadata object
          */
-        public Metadata get_metadata() {
+        public Metadata.Base get_metadata() {
             return this.metadata;
         }
 
@@ -84,7 +84,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
     /**
      * Error domain used for every render error, which might occur
      */
-    errordomain RenderError {
+    errordomain Renderer.RenderError {
         SLIDE_DOES_NOT_EXIST;
     }
 }
