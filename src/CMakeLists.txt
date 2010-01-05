@@ -36,11 +36,13 @@ set(VALA_SRC
 	classes/cache_status.vala
 	classes/link_handler/base.vala
 	classes/link_handler/default.vala
+	classes/mutex_locks.vala
 	classes/options.vala
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
 	classes/slide/metadata/base.vala
+	classes/slide/metadata/pdf.vala
 	classes/slide/renderer/base.vala
 	classes/slide/view/base.vala
 	classes/timer_label.vala
