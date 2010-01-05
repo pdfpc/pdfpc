@@ -44,6 +44,7 @@ set(VALA_SRC
 	classes/slide/metadata/base.vala
 	classes/slide/metadata/pdf.vala
 	classes/slide/renderer/base.vala
+	classes/slide/renderer/pdf.vala
 	classes/slide/view/base.vala
 	classes/timer_label.vala
 	classes/window/fullscreen.vala

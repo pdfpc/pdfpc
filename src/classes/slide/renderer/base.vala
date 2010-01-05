@@ -33,18 +33,18 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         /**
          * Width to render to
          */
-        protected uint width;
+        protected int width;
 
         /**
          * Height to render to
          */
-        protected uint height;
+        protected int height;
 
         /**
          * Base constructor taking a metadata object as well as the desired
          * render width and height as parameters.
          */
-        public Base( Metadata.Base metadata, uint width, uint height ) {
+        public Base( Metadata.Base metadata, int width, int height ) {
             this.metadata = metadata;
             this.width = width;
             this.height = height;
@@ -60,14 +60,14 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         /**
          * Return the desired render width
          */
-        public uint get_width() {
+        public int get_width() {
             return this.width;
         }
 
         /**
          * Return the desired render height
          */
-        public uint get_height() {
+        public int get_height() {
             return this.height;
         }
 
@@ -77,7 +77,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
          */
-        public abstract Gdk.Pixmap render_to_pixmap( uint slide_number ) 
+        public abstract Gdk.Pixmap render_to_pixmap( int slide_number ) 
             throws RenderError;
     }
 

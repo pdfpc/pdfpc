@@ -17,7 +17,7 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-namespace org.westhoffswelt.pdfpresenter.Slide {
+namespace org.westhoffswelt.pdfpresenter.slide {
     /**
      * Every renderer may decide to implement the Caching interface for speed
      * enhancements.
@@ -32,17 +32,17 @@ namespace org.westhoffswelt.pdfpresenter.Slide {
          * This signal should be emitted slide_count number of times during a
          * precaching cylce.
          */
-        public abstract signal void slide_precached();
+        public signal void slide_precached();
 
         /**
          * Signal emitted when the precaching cycle is complete
          */
-        public abstract signal void precaching_completed();
+        public signal void precaching_completed();
 
         /**
          * Signal emitted when the precaching cycle just started
          */
-        public abstract signal void precaching_started();
+        public signal void precaching_started();
 
         /**
          * Enable the caching and initialize it. If precaching should be done
