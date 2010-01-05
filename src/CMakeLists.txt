@@ -36,8 +36,8 @@ set(VALA_SRC
 	pdf_presenter_console.vala
 	classes/cache_status.vala
 	classes/fullscreen_window.vala
-	classes/link_handler.vala
-	classes/link_handler/default_link_handler.vala
+	classes/link_handler/base.vala
+	classes/link_handler/default.vala
 	classes/options.vala
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala

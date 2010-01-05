@@ -47,7 +47,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Handler for all pdf links
          */
-        protected LinkHandler link_handler = null;
+        protected LinkHandler.Base link_handler = null;
 
         /**
          * Countdown until the presentation ends
@@ -192,7 +192,7 @@ namespace org.westhoffswelt.pdfpresenter {
             
             // Register a new default link handler for the pdf_event_boxes and
             // connect it to the presentation controller.
-            this.link_handler = new DefaultLinkHandler( controller );
+            this.link_handler = new LinkHandler.Default( controller );
             this.link_handler.add( this.current_slide_box );
             this.link_handler.add( this.next_slide_box );
         }

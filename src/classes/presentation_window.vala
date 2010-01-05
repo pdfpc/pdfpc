@@ -41,7 +41,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Link handler used to handle pdf links
          */
-        protected LinkHandler link_handler = null;
+        protected LinkHandler.Base link_handler = null;
 
         /**
          * Base constructor instantiating a new presentation window
@@ -102,7 +102,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
             // Register a new default link handler for the pdf_event_box and
             // connect it to the presentation controller.
-            this.link_handler = new DefaultLinkHandler( controller );
+            this.link_handler = new LinkHandler.Default( controller );
             this.link_handler.add( this.pdf_event_box );
         }
 
