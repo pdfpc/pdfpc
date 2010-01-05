@@ -20,14 +20,16 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+using org.westhoffswelt.pdfpresenter;
+
+namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * Window showing the currently active and next slide.
      *
      * Other useful information like time slide count, ... can be displayed here as
      * well.
      */
-    public class PresenterWindow: FullscreenWindow, Controllable {
+    public class Presenter: Fullscreen, Controllable {
         /**
          * Controller handling all the events which might happen. Furthermore it is
          * responsible to update all the needed visual stuff if needed
@@ -67,7 +69,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Base constructor instantiating a new presenter window
          */
-        public PresenterWindow( string pdf_filename, int screen_num ) {
+        public Presenter( string pdf_filename, int screen_num ) {
             base( screen_num );
 
             this.destroy += (source) => {
@@ -164,7 +166,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Handle keypress events on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( PresenterWindow source, EventKey key ) {
+        protected bool on_key_pressed( Presenter source, EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
             }

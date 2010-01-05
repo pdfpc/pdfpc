@@ -20,11 +20,13 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+using org.westhoffswelt.pdfpresenter;
+
+namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * Window showing the currently active slide to be presented on a beamer
      */
-    public class PresentationWindow: FullscreenWindow, Controllable {
+    public class Presentation: Fullscreen, Controllable {
         
         /**
          * Controller handling all the events which might happen. Furthermore it is
@@ -46,7 +48,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public PresentationWindow( string pdf_filename, int screen_num ) {
+        public Presentation( string pdf_filename, int screen_num ) {
             base( screen_num );
 
             this.destroy += (source) => {
@@ -86,7 +88,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Handle keypress events on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( PresentationWindow source, EventKey key ) {
+        protected bool on_key_pressed( Presentation source, EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
             }
