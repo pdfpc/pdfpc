@@ -72,12 +72,12 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         }
 
         /**
-         * Render the given slide_number to a Gdk.Pixbuf and return it.
+         * Render the given slide_number to a Gdk.Pixmap and return it.
          *
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
          */
-        public abstract Gdk.Pixbuf render_to_pixbuf( uint slide_number ) 
+        public abstract Gdk.Pixmap render_to_pixmap( uint slide_number ) 
             throws RenderError;
     }
 
