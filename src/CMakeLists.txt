@@ -35,8 +35,9 @@ link_directories(${LIB_PATHS})
 set(VALA_SRC
 	pdf_presenter_console.vala
 	classes/cache_status.vala
-	classes/default_link_handler.vala
 	classes/fullscreen_window.vala
+	classes/link_handler.vala
+	classes/link_handler/default_link_handler.vala
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
@@ -44,7 +45,6 @@ set(VALA_SRC
 	classes/presenter_window.vala
 	classes/timer_label.vala
 	interfaces/controllable.vala
-	interfaces/link_handler.vala
 )
 
 # Vala segfaults if its output dirs are not existant. Therefore make sure they
