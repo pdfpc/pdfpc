@@ -46,6 +46,7 @@ set(VALA_SRC
 	classes/slide/renderer/base.vala
 	classes/slide/renderer/pdf.vala
 	classes/slide/view/base.vala
+	classes/slide/view/default.vala
 	classes/timer_label.vala
 	classes/window/fullscreen.vala
 	classes/window/presentation.vala

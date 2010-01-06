@@ -35,8 +35,8 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         protected Base( Renderer.Base renderer ) {
             this.renderer = renderer;
             this.set_size_request( 
-                (int)renderer.get_width(),
-                (int)renderer.get_height()
+                renderer.get_width(),
+                renderer.get_height()
             );
         }
         
@@ -68,7 +68,12 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public abstract void display( uint slide_number )
+        public abstract void display( int slide_number )
             throws Renderer.RenderError;
+
+        /**
+         * Return the currently shown slide number
+         */
+        public abstract int get_current_slide_number();
     }
 }
