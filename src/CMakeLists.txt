@@ -41,6 +41,7 @@ set(VALA_SRC
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
+	classes/scaler.vala
 	classes/signal_decorator.vala
 	classes/slide/metadata/base.vala
 	classes/slide/metadata/pdf.vala
