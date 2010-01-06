@@ -25,6 +25,16 @@ namespace org.westhoffswelt.pdfpresenter.slide {
      */
     public abstract class View.Base: Gtk.DrawingArea {
         /**
+         * Signal fired every time a slide is about to be left
+         */
+        public signal void leaving_slide( int from, int to );
+
+        /**
+         * Signal fired every time a slide is entered
+         */
+        public signal void entering_slide( int slide_number );
+        
+        /**
          * Renderer to be used for rendering the slides
          */
         protected Renderer.Base renderer;

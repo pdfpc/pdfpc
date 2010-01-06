@@ -44,6 +44,18 @@ namespace org.westhoffswelt.pdfpresenter.slide {
            // As we are using our own kind of double buffer and blit in a one
            // time action, we do not need gtk to double buffer as well.
            this.set_double_buffered( false );
+
+           // Render the initial page on first realization.
+           this.add_events( Gdk.EventMask.STRUCTURE_MASK );
+           this.realize.connect( () => {
+                try {
+                    this.display( 0 );
+                }
+                catch( Renderer.RenderError e ) {
+                    // There should always be a page 0 but you never know.
+                    error( "Could not render initial page 0: %s", e.message );
+                }
+           });
         }
         
         /**
@@ -100,13 +112,20 @@ namespace org.westhoffswelt.pdfpresenter.slide {
                 return;
             }
 
+            // Notify all listeners
+            this.leaving_slide( this.current_slide_number, slide_number );
+
             // Render the requested slide
             // An exception is thrown here, if the slide can not be rendered.
             this.current_slide = this.renderer.render_to_pixmap( slide_number );
+            this.current_slide_number = slide_number;
 
             // Have Gtk update the widget
             this.queue_draw_area( 0, 0, this.renderer.get_width(), this.renderer.get_height() );
+
+            this.entering_slide( this.current_slide_number );
         }
+
 
         /**
          * Return the currently shown slide number
