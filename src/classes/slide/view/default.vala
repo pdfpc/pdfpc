@@ -106,7 +106,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          */
         public override void display( int slide_number )
             throws Renderer.RenderError {
-            if ( slide_number == this.current_slide_number ) {
+            if ( slide_number == this.current_slide_number && this.current_slide != null ) {
                 // The slide does not need to be changed, as the correct one is
                 // already shown.
                 return;
