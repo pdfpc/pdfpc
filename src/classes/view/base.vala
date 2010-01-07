@@ -19,7 +19,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.slide {
+namespace org.westhoffswelt.pdfpresenter {
     /**
      * Base class for every slide view
      */

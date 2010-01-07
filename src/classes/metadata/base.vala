@@ -19,7 +19,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.slide {
+namespace org.westhoffswelt.pdfpresenter {
     /**
      * Metadata base class describing the basic metadata needed for every
      * slideset

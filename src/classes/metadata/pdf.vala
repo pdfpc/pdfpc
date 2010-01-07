@@ -19,7 +19,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.slide.Metadata {
+namespace org.westhoffswelt.pdfpresenter.Metadata {
     /**
      * Metadata for Pdf files
      */

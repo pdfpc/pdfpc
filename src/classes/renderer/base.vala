@@ -19,7 +19,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.slide {
+namespace org.westhoffswelt.pdfpresenter {
     /**
      * Renderer base class needed to be extended by every slide renderer.
      */

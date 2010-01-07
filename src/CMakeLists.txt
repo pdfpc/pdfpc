@@ -36,26 +36,26 @@ set(VALA_SRC
 	classes/cache_status.vala
 	classes/link_handler/base.vala
 	classes/link_handler/default.vala
+	classes/metadata/base.vala
+	classes/metadata/pdf.vala
 	classes/mutex_locks.vala
 	classes/options.vala
 	classes/pdf_event_box.vala
 	classes/pdf_image.vala
 	classes/presentation_controller.vala
+	classes/renderer/base.vala
+	classes/renderer/pdf.vala
 	classes/scaler.vala
 	classes/signal_decorator.vala
-	classes/slide/metadata/base.vala
-	classes/slide/metadata/pdf.vala
-	classes/slide/renderer/base.vala
-	classes/slide/renderer/pdf.vala
-	classes/slide/view/base.vala
-	classes/slide/view/default.vala
 	classes/timer_label.vala
+	classes/view/base.vala
+	classes/view/default.vala
 	classes/window/fullscreen.vala
 	classes/window/presentation.vala
 	classes/window/presenter.vala
+	interfaces/caching.vala
 	interfaces/controllable.vala
 	interfaces/signal_decoratable.vala
-	interfaces/slide/caching.vala
 	pdf_presenter_console.vala
 )
 
@@ -69,10 +69,9 @@ endmacro(make_compile_directory)
 
 make_compile_directory("classes")
 make_compile_directory("classes/link_handler")
-make_compile_directory("classes/slide")
-make_compile_directory("classes/slide/metadata")
-make_compile_directory("classes/slide/renderer")
-make_compile_directory("classes/slide/view")
+make_compile_directory("classes/metadata")
+make_compile_directory("classes/renderer")
+make_compile_directory("classes/view")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
 make_compile_directory("interfaces/slide")

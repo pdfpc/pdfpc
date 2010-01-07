@@ -17,7 +17,7 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-namespace org.westhoffswelt.pdfpresenter.slide {
+namespace org.westhoffswelt.pdfpresenter {
     /**
      * Every renderer may decide to implement the Caching interface for speed
      * enhancements.
