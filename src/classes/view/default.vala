@@ -38,7 +38,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Base constructor taking the renderer to use as an argument
          */
-        protected Default( Renderer.Base renderer ) {
+        public Default( Renderer.Base renderer ) {
            base( renderer );
 
            // As we are using our own kind of double buffer and blit in a one
