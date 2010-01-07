@@ -39,6 +39,14 @@ namespace org.westhoffswelt.pdfpresenter.slide {
         protected Gdk.Pixmap[] rendered_pages = null;
 
         /**
+         * Mutex used to limit access to rendered_pages array to one thread at
+         * a time.
+         *
+         * Unfortunately the vala lock statement does not work here.
+         */
+        protected Mutex rendered_pages_mutex = new Mutex();
+
+        /**
          * Base constructor taking a pdf metadata object as well as the desired
          * render width and height as parameters.
          *
@@ -65,9 +73,9 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          */
         public void enable_caching( bool precaching = false ) {
             // Allocate space for the storage of cached pages
-            lock( this.rendered_pages ) {
-                this.rendered_pages = new Gdk.Pixmap[this.metadata.get_slide_count()];
-            }
+            this.rendered_pages_mutex.lock();
+            this.rendered_pages = new Gdk.Pixmap[this.metadata.get_slide_count()];
+            this.rendered_pages_mutex.unlock();
 
             if( precaching != true ) {
                 // Precaching is disabled, therefore the thread setup can be
@@ -134,11 +142,11 @@ namespace org.westhoffswelt.pdfpresenter.slide {
             }
 
             // If caching is enabled check for the page in the cache
-            lock( this.rendered_pages ) {
-                if ( this.rendered_pages != null && this.rendered_pages[slide_number] != null ) {
-                    return this.rendered_pages[slide_number];
-                }
+            this.rendered_pages_mutex.lock();
+            if ( this.rendered_pages != null && this.rendered_pages[slide_number] != null ) {
+                return this.rendered_pages[slide_number];
             }
+            this.rendered_pages_mutex.unlock();
 
             // Retrieve the Poppler.Page for the page to render
             MutexLocks.poppler.lock();
@@ -162,11 +170,11 @@ namespace org.westhoffswelt.pdfpresenter.slide {
             pixmap.draw_pixbuf( gc, pdf, 0, 0, 0, 0, this.width, this.height, Gdk.RgbDither.NONE, 0, 0 );
 
             // If the cache is enabled store the newly rendered pixmap
-            lock( this.rendered_pages ) {
-                if ( this.rendered_pages != null ) {
-                    this.rendered_pages[slide_number] = pixmap;
-                }
+            this.rendered_pages_mutex.lock();
+            if ( this.rendered_pages != null ) {
+                this.rendered_pages[slide_number] = pixmap;
             }
+            this.rendered_pages_mutex.unlock();
 
             return pixmap;
         }
