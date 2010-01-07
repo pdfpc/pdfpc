@@ -47,6 +47,7 @@ set(VALA_SRC
 	classes/renderer/pdf.vala
 	classes/scaler.vala
 	classes/signal_decorator/base.vala
+	classes/signal_decorator/pdf_link.vala
 	classes/timer_label.vala
 	classes/view/base.vala
 	classes/view/default.vala

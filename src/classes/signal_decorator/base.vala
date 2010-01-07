@@ -33,7 +33,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * to override this method. Use a constructor for decorator internal
          * initialization.
          */
-        public void initialize( Object target ) {
+        public virtual void initialize( Object target ) {
             if ( !this.is_supported( target ) ) {
                 Type decoratable = Type.from_instance( target );
                 Type decorator   = Type.from_instance( this );
