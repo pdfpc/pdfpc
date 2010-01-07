@@ -84,7 +84,7 @@ namespace org.westhoffswelt.pdfpresenter.slide {
          * If the beginning of slides is reached this method does nothing.
          */
         public override void previous() {
-            if ( this.current_slide_number + 1 < 0 ) {
+            if ( this.current_slide_number - 1 < 0 ) {
                 // The first slide has been reached, do nothing.
                 return;
             }
