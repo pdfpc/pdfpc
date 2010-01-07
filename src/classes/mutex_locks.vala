@@ -30,6 +30,13 @@ namespace org.westhoffswelt.pdfpresenter {
         *
         * Unfortunately the poppler library is not threadsafe.
         */
-       public static Mutex poppler = new Mutex(); 
+       public static Mutex poppler;
+
+        /**
+         * Initialize all used mutex objects for the first time
+         */
+       public static void init() {
+           MutexLocks.poppler = new Mutex();
+       }
     }
 }

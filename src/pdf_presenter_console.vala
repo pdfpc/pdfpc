@@ -97,6 +97,9 @@ namespace org.westhoffswelt.pdfpresenter {
             Gdk.threads_init();
             Gtk.init( ref args );
 
+            // Initialize the application wide mutex objects
+            MutexLocks.init();
+
             this.parse_command_line_options( args );
 
             stdout.printf( "Initializing pdf rendering...\n" );
