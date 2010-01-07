@@ -46,10 +46,11 @@ set(VALA_SRC
 	classes/renderer/base.vala
 	classes/renderer/pdf.vala
 	classes/scaler.vala
-	classes/signal_decorator.vala
+	classes/signal_decorator/base.vala
 	classes/timer_label.vala
 	classes/view/base.vala
 	classes/view/default.vala
+	classes/view/pdf.vala
 	classes/window/fullscreen.vala
 	classes/window/presentation.vala
 	classes/window/presenter.vala
@@ -71,6 +72,7 @@ make_compile_directory("classes")
 make_compile_directory("classes/link_handler")
 make_compile_directory("classes/metadata")
 make_compile_directory("classes/renderer")
+make_compile_directory("classes/signal_decorator")
 make_compile_directory("classes/view")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")

@@ -26,11 +26,11 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Register the given signal decorator to provide its signals
          */
-        public abstract void decorate_signals( SignalDecorator decorator );
+        public abstract void decorate_signals( SignalDecorator.Base decorator );
 
         /**
          * Get the signals of a certain decorator
          */
-        public abstract SignalDecorator get_signals( string decorator_group );
+        public abstract SignalDecorator.Base get_signals( string decorator_group );
     }
 }

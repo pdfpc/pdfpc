@@ -23,7 +23,7 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Abstract decorator class to provide additional signals for a given class
      */
-    public abstract class SignalDecorator: Object {
+    public abstract class SignalDecorator.Base: Object {
         /**
          * First method called on the SignalDecorator after the decoration
          * process started.
