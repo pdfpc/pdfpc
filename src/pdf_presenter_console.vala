@@ -85,7 +85,7 @@ namespace org.westhoffswelt.pdfpresenter {
             { "last-minutes", 'l', 0, OptionArg.INT, ref Application.last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5 minutes)", "N" },
             { "current-size", 'u', 0, OptionArg.INT, ref Application.current_size, "Percentage of the presenter screen to be used for the current slide. (Default 60)", "N" },
             { "switch-screens", 's', 0, 0, ref Application.display_switch, "Switch the presentation and the presenter screen.", null },
-            { "disable-cache", 'c', 0, 0, ref Application.disable_caching, "Disable caching and pre-rendering of slides to save memory on cost of speed.", null },
+            { "disable-cache", 'c', 0, 0, ref Application.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { null }
         };
 
