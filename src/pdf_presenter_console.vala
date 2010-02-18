@@ -52,30 +52,30 @@ namespace org.westhoffswelt.pdfpresenter {
          * Commandline option specifying if the presenter and presentation screen
          * should be switched.
          */
-        protected static bool display_switch = false;
+        public static bool display_switch = false;
         
         /**
          * Commandline option which allows the complete disabling of slide caching
          */
-        protected static bool disable_caching = false;
+        public static bool disable_caching = false;
 
         /**
          * Commandline option providing the talk duration, which will be used to
          * display a timer
          */
-        protected static uint duration = 45;
+        public static uint duration = 45;
 
         /**
          * Commandline option providing the time from which on the timer should
          * change its color.
          */
-        protected static uint last_minutes = 5;
+        public static uint last_minutes = 5;
 
         /**
          * Commandline option providing the size of the current slide in
          * the presenter window
          */
-        protected static uint current_size = 60;
+        public static uint current_size = 60;
 
         /**
          * Commandline option parser entry definitions
