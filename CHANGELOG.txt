@@ -2,6 +2,15 @@
 Pdf Presenter Console Changelog
 ===============================
 
+Version 1.1.1
+=============
+
+- Fixed: Compile error with newer vala versions due to wrong property
+  visibility
+
+- Fixed: Typo in help text
+
+
 Version 1.1
 ===========
 
