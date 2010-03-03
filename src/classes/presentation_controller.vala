@@ -71,6 +71,20 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Handle mouse clicks to each of the controllables
+         */
+        public void button_press( Gdk.EventButton button ) {
+            switch( button.button ) {
+                case 1: /* Left button */
+                    this.controllables_next_page();
+                break;
+                case 3: /* Right button */
+                    this.controllables_previous_page();
+                break;
+            }
+        }
+
+        /**
          * A request to change the page has been issued
          */
         public void page_change_request( int page_number ) {
