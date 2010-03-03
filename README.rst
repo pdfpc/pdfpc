@@ -142,11 +142,12 @@ As the prerendering takes a lot of memory it can be disabled using the
 Keybindings
 -----------
 
-During the presentation the following key strokes are detected and interpreted:
+During the presentation the following key strokes and mouse clicks are detected
+and interpreted:
 
-- Left cursor key / Page up
+- Left cursor key / Page up / Right mouse button click 
     - Go back one slide
-- Right cursor key / Page down / Return / Space
+- Right cursor key / Page down / Return / Space / Left mouse button click
     - Go forward one slide
 - Home
     - Go back to the first slide and reset the timer
