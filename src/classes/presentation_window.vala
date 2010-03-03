@@ -78,6 +78,7 @@ namespace org.westhoffswelt.pdfpresenter {
             );
 
             this.key_press_event += this.on_key_pressed;
+	    this.button_press_event += this.on_button_press;
 
             this.reset();
         }
@@ -89,6 +90,17 @@ namespace org.westhoffswelt.pdfpresenter {
         protected bool on_key_pressed( PresentationWindow source, EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
+            }
+            return false;
+        }
+
+        /**
+	 * Handle mouse button events on the window and, if neccessary send
+	 * them to the presentation controller
+         */
+        protected bool on_button_press( PresentationWindow source, EventButton button ) {
+            if ( this.presentation_controller != null ) {
+                this.presentation_controller.button_press( button );
             }
             return false;
         }
