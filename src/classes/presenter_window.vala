@@ -178,7 +178,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected bool on_button_press( PresenterWindow source, EventButton button ) {
             if ( this.presentation_controller != null ) {
-                this.presentation_controller.mouse_down( button );
+                this.presentation_controller.button_press( button );
             }
             return false;
         }
