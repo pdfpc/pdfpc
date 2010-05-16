@@ -45,15 +45,17 @@ namespace org.westhoffswelt.pdfpresenter {
            // time action, we do not need gtk to double buffer as well.
            this.set_double_buffered( false );
 
+           this.current_slide_number = 0;
+
            // Render the initial page on first realization.
            this.add_events( Gdk.EventMask.STRUCTURE_MASK );
            this.realize.connect( () => {
                 try {
-                    this.display( 0 );
+                    this.display( this.current_slide_number );
                 }
                 catch( Renderer.RenderError e ) {
                     // There should always be a page 0 but you never know.
-                    error( "Could not render initial page 0: %s", e.message );
+                    error( "Could not render initial page %d: %s", this.current_slide_number, e.message );
                 }
            });
         }
@@ -125,7 +127,6 @@ namespace org.westhoffswelt.pdfpresenter {
 
             this.entering_slide( this.current_slide_number );
         }
-
 
         /**
          * Return the currently shown slide number
