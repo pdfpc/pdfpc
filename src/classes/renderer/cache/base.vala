@@ -39,6 +39,18 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Asks the cache engine if prerendering is allowed in conjunction with it.
+         *
+         * The default behaviour is to allow prerendering, there might however
+         * be engine implementation where prerendering does not make any sense.
+         * Therefore it can be disabled by overriding this method and returning
+         * false.
+         */
+        public bool allows_prerendering() {
+            return true;
+        }
+
+        /**
          * Store a pixmap in the cache using the given index as identifier
          */
         public abstract void store( uint index, Pixmap pixmap );
