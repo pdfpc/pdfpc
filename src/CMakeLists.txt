@@ -49,7 +49,7 @@ set(VALA_SRC
 	classes/window/fullscreen.vala
 	classes/window/presentation.vala
 	classes/window/presenter.vala
-	interfaces/caching.vala
+	interfaces/renderer/caching.vala
 	interfaces/controllable.vala
 	pdf_presenter_console.vala
 )
@@ -68,6 +68,7 @@ make_compile_directory("classes/renderer")
 make_compile_directory("classes/view")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
+make_compile_directory("interfaces/renderer")
 
 vala_precompile(VALA_C
 	${VALA_SRC}

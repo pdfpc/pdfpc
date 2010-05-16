@@ -66,7 +66,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             );
             
             if ( !Options.disable_caching ) {
-                this.view.get_renderer().enable_caching( true );
+                ((Renderer.Caching)this.view.get_renderer()).enable_caching( true );
             }
 
             // Center the scaled pdf on the monitor

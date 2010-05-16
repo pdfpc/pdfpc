@@ -23,7 +23,7 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Pdf slide renderer
      */
-    public class Renderer.Pdf: Renderer.Base, Caching
+    public class Renderer.Pdf: Renderer.Base, Renderer.Caching
     {
         /**
          * The scaling factor needed to render the pdf page to the desired size.
@@ -71,7 +71,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * If precaching is enabled the prerendering thread is started from
          * within this method.
          */
-        public override void enable_caching( bool precaching = false ) {
+        public void enable_caching( bool precaching = false ) {
             // Allocate space for the storage of cached pages
             this.rendered_pages_mutex.lock();
             this.rendered_pages = new Gdk.Pixmap[this.metadata.get_slide_count()];

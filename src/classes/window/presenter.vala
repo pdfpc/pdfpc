@@ -180,9 +180,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.reset();
 
             // Enable the render caching if it hasn't been forcefully disabled.
-            if ( !Options.disable_caching ) {
-                this.current_view.get_renderer().enable_caching( true );
-                this.next_view.get_renderer().enable_caching( true );
+            if ( !Options.disable_caching ) {               
+                ((Renderer.Caching)this.current_view.get_renderer()).enable_caching( true );
+                ((Renderer.Caching)this.next_view.get_renderer()).enable_caching( true );
             }
         }
 
