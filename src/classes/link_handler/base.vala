@@ -19,14 +19,14 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace org.westhoffswelt.pdfpresenter.LinkHandler {
     /**
      * Abstract class interface to be implemented by every link handler
      *
      * A link handler is supposed to handle all link based events of the
      * PdfEventBox and react on them properly.
      */
-    public abstract class LinkHandler: Object {
+    public abstract class Base: Object {
         /**
          * All known and handled PdfEventBoxes
          */
@@ -41,7 +41,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Constructor taking the main PresentationController as an argument
          */
-        public LinkHandler( PresentationController controller ) {
+        public Base( PresentationController controller ) {
             this.controller = controller;
         }
 

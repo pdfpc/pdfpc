@@ -20,7 +20,7 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * Window extension implementing all the needed functionality, to be
      * displayed fullscreen.
@@ -28,7 +28,7 @@ namespace org.westhoffswelt.pdfpresenter {
      * Methods to specify the monitor to be displayed on in a multi-head setup
      * are provided as well.
      */
-    public class FullscreenWindow: Gtk.Window {
+    public class Fullscreen: Gtk.Window {
         /**
          * The geometry data of the screen this window is on
          */
@@ -40,7 +40,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected uint hide_cursor_timeout = 0;
 
-        public FullscreenWindow( int screen_num ) {
+        public Fullscreen( int screen_num ) {
             var screen = Screen.get_default();
             screen.get_monitor_geometry( screen_num, out this.screen_geometry );
 
@@ -106,7 +106,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Called every time the mouse cursor is moved
          */
-        protected bool on_mouse_move( FullscreenWindow w, EventMotion event ) {
+        protected bool on_mouse_move( Fullscreen source, EventMotion event ) {
             // Restore the mouse cursor to its default value
             this.window.set_cursor( null );
 

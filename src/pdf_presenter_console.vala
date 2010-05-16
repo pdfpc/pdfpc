@@ -32,14 +32,14 @@ namespace org.westhoffswelt.pdfpresenter {
          *
          * This window is supposed to be shown on the beamer
          */
-        private PresentationWindow presentation_window;
+        private Window.Presentation presentation_window;
 
         /**
          * Presenter window showing the current and the next slide as well as
          * different other meta information useful for the person giving the
          * presentation.
          */
-        private PresenterWindow presenter_window;
+        private Window.Presenter presenter_window;
 
         /**
          * Global mutex used by all threads, to lock the operations on the poppler
@@ -97,6 +97,9 @@ namespace org.westhoffswelt.pdfpresenter {
             Gdk.threads_init();
             Gtk.init( ref args );
 
+            // Initialize the application wide mutex objects
+            MutexLocks.init();
+
             this.parse_command_line_options( args );
 
             stdout.printf( "Initializing pdf rendering...\n" );
@@ -115,7 +118,7 @@ namespace org.westhoffswelt.pdfpresenter {
             var cache_status = new CacheStatus();
 
             if ( Gdk.Screen.get_default().get_n_monitors() > 1 ) {
-                this.presenter_window = new PresenterWindow( args[1], presenter_monitor );
+                this.presenter_window = new Window.Presenter( args[1], presenter_monitor );
                 controller.register_controllable( this.presenter_window );
                 this.presenter_window.set_cache_observer( cache_status );
             }
@@ -124,7 +127,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 presentation_monitor = 0;
             }
 
-            this.presentation_window = new PresentationWindow( args[1], presentation_monitor );
+            this.presentation_window = new Window.Presentation( args[1], presentation_monitor );
 
             controller.register_controllable( this.presentation_window );
             this.presentation_window.set_cache_observer( cache_status );
@@ -138,7 +141,7 @@ namespace org.westhoffswelt.pdfpresenter {
             }
 
             Gdk.threads_enter();
-            Gtk.main ();
+            Gtk.main();
             Gdk.threads_leave();
         }
 

@@ -20,17 +20,19 @@
 using GLib;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+using org.westhoffswelt.pdfpresenter;
+
+namespace org.westhoffswelt.pdfpresenter.LinkHandler {
     /**
      * Default link handler taking care of mousepointer changes, as well as
      * internal and launch links.
      */
-    public class DefaultLinkHandler: LinkHandler {
+    public class Default: Base {
 
         /**
          * Default constructor
          */
-        public DefaultLinkHandler( PresentationController controller ) {
+        public Default( PresentationController controller ) {
             base( controller );
         }
 

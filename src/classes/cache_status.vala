@@ -29,12 +29,12 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * The number of entries currently inside the cache
          */
-        protected int currentValue = 0;
+        protected int current_value = 0;
 
         /**
          * The value which indicates a fully primed cache
          */
-        protected int maxValue = 0;
+        protected int max_value = 0;
 
         /**
          * Width of the widget
@@ -58,14 +58,6 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void set_width( int width ) {
             this.width = width;
-        }
-
-        /**
-         * Called whenever a new entry has been added to the cache
-         */
-        public void new_cache_entry_created() {
-            ++this.currentValue;
-            this.redraw();
         }
 
         /**
@@ -95,7 +87,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 true,
                 0,
                 0,
-                (int)Math.ceil( this.width * ( (double)this.currentValue / this.maxValue ) ),
+                (int)Math.ceil( this.width * ( (double)this.current_value / this.max_value ) ),
                 this.height
             );
             
@@ -103,11 +95,16 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Add a new pdf_image to the cache monitoring
+         * Monitor a new view for prerendering information
          */
-        public void monitor_pdf_image( PdfImage pdf_image ) {
-            this.maxValue += pdf_image.get_page_count();
-            pdf_image.set_cache_observer( this );
+        public void monitor_view( View.Prerendering view ) {
+            view.prerendering_started.connect( (v) => {
+                this.max_value += (int)((View.Base)v).get_renderer().get_metadata().get_slide_count();
+            });
+            view.slide_prerendered.connect( () => {
+                ++this.current_value;
+                this.redraw();
+            });
         }
     }
 }

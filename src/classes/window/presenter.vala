@@ -20,14 +20,16 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+using org.westhoffswelt.pdfpresenter;
+
+namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * Window showing the currently active and next slide.
      *
      * Other useful information like time slide count, ... can be displayed here as
      * well.
      */
-    public class PresenterWindow: FullscreenWindow, Controllable {
+    public class Presenter: Fullscreen, Controllable {
         /**
          * Controller handling all the events which might happen. Furthermore it is
          * responsible to update all the needed visual stuff if needed
@@ -35,19 +37,14 @@ namespace org.westhoffswelt.pdfpresenter {
         protected PresentationController presentation_controller = null;
 
         /**
-         * EventBox containing the currently shown slide PdfImage
+         * View showing the current slide
          */
-        protected PdfEventBox current_slide_box;
+        protected View.Base current_view;
 
         /**
-         * EventBox containing the next shown slide PdfImage
+         * View showing a preview of the next slide
         */
-        protected PdfEventBox next_slide_box;
-
-        /**
-         * Handler for all pdf links
-         */
-        protected LinkHandler link_handler = null;
+        protected View.Base next_view;
 
         /**
          * Countdown until the presentation ends
@@ -65,9 +62,17 @@ namespace org.westhoffswelt.pdfpresenter {
         protected Fixed fixedLayout = null;
 
         /**
+         * Number of slides inside the presentation
+         *
+         * This value is needed a lot of times therefore it is retrieved once
+         * and stored here for performance and readability reasons.
+         */
+        protected uint slide_count;
+
+        /**
          * Base constructor instantiating a new presenter window
          */
-        public PresenterWindow( string pdf_filename, int screen_num ) {
+        public Presenter( string pdf_filename, int screen_num ) {
             base( screen_num );
 
             this.destroy += (source) => {
@@ -86,34 +91,46 @@ namespace org.westhoffswelt.pdfpresenter {
             var bottom_position = (int)Math.floor( this.screen_geometry.height * 0.9 );
             var bottom_height = this.screen_geometry.height - bottom_position;
 
-            // The currentslide needs to be bigger than the next one it, It takes
-            // two third of of the available screen width while max taking 90 percent of the height
-            this.current_slide_box = new PdfEventBox.with_pdf_image( 
-                new PdfImage.from_pdf( 
-                    pdf_filename,
-                    0,
-                    (int)Math.floor( this.screen_geometry.width * Options.current_size / (double)100 ),
-                    bottom_position,
-                    !Options.disable_caching
-                )
+            // In most scenarios the current slide is displayed bigger than the
+            // next one. The option current_size represents the width this view
+            // should use as a percentage value. The maximal height is 90% of
+            // the screen, as we need a place to display the timer and slide
+            // count.
+            Rectangle current_scale_rect;
+            int current_allocated_width = (int)Math.floor( 
+                this.screen_geometry.width * Options.current_size / (double)100 
             );
-            // Position it in the top left corner
-            this.fixedLayout.put( this.current_slide_box, 0, 0 );
+            this.current_view = View.Pdf.from_pdf_file( 
+                pdf_filename,
+                current_allocated_width,
+                bottom_position,
+                out current_scale_rect
+            );
 
-            //The next slide is next to the current one and takes up the remaining
-            //width
-            var next_slide_width = this.screen_geometry.width - this.current_slide_box.get_child().get_scaled_width();
-            this.next_slide_box = new PdfEventBox.with_pdf_image( 
-                new PdfImage.from_pdf( 
-                    pdf_filename,
-                    1,
-                    next_slide_width,
-                    bottom_position,
-                    !Options.disable_caching
-                )
+            // Position it in the top left corner.
+            // The scale rect information is used to center the image inside
+            // its area.
+            this.fixedLayout.put( this.current_view, current_scale_rect.x, current_scale_rect.y );
+
+            // The next slide is right to the current one and takes up the
+            // remaining width
+            Rectangle next_scale_rect;
+            var next_allocated_width = this.screen_geometry.width - current_allocated_width;
+            this.next_view = View.Pdf.from_pdf_file( 
+                pdf_filename,
+                next_allocated_width,
+                bottom_position,
+                out next_scale_rect
             );
-            // Position it at the top besides the current slide
-            this.fixedLayout.put( this.next_slide_box, this.current_slide_box.get_child().get_scaled_width(), 0 );
+            // Set the second slide as starting point
+            this.next_view.next();
+
+            // Position it at the top and right of the current slide
+            this.fixedLayout.put( 
+                this.next_view, 
+                current_allocated_width + next_scale_rect.x,
+                next_scale_rect.y 
+            );
 
             // Color needed for the labels
             Color white;
@@ -158,14 +175,31 @@ namespace org.westhoffswelt.pdfpresenter {
             this.key_press_event += this.on_key_pressed;
             this.button_press_event += this.on_button_press;
 
+            // Store the slide count once
+            this.slide_count = this.current_view.get_renderer().get_metadata().get_slide_count();
+
             this.reset();
+
+            // Enable the render caching if it hasn't been forcefully disabled.
+            if ( !Options.disable_caching ) {               
+                ((Renderer.Caching)this.current_view.get_renderer()).set_cache( 
+                    new Renderer.Cache.Simple( 
+                        this.current_view.get_renderer().get_metadata()
+                    )
+                );
+                ((Renderer.Caching)this.next_view.get_renderer()).set_cache( 
+                    new Renderer.Cache.Simple( 
+                        this.next_view.get_renderer().get_metadata()
+                    )
+                );
+            }
         }
 
         /**
          * Handle keypress events on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( PresenterWindow source, EventKey key ) {
+        protected bool on_key_pressed( Presenter source, EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
             }
@@ -188,9 +222,9 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected void update_slide_count() {
             this.slide_progress.set_text( 
-                "%d/%d".printf( 
-                    this.current_slide_box.get_child().get_page_number() + 1, 
-                    this.current_slide_box.get_child().get_page_count()
+                "%d/%u".printf( 
+                    this.current_view.get_current_slide_number() + 1, 
+                    this.slide_count
                 )        
             );
         }
@@ -201,20 +235,14 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void set_controller( PresentationController controller ) {
             this.presentation_controller = controller;
-            
-            // Register a new default link handler for the pdf_event_boxes and
-            // connect it to the presentation controller.
-            this.link_handler = new DefaultLinkHandler( controller );
-            this.link_handler.add( this.current_slide_box );
-            this.link_handler.add( this.next_slide_box );
         }
 
         /**
          * Switch the shown pdf to the next page
          */
         public void next_page() {
-            this.current_slide_box.get_child().next_page();
-            this.next_slide_box.get_child().next_page();
+            this.current_view.next();
+            this.next_view.next();
             this.update_slide_count();
 
             this.timer.start();
@@ -224,13 +252,13 @@ namespace org.westhoffswelt.pdfpresenter {
          * Switch to the previous page
          */
         public void previous_page() {
-            if ( (int)Math.fabs( (double)( this.current_slide_box.get_child().get_page_number() - this.next_slide_box.get_child().get_page_number() ) ) >= 1
-              && this.current_slide_box.get_child().get_page_number() != 0 ) {
+            if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1
+              && this.current_view.get_current_slide_number() != 0 ) {
                 // Only move the next slide back if there is a difference of at
                 // least one slide between current and next
-                this.next_slide_box.get_child().previous_page();
+                this.next_view.previous();
             }
-            this.current_slide_box.get_child().previous_page();
+            this.current_view.previous();
             this.update_slide_count();
         }
 
@@ -239,10 +267,11 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void reset() {
             try {
-                this.current_slide_box.get_child().goto_page( 0 );
-                this.next_slide_box.get_child().goto_page( 1 );
+                this.current_view.display( 0 );
+                this.next_view.display( 0 );
+                this.next_view.next();
             }
-            catch( PdfImageError e ) {
+            catch( Renderer.RenderError e ) {
                 GLib.error( "The pdf page could not be rendered: %s", e.message );
             }
 
@@ -256,14 +285,14 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void goto_page( int page_number ) {
             try {
-                this.current_slide_box.get_child().goto_page( page_number );
-                this.next_slide_box.get_child().goto_page( 
-                    ( page_number == this.next_slide_box.get_child().get_page_count() - 1 ) 
+                this.current_view.display( page_number );
+                this.next_view.display( 
+                    ( page_number == this.next_view.get_current_slide_number() - 1 ) 
                     ? ( page_number )
                     : ( page_number + 1 )
                 );
             }
-            catch( PdfImageError e ) {
+            catch( Renderer.RenderError e ) {
                 GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
             }
 
@@ -272,14 +301,21 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /** 
-         * Take a cache observer and register it with all PdfImage shown on the window.
+         * Take a cache observer and register it with all prerendering Views
+         * shown on the window.
          *
          * Furthermore it is taken care of to add the cache observer to this window
          * for display, as it is a Image widget after all.
          */
         public void set_cache_observer( CacheStatus observer ) {
-            observer.monitor_pdf_image( this.current_slide_box.get_child() );
-            observer.monitor_pdf_image( this.next_slide_box.get_child() );
+            var current_prerendering_view = this.current_view as View.Prerendering;
+            if( current_prerendering_view != null ) {
+                observer.monitor_view( current_prerendering_view );
+            }
+            var next_prerendering_view = this.next_view as View.Prerendering;
+            if( next_prerendering_view != null ) {
+                observer.monitor_view( next_prerendering_view );
+            }
 
             // Add the cache status widget to be displayed
             observer.set_height( 6 );
