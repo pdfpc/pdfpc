@@ -79,6 +79,14 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public abstract Gdk.Pixmap render_to_pixmap( int slide_number ) 
             throws RenderError;
+
+        /**
+         * Enable the caching and initialize it. 
+         *
+         * If precaching is enabled the prerendering thread is started from
+         * within this method.
+         */
+        public abstract void enable_caching( bool precaching = false );
     }
 
     /**

@@ -18,6 +18,7 @@
  */
 
 using GLib;
+using Gdk;
 
 namespace org.westhoffswelt.pdfpresenter {
     /**
@@ -34,6 +35,35 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public Pdf( Renderer.Pdf renderer ) {
             base( renderer );
+        }
+
+        /**
+         * Create a new Pdf view directly from a file
+         *
+         * This is a convenience constructor which automatically create a full
+         * metadata and rendering chain to be used with the pdf view. The given
+         * width and height is used in conjunction with a scaler to maintain
+         * aspect ration. The scale rectangle is provided in the scale_rect
+         * argument.
+         */
+        public Pdf.from_pdf_file( string pdf_file, int width, int height, out Rectangle scale_rect ) {
+            var file = File.new_for_commandline_arg( pdf_file );
+            var metadata = new Metadata.Pdf( file.get_uri() );
+            var scaler = new Scaler( 
+                metadata.get_page_width(),
+                metadata.get_page_height()
+            );
+            scale_rect = scaler.scale_to( width, height );
+            this.renderer = new Renderer.Pdf( 
+                metadata,
+                scale_rect.width,
+                scale_rect.height
+            );
+
+            this.set_size_request( 
+                renderer.get_width(),
+                renderer.get_height()
+            );
         }
 
         /**

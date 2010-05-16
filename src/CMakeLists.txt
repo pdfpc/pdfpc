@@ -34,20 +34,14 @@ link_directories(${LIB_PATHS})
 
 set(VALA_SRC
 	classes/cache_status.vala
-	classes/link_handler/base.vala
-	classes/link_handler/default.vala
 	classes/metadata/base.vala
 	classes/metadata/pdf.vala
 	classes/mutex_locks.vala
 	classes/options.vala
-	classes/pdf_event_box.vala
-	classes/pdf_image.vala
 	classes/presentation_controller.vala
 	classes/renderer/base.vala
 	classes/renderer/pdf.vala
 	classes/scaler.vala
-	classes/signal_decorator/base.vala
-	classes/signal_decorator/pdf_link.vala
 	classes/timer_label.vala
 	classes/view/base.vala
 	classes/view/default.vala
@@ -57,7 +51,6 @@ set(VALA_SRC
 	classes/window/presenter.vala
 	interfaces/caching.vala
 	interfaces/controllable.vala
-	interfaces/signal_decoratable.vala
 	pdf_presenter_console.vala
 )
 
@@ -70,14 +63,11 @@ macro(make_compile_directory directory)
 endmacro(make_compile_directory)
 
 make_compile_directory("classes")
-make_compile_directory("classes/link_handler")
 make_compile_directory("classes/metadata")
 make_compile_directory("classes/renderer")
-make_compile_directory("classes/signal_decorator")
 make_compile_directory("classes/view")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
-make_compile_directory("interfaces/slide")
 
 vala_precompile(VALA_C
 	${VALA_SRC}

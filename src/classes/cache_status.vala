@@ -105,9 +105,9 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Add a new pdf_image to the cache monitoring
          */
-        public void monitor_pdf_image( PdfImage pdf_image ) {
-            this.maxValue += pdf_image.get_page_count();
-            pdf_image.set_cache_observer( this );
-        }
+//        public void monitor_pdf_image( PdfImage pdf_image ) {
+//            this.maxValue += pdf_image.get_page_count();
+//            pdf_image.set_cache_observer( this );
+//        }
     }
 }
