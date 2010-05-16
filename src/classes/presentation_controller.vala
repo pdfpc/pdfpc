@@ -74,6 +74,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Handle mouse clicks to each of the controllables
          */
         public void button_press( Gdk.EventButton button ) {
+            debug( "mouse button press" );
             switch( button.button ) {
                 case 1: /* Left button */
                     this.controllables_next_page();

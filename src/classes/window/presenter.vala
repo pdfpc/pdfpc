@@ -207,10 +207,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-	 * Handle mouse button events on the window and, if neccessary send
-	 * them to the presentation controller
+         * Handle mouse button events on the window and, if neccessary send
+         * them to the presentation controller
          */
-        protected bool on_button_press( PresenterWindow source, EventButton button ) {
+        protected bool on_button_press( Presenter source, EventButton button ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
             }
