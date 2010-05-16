@@ -141,7 +141,7 @@ namespace org.westhoffswelt.pdfpresenter {
             }
 
             Gdk.threads_enter();
-            Gtk.main ();
+            Gtk.main();
             Gdk.threads_leave();
         }
 
