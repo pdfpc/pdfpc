@@ -31,20 +31,9 @@ namespace org.westhoffswelt.pdfpresenter {
         protected double scaling_factor;
 
         /**
-         * Cache storage for rendered pdf pages
-         *
-         * This is a caching indicator as well. If it is null caching is
-         * disabled.
+         * Cache store to be used
          */
-        protected Gdk.Pixmap[] rendered_pages = null;
-
-        /**
-         * Mutex used to limit access to rendered_pages array to one thread at
-         * a time.
-         *
-         * Unfortunately the vala lock statement does not work here.
-         */
-        protected Mutex rendered_pages_mutex = new Mutex();
+        protected Renderer.Cache.Base cache = null;
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -66,12 +55,26 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Set cache store to use
+         */
+        public void set_cache( Renderer.Cache.Base cache ) {
+            this.cache = cache;
+        }
+
+        /**
+         * Retrieve the currently used cache engine
+         */
+        public Renderer.Cache.Base get_cache() {
+            return this.cache;
+        }
+
+        /**
          * Enable the caching and initialize it. 
          *
          * If precaching is enabled the prerendering thread is started from
          * within this method.
          */
-        public void enable_caching( bool precaching = false ) {
+/*        public void enable_caching( bool precaching = false ) {
             // Allocate space for the storage of cached pages
             this.rendered_pages_mutex.lock();
             this.rendered_pages = new Gdk.Pixmap[this.metadata.get_slide_count()];
@@ -124,7 +127,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 error( "Pre-Rendering thread could not be spawned: %s", e.message );
             }
         }
-
+*/
         /**
          * Render the given slide_number to a Gdk.Pixmap and return it.
          *
@@ -142,11 +145,9 @@ namespace org.westhoffswelt.pdfpresenter {
             }
 
             // If caching is enabled check for the page in the cache
-            this.rendered_pages_mutex.lock();
-            if ( this.rendered_pages != null && this.rendered_pages[slide_number] != null ) {
-                return this.rendered_pages[slide_number];
+            if ( this.cache != null && this.cache.retrieve( slide_number ) != null ) {
+                return this.cache.retrieve( slide_number );
             }
-            this.rendered_pages_mutex.unlock();
 
             // Retrieve the Poppler.Page for the page to render
             MutexLocks.poppler.lock();
@@ -170,11 +171,9 @@ namespace org.westhoffswelt.pdfpresenter {
             pixmap.draw_pixbuf( gc, pdf, 0, 0, 0, 0, this.width, this.height, Gdk.RgbDither.NONE, 0, 0 );
 
             // If the cache is enabled store the newly rendered pixmap
-            this.rendered_pages_mutex.lock();
-            if ( this.rendered_pages != null ) {
-                this.rendered_pages[slide_number] = pixmap;
+            if ( this.cache != null ) {
+                this.cache.store( slide_number, pixmap );
             }
-            this.rendered_pages_mutex.unlock();
 
             return pixmap;
         }

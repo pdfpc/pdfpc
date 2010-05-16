@@ -1,5 +1,5 @@
 /**
- * Caching interface
+ * Cache store
  *
  * This file is part of pdf-presenter-console.
  *
@@ -17,22 +17,37 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-namespace org.westhoffswelt.pdfpresenter.Renderer {
+using GLib;
+using Gdk;
+
+namespace org.westhoffswelt.pdfpresenter {
     /**
-     * Every renderer may decide to implement the Caching interface to improve
-     * rendering speed.
+     * Base Cache store interface which needs to be implemented by every
+     * working cache.
      */
-    public interface Caching: GLib.Object {
+    public abstract class Renderer.Cache.Base: Object {
         /**
-         * Set a Cache store to be used for caching
+         * Metadata object to provide caching for
          */
-        public abstract void set_cache( Cache.Base cache );
+        protected Metadata.Base metadata;
 
         /**
-         * Retrieve the currently used cache store
-         *
-         * If no cache store is set null will be returned.
+         * Initialize the cache store
          */
-        public abstract Cache.Base get_cache();
+        public Base( Metadata.Base metadata ) {
+            this.metadata = metadata;
+        }
+
+        /**
+         * Store a pixmap in the cache using the given index as identifier
+         */
+        public abstract void store( uint index, Pixmap pixmap );
+
+        /**
+         * Retrieve a stored pixmap from the cache.
+         *
+         * If no item with the given index is available null is returned
+         */
+        public abstract Pixmap retrieve( uint index );
     }
 }
