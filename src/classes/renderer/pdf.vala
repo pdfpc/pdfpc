@@ -69,66 +69,6 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Enable the caching and initialize it. 
-         *
-         * If precaching is enabled the prerendering thread is started from
-         * within this method.
-         */
-/*        public void enable_caching( bool precaching = false ) {
-            // Allocate space for the storage of cached pages
-            this.rendered_pages_mutex.lock();
-            this.rendered_pages = new Gdk.Pixmap[this.metadata.get_slide_count()];
-            this.rendered_pages_mutex.unlock();
-
-            if( precaching != true ) {
-                // Precaching is disabled, therefore the thread setup can be
-                // skipped.
-                return;
-            }
-
-            // Setup the prerendering thread
-            try {
-                Thread.create(
-                    () => {
-                        this.precaching_started();
-
-                        var page_count = this.metadata.get_slide_count();
-                        for( var i=0; i<page_count; ++i ) {
-                            Gdk.threads_enter();
-
-                            // We do not care about the result, as the
-                            // rendering function stores the rendered
-                            // pixmap in the cache if it is enabled. This
-                            // is exactly what we want.
-                            try {
-                                this.render_to_pixmap( i );
-                            }
-                            catch( Renderer.RenderError e ) {
-                                error( "Could not render page '%i' while pre-caching: %s", i, e.message );
-                            }
-                            
-                            // Inform possible observers about the cached slide
-                            this.slide_precached();
-
-                            Gdk.threads_leave();
-
-                            // Give other threads the chance to do their work.
-                            // This should speedup normal navigation during the
-                            // precache phase a lot.
-                            Thread.self().yield();
-                        }
-                        this.precaching_completed();
-                        return null;
-                    },
-                    true
-                );
-            }
-            catch ( ThreadError e ) {
-                error( "Pre-Rendering thread could not be spawned: %s", e.message );
-            }
-        }
-*/
-        /**
          * Render the given slide_number to a Gdk.Pixmap and return it.
          *
          * If the requested slide is not available an

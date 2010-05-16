@@ -23,7 +23,7 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Basic view class which is usable with any renderer.
      */
-    public class View.Default: View.Base {
+    public class View.Default: View.Base, View.Prerendering {
         
         /**
          * The currently displayed slide
@@ -57,7 +57,72 @@ namespace org.westhoffswelt.pdfpresenter {
                     // There should always be a page 0 but you never know.
                     error( "Could not render initial page %d: %s", this.current_slide_number, e.message );
                 }
+
+                // Start the prerender cycle if the renderer supports caching
+                // and the used cache engine allows prerendering.
+                // Executing the cycle here to ensure it is executed within the
+                // Gtk event loop. If it is not proper Gdk thread handling is
+                // impossible.
+                var caching_renderer = this.renderer as Renderer.Caching;
+                if ( caching_renderer != null
+                  && caching_renderer.get_cache() != null 
+                  && caching_renderer.get_cache().allows_prerendering()) {
+                    this.start_prerendering_thread();
+                }
            });
+        }
+
+        /**
+         * Start a thread to prerender all slides this view might display at
+         * some time.
+         *
+         * This method may only be called from within the Gtk event loop, as
+         * thread handling is borked otherwise.
+         */
+        protected void start_prerendering_thread() {
+            try {
+                Thread.create(
+                    () => {
+                        // Wait 2.5 seconds before starting the prerendering to
+                        // allow the base interface to be rendered correctly.
+                        Thread.self().usleep( 2500000 );
+
+                        this.prerendering_started();
+
+                        var page_count = this.get_renderer().get_metadata().get_slide_count();
+                        for( var i = 0; i < page_count; ++i ) {
+                            Gdk.threads_enter();
+
+                            // We do not care about the result, as the
+                            // rendering function stores the rendered
+                            // pixmap in the cache if it is enabled. This
+                            // is exactly what we want.
+                            try {
+                                this.get_renderer().render_to_pixmap( i );
+                            }
+                            catch( Renderer.RenderError e ) {
+                                error( "Could not render page '%i' while pre-rendering: %s", i, e.message );
+                            }
+                            
+                            // Inform possible observers about the cached slide
+                            this.slide_prerendered();
+
+                            Gdk.threads_leave();
+
+                            // Give other threads the chance to do their work.
+                            // This should speedup normal navigation during the
+                            // precache phase a lot.
+                            Thread.self().yield();
+                        }
+                        this.prerendering_completed();
+                        return null;
+                    },
+                    true
+                );
+            }
+            catch ( ThreadError e ) {
+                error( "Pre-Rendering thread could not be spawned: %s", e.message );
+            }
         }
         
         /**

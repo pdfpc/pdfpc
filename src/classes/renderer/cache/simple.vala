@@ -63,10 +63,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * If no item with the given index is available null is returned
          */
         public override Pixmap retrieve( uint index ) {
-            this.mutex.lock();
-            var pixmap = this.storage[index];
-            this.mutex.unlock();
-            return pixmap;
+            return this.storage[index];
         }
     }
 }
