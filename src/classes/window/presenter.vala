@@ -100,7 +100,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             int current_allocated_width = (int)Math.floor( 
                 this.screen_geometry.width * Options.current_size / (double)100 
             );
-            this.current_view = new View.Pdf.from_pdf_file( 
+            this.current_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 current_allocated_width,
                 bottom_position,
@@ -116,7 +116,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // remaining width
             Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width;
-            this.next_view = new View.Pdf.from_pdf_file( 
+            this.next_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 next_allocated_width,
                 bottom_position,

@@ -58,7 +58,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             
             Rectangle scale_rect;
             
-            this.view = new View.Pdf.from_pdf_file( 
+            this.view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 this.screen_geometry.width, 
                 this.screen_geometry.height,

@@ -46,7 +46,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * aspect ration. The scale rectangle is provided in the scale_rect
          * argument.
          */
-        public Pdf.from_pdf_file( string pdf_file, int width, int height, out Rectangle scale_rect ) {
+        public static View.Pdf from_pdf_file( string pdf_file, int width, int height, out Rectangle scale_rect = null ) {
             var file = File.new_for_commandline_arg( pdf_file );
             var metadata = new Metadata.Pdf( file.get_uri() );
             var scaler = new Scaler( 
@@ -54,16 +54,13 @@ namespace org.westhoffswelt.pdfpresenter {
                 metadata.get_page_height()
             );
             scale_rect = scaler.scale_to( width, height );
-            this.renderer = new Renderer.Pdf( 
+            var renderer = new Renderer.Pdf( 
                 metadata,
                 scale_rect.width,
                 scale_rect.height
             );
-
-            this.set_size_request( 
-                renderer.get_width(),
-                renderer.get_height()
-            );
+            
+            return new View.Pdf( renderer );
         }
 
         /**
