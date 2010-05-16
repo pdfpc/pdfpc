@@ -172,6 +172,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 bottom_position - 10
             );
 
+            this.add_events(EventMask.KEY_PRESS_MASK);
+            this.add_events(EventMask.BUTTON_PRESS_MASK);
+
             this.key_press_event += this.on_key_pressed;
             this.button_press_event += this.on_button_press;
 

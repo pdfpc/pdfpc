@@ -81,6 +81,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 scale_rect.y
             );
 
+            this.add_events(EventMask.KEY_PRESS_MASK);
+            this.add_events(EventMask.BUTTON_PRESS_MASK);
+
             this.key_press_event += this.on_key_pressed;
             this.button_press_event += this.on_button_press;
 
@@ -103,7 +106,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * them to the presentation controller
          */
         protected bool on_button_press( Presentation source, EventButton button ) {
-            debug( "mouse button press" );
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
             }
