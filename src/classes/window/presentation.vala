@@ -144,14 +144,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Set the cache observer for the PdfImages on this window
+         * Set the cache observer for the Views on this window
          *
-         * This method takes care of registering all PdfImages used by this window
-         * correctly with the CacheStatus object to provide acurate cache status
-         * measurements.
+         * This method takes care of registering all Prerendering Views used by
+         * this window correctly with the CacheStatus object to provide acurate
+         * cache status measurements.
          */
         public void set_cache_observer( CacheStatus observer ) {
-//            observer.monitor_pdf_image( this.pdf_event_box.get_child() );
+            var prerendering_view = this.view as View.Prerendering;
+            if( prerendering_view != null ) {
+                observer.monitor_view( prerendering_view );
+            }
         }
     }
 }

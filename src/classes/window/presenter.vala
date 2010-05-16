@@ -289,14 +289,21 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /** 
-         * Take a cache observer and register it with all PdfImage shown on the window.
+         * Take a cache observer and register it with all prerendering Views
+         * shown on the window.
          *
          * Furthermore it is taken care of to add the cache observer to this window
          * for display, as it is a Image widget after all.
          */
         public void set_cache_observer( CacheStatus observer ) {
-//            observer.monitor_pdf_image( this.current_slide_box.get_child() );
-//            observer.monitor_pdf_image( this.next_slide_box.get_child() );
+            var current_prerendering_view = this.current_view as View.Prerendering;
+            if( current_prerendering_view != null ) {
+                observer.monitor_view( current_prerendering_view );
+            }
+            var next_prerendering_view = this.next_view as View.Prerendering;
+            if( next_prerendering_view != null ) {
+                observer.monitor_view( next_prerendering_view );
+            }
 
             // Add the cache status widget to be displayed
             observer.set_height( 6 );
