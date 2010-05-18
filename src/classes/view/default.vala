@@ -67,7 +67,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 if ( caching_renderer != null
                   && caching_renderer.get_cache() != null 
                   && caching_renderer.get_cache().allows_prerendering()) {
-                    this.start_prerendering_thread();
+                    this.register_prerendering();
                 }
            });
         }
@@ -79,50 +79,48 @@ namespace org.westhoffswelt.pdfpresenter {
          * This method may only be called from within the Gtk event loop, as
          * thread handling is borked otherwise.
          */
-        protected void start_prerendering_thread() {
-            try {
-                Thread.create(
-                    () => {
-                        // Wait 2.5 seconds before starting the prerendering to
-                        // allow the base interface to be rendered correctly.
-                        Thread.self().usleep( 2500000 );
+        protected void register_prerendering() {
+            // The pointer is needed to keep track of the slide progress inside
+            // the prerender function
+            int* i = null;
+            // The page_count will be transfered into the lamda function as
+            // well.
+            var page_count = this.get_renderer().get_metadata().get_slide_count();
+                
+            this.prerendering_started();
 
-                        this.prerendering_started();
+            Idle.add(() => {
+                if( i == null ) {
+                    i = malloc( sizeof( int ) );
+                    *i = 0;
+                }
 
-                        var page_count = this.get_renderer().get_metadata().get_slide_count();
-                        for( var i = 0; i < page_count; ++i ) {
-                            Gdk.threads_enter();
-
-                            // We do not care about the result, as the
-                            // rendering function stores the rendered
-                            // pixmap in the cache if it is enabled. This
-                            // is exactly what we want.
-                            try {
-                                this.get_renderer().render_to_pixmap( i );
-                            }
-                            catch( Renderer.RenderError e ) {
-                                error( "Could not render page '%i' while pre-rendering: %s", i, e.message );
-                            }
-                            
-                            // Inform possible observers about the cached slide
-                            this.slide_prerendered();
-
-                            Gdk.threads_leave();
-
-                            // Give other threads the chance to do their work.
-                            // This should speedup normal navigation during the
-                            // precache phase a lot.
-                            Thread.self().yield();
-                        }
-                        this.prerendering_completed();
-                        return null;
-                    },
-                    true
-                );
-            }
-            catch ( ThreadError e ) {
-                error( "Pre-Rendering thread could not be spawned: %s", e.message );
-            }
+                // We do not care about the result, as the
+                // rendering function stores the rendered
+                // pixmap in the cache if it is enabled. This
+                // is exactly what we want.
+                try {
+                    this.get_renderer().render_to_pixmap( *i );
+                }
+                catch( Renderer.RenderError e ) {
+                    error( "Could not render page '%i' while pre-rendering: %s", *i, e.message );
+                }
+                
+                // Inform possible observers about the cached slide
+                this.slide_prerendered();
+                
+                // Increment one slide for each call and stop the loop if we
+                // have reached the last slide
+                *i = *i + 1;
+                if ( *i >= page_count ) {
+                    this.prerendering_completed();
+                    free( i );
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
         }
         
         /**
