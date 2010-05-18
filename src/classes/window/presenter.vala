@@ -186,12 +186,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
                 ((Renderer.Caching)this.current_view.get_renderer()).set_cache( 
-                    new Renderer.Cache.Simple( 
+                    new Renderer.Cache.PNG.Engine( 
                         this.current_view.get_renderer().get_metadata()
                     )
                 );
                 ((Renderer.Caching)this.next_view.get_renderer()).set_cache( 
-                    new Renderer.Cache.Simple( 
+                    new Renderer.Cache.PNG.Engine( 
                         this.next_view.get_renderer().get_metadata()
                     )
                 );

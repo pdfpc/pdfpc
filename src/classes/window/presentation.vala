@@ -67,7 +67,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             
             if ( !Options.disable_caching ) {
                 ((Renderer.Caching)this.view.get_renderer()).set_cache( 
-                    new Renderer.Cache.Simple( 
+                    new Renderer.Cache.PNG.Engine( 
                         this.view.get_renderer().get_metadata()
                     )
                 );

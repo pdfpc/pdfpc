@@ -85,8 +85,11 @@ namespace org.westhoffswelt.pdfpresenter {
             }
 
             // If caching is enabled check for the page in the cache
-            if ( this.cache != null && this.cache.retrieve( slide_number ) != null ) {
-                return this.cache.retrieve( slide_number );
+            if ( this.cache != null ) {
+                Gdk.Pixmap cache_content;
+                if ( ( cache_content = this.cache.retrieve( slide_number ) ) != null ) {
+                    return cache_content;
+                }
             }
 
             // Retrieve the Poppler.Page for the page to render
@@ -109,6 +112,8 @@ namespace org.westhoffswelt.pdfpresenter {
 
             // Compose the rendered pdf with the white background.
             pixmap.draw_pixbuf( gc, pdf, 0, 0, 0, 0, this.width, this.height, Gdk.RgbDither.NONE, 0, 0 );
+
+            pdf = null;
 
             // If the cache is enabled store the newly rendered pixmap
             if ( this.cache != null ) {

@@ -60,6 +60,6 @@ namespace org.westhoffswelt.pdfpresenter {
          *
          * If no item with the given index is available null is returned
          */
-        public abstract Pixmap retrieve( uint index );
+        public abstract Pixmap? retrieve( uint index );
     }
 }

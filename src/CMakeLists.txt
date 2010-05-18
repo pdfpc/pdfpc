@@ -42,7 +42,9 @@ set(VALA_SRC
 	classes/renderer/base.vala
 	classes/renderer/pdf.vala
 	classes/renderer/cache/base.vala
-	classes/renderer/cache/simple.vala
+	classes/renderer/cache/simple/engine.vala
+	classes/renderer/cache/png/item.vala
+	classes/renderer/cache/png/engine.vala
 	classes/scaler.vala
 	classes/timer_label.vala
 	classes/view/base.vala
@@ -68,7 +70,8 @@ endmacro(make_compile_directory)
 make_compile_directory("classes")
 make_compile_directory("classes/metadata")
 make_compile_directory("classes/renderer")
-make_compile_directory("classes/renderer/cache")
+make_compile_directory("classes/renderer/cache/simple")
+make_compile_directory("classes/renderer/cache/png")
 make_compile_directory("classes/view")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
@@ -84,6 +87,7 @@ PACKAGES
 	posix
 OPTIONS 
 	--thread
+	--debug
 GENERATE_HEADER
 	presenter
 GENERATE_VAPI

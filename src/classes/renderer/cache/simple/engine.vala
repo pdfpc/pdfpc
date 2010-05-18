@@ -20,11 +20,13 @@
 using GLib;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+using org.westhoffswelt.pdfpresenter;
+
+namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
     /**
      * Cache store which simply holds all given items in memory.
      */
-    public class Renderer.Cache.Simple: Renderer.Cache.Base {
+    public class Simple.Engine: Renderer.Cache.Base {
         /**
          * In memory storage for all the given pixmaps
          */
@@ -40,7 +42,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Initialize the cache store
          */
-        public Simple( Metadata.Base metadata ) {
+        public Engine( Metadata.Base metadata ) {
             base( metadata );
 
             this.mutex.lock();
@@ -62,7 +64,7 @@ namespace org.westhoffswelt.pdfpresenter {
          *
          * If no item with the given index is available null is returned
          */
-        public override Pixmap retrieve( uint index ) {
+        public override Pixmap? retrieve( uint index ) {
             return this.storage[index];
         }
     }
