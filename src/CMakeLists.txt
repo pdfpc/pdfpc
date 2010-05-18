@@ -45,6 +45,7 @@ set(VALA_SRC
 	classes/renderer/cache/simple/engine.vala
 	classes/renderer/cache/png/item.vala
 	classes/renderer/cache/png/engine.vala
+	classes/renderer/cache/option_factory.vala
 	classes/scaler.vala
 	classes/timer_label.vala
 	classes/view/base.vala
