@@ -42,13 +42,6 @@ namespace org.westhoffswelt.pdfpresenter {
         private Window.Presenter presenter_window;
 
         /**
-         * Global mutex used by all threads, to lock the operations on the poppler
-         * library, which is unfortunately not threadsafe, therefore only one
-         * poppler call at a time is possible.
-         */
-        public static GLib.Mutex poppler_mutex = new GLib.Mutex();
-
-        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
