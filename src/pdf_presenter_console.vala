@@ -42,6 +42,19 @@ namespace org.westhoffswelt.pdfpresenter {
         private Window.Presenter presenter_window;
 
         /**
+         * PresentationController instanace managing all actions which need to
+         * be coordinated between the different windows
+         */
+        private PresentationController controller;
+
+        /**
+         * CacheStatus widget, which coordinates all the information about
+         * cached slides to provide a visual feedback to the user about the
+         * rendering state
+         */
+        private CacheStatus cache_status;
+
+        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
@@ -82,6 +95,30 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Create and return a PresenterWindow using the specified monitor
+         * while displaying the given file
+         */
+        private Window.Presenter create_presenter_window( string filename, int monitor ) {
+            var presenter_window = new Window.Presenter( filename, monitor );
+            controller.register_controllable( presenter_window );
+            presenter_window.set_cache_observer( this.cache_status );
+
+            return presenter_window;
+        }
+
+        /**
+         * Create and return a PresentationWindow using the specified monitor
+         * while displaying the given file
+         */
+        private Window.Presentation create_presentation_window( string filename, int monitor ) {
+            var presentation_window = new Window.Presentation( filename, monitor );
+            controller.register_controllable( presentation_window );
+            presentation_window.set_cache_observer( this.cache_status );
+
+            return presentation_window;
+        }
+
+        /**
          * Main application function, which instantiates the windows and
          * initializes the Gtk system.
          */
@@ -96,8 +133,13 @@ namespace org.westhoffswelt.pdfpresenter {
 
             this.parse_command_line_options( args );
 
-            stdout.printf( "Initializing pdf rendering...\n" );
-            
+            stdout.printf( "Initializing rendering...\n" );
+           
+            // Initialize global controller and CacheStatus, to manage
+            // crosscutting concerns between the different windows.
+            this.controller = new PresentationController();
+            this.cache_status = new CacheStatus();
+
             int presenter_monitor, presentation_monitor;
             if ( Options.display_switch != true ) {
                 presenter_monitor    = 0;
@@ -108,32 +150,40 @@ namespace org.westhoffswelt.pdfpresenter {
                 presentation_monitor = 0;
             }
 
-            var controller = new PresentationController();
-            var cache_status = new CacheStatus();
-
             if ( Gdk.Screen.get_default().get_n_monitors() > 1 ) {
-                this.presenter_window = new Window.Presenter( args[1], presenter_monitor );
-                controller.register_controllable( this.presenter_window );
-                this.presenter_window.set_cache_observer( cache_status );
+                this.presentation_window = 
+                    this.create_presentation_window( args[1], presentation_monitor );
+                this.presenter_window = 
+                    this.create_presenter_window( args[1], presenter_monitor );
             }
             else {
                 stdout.printf( "Only one screen detected falling back to simple presentation mode.\n" );
-                presentation_monitor = 0;
+                // Decide which window to display by indirectly examining the
+                // display_switch flag This allows for training sessions with
+                // one monitor displaying the presenter screen
+                if ( presenter_monitor == 1 ) {
+                    this.presentation_window = 
+                        this.create_presentation_window( args[1], 0 );
+                }
+                else {
+                    this.presenter_window = 
+                        this.create_presenter_window( args[1], 0 );
+                }
             }
-
-            this.presentation_window = new Window.Presentation( args[1], presentation_monitor );
-
-            controller.register_controllable( this.presentation_window );
-            this.presentation_window.set_cache_observer( cache_status );
 
             // The windows are always displayed at last to be sure all caches have
             // been created at this point.
-            this.presentation_window.show_all();
+            if ( this.presentation_window != null ) {
+                this.presentation_window.show_all();
+            }
             
             if ( this.presenter_window != null ) {
                 this.presenter_window.show_all();
             }
 
+            
+            // Enter the Glib eventloop
+            // Everything from this point on is completely signal based
             Gdk.threads_enter();
             Gtk.main();
             Gdk.threads_leave();
