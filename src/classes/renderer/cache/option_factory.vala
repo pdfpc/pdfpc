@@ -39,11 +39,11 @@ namespace org.westhoffswelt.pdfpresenter.Renderer {
          * options.
          */
         public static Cache.Base create( Metadata.Base metadata ) {
-            if ( Options.disable_cache_compression ) {
-                return new Cache.Simple.Engine( metadata );
+            if ( Options.enable_cache_compression ) {
+                return new Cache.PNG.Engine( metadata );
             }
             else {
-                return new Cache.PNG.Engine( metadata );
+                return new Cache.Simple.Engine( metadata );
             }
         }
     }
