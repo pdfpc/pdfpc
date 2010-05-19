@@ -139,15 +139,30 @@ As the prerendering takes a lot of memory it can be disabled using the
 *--disable-cache* switch on cost of speed.
 
 
+Cache compression
+-----------------
+
+Since version 2.0 of the Pdf-Presenter-Console the prerendered and cached
+slides can be compressed in memory to save up some memory. Without compression
+a set of about 100 pdf pages can easily grow up to about 1.5gb size. Netbooks
+with only 1gb of memory would swap themselves to death if prerendering is
+enabled in such a situation. Using the *-z* switch the cached slides will be
+compressed before being stored in memory. Even though this reduces the used
+amount of memory by about factor 30 (aka the 1.5gb become about 50mb) it has a
+performance penalty. The compression slows down prerendering by approximately
+factor 2. It does have a speed penalty on page changes as well. But this one is
+negligible.
+
+
 Keybindings
 -----------
 
 During the presentation the following key strokes and mouse clicks are detected
 and interpreted:
 
-- Left cursor key / Page up / Right mouse button click 
+- Left cursor key / Page up / Right mouse button 
     - Go back one slide
-- Right cursor key / Page down / Return / Space / Left mouse button click
+- Right cursor key / Page down / Return / Space / Left mouse button
     - Go forward one slide
 - Home
     - Go back to the first slide and reset the timer
