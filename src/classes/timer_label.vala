@@ -101,7 +101,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Start the timer
          */
         public void start() {
-            if ( this.timeout == 0 ) {
+            if ( this.initial_time != 0 && this.timeout == 0 ) {
                 this.timeout = Timeout.add( 1000, this.on_timeout );
             }
         }
@@ -157,7 +157,8 @@ namespace org.westhoffswelt.pdfpresenter {
 
             if ( this._time >= 0 ) {
                 // Time is positive
-                if ( this._time < this.last_minutes * 60 ) {
+                if ( this.initial_time != 0 
+                  && this._time < this.last_minutes * 60 ) {
                     this.modify_fg( 
                         StateType.NORMAL, 
                         this.last_minutes_color
