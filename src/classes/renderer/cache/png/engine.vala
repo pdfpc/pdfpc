@@ -88,9 +88,6 @@ namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
                 error( "Could not generate PNG cache image for slide %u: %s", index, e.message );
             }
 
-            debug( "storing png(%ld)", buffer.length );
-
-
             var item = new PNG.Item.with_char_array( buffer );
             
             this.mutex.lock();
@@ -108,8 +105,6 @@ namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
             if ( item == null ) {
                 return null;
             }
-
-            debug( "loading png(%d)", item.get_length() );
 
             var loader = new PixbufLoader();
             try {
