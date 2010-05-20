@@ -55,22 +55,17 @@ namespace org.westhoffswelt.pdfpresenter.View {
         }
 
         /**
-         * Associate the implementing Behaviour with the given View
-         *
-         * This method should be overridden in every implementation to add
-         * further initializing code.
-         *
-         * This base implementation simple ensures the association is
-         * exclusive.
+         * Enfore the fact that a Behaviour may only be associated to one View
          */
-        public void associate( View.Base target ) {
+        protected void enforce_exclusive_association( View.Base target )
+            throws Behaviour.AssociationError {
             if ( this.target == target ) {
                 // Handle multiple association with the same View by simply
                 // ignoring it.
                 return;
             }
 
-            if ( target != null ) {
+            if ( this.target != null ) {
                 throw new Behaviour.AssociationError.BEHAVIOUR_ALREADY_ASSOCIATED( 
                     "A behaviour has been associated with two different Views."
                 );
@@ -82,6 +77,12 @@ namespace org.westhoffswelt.pdfpresenter.View {
                 );
             }
         }
+
+        /**
+         * Associate the implementing Behaviour with the given View
+         */
+        public abstract void associate( View.Base target )
+            throws Behaviour.AssociationError;
 
         /**
          * Check wheter the given target is supported by this Behaviour

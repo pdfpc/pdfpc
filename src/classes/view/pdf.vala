@@ -35,6 +35,11 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public Pdf( Renderer.Pdf renderer ) {
             base( renderer );
+
+            // Enable the PDFLink Behaviour by default on PDF Views
+            this.associate_behaviour( 
+                new View.Behaviour.PdfLink.Implementation()
+            );
         }
 
         /**

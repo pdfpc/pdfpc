@@ -63,7 +63,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.screen_geometry.height,
                 out scale_rect
             );
-            
+
             if ( !Options.disable_caching ) {
                 ((Renderer.Caching)this.view.get_renderer()).set_cache( 
                     Renderer.Cache.OptionFactory.create( 
@@ -83,8 +83,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.add_events(EventMask.BUTTON_PRESS_MASK);
 
-            this.key_press_event += this.on_key_pressed;
-            this.button_press_event += this.on_button_press;
+            this.key_press_event.connect( this.on_key_pressed );
+            this.button_press_event.connect( this.on_button_press );
 
             this.reset();
         }
@@ -93,7 +93,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Handle keypress vents on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( Presentation source, EventKey key ) {
+        protected bool on_key_pressed( EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
             }
@@ -104,7 +104,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Handle mouse button events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_button_press( Presentation source, EventButton button ) {
+        protected bool on_button_press( EventButton button ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
             }

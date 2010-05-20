@@ -297,9 +297,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             try {
                 this.current_view.display( page_number );
                 this.next_view.display( 
-                    ( page_number == this.next_view.get_current_slide_number() - 1 ) 
-                    ? ( page_number )
-                    : ( page_number + 1 )
+                    page_number + 1
                 );
             }
             catch( Renderer.RenderError e ) {

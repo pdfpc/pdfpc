@@ -23,7 +23,8 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Basic view class which is usable with any renderer.
      */
-    public class View.Default: View.Base, View.Prerendering {
+    public class View.Default: View.Base,
+        View.Prerendering, View.Behaviour.Decoratable {
         
         /**
          * The currently displayed slide
@@ -34,6 +35,11 @@ namespace org.westhoffswelt.pdfpresenter {
          * The pixmap containing the currently shown slide
          */
         protected Gdk.Pixmap current_slide;
+
+        /**
+         * List to store all associated behaviours
+         */
+        protected GLib.List<View.Behaviour.Base> behaviours = new GLib.List<View.Behaviour.Base>();
 
         /**
          * Base constructor taking the renderer to use as an argument
@@ -122,6 +128,22 @@ namespace org.westhoffswelt.pdfpresenter {
                 }
             });
         }
+
+        /**
+         * Associate a new Behaviour with this View
+         *
+         * The implementation supports an arbitrary amount of different
+         * behaviours.
+         */
+        public void associate_behaviour( Behaviour.Base behaviour ) {
+            this.behaviours.append( behaviour );
+            try {
+                behaviour.associate( this );
+            }
+            catch( Behaviour.AssociationError e ) {
+                error( "Behaviour association failure: %s", e.message );
+            }
+        }
         
         /**
          * Goto the next slide
@@ -171,6 +193,15 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public override void display( int slide_number )
             throws Renderer.RenderError {
+            // If the slide is out of bounds render the outer most slide on
+            // each side of the document.
+            if ( slide_number < 0 ) {
+                slide_number = 0;
+            }
+            if ( slide_number >= this.get_renderer().get_metadata().get_slide_count() ) {
+                slide_number = (int)this.get_renderer().get_metadata().get_slide_count() - 1;
+            }
+
             if ( slide_number == this.current_slide_number && this.current_slide != null ) {
                 // The slide does not need to be changed, as the correct one is
                 // already shown.

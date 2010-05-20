@@ -77,11 +77,11 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
          */
         public void attach( View.Pdf view ) {
             this.target = view;
-            
-            view.add_events( Gdk.EventMask.BUTTON_RELEASE_MASK );
+
+            view.add_events( Gdk.EventMask.BUTTON_PRESS_MASK );
             view.add_events( Gdk.EventMask.POINTER_MOTION_MASK );
 
-            view.button_release_event.connect( this.on_button_release );
+            view.button_press_event.connect( this.on_button_press );
             view.motion_notify_event.connect( this.on_mouse_move );
             view.entering_slide.connect( this.on_entering_slide );
             view.leaving_slide.connect( this.on_leaving_slide );
@@ -183,11 +183,11 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
         }
 
         /**
-         * Called whenever a mouse button is released inside the View.Pdf
+         * Called whenever a mouse button is pressed inside the View.Pdf
          *
          * Maybe a link has been clicked. Therefore we need to handle this.
          */
-        protected bool on_button_release( Gtk.Widget source, Gdk.EventButton e ) {
+        protected bool on_button_press( Gtk.Widget source, Gdk.EventButton e ) {
             // We are only interested in left button clicks
             if ( e.button != 1 ) {
                 return false;
@@ -203,9 +203,10 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
 
             // Handle the mapping properly by emitting the correct signals
             this.handle_link_mapping( mapping );
-
-            // Call all registered callbacks up the chain as well.
-            return false;
+            
+            // Other callbacks up the chain are suppressed to make sure nobody
+            // else changes the presentation page on a mouseclick.
+            return true;
         }
 
         /**
