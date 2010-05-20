@@ -51,11 +51,15 @@ set(VALA_SRC
 	classes/view/base.vala
 	classes/view/default.vala
 	classes/view/pdf.vala
+	classes/view/behaviour/base.vala
+	classes/view/behaviour/pdf_link/implementation.vala
+	classes/view/behaviour/pdf_link/signal_provider.vala
 	classes/window/fullscreen.vala
 	classes/window/presentation.vala
 	classes/window/presenter.vala
 	interfaces/renderer/caching.vala
 	interfaces/view/prerendering.vala
+	interfaces/view/behaviour/decoratable.vala
 	interfaces/controllable.vala
 	pdf_presenter_console.vala
 )
@@ -74,10 +78,13 @@ make_compile_directory("classes/renderer")
 make_compile_directory("classes/renderer/cache/simple")
 make_compile_directory("classes/renderer/cache/png")
 make_compile_directory("classes/view")
+make_compile_directory("classes/view/behaviour")
+make_compile_directory("classes/view/behaviour/pdf_link")
 make_compile_directory("classes/window")
 make_compile_directory("interfaces")
 make_compile_directory("interfaces/renderer")
 make_compile_directory("interfaces/view")
+make_compile_directory("interfaces/view/behaviour")
 
 vala_precompile(VALA_C
 	${VALA_SRC}

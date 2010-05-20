@@ -1,5 +1,5 @@
 /**
- * Signal decorator for all kinds pdf link based signals
+ * Signal Provider for all pdf link related events
  *
  * This file is part of pdf-presenter-console.
  *
@@ -18,14 +18,14 @@
  */
 
 using GLib;
-using Gdk;
-using Poppler;
 
-namespace org.westhoffswelt.pdfpresenter {
+using org.westhoffswelt.pdfpresenter;
+
+namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
     /**
-     * Signal decorator to attach pdf-link signals to any View.Pdf object.
+     * Access provider to all signals related to PDF links.
      */
-    public class SignalDecorator.PdfLink: SignalDecorator.Base {
+    public class PdfLink.SignalProvider: Object {
         /**
          * Emitted whenever a link on a pdf page is clicked, which should
          * trigger a document internal switch to another page.
@@ -52,6 +52,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public signal void link_mouse_leave( Gdk.Rectangle link_rect, Poppler.LinkMapping mapping );
 
         /**
+         * View which is attached to this provider
+         */
+        protected View.Pdf target = null;
+
+        /**
          * The Poppler.LinkMapping which is currently beneath the mouse cursor or null
          * if there is none.
          */
@@ -66,11 +71,116 @@ namespace org.westhoffswelt.pdfpresenter {
          * Precalculated Gdk.Rectangles for every link mapping
          */
         protected Gdk.Rectangle[] precalculated_mapping_rectangles = null;
+        
+        /**
+         * Attach a View.Pdf to this signal provider
+         */
+        public void attach( View.Pdf view ) {
+            this.target = view;
+            
+            view.add_events( Gdk.EventMask.BUTTON_RELEASE_MASK );
+            view.add_events( Gdk.EventMask.POINTER_MOTION_MASK );
+
+            view.button_release_event.connect( this.on_button_release );
+            view.motion_notify_event.connect( this.on_mouse_move );
+            view.entering_slide.connect( this.on_entering_slide );
+            view.leaving_slide.connect( this.on_leaving_slide );
+        }
 
         /**
-         * The decoratable that is decorated with additional signals
+         * Return the Poppler.LinkMapping associated with link for the given
+         * coordinates.
+         *
+         * If there is no link for the given coordinates null is returned
+         * instead.
          */
-        protected View.Pdf decoratable;
+        protected unowned Poppler.LinkMapping? get_link_mapping_by_coordinates( double x, double y ) {
+            // Try to find a matching link mapping on the page.
+            for( var i=0; i<this.precalculated_mapping_rectangles.length; ++i ) {
+                Gdk.Rectangle r = this.precalculated_mapping_rectangles[i];
+                // A simple bounding box check tells us if the given point lies
+                // within the link area.
+                if ( ( x >= r.x )
+                  && ( x <= r.x + r.width )
+                  && ( y >= r.y )
+                  && ( y <= r.y + r.height ) ) {
+                    return this.page_link_mappings.nth_data( i );
+                }
+            }
+            return null;
+}
+    
+        /**
+         * Handle the given mapping as it has been clicked on.
+         *
+         * This method evaluates the mapping and emits all signals which are
+         * needed in the given case.
+         */
+        protected void handle_link_mapping( Poppler.LinkMapping mapping ) {
+            switch( mapping.action.type ) {
+                // Internal goto link
+                case Poppler.ActionType.GOTO_DEST:
+                    // There are different goto destination types we need to
+                    // handle correctly.
+                    unowned Poppler.ActionGotoDest action = (Poppler.ActionGotoDest)mapping.action;
+                    switch( action.dest.type ) {
+                        case Poppler.DestType.NAMED:
+                            MutexLocks.poppler.lock();
+                            var metadata = this.target.get_renderer().get_metadata() as Metadata.Pdf;
+                            var document = metadata.get_document();
+                            unowned Poppler.Dest destination = document.find_dest( 
+                                action.dest.named_dest
+                            );
+                            MutexLocks.poppler.unlock();
+
+                            // Fire the correct signal for this
+                            this.clicked_internal_link( 
+                                this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                                this.target.get_current_slide_number(),
+                                /* We use zero based indexing. Pdf links use one based indexing */ 
+                                destination.page_num - 1
+                            );
+                        break;
+                    }
+                break;
+                // External launch link
+                case Poppler.ActionType.LAUNCH:
+                    unowned Poppler.ActionLaunch action = (Poppler.ActionLaunch)mapping.action;
+                    // Fire the appropriate signal
+                    this.clicked_external_command( 
+                        this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                        this.target.get_current_slide_number(),
+                        action.file_name,
+                        action.params
+                    );
+                break;
+            }
+        }
+
+        /**
+         * Convert an arbitrary Poppler.Rectangle struct into a Gdk.Rectangle
+         * struct taking into account the measurement differences between pdf
+         * space and screen space.
+         */
+        protected Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle( Poppler.Rectangle poppler_rectangle ) {
+            Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
+
+            Gtk.Requisition requisition;
+            this.target.size_request( out requisition );
+
+            // We need the page dimensions for coordinate conversion between
+            // pdf coordinates and screen coordinates
+            var metadata = this.target.get_renderer().get_metadata() as Metadata.Pdf;
+            gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / metadata.get_page_width() ) * requisition.width );
+            gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / metadata.get_page_height() ) * requisition.width );
+
+            // Gdk has its coordinate origin in the upper left, while Poppler
+            // has its origin in the lower left.
+            gdk_rectangle.y = (int)Math.ceil( ( ( metadata.get_page_height() - poppler_rectangle.y2 ) / metadata.get_page_height() ) * requisition.height );
+            gdk_rectangle.height = (int)Math.floor( ( ( poppler_rectangle.y2 - poppler_rectangle.y1 ) / metadata.get_page_height() ) * requisition.height );
+
+            return gdk_rectangle;
+        }
 
         /**
          * Called whenever a mouse button is released inside the View.Pdf
@@ -101,8 +211,8 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Called whenever the mouse is moved on the surface of the View.Pdf
          *
-         * This method changes the mouse cursor if the pointer enters or leaves
-         * a link
+         * The signal emitted by this method may for example be used to change
+         * the mouse cursor if the pointer enters or leaves a link
          */
         protected bool on_mouse_move( Gtk.Widget source, Gdk.EventMotion event ) {
             unowned Poppler.LinkMapping link_mapping = this.get_link_mapping_by_coordinates( event.x, event.y );
@@ -186,138 +296,6 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.page_link_mappings
             );
             MutexLocks.poppler.unlock();
-        }
-
-        /**
-         * Return the Poppler.LinkMapping associated with link for the given
-         * coordinates.
-         *
-         * If there is no link for the given coordinates null is returned
-         * instead.
-         */
-        protected unowned Poppler.LinkMapping? get_link_mapping_by_coordinates( double x, double y ) {
-            // Try to find a matching link mapping on the page.
-            for( var i=0; i<this.precalculated_mapping_rectangles.length; ++i ) {
-                Gdk.Rectangle r = this.precalculated_mapping_rectangles[i];
-                // A simple bounding box check tells us if the given point lies
-                // within the link area.
-                if ( ( x >= r.x )
-                  && ( x <= r.x + r.width )
-                  && ( y >= r.y )
-                  && ( y <= r.y + r.height ) ) {
-                    return this.page_link_mappings.nth_data( i );
-                }
-            }
-            return null;
-        }
-    
-        /**
-         * Handle the given mapping as it has been clicked on.
-         *
-         * This method evaluates the mapping and emits all signals which are
-         * needed in the given case.
-         */
-        protected void handle_link_mapping( Poppler.LinkMapping mapping ) {
-            switch( mapping.action.type ) {
-                // Internal goto link
-                case Poppler.ActionType.GOTO_DEST:
-                    // There are different goto destination types we need to
-                    // handle correctly.
-                    unowned Poppler.ActionGotoDest action = (Poppler.ActionGotoDest)mapping.action;
-                    switch( action.dest.type ) {
-                        case DestType.NAMED:
-                            MutexLocks.poppler.lock();
-                            var metadata = this.decoratable.get_renderer().get_metadata() as Metadata.Pdf;
-                            var document = metadata.get_document();
-                            unowned Poppler.Dest destination = document.find_dest( 
-                                action.dest.named_dest
-                            );
-                            MutexLocks.poppler.unlock();
-
-                            // Fire the correct signal for this
-                            this.clicked_internal_link( 
-                                this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
-                                this.decoratable.get_current_slide_number(),
-                                /* We use zero based indexing. Pdf links use one based indexing */ 
-                                destination.page_num - 1
-                            );
-                        break;
-                    }
-                break;
-                // External launch link
-                case Poppler.ActionType.LAUNCH:
-                    unowned Poppler.ActionLaunch action = (Poppler.ActionLaunch)mapping.action;
-                    // Fire the appropriate signal
-                    this.clicked_external_command( 
-                        this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
-                        this.decoratable.get_current_slide_number(),
-                        action.file_name,
-                        action.params
-                    );
-                break;
-            }
-        }
-
-        /**
-         * Convert an arbitrary Poppler.Rectangle struct into a Gdk.Rectangle
-         * struct taking into account the measurement differences between pdf
-         * space and screen space.
-         */
-        protected Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle( Poppler.Rectangle poppler_rectangle ) {
-            Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
-
-            Gtk.Requisition requisition;
-            this.decoratable.size_request( out requisition );
-
-            // We need the page dimensions for coordinate conversion between
-            // pdf coordinates and screen coordinates
-            var metadata = this.decoratable.get_renderer().get_metadata() as Metadata.Pdf;
-            gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / metadata.get_page_width() ) * requisition.width );
-            gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / metadata.get_page_height() ) * requisition.width );
-
-            // Gdk has its coordinate origin in the upper left, while Poppler
-            // has its origin in the lower left.
-            gdk_rectangle.y = (int)Math.ceil( ( ( metadata.get_page_height() - poppler_rectangle.y2 ) / metadata.get_page_height() ) * requisition.height );
-            gdk_rectangle.height = (int)Math.floor( ( ( poppler_rectangle.y2 - poppler_rectangle.y1 ) / metadata.get_page_height() ) * requisition.height );
-
-            return gdk_rectangle;
-        }
-        
-        /**
-         * Initialize the signal decorator and save the decoratable target
-         */
-        public override void initialize( Object target ) {
-            base.initialize( target );
-            this.decoratable = target as View.Pdf;
-        }
-
-        /**
-         * Enable the needed event masks on the view object
-         */
-        public override void enable_events( Object target ) {
-            var view = target as View.Pdf;
-            view.add_events( Gdk.EventMask.BUTTON_RELEASE_MASK );
-            view.add_events( Gdk.EventMask.POINTER_MOTION_MASK );
-        }
-            
-        /**
-         * Register all the needed events on the target.
-         */
-        public override void register_events( Object target ) {
-            var view = target as View.Pdf;
-            view.button_release_event.connect( this.on_button_release );
-            view.motion_notify_event.connect( this.on_mouse_move );
-            view.entering_slide.connect( this.on_entering_slide );
-            view.leaving_slide.connect( this.on_leaving_slide );
-        }
-
-        /**
-         * Check if this signal decorator can be applied to the target object.
-         *
-         * Only View.Pdf can be decorated.
-         */
-        protected override bool is_supported( Object target ) {
-            return target is View.Pdf;
         }
     }
 }
