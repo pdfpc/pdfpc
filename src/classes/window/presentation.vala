@@ -27,7 +27,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
      * Window showing the currently active slide to be presented on a beamer
      */
     public class Presentation: Fullscreen, Controllable {
-        
         /**
          * Controller handling all the events which might happen. Furthermore it is
          * responsible to update all the needed visual stuff if needed
@@ -118,6 +117,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         public void set_controller( PresentationController controller ) {
             this.presentation_controller = controller;
+        }
+
+        /**
+         * Return the PresentationController
+         */
+        public PresentationController? get_controller() {
+            return this.presentation_controller;
         }
 
         /**

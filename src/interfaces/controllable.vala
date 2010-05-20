@@ -30,6 +30,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void set_controller( PresentationController controller ) ;
 
         /**
+         * Return the registered PresentationController
+         */
+        public abstract PresentationController? get_controller();
+
+        /**
          * Change the presentation slide to the next page if applicable
          */
         public abstract void next_page();

@@ -241,6 +241,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Return the registered PresentationController
+         */
+        public PresentationController? get_controller() {
+            return this.presentation_controller;
+        }
+
+        /**
          * Switch the shown pdf to the next page
          */
         public void next_page() {
