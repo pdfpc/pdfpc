@@ -97,6 +97,8 @@ OPTIONS
 	--thread
 	--debug
 	--vapidir=${CMAKE_CURRENT_SOURCE_DIR}/vapis
+# Needed to compile on Fedora 13 with DSO linking
+	--Xcc=-lm
 GENERATE_HEADER
 	presenter
 GENERATE_VAPI
