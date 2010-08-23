@@ -121,6 +121,9 @@ You are now set to compile and install the presenter as described in the
 section above. However as mentioned above the code might not compile at all.
 
 
+__ http://github.com/jakobwesthoff/Pdf-Presenter-Console
+
+
 Startup and usage
 =================
 
