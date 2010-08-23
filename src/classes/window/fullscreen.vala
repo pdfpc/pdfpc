@@ -57,7 +57,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.size_allocate.connect( this.on_size_allocate );
 
             this.add_events(EventMask.POINTER_MOTION_MASK);
-            this.motion_notify_event += this.on_mouse_move;
+            this.motion_notify_event.connect( this.on_mouse_move );
 
             // Start the 5 seconds timeout after which the mouse curosr is
             // hidden
@@ -71,7 +71,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * movement commands before the window has been displayed for the first
          * time.
          */
-        protected void on_size_allocate( Rectangle r ) {
+        protected void on_size_allocate( Gtk.Widget source, Rectangle r ) {
             if ( this.is_mapped() ) {
                 // We are only interested to handle this event AFTER the window has
                 // been mapped.
@@ -106,7 +106,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Called every time the mouse cursor is moved
          */
-        protected bool on_mouse_move( Fullscreen source, EventMotion event ) {
+        protected bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
             // Restore the mouse cursor to its default value
             this.window.set_cursor( null );
 

@@ -75,9 +75,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public Presenter( string pdf_filename, int screen_num ) {
             base( screen_num );
 
-            this.destroy += (source) => {
+            this.destroy.connect( (source) => {
                 Gtk.main_quit();
-            };
+            } );
 
             Color black;
             Color.parse( "black", out black );
@@ -175,8 +175,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.add_events(EventMask.BUTTON_PRESS_MASK);
 
-            this.key_press_event += this.on_key_pressed;
-            this.button_press_event += this.on_button_press;
+            this.key_press_event.connect( this.on_key_pressed );
+            this.button_press_event.connect( this.on_button_press );
 
             // Store the slide count once
             this.slide_count = this.current_view.get_renderer().get_metadata().get_slide_count();
@@ -202,7 +202,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Handle keypress events on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( Presenter source, EventKey key ) {
+        protected bool on_key_pressed( Gtk.Widget source, EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
             }
@@ -213,7 +213,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Handle mouse button events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_button_press( Presenter source, EventButton button ) {
+        protected bool on_button_press( Gtk.Widget source, EventButton button ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
             }

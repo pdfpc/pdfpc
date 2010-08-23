@@ -44,9 +44,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public Presentation( string pdf_filename, int screen_num ) {
             base( screen_num );
 
-            this.destroy += (source) => {
+            this.destroy.connect( (source) => {
                 Gtk.main_quit();
-            };
+            } );
 
             Color black;
             Color.parse( "black", out black );
