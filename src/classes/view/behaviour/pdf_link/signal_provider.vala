@@ -122,7 +122,7 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
                 case Poppler.ActionType.GOTO_DEST:
                     // There are different goto destination types we need to
                     // handle correctly.
-                    unowned Poppler.ActionGotoDest action = (Poppler.ActionGotoDest)mapping.action;
+                    unowned Poppler.ActionGotoDest* action = (Poppler.ActionGotoDest*)mapping.action;
                     switch( action.dest.type ) {
                         case Poppler.DestType.NAMED:
                             MutexLocks.poppler.lock();
@@ -145,7 +145,7 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
                 break;
                 // External launch link
                 case Poppler.ActionType.LAUNCH:
-                    unowned Poppler.ActionLaunch action = (Poppler.ActionLaunch)mapping.action;
+                    unowned Poppler.ActionLaunch* action = (Poppler.ActionLaunch*)mapping.action;
                     // Fire the appropriate signal
                     this.clicked_external_command( 
                         this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
