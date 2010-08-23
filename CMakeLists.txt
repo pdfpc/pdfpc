@@ -7,7 +7,6 @@ include(ValaVersion)
 
 find_package(Vala)
 
-		
-ensure_vala_version("0.7.10" MINIMUM)
+ensure_vala_version("0.9.7" MINIMUM)
 
 add_subdirectory(src)

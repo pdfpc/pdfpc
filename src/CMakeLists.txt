@@ -96,7 +96,6 @@ PACKAGES
 OPTIONS 
 	--thread
 	--debug
-	--vapidir=${CMAKE_CURRENT_SOURCE_DIR}/vapis
 GENERATE_HEADER
 	presenter
 GENERATE_VAPI
