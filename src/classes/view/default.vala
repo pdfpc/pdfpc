@@ -21,6 +21,8 @@
  */
 
 using GLib;
+using Cairo;
+using Gdk;
 
 namespace org.westhoffswelt.pdfpresenter {
     /**
@@ -239,17 +241,20 @@ namespace org.westhoffswelt.pdfpresenter {
          * the window surface.
          */
         public override bool expose_event ( Gdk.EventExpose event ) {
-            var gc = new Gdk.GC( this.window );
-            this.window.draw_drawable( 
-                gc,
+            Context cr = Gdk.cairo_create( this.window );
+            Gdk.cairo_set_source_pixmap(
+                cr,
                 this.current_slide,
                 event.area.x,
-                event.area.y,
+                event.area.y
+            );
+            cr.rectangle(
                 event.area.x,
                 event.area.y,
                 event.area.width,
                 event.area.height
             );
+            cr.fill();
 
             // We are the only ones drawing on this context skip everything
             // else.
