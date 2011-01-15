@@ -22,6 +22,7 @@
 
 using Gtk;
 using Gdk;
+using Cairo;
 
 namespace org.westhoffswelt.pdfpresenter {
     /**
@@ -72,28 +73,28 @@ namespace org.westhoffswelt.pdfpresenter {
                 return;
             }
 
-            var background_pixmap = new Pixmap( null, this.width, this.height, 24 );
-            var gc = new GC( background_pixmap );
+            Pixmap background_pixmap = new Pixmap(
+                null,
+                this.width,
+                this.height,
+                24
+            );
+
+            Context cr = Gdk.cairo_create( background_pixmap );
             
-            Color white;
-            Color.parse( "white", out white );
-            Color black;
-            Color.parse( "black", out black );
+            cr.set_source_rgb( 0, 0, 0 );
+            cr.rectangle( 0,0, this.height, this.width );
+            cr.fill();
 
-            gc.set_rgb_fg_color( black );
-            background_pixmap.draw_rectangle( gc, true, 0, 0, this.width, this.height );
-
-            gc.set_rgb_fg_color( white );
-
-            background_pixmap.draw_rectangle( 
-                gc,
-                true,
+            cr.set_source_rgb( 1, 1, 1 );
+            cr.rectangle( 
                 0,
                 0,
                 (int)Math.ceil( this.width * ( (double)this.current_value / this.max_value ) ),
                 this.height
             );
-            
+            cr.fill();
+
             this.set_from_pixmap( background_pixmap, null );
         }
 
