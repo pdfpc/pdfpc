@@ -21,6 +21,8 @@
  */
 
 using GLib;
+using Gdk;
+using Cairo;
 
 namespace org.westhoffswelt.pdfpresenter {
     /**
@@ -102,19 +104,26 @@ namespace org.westhoffswelt.pdfpresenter {
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
-            Gdk.Color white; Gdk.Color.parse( "white", out white );
-            var pixmap = new Gdk.Pixmap( null, this.width, this.height, 24 );
-            var gc = new Gdk.GC( pixmap );
-            gc.set_rgb_fg_color( white );
-            pixmap.draw_rectangle( gc, true, 0, 0, this.width, this.height );
+            Pixmap pixmap = new Pixmap( null, this.width, this.height, 24 );
+            Context cr = Gdk.cairo_create( pixmap );
 
+            cr.set_source_rgb( 0, 0, 0 );
+            cr.rectangle( 0, 0, this.width, this.height );
+            cr.fill();
+
+            /**
+             * @TODO: Refactor rendering process to use cairo context directly
+             * for page rendering instead of inbetween pixbuf
+             */
             var pdf = new Gdk.Pixbuf( Gdk.Colorspace.RGB, false, 8, this.width, this.height );
             MutexLocks.poppler.lock();
             page.render_to_pixbuf( 0, 0, this.width, this.height, this.scaling_factor, 0, pdf );
             MutexLocks.poppler.unlock();
 
             // Compose the rendered pdf with the white background.
-            pixmap.draw_pixbuf( gc, pdf, 0, 0, 0, 0, this.width, this.height, Gdk.RgbDither.NONE, 0, 0 );
+            Gdk.cairo_set_source_pixbuf( cr, pdf, 0, 0 );
+            cr.rectangle( 0, 0, this.width, this.height );
+            cr.fill();
 
             pdf = null;
 
