@@ -173,12 +173,13 @@ Since version 2.0 of the Pdf-Presenter-Console the prerendered and cached
 slides can be compressed in memory to save up some memory. Without compression
 a set of about 100 pdf pages can easily grow up to about 1.5gb size. Netbooks
 with only 1gb of memory would swap themselves to death if prerendering is
-enabled in such a situation. Using the *-z* switch the cached slides will be
-compressed before being stored in memory. Even though this reduces the used
-amount of memory by about factor 30 (aka the 1.5gb become about 50mb) it has a
-performance penalty. The compression slows down prerendering by approximately
-factor 2. It does have a speed penalty on page changes as well. But this one is
-negligible.
+enabled in such a situation. The compression is enabled by default as it does
+not harm rendering speed in a noticeable way on most systems. It does however
+slows down prerendering by about a factor of 2. If you have got enough memory
+and want to ensure the fastest possible prerendering you can disable slide
+compression by using the *-z* switch. But be warned using the uncompressed
+prerendering storage will use about 30 times the memory the new compressed
+storage utilizes (aka the 1.5gb become about 50mb)
 
 
 Keybindings
