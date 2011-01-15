@@ -22,6 +22,7 @@
 
 using GLib;
 using Gdk;
+using Cairo;
 
 using org.westhoffswelt.pdfpresenter;
 
@@ -126,18 +127,16 @@ namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
                 pixbuf.get_height(),
                 24
             );
-            var gc = new Gdk.GC( pixmap );
 
-            pixmap.draw_pixbuf( 
-                gc, 
-                pixbuf, 
-                0, 0,
-                0, 0,
-                pixbuf.get_width(), pixbuf.get_height(),
-                Gdk.RgbDither.NONE,
+            Context cr = Gdk.cairo_create( pixmap );
+            Gdk.cairo_set_source_pixbuf( cr, pixbuf, 0, 0 );
+            cr.rectangle(
                 0,
-                0
+                0,
+                pixbuf.get_width(),
+                pixbuf.get_height()
             );
+            cr.fill();
 
             return pixmap;
         }
