@@ -2,6 +2,41 @@
 Pdf Presenter Console Changelog
 ===============================
 
+Version 2.0
+===========
+
+*Released: 15. Jan 2010*
+
+- Complete rewrite of rendering system to allow more sophisticated actions.
+
+- Changed license of the project from GPLv3 to GPLv2+ because of
+  incompatibilities with Poppler. (Thanks to Jakub Wilk <jwilk@debian.org> and
+  Barak A. Pearlmutter <barak@cs.nuim.ie> for pointing out this out).
+
+- Implemented: Usage of left-/right mousebuttons for slide navigation.
+
+- Implemented: Handling of navigational links inside of PDF files.
+
+- Implemented: Abstraction to cache prerendered slides.
+
+- Implemented: Compressed cache for prerendered slides.
+
+- Implemented: Alternative way of executing the prerendering process to allow
+  for smoother navigation while slides are generated.
+
+- Implemented: Means to switch displays in single monitor mode as well as dual
+  monitor mode
+
+- Implemented: Disabled timer if a duration of 0 is provided
+
+- Fixed: Build problems on Fedora 13 due to changed linking procedure
+
+- Fixed: Slightly changed image data formats due to update of Gtk to Version
+  2.22 or higher.
+
+- Implemented: Removed usage of deprecated Gdk.GC in favor of Cairo.
+
+
 Version 1.1.1
 =============
 
