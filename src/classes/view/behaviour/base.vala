@@ -100,7 +100,7 @@ namespace org.westhoffswelt.pdfpresenter.View {
     /**
      * Error domain used for association errors
      */
-    errordomain Behaviour.AssociationError {
+    public errordomain Behaviour.AssociationError {
         BEHAVIOUR_ALREADY_ASSOCIATED,
         VIEW_NOT_SUPPORTED 
     }

@@ -30,26 +30,19 @@ namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
         /**
          * PNG picture data stored for this item
          */
-        protected uchar[] data;
+        protected uint8[] data;
 
         /**
          * Create the item from a uchar array
          */
-        public Item( uchar[] data ) {
+        public Item( uint8[] data ) {
             this.data = data;
-        }
-
-        /**
-         * Create the item from a char array
-         */
-        public Item.with_char_array( char[] data ) {
-            this( (uchar[]) data );
         }
 
         /**
          * Return the stored data
          */
-        public uchar[] get_png_data() {
+        public uint8[] get_png_data() {
             return this.data;
         }
 

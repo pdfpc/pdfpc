@@ -87,7 +87,7 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Error domain used for every render error, which might occur
      */
-    errordomain Renderer.RenderError {
+    public errordomain Renderer.RenderError {
         SLIDE_DOES_NOT_EXIST;
     }
 }
