@@ -42,7 +42,7 @@ namespace org.westhoffswelt.pdfpresenter.Renderer {
          * options.
          */
         public static Cache.Base create( Metadata.Base metadata ) {
-            if ( Options.enable_cache_compression ) {
+            if ( !Options.disable_cache_compression ) {
                 return new Cache.PNG.Engine( metadata );
             }
             else {

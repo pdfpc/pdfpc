@@ -38,11 +38,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public static bool disable_caching = false;
 
         /**
-         * Commandline option to enable the compression of cached slides. This
+         * Commandline option to disable the compression of cached slides. This
          * trades speed for memory. A lot of memory ;) It's about factor 30
-         * smaller for normal presentations.
+         * bigger for normal presentations.
          */
-        public static bool enable_cache_compression = false;
+        public static bool disable_cache_compression = false;
 
         /**
          * Commandline option providing the talk duration, which will be used to
