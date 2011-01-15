@@ -83,7 +83,7 @@ namespace org.westhoffswelt.pdfpresenter {
             Context cr = Gdk.cairo_create( background_pixmap );
             
             cr.set_source_rgb( 0, 0, 0 );
-            cr.rectangle( 0,0, this.height, this.width );
+            cr.rectangle( 0,0, this.width, this.height );
             cr.fill();
 
             cr.set_source_rgb( 1, 1, 1 );
