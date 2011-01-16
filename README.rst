@@ -115,8 +115,8 @@ After it has been transfered you need to switch to the
 ``Pdf-Presenter-Console`` directory, which has just been created. From inside
 this directory use these commands to retrieve all needed submodules::
 
-    git submodules init
-    git submodules update
+    git submodule init
+    git submodule update
 
 You are now set to compile and install the presenter as described in the
 section above. However as mentioned above the code might not compile at all.
