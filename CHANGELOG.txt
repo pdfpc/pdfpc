@@ -5,7 +5,7 @@ Pdf Presenter Console Changelog
 Version 2.0
 ===========
 
-*Released: 15. Jan 2010*
+*Released: 16. Jan 2010*
 
 - Complete rewrite of rendering system to allow more sophisticated actions.
 
