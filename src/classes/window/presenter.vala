@@ -148,22 +148,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             // Calculate the countdown to display until the presentation has to
             // start
-            int countdown = 0;
+            time_t start_time = 0;
             if ( Options.start_time != null ) 
             {
-                var start_time = this.parseStartTime( 
+                start_time = this.parseStartTime( 
                     Options.start_time 
                 );
-
-                var tm = Time.local( time_t() );
-                var now = tm.mktime();
-
-                countdown = (int)Math.fmax( 0, start_time - now );
             }
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
-            this.timer = new TimerLabel( (int)Options.duration * 60, countdown );
+            this.timer = new TimerLabel( (int)Options.duration * 60, start_time );
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
             this.timer.set_size_request( 
