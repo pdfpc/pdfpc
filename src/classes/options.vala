@@ -61,5 +61,11 @@ namespace org.westhoffswelt.pdfpresenter {
          * the presenter window
          */
         public static uint current_size = 60;
+
+        /**
+         * Time the talk starts at, to calculate and display a countdown to
+         * this time.
+         */
+        public static string? start_time = null;
     }
 }
