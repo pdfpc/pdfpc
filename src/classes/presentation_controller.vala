@@ -63,6 +63,9 @@ namespace org.westhoffswelt.pdfpresenter {
                 case 0xff55: /* Page Up */
                     this.controllables_previous_page();
                 break;
+                case 0xff08: /* Backspace */
+                    this.controllables_back10();
+                break;
                 case 0xff1b: /* Escape */
                 case 0x071:  /* q */
                     Gtk.main_quit();
@@ -127,6 +130,15 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_previous_page() {
             foreach( Controllable c in this.controllables ) {
                 c.previous_page();
+            }
+        }
+
+        /**
+         * Go back 10 pages in all registered controllables
+         */
+        protected void controllables_back10() {
+            foreach( Controllable c in this.controllables ) {
+                c.back10();
             }
         }
 

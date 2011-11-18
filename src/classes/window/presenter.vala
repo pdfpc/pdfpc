@@ -286,6 +286,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Go back 10 slides
+         */
+        public void back10() {
+            if ( this.current_view.get_current_slide_number() >= 10 ) // Note, this is the *current* slide (0 counted)
+                this.next_view.back10();
+            this.current_view.back10();
+            this.update_slide_count();
+        }
+
+        /**
          * Reset the presentation display to the initial status
          */
         public void reset() {

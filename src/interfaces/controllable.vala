@@ -48,6 +48,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void previous_page();
 
         /**
+         * Go back 10 slides in the presentation, if applicable
+         */
+        public abstract void back10(); 
+
+        /**
          * Reset the presentation to it's initial state
          */
         public abstract void reset();

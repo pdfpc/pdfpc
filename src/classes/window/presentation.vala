@@ -144,6 +144,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Switch the shown pdf to the previous page
+         */
+        public void back10() {
+            this.view.back10();
+        }
+
+        /**
          * Reset to the initial presentation state
          */
         public void reset() {
