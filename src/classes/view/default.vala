@@ -191,6 +191,26 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Go back 10 slides
+         *
+         * If the beginning of slides is reached this method does nothing.
+         */
+        public override void back10() {
+            if ( this.current_slide_number - 10 < 0 ) {
+                // The first slide has been reached, do nothing.
+                return;
+            }
+            
+            try {
+                this.display( this.current_slide_number - 10 );
+            }
+            catch( Renderer.RenderError e ) {
+                // Should actually never happen, but one never knows
+                error( "Could not display previous slide: %s", e.message );
+            }
+        }
+
+        /**
          * Goto a specific slide number
          *
          * If the slide number does not exist a

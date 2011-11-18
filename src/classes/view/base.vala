@@ -77,6 +77,13 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void previous();
 
         /**
+         * Go back 10 slides
+         *
+         * If the beginning of slides is reached this method does nothing.
+         */
+        public abstract void back10();
+
+        /**
          * Goto a specific slide number
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
