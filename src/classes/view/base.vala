@@ -69,6 +69,14 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void next();
 
         /**
+         * Go forward 10 slides
+         *
+         * If the end of slides is reached this method is expected to do
+         * nothing.
+         */
+        public abstract void jump10();
+
+        /**
          * Goto the previous slide
          *
          * If the beginning of slides is reached this method is expected to do

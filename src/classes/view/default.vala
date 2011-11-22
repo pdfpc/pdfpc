@@ -171,6 +171,27 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Goto forward 10 slides
+         *
+         * If the end of slides is reached this method does nothing.
+         */
+        public override void jump10() {
+            uint totalSlides = this.renderer.get_metadata().get_slide_count();
+            try {
+                if ( this.current_slide_number + 10 >= totalSlides ) {
+                    // Jump to the last slides
+                    this.display((int) totalSlides - 1) ;
+                } else {
+                    this.display( this.current_slide_number + 10 );
+                }
+            }
+            catch( Renderer.RenderError e ) {
+                // Should actually never happen, but one never knows
+                error( "Could not display next slide: %s", e.message );
+            }
+        }
+
+        /**
          * Goto the previous slide
          *
          * If the beginning of slides is reached this method does nothing.

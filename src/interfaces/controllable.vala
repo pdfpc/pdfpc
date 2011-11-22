@@ -43,6 +43,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void next_page();
 
         /**
+         * Go forward 10 slides in the presentation, if applicable
+         */
+        public abstract void jump10();
+
+        /**
          * Change the presentation slide to the previous page if applicable.
          */
         public abstract void previous_page();

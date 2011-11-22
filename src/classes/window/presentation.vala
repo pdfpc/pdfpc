@@ -137,6 +137,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Go forward 10 slides
+         */
+        public void jump10() {
+            this.view.jump10();
+        }
+
+        /**
          * Switch the shown pdf to the previous page
          */
         public void previous_page() {

@@ -59,6 +59,9 @@ namespace org.westhoffswelt.pdfpresenter {
                 case 0x020:  /* Space */
                     this.controllables_next_page();
                 break;
+                case 0x06e:  /* n */
+                    this.controllables_jump10();
+                break;
                 case 0xff51: /* Cursor left */
                 case 0xff55: /* Page Up */
                     this.controllables_previous_page();
@@ -121,6 +124,15 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_next_page() {
             foreach( Controllable c in this.controllables ) {
                 c.next_page();
+            }
+        }
+
+        /**
+         * Move all registered controllables 10 pages forward
+         */
+        protected void controllables_jump10() {
+            foreach( Controllable c in this.controllables ) {
+                c.jump10();
             }
         }
 

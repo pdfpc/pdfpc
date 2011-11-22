@@ -272,6 +272,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Switch the shown pdf to the next page
+         */
+        public void jump10() {
+            this.current_view.jump10();
+            this.next_view.jump10();
+            this.update_slide_count();
+
+            this.timer.start();
+        }
+
+        /**
          * Switch to the previous page
          */
         public void previous_page() {
