@@ -308,11 +308,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 } else {
                     this.next_view.backN(9);
                 }
+                this.current_view.backN(10);
+                this.update_slide_count();
             } else {
                 this.goto_page(0);
             }
-            this.current_view.backN(10);
-            this.update_slide_count();
         }
 
         /**
