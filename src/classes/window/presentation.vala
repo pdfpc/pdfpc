@@ -140,7 +140,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Go forward 10 slides
          */
         public void jump10() {
-            this.view.jump10();
+            this.view.jumpN(10);
         }
 
         /**
@@ -154,7 +154,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Switch the shown pdf to the previous page
          */
         public void back10() {
-            this.view.back10();
+            this.view.backN(10);
         }
 
         /**

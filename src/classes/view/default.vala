@@ -171,18 +171,18 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Goto forward 10 slides
+         * Goto forward n slides
          *
          * If the end of slides is reached this method does nothing.
          */
-        public override void jump10() {
+        public override void jumpN( int n ) {
             uint totalSlides = this.renderer.get_metadata().get_slide_count();
             try {
-                if ( this.current_slide_number + 10 >= totalSlides ) {
-                    // Jump to the last slides
+                if ( this.current_slide_number + n >= totalSlides ) {
+                    // Jump to the last slide
                     this.display((int) totalSlides - 1) ;
                 } else {
-                    this.display( this.current_slide_number + 10 );
+                    this.display( this.current_slide_number + n );
                 }
             }
             catch( Renderer.RenderError e ) {
@@ -212,18 +212,17 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Go back 10 slides
+         * Go back n slides
          *
          * If the beginning of slides is reached this method does nothing.
          */
-        public override void back10() {
-            if ( this.current_slide_number - 10 < 0 ) {
-                // The first slide has been reached, do nothing.
-                return;
-            }
-            
+        public override void backN( int n ) {
             try {
-                this.display( this.current_slide_number - 10 );
+                if ( this.current_slide_number - n < 0 ) {
+                    this.display( 0 );
+                } else {
+                    this.display( this.current_slide_number - n );
+                }
             }
             catch( Renderer.RenderError e ) {
                 // Should actually never happen, but one never knows

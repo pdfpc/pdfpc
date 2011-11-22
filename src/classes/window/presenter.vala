@@ -275,8 +275,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Switch the shown pdf to the next page
          */
         public void jump10() {
-            this.current_view.jump10();
-            this.next_view.jump10();
+            this.current_view.jumpN(10);
+            this.next_view.jumpN(10);
             this.update_slide_count();
 
             this.timer.start();
@@ -300,9 +300,18 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Go back 10 slides
          */
         public void back10() {
-            if ( this.current_view.get_current_slide_number() >= 10 ) // Note, this is the *current* slide (0 counted)
-                this.next_view.back10();
-            this.current_view.back10();
+            if (this.current_view.get_current_slide_number() > 10) {
+            if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1) {
+                // Only move the next slide back 10 if there is a difference of at
+                // least one slide between current and next
+                    this.next_view.backN(10);
+                } else {
+                    this.next_view.backN(9);
+                }
+            } else {
+                this.goto_page(0);
+            }
+            this.current_view.backN(10);
             this.update_slide_count();
         }
 

@@ -74,7 +74,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * If the end of slides is reached this method is expected to do
          * nothing.
          */
-        public abstract void jump10();
+        public abstract void jumpN( int n );
 
         /**
          * Goto the previous slide
@@ -89,7 +89,7 @@ namespace org.westhoffswelt.pdfpresenter {
          *
          * If the beginning of slides is reached this method does nothing.
          */
-        public abstract void back10();
+        public abstract void backN( int n );
 
         /**
          * Goto a specific slide number
