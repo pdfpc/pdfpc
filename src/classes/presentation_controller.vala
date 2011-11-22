@@ -67,6 +67,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     this.controllables_previous_page();
                 break;
                 case 0xff08: /* Backspace */
+                case 0x070:
                     this.controllables_back10();
                 break;
                 case 0xff1b: /* Escape */
