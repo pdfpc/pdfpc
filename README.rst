@@ -191,8 +191,12 @@ and interpreted:
 
 - Left cursor key / Page up / Right mouse button 
     - Go back one slide
+- Backspace / p
+    - Go back 10 slides
 - Right cursor key / Page down / Return / Space / Left mouse button
     - Go forward one slide
+- n
+    - Go forward 10 slides
 - Home
     - Go back to the first slide and reset the timer
 - Escape / q /Alt+F4
