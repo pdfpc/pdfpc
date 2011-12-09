@@ -60,6 +60,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected Label slide_progress;
 
         /**
+         * Text box for displaying notes for the slides
+         */
+        protected TextView notes;
+
+        /**
          * Fixed layout to position all the elements inside the window
          */
         protected Fixed fixedLayout = null;
@@ -114,11 +119,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // The scale rect information is used to center the image inside
             // its area.
             this.fixedLayout.put( this.current_view, current_scale_rect.x, current_scale_rect.y );
+            //this.fixedLayout.put( this.current_view, 0, 0);
 
             // The next slide is right to the current one and takes up the
             // remaining width
             Rectangle next_scale_rect;
-            var next_allocated_width = this.screen_geometry.width - current_allocated_width;
+            var next_allocated_width = this.screen_geometry.width - current_allocated_width-10; // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 next_allocated_width,
@@ -131,13 +137,34 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Position it at the top and right of the current slide
             this.fixedLayout.put( 
                 this.next_view, 
-                current_allocated_width + next_scale_rect.x,
-                next_scale_rect.y 
+                current_allocated_width + next_scale_rect.x + 5,
+                5
+                //next_scale_rect.y 
             );
 
             // Color needed for the labels
             Color white;
             Color.parse( "white", out white );
+
+            // TextView for notes in the slides
+            var notesFont = Pango.FontDescription.from_string( "Verdana Bold" );
+            notesFont.set_size( 
+                (int)Math.floor( 16 * 0.75 ) * Pango.SCALE
+            );
+            this.notes = new TextView();
+            this.notes.editable = false;
+            this.notes.cursor_visible = false;
+            this.notes.wrap_mode = WrapMode.WORD;
+            this.notes.modify_font(notesFont); 
+            this.notes.modify_base(StateType.NORMAL, black);
+            this.notes.modify_text(StateType.NORMAL, white);
+            this.notes.set_size_request(next_scale_rect.width, 300);
+            string text="Here will come very nice notes for slides, that perhaps in some cases may get very long and then we have to come up with better positioning.";
+            this.notes.buffer.text = text;
+            this.fixedLayout.put(this.notes,
+                                 current_allocated_width + next_scale_rect.x + 5,
+                                 2*next_scale_rect.y + 5
+            );
 
             // Initial font needed for the labels
             // We approximate the point size using pt = px * .75
