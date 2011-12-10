@@ -47,6 +47,7 @@ set(VALA_SRC
 	classes/renderer/cache/png/engine.vala
 	classes/renderer/cache/option_factory.vala
 	classes/scaler.vala
+        classes/slides_notes.vala
 	classes/timer_label.vala
 	classes/view/base.vala
 	classes/view/default.vala

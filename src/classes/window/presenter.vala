@@ -62,7 +62,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Text box for displaying notes for the slides
          */
-        protected TextView notes;
+        protected TextView notes_view;
 
         /**
          * Fixed layout to position all the elements inside the window
@@ -78,9 +78,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected uint slide_count;
 
         /**
+         * Notes for the slides
+         */
+        protected SlidesNotes notes;
+
+        /**
          * Base constructor instantiating a new presenter window
          */
-        public Presenter( string pdf_filename, int screen_num ) {
+        public Presenter( string pdf_filename, int screen_num, SlidesNotes slides_notes ) {
             base( screen_num );
 
             this.destroy.connect( (source) => {
@@ -114,6 +119,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 bottom_position,
                 out current_scale_rect
             );
+            this.notes = slides_notes;
 
             // Position it in the top left corner.
             // The scale rect information is used to center the image inside
@@ -135,10 +141,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.next_view.next();
 
             // Position it at the top and right of the current slide
+            int next_view_y_pos;
+            if (this.notes.has_notes())
+                next_view_y_pos = 5;
+            else
+                next_view_y_pos = next_scale_rect.y;
             this.fixedLayout.put( 
                 this.next_view, 
                 current_allocated_width + next_scale_rect.x + 5,
-                5
+                next_view_y_pos
                 //next_scale_rect.y 
             );
 
@@ -147,24 +158,26 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             Color.parse( "white", out white );
 
             // TextView for notes in the slides
-            var notesFont = Pango.FontDescription.from_string( "Verdana Bold" );
-            notesFont.set_size( 
-                (int)Math.floor( 16 * 0.75 ) * Pango.SCALE
+            var notes_font = Pango.FontDescription.from_string( "Verdana" );
+            notes_font.set_size( 
+                (int)Math.floor( 20 * 0.75 ) * Pango.SCALE
             );
-            this.notes = new TextView();
-            this.notes.editable = false;
-            this.notes.cursor_visible = false;
-            this.notes.wrap_mode = WrapMode.WORD;
-            this.notes.modify_font(notesFont); 
-            this.notes.modify_base(StateType.NORMAL, black);
-            this.notes.modify_text(StateType.NORMAL, white);
-            this.notes.set_size_request(next_scale_rect.width, 300);
-            string text="Here will come very nice notes for slides, that perhaps in some cases may get very long and then we have to come up with better positioning.";
-            this.notes.buffer.text = text;
-            this.fixedLayout.put(this.notes,
-                                 current_allocated_width + next_scale_rect.x + 5,
-                                 2*next_scale_rect.y + 5
-            );
+            this.notes_view = new TextView();
+            this.notes_view.editable = false;
+            this.notes_view.cursor_visible = false;
+            this.notes_view.wrap_mode = WrapMode.WORD;
+            this.notes_view.modify_font(notes_font); 
+            this.notes_view.modify_base(StateType.NORMAL, black);
+            this.notes_view.modify_text(StateType.NORMAL, white);
+            this.notes_view.set_size_request(next_scale_rect.width, 
+                                             bottom_position - next_scale_rect.height - 15);
+            this.notes_view.buffer.text = "";
+            if (this.notes.has_notes()) {
+                this.fixedLayout.put(this.notes_view,
+                                     current_allocated_width + next_scale_rect.x + 5,
+                                     2*next_scale_rect.y
+                );
+            }
 
             // Initial font needed for the labels
             // We approximate the point size using pt = px * .75
@@ -294,6 +307,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view.next();
             this.next_view.next();
             this.update_slide_count();
+            this.update_note();
 
             this.timer.start();
         }
@@ -305,6 +319,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view.jumpN(10);
             this.next_view.jumpN(10);
             this.update_slide_count();
+            this.update_note();
 
             this.timer.start();
         }
@@ -321,6 +336,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
             this.current_view.previous();
             this.update_slide_count();
+            this.update_note();
         }
 
         /**
@@ -337,6 +353,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 }
                 this.current_view.backN(10);
                 this.update_slide_count();
+                this.update_note();
             } else {
                 this.goto_page(0);
             }
@@ -358,6 +375,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.timer.reset();
 
             this.update_slide_count();
+            
+            this.update_note();
         }
 
         /**
@@ -375,7 +394,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
 
             this.update_slide_count();
+            this.update_note();
             this.timer.start();
+        }
+        
+        protected void update_note() {
+            string this_note = notes.get_note_for_slide(this.current_view.get_current_slide_number());
+            this.notes_view.buffer.text = this_note;
         }
 
         /** 

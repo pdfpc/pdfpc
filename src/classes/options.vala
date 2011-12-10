@@ -67,5 +67,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * this time.
          */
         public static string? start_time = null;
+
+        /**
+         * File containing the notes to display alongside the slides
+         */
+        public static string? notes_fname = null;
     }
 }
