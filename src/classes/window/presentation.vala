@@ -64,6 +64,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 pdf_filename,
                 this.screen_geometry.width, 
                 this.screen_geometry.height,
+                false,
                 out scale_rect
             );
 

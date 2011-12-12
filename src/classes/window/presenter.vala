@@ -117,6 +117,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 pdf_filename,
                 current_allocated_width,
                 bottom_position,
+                false,
                 out current_scale_rect
             );
             this.notes = slides_notes;
@@ -135,6 +136,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 pdf_filename,
                 next_allocated_width,
                 bottom_position,
+                true,
                 out next_scale_rect
             );
             // Set the second slide as starting point

@@ -82,6 +82,12 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public abstract Gdk.Pixmap render_to_pixmap( int slide_number ) 
             throws RenderError;
+
+        /**
+         * Fill the display with black. Useful for last "slide" or for fading
+         * to black at certain points in the presentation.
+         */
+        public abstract Gdk.Pixmap fade_to_black();
     }
 
     /**

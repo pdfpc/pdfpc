@@ -123,5 +123,18 @@ namespace org.westhoffswelt.pdfpresenter {
 
             return pixmap;
         }
+
+      public override Gdk.Pixmap fade_to_black() {
+            Pixmap pixmap = new Pixmap( null, this.width, this.height, 24 );
+            Context cr = Gdk.cairo_create( pixmap );
+
+            cr.set_source_rgb( 0, 0, 0 );
+            cr.rectangle( 0, 0, this.width, this.height );
+            cr.fill();
+
+            cr.scale(this.scaling_factor, this.scaling_factor);
+            
+            return pixmap;
+        }
     }
 }

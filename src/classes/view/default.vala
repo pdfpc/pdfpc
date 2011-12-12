@@ -42,6 +42,23 @@ namespace org.westhoffswelt.pdfpresenter {
         protected Gdk.Pixmap current_slide;
 
         /**
+         * A flag signaling if we allow for a black slide at the end. Tis is
+         * useful for the next view and (for some presenters) also for the main
+         * view.
+         */
+        protected bool black_on_end;
+
+        /**
+         * The number of slides in the presentation
+         */
+        protected int n_slides;
+
+        /**
+         * The biggest slide number that we allow (dependent on black_on_end)
+         */
+        protected int slide_limit;
+
+        /**
          * List to store all associated behaviours
          */
         protected GLib.List<View.Behaviour.Base> behaviours = new GLib.List<View.Behaviour.Base>();
@@ -49,7 +66,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Base constructor taking the renderer to use as an argument
          */
-        public Default( Renderer.Base renderer ) {
+        public Default( Renderer.Base renderer, bool allow_black_on_end ) {
            base( renderer );
 
            // As we are using our own kind of double buffer and blit in a one
@@ -57,6 +74,13 @@ namespace org.westhoffswelt.pdfpresenter {
            this.set_double_buffered( false );
 
            this.current_slide_number = 0;
+        
+           this.n_slides = (int)renderer.get_metadata().get_slide_count();
+           this.black_on_end = allow_black_on_end;
+           if (this.black_on_end)
+               this.slide_limit = this.n_slides + 1;
+           else
+               this.slide_limit = this.n_slides;
 
            // Render the initial page on first realization.
            this.add_events( Gdk.EventMask.STRUCTURE_MASK );
@@ -156,7 +180,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * If the end of slides is reached this method does nothing.
          */
         public override void next() {
-            if ( this.renderer.get_metadata().get_slide_count() <= this.current_slide_number + 1 ) {
+            if ( this.slide_limit <= this.current_slide_number + 1 ) {
                 // The last slide has been reached, do nothing.
                 return;
             }
@@ -176,11 +200,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * If the end of slides is reached this method does nothing.
          */
         public override void jumpN( int n ) {
-            uint totalSlides = this.renderer.get_metadata().get_slide_count();
             try {
-                if ( this.current_slide_number + n >= totalSlides ) {
+                if ( this.current_slide_number + n >= this.slide_limit ) {
                     // Jump to the last slide
-                    this.display((int) totalSlides - 1) ;
+                    this.display((int) this.slide_limit - 1) ;
                 } else {
                     this.display( this.current_slide_number + n );
                 }
@@ -243,8 +266,8 @@ namespace org.westhoffswelt.pdfpresenter {
             if ( slide_number < 0 ) {
                 slide_number = 0;
             }
-            if ( slide_number >= this.get_renderer().get_metadata().get_slide_count() ) {
-                slide_number = (int)this.get_renderer().get_metadata().get_slide_count() - 1;
+            if ( slide_number >= this.slide_limit ) {
+                slide_number = this.slide_limit - 1;
             }
 
             if ( slide_number == this.current_slide_number && this.current_slide != null ) {
@@ -258,7 +281,10 @@ namespace org.westhoffswelt.pdfpresenter {
 
             // Render the requested slide
             // An exception is thrown here, if the slide can not be rendered.
-            this.current_slide = this.renderer.render_to_pixmap( slide_number );
+            if (slide_number < this.n_slides)
+                this.current_slide = this.renderer.render_to_pixmap( slide_number );
+            else
+                this.current_slide = this.renderer.fade_to_black();
             this.current_slide_number = slide_number;
 
             // Have Gtk update the widget
