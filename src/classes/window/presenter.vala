@@ -117,7 +117,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 pdf_filename,
                 current_allocated_width,
                 bottom_position,
-                false,
+                Options.black_on_end,
                 out current_scale_rect
             );
             this.notes = slides_notes;

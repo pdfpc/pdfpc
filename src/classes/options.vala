@@ -72,5 +72,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * File containing the notes to display alongside the slides
          */
         public static string? notes_fname = null;
+
+        /**
+         * Add a black slide at the end of the presentation
+         */
+        public static bool black_on_end = false;
     }
 }
