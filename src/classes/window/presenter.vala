@@ -60,6 +60,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected Label slide_progress;
 
         /**
+         * Indication that the slide is blanked (faded to black)
+         */
+        protected Label blank_label;
+
+        /**
          * Text box for displaying notes for the slides
          */
         protected TextView notes_view;
@@ -227,6 +232,21 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 bottom_position - 10
             );
 
+            this.blank_label = new Label( "Blank" );
+            this.blank_label.set_justify( Justification.LEFT );
+            this.blank_label.modify_fg( StateType.NORMAL, white );
+            this.blank_label.modify_font( font );
+            this.blank_label.no_show_all = true;
+            this.blank_label.set_size_request( 
+                (int)Math.floor( this.screen_geometry.width * 0.25 ),
+                bottom_height - 10 
+            );
+            this.fixedLayout.put(
+                this.blank_label,
+                0,
+                bottom_position - 10
+            );
+
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.add_events(EventMask.BUTTON_PRESS_MASK);
 
@@ -310,6 +330,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.next_view.next();
             this.update_slide_count();
             this.update_note();
+            this.blank_label.hide();
 
             this.timer.start();
         }
@@ -322,6 +343,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.next_view.jumpN(10);
             this.update_slide_count();
             this.update_note();
+            this.blank_label.hide();
 
             this.timer.start();
         }
@@ -339,6 +361,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view.previous();
             this.update_slide_count();
             this.update_note();
+            this.blank_label.hide();
         }
 
         /**
@@ -356,6 +379,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.current_view.backN(10);
                 this.update_slide_count();
                 this.update_note();
+                this.blank_label.hide();
             } else {
                 this.goto_page(0);
             }
@@ -379,6 +403,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             
             this.update_note();
+
+            this.blank_label.hide();
         }
 
         /**
@@ -397,6 +423,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.update_slide_count();
             this.update_note();
+            this.blank_label.hide();
             this.timer.start();
         }
 
@@ -405,6 +432,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * we will retain the slide view.
          */
         public void fade_to_black() {
+            if (this.faded_to_black)
+                this.blank_label.hide();
+            else
+                this.blank_label.show();
+            this.faded_to_black = !this.faded_to_black;
         }
         
         protected void update_note() {
