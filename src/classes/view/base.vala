@@ -96,13 +96,18 @@ namespace org.westhoffswelt.pdfpresenter {
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public abstract void display( int slide_number )
+        public abstract void display( int slide_number, bool force_redraw=false )
             throws Renderer.RenderError;
 
         /**
          * Make the screen black. Useful for presentations together with a whiteboard
          */
         public abstract void fade_to_black();
+
+        /**
+         * Redraw the current slide. Useful for example when exiting from fade_to_black
+         */
+        public abstract void redraw() throws Renderer.RenderError;
 
         /**
          * Return the currently shown slide number

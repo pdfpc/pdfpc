@@ -259,7 +259,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * If the slide number does not exist a
          * RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public override void display( int slide_number )
+        public override void display( int slide_number, bool force_redraw=false )
             throws Renderer.RenderError {
             // If the slide is out of bounds render the outer most slide on
             // each side of the document.
@@ -270,7 +270,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 slide_number = this.slide_limit - 1;
             }
 
-            if ( slide_number == this.current_slide_number && this.current_slide != null ) {
+            if ( !force_redraw && slide_number == this.current_slide_number && this.current_slide != null ) {
                 // The slide does not need to be changed, as the correct one is
                 // already shown.
                 return;
@@ -293,11 +293,20 @@ namespace org.westhoffswelt.pdfpresenter {
             this.entering_slide( this.current_slide_number );
         }
 
+        /**
+         * Fill everything with black
+         */
         public override void fade_to_black() {
             this.current_slide = this.renderer.fade_to_black();
             this.queue_draw_area( 0, 0, this.renderer.get_width(), this.renderer.get_height() );
         }
 
+        /**
+         * Redraw the current slide. Useful for example when exiting from fade_to_black
+         */
+        public override void redraw() throws Renderer.RenderError {
+            this.display(this.current_slide_number, true);
+        }
 
         /**
          * Return the currently shown slide number

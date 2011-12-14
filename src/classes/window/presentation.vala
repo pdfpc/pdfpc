@@ -183,7 +183,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
         
         public void fade_to_black() {
-            this.view.fade_to_black();
+            if (this.faded_to_black) {
+                try {
+                    this.view.redraw();
+                }
+                catch ( Renderer.RenderError e ) {
+                    GLib.error( "Could not redraw slide: %s", e.message);
+                }
+            } else {
+                this.view.fade_to_black();
+            }
+            this.faded_to_black = !this.faded_to_black;
         }
 
         /**
