@@ -268,11 +268,18 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
          */
         public void on_entering_slide( View.Base source, int page_number ) {
             // Get the link mapping table
+            bool in_range = true;
             MutexLocks.poppler.lock();
             Metadata.Pdf metadata = source.get_renderer().get_metadata() as Metadata.Pdf;
-            Poppler.Page page = metadata.get_document().get_page( page_number );
-            this.page_link_mappings = page.get_link_mapping();
+            if (page_number < metadata.get_slide_count()) {
+                Poppler.Page page = metadata.get_document().get_page( page_number );
+                this.page_link_mappings = page.get_link_mapping();
+            } else {
+                in_range = false;
+            }
             MutexLocks.poppler.unlock();
+            if (!in_range)
+                return;
 
             // Precalculate the a Gdk.Rectangle for every link mapping area
             if ( this.page_link_mappings.length() > 0 ) {
