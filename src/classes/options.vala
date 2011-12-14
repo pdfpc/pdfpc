@@ -31,6 +31,13 @@ namespace org.westhoffswelt.pdfpresenter {
          * should be switched.
          */
         public static bool display_switch = false;
+
+        /**
+         * Commandline option to force using only one screen.
+         * This should actually be an int? but I cannot seem to get it to work. Doing
+         * a temporary solution.
+         */
+        public static int single_screen = 100;
         
         /**
          * Commandline option which allows the complete disabling of slide caching
