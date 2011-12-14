@@ -77,6 +77,9 @@ namespace org.westhoffswelt.pdfpresenter {
                 case 0xff50: /* Home */
                     this.controllables_reset();
                 break;
+                case 0x062: /* b*/
+                    this.controllables_fade_to_black();
+                break;
             }
         }
 
@@ -170,6 +173,12 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_goto_page( int page_number ) {
             foreach( Controllable c in this.controllables ) {
                 c.goto_page( page_number );
+            }
+        }
+
+        protected void controllables_fade_to_black() {
+            foreach( Controllable c in this.controllables ) {
+                c.fade_to_black();
             }
         }
     }

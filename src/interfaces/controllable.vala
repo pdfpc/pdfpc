@@ -58,6 +58,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void back10(); 
 
         /**
+         * Make the presentation go black, if applicable
+         */
+        public abstract void fade_to_black();
+
+        /**
          * Reset the presentation to it's initial state
          */
         public abstract void reset();

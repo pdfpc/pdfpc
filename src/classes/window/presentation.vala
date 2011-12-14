@@ -181,6 +181,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
             }
         }
+        
+        public void fade_to_black() {
+            this.view.fade_to_black();
+        }
 
         /**
          * Set the cache observer for the Views on this window

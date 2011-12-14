@@ -399,6 +399,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_note();
             this.timer.start();
         }
+
+        /**
+         * We will notify the presenter that the screen is faded to black, but
+         * we will retain the slide view.
+         */
+        public void fade_to_black() {
+        }
         
         protected void update_note() {
             string this_note = notes.get_note_for_slide(this.current_view.get_current_slide_number());

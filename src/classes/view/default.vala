@@ -293,6 +293,12 @@ namespace org.westhoffswelt.pdfpresenter {
             this.entering_slide( this.current_slide_number );
         }
 
+        public override void fade_to_black() {
+            this.current_slide = this.renderer.fade_to_black();
+            this.queue_draw_area( 0, 0, this.renderer.get_width(), this.renderer.get_height() );
+        }
+
+
         /**
          * Return the currently shown slide number
          */

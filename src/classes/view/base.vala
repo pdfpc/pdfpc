@@ -100,6 +100,11 @@ namespace org.westhoffswelt.pdfpresenter {
             throws Renderer.RenderError;
 
         /**
+         * Make the screen black. Useful for presentations together with a whiteboard
+         */
+        public abstract void fade_to_black();
+
+        /**
          * Return the currently shown slide number
          */
         public abstract int get_current_slide_number();
