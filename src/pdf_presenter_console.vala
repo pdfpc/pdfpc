@@ -68,7 +68,8 @@ namespace org.westhoffswelt.pdfpresenter {
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
-            { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_fname, "File containing the notes to display with the slides", "T" },
+            { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_fname, "File containing the notes to display with the slides", "F" },
+            { "single-screen", 'S', 0, OptionArg.INT, ref Options.single_screen, "Force to use only one screen", "S" },
             { null }
         };
 
@@ -157,7 +158,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
             SlidesNotes notes = new SlidesNotes(Options.notes_fname);
 
-            if ( Gdk.Screen.get_default().get_n_monitors() > 1 ) {
+            if ( Options.single_screen == 100 && Gdk.Screen.get_default().get_n_monitors() > 1 ) {
                 this.presentation_window = 
                     this.create_presentation_window( args[1], presentation_monitor );
                 this.presenter_window = 
@@ -165,16 +166,19 @@ namespace org.westhoffswelt.pdfpresenter {
             }
             else {
                 stdout.printf( "Only one screen detected falling back to simple presentation mode.\n" );
+                int monitor = 0;
+                if ( Options.single_screen < 100)
+                    monitor = Options.single_screen;
                 // Decide which window to display by indirectly examining the
                 // display_switch flag This allows for training sessions with
                 // one monitor displaying the presenter screen
-                if ( presenter_monitor == 1 ) {
+                if ( presenter_monitor == monitor ) {
                     this.presentation_window = 
-                        this.create_presentation_window( args[1], 0 );
+                        this.create_presentation_window( args[1], monitor );
                 }
                 else {
                     this.presenter_window = 
-                        this.create_presenter_window( args[1], 0, notes );
+                        this.create_presenter_window( args[1], monitor, notes );
                 }
             }
 
