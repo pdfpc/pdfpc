@@ -30,7 +30,7 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected string[] notes;
 
-        protected void store_note(string note, int slide_number) {
+        public void set_note(string note, int slide_number) {
             if (slide_number != -1) {
                 if (notes.length <= slide_number)
                     notes.resize(slide_number+1);
@@ -59,14 +59,14 @@ namespace org.westhoffswelt.pdfpresenter {
                     string current_note = "";
                     for (int i=0; i < lines.length; ++i) {
                         if (lines[i][0] == '#') {
-                            store_note(current_note, current_slide);
+                            set_note(current_note, current_slide);
                             current_slide = int.parse(lines[i].substring(1)) - 1;
                             current_note = "";
                         } else {
                             current_note += lines[i] + "\n";
                         }
                     }
-                    store_note(current_note, current_slide);
+                    set_note(current_note, current_slide);
                 } catch(GLib.FileError e) {
                     stderr.printf("Could not read notes from file %s\n", fname);
                 }

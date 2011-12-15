@@ -66,5 +66,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * Display a certain page
          */
         public abstract void goto_page( int page_number );
+
+        /**
+         * Edit note for current slide.
+         */
+        public abstract void edit_note();
     }
 }

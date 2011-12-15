@@ -82,6 +82,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected SlidesNotes notes;
 
+        protected bool ignore_key_press = false;
+
         /**
          * Base constructor instantiating a new presenter window
          */
@@ -172,6 +174,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.notes_view.set_size_request(next_scale_rect.width, 
                                              bottom_position - next_scale_rect.height - 15);
             this.notes_view.buffer.text = "";
+            this.notes_view.key_press_event.connect( this.on_key_press_notes_view );
             if (this.notes.has_notes()) {
                 this.fixedLayout.put(this.notes_view,
                                      current_allocated_width + next_scale_rect.x + 5,
@@ -256,10 +259,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * presentation controller
          */
         protected bool on_key_pressed( Gtk.Widget source, EventKey key ) {
-            if ( this.presentation_controller != null ) {
+            if ( !ignore_key_press && this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
+                return true;
+            } else {
+                return false;
             }
-            return false;
         }
 
         /**
@@ -396,6 +401,27 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             this.update_note();
             this.timer.start();
+        }
+
+        public void edit_note() {
+            //this.set_events(this.get_events() & ~EventMask.KEY_PRESS_MASK);
+            this.notes_view.editable = true;
+            this.notes_view.cursor_visible = true;
+            this.ignore_key_press = true;
+            //this.key_press_event.connect( this.ignore_key_press );
+            //this.notes_view.focus();
+        }
+
+        protected bool on_key_press_notes_view( Gtk.Widget source, EventKey key ) {
+            if ( key.keyval == 0xff1b) { /* Escape */
+                this.ignore_key_press = false;
+                this.notes_view.editable = false;
+                this.notes_view.cursor_visible = false;
+                this.notes.set_note( this.notes_view.buffer.text, this.current_view.get_current_slide_number() );
+                return true;
+            } else {
+                return false;
+            }
         }
         
         protected void update_note() {

@@ -77,6 +77,9 @@ namespace org.westhoffswelt.pdfpresenter {
                 case 0xff50: /* Home */
                     this.controllables_reset();
                 break;
+                case 0x065: /* e */
+                    this.controllables_edit_note();
+                break;
             }
         }
 
@@ -172,5 +175,15 @@ namespace org.westhoffswelt.pdfpresenter {
                 c.goto_page( page_number );
             }
         }
+
+        /**
+         * Edit note for current slide.
+         */
+        protected void controllables_edit_note() {
+            foreach( Controllable c in this.controllables ) {
+                c.edit_note();
+            }
+        }
+            
     }
 }
