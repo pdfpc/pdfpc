@@ -28,9 +28,17 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * The array where we will store the text of the notes
          */
-        protected string[] notes;
+        protected string?[] notes;
 
-        public void set_note(string note, int slide_number) {
+        /**
+         * File name for notes
+         */
+        protected string? fname = null;
+
+        /**
+         * Set a note for a given slide
+         */
+        public void set_note( string note, int slide_number ) {
             if (slide_number != -1) {
                 if (notes.length <= slide_number)
                     notes.resize(slide_number+1);
@@ -38,19 +46,47 @@ namespace org.westhoffswelt.pdfpresenter {
             }
         }
 
-        public string get_note_for_slide(int number) {
+        /**
+         * Return the text of a note
+         */
+        public string get_note_for_slide( int number ) {
             if (number >= notes.length || notes[number] == null)
                 return "";
             else
                 return notes[number];
         }
 
+        /**
+         * Does the user want notes?
+         */
         public bool has_notes() {
-            return notes.length > 0;
+            return fname != null;
         }
 
-        public SlidesNotes(string? fname) {
+        /**
+         * Save the notes to the filename given in the constructor
+         */
+        public void save_to_disk() {
             if (fname != null) {
+                try {
+                    string text="";
+                    for (int i = 0; i < notes.length; ++i) {
+                        if (notes[i] != null) {
+                            text += @"# $(i+1)\n" + notes[i];
+                            if (text[text.length-1] != '\n') // [last] == '\0'
+                                text += "\n";
+                        }
+                    }
+                    FileUtils.set_contents(fname, text);
+                } catch (Error e) {
+                    stderr.printf ("%s\n", e.message);
+                }
+            }
+        }
+
+        public SlidesNotes( string? filename ) {
+            if (filename != null) {
+                fname = filename;
                 try {
                     string raw_data;
                     FileUtils.get_contents(fname, out raw_data);
@@ -68,7 +104,10 @@ namespace org.westhoffswelt.pdfpresenter {
                     }
                     set_note(current_note, current_slide);
                 } catch(GLib.FileError e) {
-                    stderr.printf("Could not read notes from file %s\n", fname);
+                    if (e is FileError.NOENT) // If file doesn't exits this is no problem
+                        stdout.printf("Creating new file %s for notes\n", fname);
+                    else
+                        stderr.printf("Could not read notes from file %s\n", fname);
                 }
             }
         }

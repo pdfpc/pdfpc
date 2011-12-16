@@ -39,10 +39,16 @@ namespace org.westhoffswelt.pdfpresenter {
         protected bool ignore_input_events = false;
 
         /**
+         * Notes for the slides
+         */
+        protected SlidesNotes notes;
+
+        /**
          * Instantiate a new controller
          */
-        public PresentationController() {
+        public PresentationController(SlidesNotes notes) {
             this.controllables = new List<Controllable>();
+            this.notes = notes;
         }
 
         /**
@@ -85,6 +91,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     break;
                     case 0x065: /* e */
                         this.controllables_edit_note();
+                    break;
+                    case 0x073: /* s */
+                        this.notes.save_to_disk();
                     break;
                 }
                 return true;
