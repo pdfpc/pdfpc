@@ -197,6 +197,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Edit note for current slide. We don't do anything.
+         */
+        public void edit_note() {
+        }
+
+        /**
          * Set the cache observer for the Views on this window
          *
          * This method takes care of registering all Prerendering Views used by

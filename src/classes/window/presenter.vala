@@ -179,6 +179,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.notes_view.set_size_request(next_scale_rect.width, 
                                              bottom_position - next_scale_rect.height - 15);
             this.notes_view.buffer.text = "";
+            this.notes_view.key_press_event.connect( this.on_key_press_notes_view );
             if (this.notes.has_notes()) {
                 this.fixedLayout.put(this.notes_view,
                                      current_allocated_width + next_scale_rect.x + 5,
@@ -279,9 +280,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected bool on_key_pressed( Gtk.Widget source, EventKey key ) {
             if ( this.presentation_controller != null ) {
-                this.presentation_controller.key_press( key );
+                return this.presentation_controller.key_press( key );
+            } else {
+                // Can this happen?
+                return false;
             }
-            return false;
         }
 
         /**
@@ -437,6 +440,24 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             else
                 this.blank_label.show();
             this.faded_to_black = !this.faded_to_black;
+        }
+
+        public void edit_note() {
+            this.notes_view.editable = true;
+            this.notes_view.cursor_visible = true;
+            this.presentation_controller.set_ignore_input_events( true );
+        }
+
+        protected bool on_key_press_notes_view( Gtk.Widget source, EventKey key ) {
+            if ( key.keyval == 0xff1b) { /* Escape */
+                this.notes_view.editable = false;
+                this.notes_view.cursor_visible = false;
+                this.notes.set_note( this.notes_view.buffer.text, this.current_view.get_current_slide_number() );
+                this.presentation_controller.set_ignore_input_events( false );
+                return true;
+            } else {
+                return false;
+            }
         }
         
         protected void update_note() {

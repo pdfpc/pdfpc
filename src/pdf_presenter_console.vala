@@ -141,10 +141,12 @@ namespace org.westhoffswelt.pdfpresenter {
             this.parse_command_line_options( args );
 
             stdout.printf( "Initializing rendering...\n" );
+
+            SlidesNotes notes = new SlidesNotes(Options.notes_fname);
            
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
-            this.controller = new PresentationController();
+            this.controller = new PresentationController(notes);
             this.cache_status = new CacheStatus();
 
             int presenter_monitor, presentation_monitor;
@@ -156,8 +158,6 @@ namespace org.westhoffswelt.pdfpresenter {
                 presenter_monitor    = 1;
                 presentation_monitor = 0;
             }
-
-            SlidesNotes notes = new SlidesNotes(Options.notes_fname);
 
             if ( Options.single_screen == 100 && Gdk.Screen.get_default().get_n_monitors() > 1 ) {
                 this.presentation_window = 
