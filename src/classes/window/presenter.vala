@@ -445,6 +445,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void edit_note() {
             this.notes_view.editable = true;
             this.notes_view.cursor_visible = true;
+            this.notes_view.grab_focus();
             this.presentation_controller.set_ignore_input_events( true );
         }
 
