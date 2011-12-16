@@ -72,7 +72,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     string text="";
                     for (int i = 0; i < notes.length; ++i) {
                         if (notes[i] != null) {
-                            text += @"# $(i+1)\n" + notes[i];
+                            text += @"### $(i+1)\n" + notes[i];
                             if (text[text.length-1] != '\n') // [last] == '\0'
                                 text += "\n";
                         }
@@ -94,9 +94,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     int current_slide = -1;
                     string current_note = "";
                     for (int i=0; i < lines.length; ++i) {
-                        if (lines[i][0] == '#') {
+                        if (lines[i].length > 3 && lines[i][0:3] == "###") {
                             set_note(current_note, current_slide);
-                            current_slide = int.parse(lines[i].substring(1)) - 1;
+                            current_slide = int.parse(lines[i].substring(3)) - 1;
                             current_note = "";
                         } else {
                             current_note += lines[i] + "\n";
