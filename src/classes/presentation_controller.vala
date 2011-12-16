@@ -99,6 +99,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x073: /* s */
                         this.notes.save_to_disk();
                     break;
+                    case 0x067: /* g */
+                        this.controllables_ask_goto_page();
+                    break;
                 }
                 return true;
             } else {
@@ -212,6 +215,13 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * public interface for the above function
+         */
+        public void goto_page( int page_number ) {
+            controllables_goto_page(page_number);
+        }
+
+        /**
          * Fill the presentation display with black
          */
         protected void controllables_fade_to_black() {
@@ -226,6 +236,15 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_edit_note() {
             foreach( Controllable c in this.controllables ) {
                 c.edit_note();
+            }
+        }
+
+        /**
+         * Ask for the page to jump to
+         */
+        protected void controllables_ask_goto_page() {
+            foreach( Controllable c in this.controllables ) {
+                c.ask_goto_page();
             }
         }
     }

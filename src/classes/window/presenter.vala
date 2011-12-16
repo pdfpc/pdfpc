@@ -58,6 +58,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Slide progress label ( eg. "23/42" )
          */
         protected Label slide_progress;
+        
+        protected Entry slide_jump;
 
         /**
          * Indication that the slide is blanked (faded to black)
@@ -223,12 +225,30 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slide_progress.set_justify( Justification.CENTER );
             this.slide_progress.modify_fg( StateType.NORMAL, white );
             this.slide_progress.modify_font( font );
-            this.slide_progress.set_size_request( 
+            this.slide_progress.set_size_request(
+                (int)Math.floor( this.screen_geometry.width * 0.25 ),
+                bottom_height - 10
+            );
+            this.fixedLayout.put(
+                this.slide_progress,
+                (int)Math.ceil( this.screen_geometry.width * 0.75 ),
+                bottom_position - 10
+            );
+    
+            this.slide_jump = new Entry();
+            this.slide_jump.set_alignment(0.5f);
+            //this.slide_jump.modify_base(StateType.NORMAL, black);
+            //this.slide_jump.modify_text(StateType.NORMAL, white);
+            this.slide_jump.modify_font( font );
+            this.slide_jump.editable = false;
+            this.slide_jump.no_show_all = true; 
+            this.slide_jump.key_press_event.connect( this.on_key_press_slide_jump );
+            this.slide_jump.set_size_request( 
                 (int)Math.floor( this.screen_geometry.width * 0.25 ),
                 bottom_height - 10 
             );
             this.fixedLayout.put(
-                this.slide_progress,
+                this.slide_jump,
                 (int)Math.ceil( this.screen_geometry.width * 0.75 ),
                 bottom_position - 10
             );
@@ -431,6 +451,39 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Ask for the page to jump to
+         */
+        public void ask_goto_page() {
+           this.slide_jump.set_text("/%u".printf(this.slide_count));
+           this.slide_jump.editable = true;
+           this.slide_jump.grab_focus();
+           this.slide_jump.set_position(0);
+           this.slide_jump.show();
+           this.slide_progress.hide();
+           this.presentation_controller.set_ignore_input_events( true );
+        }
+    
+        /**
+         * Handle key events for the slide_jump entry field
+         */
+        protected bool on_key_press_slide_jump( Gtk.Widget source, EventKey key ) {
+            if ( key.keyval == 0xff0d ) {
+                // Try to parse the input
+               string input_text = this.slide_jump.text;
+               int destination = int.parse(input_text.substring(0, input_text.index_of("/")));
+               this.slide_jump.editable = false;
+               this.slide_jump.hide();
+               this.slide_progress.show();
+               this.presentation_controller.set_ignore_input_events( false );
+               if ( destination != 0 )
+                  this.presentation_controller.goto_page(destination-1);
+               return true;
+            } else {
+               return false;
+            }
+        }
+
+        /**
          * We will notify the presenter that the screen is faded to black, but
          * we will retain the slide view.
          */
@@ -442,6 +495,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.faded_to_black = !this.faded_to_black;
         }
 
+        /**
+         * Edit a note. Basically give focus to notes_view
+         */
         public void edit_note() {
             this.notes_view.editable = true;
             this.notes_view.cursor_visible = true;
@@ -449,6 +505,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.presentation_controller.set_ignore_input_events( true );
         }
 
+        /**
+         * Handle key presses when editing a note
+         */
         protected bool on_key_press_notes_view( Gtk.Widget source, EventKey key ) {
             if ( key.keyval == 0xff1b) { /* Escape */
                 this.notes_view.editable = false;
@@ -461,6 +520,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
         }
         
+        /**
+         * Update the text of the current note
+         */
         protected void update_note() {
             string this_note = notes.get_note_for_slide(this.current_view.get_current_slide_number());
             this.notes_view.buffer.text = this_note;

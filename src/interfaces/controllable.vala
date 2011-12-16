@@ -73,8 +73,13 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void goto_page( int page_number );
 
         /**
-         * Edit note for current slide.
+         * Edit note for current slide
          */
         public abstract void edit_note();
+
+        /**
+         * Ask for the page to jump to
+         */
+        public abstract void ask_goto_page();
     }
 }
