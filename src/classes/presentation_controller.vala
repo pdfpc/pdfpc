@@ -34,6 +34,11 @@ namespace org.westhoffswelt.pdfpresenter {
         protected List<Controllable> controllables;
 
         /**
+         * Ignore input events. Useful e.g. for editing notes.
+         */
+        protected bool ignore_input_events = false;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController() {
@@ -51,49 +56,59 @@ namespace org.westhoffswelt.pdfpresenter {
          * https://bugzilla.gnome.org/show_bug.cgi?id=551184
          *
          */
-        public void key_press( Gdk.EventKey key ) {
-            switch( key.keyval ) {
-                case 0xff0d: /* Return */
-                case 0xff53: /* Cursor right */
-                case 0xff56: /* Page down */
-                case 0x020:  /* Space */
-                    this.controllables_next_page();
-                break;
-                case 0x06e:  /* n */
-                    this.controllables_jump10();
-                break;
-                case 0xff51: /* Cursor left */
-                case 0xff55: /* Page Up */
-                    this.controllables_previous_page();
-                break;
-                case 0xff08: /* Backspace */
-                case 0x070:
-                    this.controllables_back10();
-                break;
-                case 0xff1b: /* Escape */
-                case 0x071:  /* q */
-                    Gtk.main_quit();
-                break;
-                case 0xff50: /* Home */
-                    this.controllables_reset();
-                break;
-                case 0x065: /* e */
-                    this.controllables_edit_note();
-                break;
+        public bool key_press( Gdk.EventKey key ) {
+            if ( !ignore_input_events ) {
+                switch( key.keyval ) {
+                    case 0xff0d: /* Return */
+                    case 0xff53: /* Cursor right */
+                    case 0xff56: /* Page down */
+                    case 0x020:  /* Space */
+                        this.controllables_next_page();
+                    break;
+                    case 0x06e:  /* n */
+                        this.controllables_jump10();
+                    break;
+                    case 0xff51: /* Cursor left */
+                    case 0xff55: /* Page Up */
+                        this.controllables_previous_page();
+                    break;
+                    case 0xff08: /* Backspace */
+                    case 0x070:
+                        this.controllables_back10();
+                    break;
+                    case 0xff1b: /* Escape */
+                    case 0x071:  /* q */
+                        Gtk.main_quit();
+                    break;
+                    case 0xff50: /* Home */
+                        this.controllables_reset();
+                    break;
+                    case 0x065: /* e */
+                        this.controllables_edit_note();
+                    break;
+                }
+                return true;
+            } else {
+                return false;
             }
         }
 
         /**
          * Handle mouse clicks to each of the controllables
          */
-        public void button_press( Gdk.EventButton button ) {
-            switch( button.button ) {
-                case 1: /* Left button */
-                    this.controllables_next_page();
-                break;
-                case 3: /* Right button */
-                    this.controllables_previous_page();
-                break;
+        public bool button_press( Gdk.EventButton button ) {
+            if ( !ignore_input_events ) {
+                switch( button.button ) {
+                    case 1: /* Left button */
+                        this.controllables_next_page();
+                    break;
+                    case 3: /* Right button */
+                        this.controllables_previous_page();
+                    break;
+                }
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -102,6 +117,13 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void page_change_request( int page_number ) {
             this.controllables_goto_page( page_number );
+        }
+
+        /**
+         * Set the state of ignote_input_events
+         */
+        public void set_ignore_input_events( bool v ) {
+            ignore_input_events = v;
         }
 
         /**

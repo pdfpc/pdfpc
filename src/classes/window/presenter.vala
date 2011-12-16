@@ -82,8 +82,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected SlidesNotes notes;
 
-        protected bool ignore_key_press = false;
-
         /**
          * Base constructor instantiating a new presenter window
          */
@@ -259,10 +257,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * presentation controller
          */
         protected bool on_key_pressed( Gtk.Widget source, EventKey key ) {
-            if ( !ignore_key_press && this.presentation_controller != null ) {
-                this.presentation_controller.key_press( key );
-                return true;
+            if ( this.presentation_controller != null ) {
+                return this.presentation_controller.key_press( key );
             } else {
+                // Can this happen?
                 return false;
             }
         }
@@ -404,20 +402,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         public void edit_note() {
-            //this.set_events(this.get_events() & ~EventMask.KEY_PRESS_MASK);
             this.notes_view.editable = true;
             this.notes_view.cursor_visible = true;
-            this.ignore_key_press = true;
-            //this.key_press_event.connect( this.ignore_key_press );
-            //this.notes_view.focus();
+            this.presentation_controller.set_ignore_input_events( true );
         }
 
         protected bool on_key_press_notes_view( Gtk.Widget source, EventKey key ) {
             if ( key.keyval == 0xff1b) { /* Escape */
-                this.ignore_key_press = false;
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;
                 this.notes.set_note( this.notes_view.buffer.text, this.current_view.get_current_slide_number() );
+                this.presentation_controller.set_ignore_input_events( false );
                 return true;
             } else {
                 return false;
