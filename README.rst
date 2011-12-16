@@ -201,6 +201,8 @@ and interpreted:
     - Go forward 10 slides
 - Home
     - Go back to the first slide and reset the timer
+- g
+    - Input a slide number to jump to
 - Escape / q /Alt+F4
     - Quit the presentation viewer
 - b

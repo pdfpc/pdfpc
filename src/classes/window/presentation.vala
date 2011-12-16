@@ -203,6 +203,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Ask for the page to jump to. We don't do anything
+         */
+        public void ask_goto_page() {
+        }
+
+        /**
          * Set the cache observer for the Views on this window
          *
          * This method takes care of registering all Prerendering Views used by
