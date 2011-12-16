@@ -77,7 +77,7 @@ namespace org.westhoffswelt.pdfpresenter {
                                 text += "\n";
                         }
                     }
-                    FileUtils.set_contents(fname, text);
+                    FileUtils.set_contents(fname, text.substring(0, text.length-1));
                 } catch (Error e) {
                     stderr.printf ("%s\n", e.message);
                 }
