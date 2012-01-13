@@ -275,6 +275,7 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
                 Poppler.Page page = metadata.get_document().get_page( page_number );
                 this.page_link_mappings = page.get_link_mapping();
             } else {
+                this.page_link_mappings = null;
                 in_range = false;
             }
             MutexLocks.poppler.unlock();
