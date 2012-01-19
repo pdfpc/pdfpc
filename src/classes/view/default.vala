@@ -37,6 +37,11 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int current_slide_number;
 
         /**
+         * The current slide in "user indexes"
+         */
+        protected int current_user_slide_number;
+
+        /**
          * The pixmap containing the currently shown slide
          */
         protected Gdk.Pixmap current_slide;
@@ -59,6 +64,13 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int slide_limit;
 
         /**
+         * This is a virtual mapping of "real pages" to "user-view pages". The
+         * indexes in the vector are the user-view slide, the contents are the
+         * real slide numbers.
+         */
+        protected int[] user_view_indexes;
+
+        /**
          * List to store all associated behaviours
          */
         protected GLib.List<View.Behaviour.Base> behaviours = new GLib.List<View.Behaviour.Base>();
@@ -74,13 +86,44 @@ namespace org.westhoffswelt.pdfpresenter {
            this.set_double_buffered( false );
 
            this.current_slide_number = 0;
+           this.current_user_slide_number = 0;
         
            this.n_slides = (int)renderer.get_metadata().get_slide_count();
+           stdout.printf("n_slides = %d\n", this.n_slides);
            this.black_on_end = allow_black_on_end;
            if (this.black_on_end)
                this.slide_limit = this.n_slides + 1;
            else
                this.slide_limit = this.n_slides;
+
+           // Read which slides we have to skip
+           try {
+                string raw_data;
+                FileUtils.get_contents("skip", out raw_data);
+                string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
+                int s = 0; // Counter over real slides
+                int us = 0; // Counter over user slides
+                user_view_indexes.resize(this.n_slides - lines.length + 1);
+                for ( int l=0; l < lines.length-1; ++l ) {
+                    int current_skip = int.parse( lines[l] ) - 1;
+                    while ( s < current_skip ) {
+                        user_view_indexes[us++] = s;
+                        ++s;
+                    }
+                    ++s;
+                }
+                // Now we have to reach the end
+                while ( s < this.n_slides ) {
+                    user_view_indexes[us++] = s;
+                    ++s;
+                }
+           } catch (GLib.FileError e) {
+                stderr.printf("Could not read skip information\n");
+           }
+           stdout.printf("user_view_indexes = [");
+           for ( int s=0; s < user_view_indexes.length; ++s)
+                stdout.printf("%d ", user_view_indexes[s]);
+           stdout.printf("]\n");
 
            // Render the initial page on first realization.
            this.add_events( Gdk.EventMask.STRUCTURE_MASK );
@@ -187,6 +230,12 @@ namespace org.westhoffswelt.pdfpresenter {
             
             try {
                 this.display( this.current_slide_number + 1 );
+                // Update the user slide_number
+                if (this.current_slide_number == this.user_view_indexes[this.current_user_slide_number+1]) {
+                    // Note: current_slide_number has been updated in display()
+                    ++this.current_user_slide_number;
+                }
+                    
             }
             catch( Renderer.RenderError e ) {
                 // Should actually never happen, but one never knows
@@ -226,7 +275,9 @@ namespace org.westhoffswelt.pdfpresenter {
             }
             
             try {
-                this.display( this.current_slide_number - 1 );
+                if (this.current_user_slide_number > 0)
+                    --this.current_user_slide_number;
+                this.display( this.user_view_indexes[this.current_user_slide_number] );
             }
             catch( Renderer.RenderError e ) {
                 // Should actually never happen, but one never knows
