@@ -29,6 +29,41 @@ namespace org.westhoffswelt.pdfpresenter {
     public class PresentationController: Object {
 
         /**
+         * The currently displayed slide
+         */
+        protected int current_slide_number;
+
+        /**
+         * The current slide in "user indexes"
+         */
+        protected int current_user_slide_number;
+
+        /**
+         * The a virtual mapping of "real pages" to "user-view pages". The
+         * indexes in the vector are the user-view slide, the contents are the
+         * real slide numbers.
+         */
+        protected int[] user_view_indexes;
+
+        /**
+         * A flag signaling if we allow for a black slide at the end. Tis is
+         * useful for the next view and (for some presenters) also for the main
+         * view.
+         */
+        protected bool black_on_end;
+
+        /**
+         * The number of slides in the presentation
+         */
+        protected int n_slides;
+
+        /**
+         * The biggest slide number that we allow (dependent on black_on_end)
+         */
+        protected int slide_limit;
+
+
+        /**
          * Controllables which are registered with this presentation controller.
          */
         protected List<Controllable> controllables;
