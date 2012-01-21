@@ -131,32 +131,40 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Switch the shown pdf to the next page
+         * Update the display
          */
-        public void next_page() {
-            this.view.next();
+        public void update() {
+            this.view.display(this.presentation_controller.get_current_slide());
         }
+            
 
-        /**
-         * Go forward 10 slides
-         */
-        public void jump10() {
-            this.view.jumpN(10);
-        }
+        ///**
+        // * Switch the shown pdf to the next page
+        // */
+        //public void next_page() {
+        //    this.view.next();
+        //}
 
-        /**
-         * Switch the shown pdf to the previous page
-         */
-        public void previous_page() {
-            this.view.previous();
-        }
+        ///**
+        // * Go forward 10 slides
+        // */
+        //public void jump10() {
+        //    this.view.jumpN(10);
+        //}
 
-        /**
-         * Switch the shown pdf to the previous page
-         */
-        public void back10() {
-            this.view.backN(10);
-        }
+        ///**
+        // * Switch the shown pdf to the previous page
+        // */
+        //public void previous_page() {
+        //    this.view.previous();
+        //}
+
+        ///**
+        // * Switch the shown pdf to the previous page
+        // */
+        //public void back10() {
+        //    this.view.backN(10);
+        //}
 
         /**
          * Reset to the initial presentation state
@@ -170,17 +178,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
         }
 
-        /**
-         * Display a specific page
-         */
-        public void goto_page( int page_number ) {
-            try {
-                this.view.display( page_number );
-            }
-            catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
-            }
-        }
+        ///**
+        // * Display a specific page
+        // */
+        //public void goto_page( int page_number ) {
+        //    try {
+        //        this.view.display( page_number );
+        //    }
+        //    catch( Renderer.RenderError e ) {
+        //        GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
+        //    }
+        //}
         
         public void fade_to_black() {
             if (this.faded_to_black) {

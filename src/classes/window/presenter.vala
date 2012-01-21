@@ -147,7 +147,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 out next_scale_rect
             );
             // Set the second slide as starting point
-            this.next_view.next();
+            //this.next_view.next();
 
             // Position it at the top and right of the current slide
             int next_view_y_pos;
@@ -345,68 +345,74 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             return this.presentation_controller;
         }
 
-        /**
-         * Switch the shown pdf to the next page
-         */
-        public void next_page() {
-            this.current_view.next();
-            this.next_view.next();
-            this.update_slide_count();
-            this.update_note();
-            this.blank_label.hide();
-
-            this.timer.start();
+        public void update() {
+            int current_slide = this.presentation_controller.get_current_slide();
+            this.current_view.display(current_slide);
+            this.next_view.display(current_slide + 1);
         }
 
         /**
          * Switch the shown pdf to the next page
          */
-        public void jump10() {
-            this.current_view.jumpN(10);
-            this.next_view.jumpN(10);
-            this.update_slide_count();
-            this.update_note();
-            this.blank_label.hide();
+        //public void next_page() {
+        //    this.current_view.next();
+        //    this.next_view.next();
+        //    this.update_slide_count();
+        //    this.update_note();
+        //    this.blank_label.hide();
 
-            this.timer.start();
-        }
+        //    this.timer.start();
+        //}
 
-        /**
-         * Switch to the previous page
-         */
-        public void previous_page() {
-            if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1
-              && this.current_view.get_current_slide_number() != 0 ) {
-                // Only move the next slide back if there is a difference of at
-                // least one slide between current and next
-                this.next_view.previous();
-            }
-            this.current_view.previous();
-            this.update_slide_count();
-            this.update_note();
-            this.blank_label.hide();
-        }
+        ///**
+        // * Switch the shown pdf to the next page
+        // */
+        //public void jump10() {
+        //    this.current_view.jumpN(10);
+        //    this.next_view.jumpN(10);
+        //    this.update_slide_count();
+        //    this.update_note();
+        //    this.blank_label.hide();
 
-        /**
-         * Go back 10 slides
-         */
-        public void back10() {
-            if (this.current_view.get_current_slide_number() > 10) {
-            if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1) {
-                // Only move the next slide back 10 if there is a difference of at
-                // least one slide between current and next
-                    this.next_view.backN(10);
-                } else {
-                    this.next_view.backN(9);
-                }
-                this.current_view.backN(10);
-                this.update_slide_count();
-                this.update_note();
-                this.blank_label.hide();
-            } else {
-                this.goto_page(0);
-            }
-        }
+        //    this.timer.start();
+        //}
+
+        ///**
+        // * Switch to the previous page
+        // */
+        //public void previous_page() {
+        //    if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1
+        //      && this.current_view.get_current_slide_number() != 0 ) {
+        //        // Only move the next slide back if there is a difference of at
+        //        // least one slide between current and next
+        //        this.next_view.previous();
+        //    }
+        //    this.current_view.previous();
+        //    this.update_slide_count();
+        //    this.update_note();
+        //    this.blank_label.hide();
+        //}
+
+        ///**
+        // * Go back 10 slides
+        // */
+        //public void back10() {
+        //    if (this.current_view.get_current_slide_number() > 10) {
+        //    if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1) {
+        //        // Only move the next slide back 10 if there is a difference of at
+        //        // least one slide between current and next
+        //            this.next_view.backN(10);
+        //        } else {
+        //            this.next_view.backN(9);
+        //        }
+        //        this.current_view.backN(10);
+        //        this.update_slide_count();
+        //        this.update_note();
+        //        this.blank_label.hide();
+        //    } else {
+        //        this.goto_page(0);
+        //    }
+        //}
 
         /**
          * Reset the presentation display to the initial status
@@ -414,8 +420,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void reset() {
             try {
                 this.current_view.display( 0 );
-                this.next_view.display( 0 );
-                this.next_view.next();
+                this.next_view.display( 1 );
+                //this.next_view.next();
             }
             catch( Renderer.RenderError e ) {
                 GLib.error( "The pdf page could not be rendered: %s", e.message );

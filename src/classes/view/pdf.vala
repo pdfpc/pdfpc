@@ -37,7 +37,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Default constructor restricted to Pdf renderers as input parameter
          */
         public Pdf( Renderer.Pdf renderer, bool allow_black_on_end ) {
-            base( renderer, allow_black_on_end );
+            base( renderer );
 
             // Enable the PDFLink Behaviour by default on PDF Views
             this.associate_behaviour( 

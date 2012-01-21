@@ -143,10 +143,13 @@ namespace org.westhoffswelt.pdfpresenter {
             stdout.printf( "Initializing rendering...\n" );
 
             SlidesNotes notes = new SlidesNotes(Options.notes_fname);
-           
+
+            var pdffile = File.new_for_commandline_arg( args[1] );
+            var metadata = new Metadata.Pdf( pdffile.get_uri() );
+
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
-            this.controller = new PresentationController(notes);
+            this.controller = new PresentationController(metadata, false, notes);
             this.cache_status = new CacheStatus();
 
             int presenter_monitor, presentation_monitor;

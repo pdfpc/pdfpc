@@ -81,9 +81,47 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Instantiate a new controller
          */
-        public PresentationController(SlidesNotes notes) {
+        public PresentationController( Metadata.Base metadata, bool allow_black_on_end, SlidesNotes notes ) {
             this.controllables = new List<Controllable>();
             this.notes = notes;
+
+           this.n_slides = (int)metadata.get_slide_count();
+           stdout.printf("n_slides = %d\n", this.n_slides);
+           this.black_on_end = allow_black_on_end;
+           if (this.black_on_end)
+               this.slide_limit = this.n_slides + 1;
+           else
+               this.slide_limit = this.n_slides;
+
+            // Read which slides we have to skip
+            try {
+                 string raw_data;
+                 FileUtils.get_contents("skip", out raw_data);
+                 string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
+                 int s = 0; // Counter over real slides
+                 int us = 0; // Counter over user slides
+                 user_view_indexes.resize(this.n_slides - lines.length + 1);
+                 for ( int l=0; l < lines.length-1; ++l ) {
+                     int current_skip = int.parse( lines[l] ) - 1;
+                     while ( s < current_skip ) {
+                         user_view_indexes[us++] = s;
+                         ++s;
+                     }
+                     ++s;
+                 }
+                 // Now we have to reach the end
+                 while ( s < this.n_slides ) {
+                     user_view_indexes[us++] = s;
+                     ++s;
+                 }
+            } catch (GLib.FileError e) {
+                 stderr.printf("Could not read skip information\n");
+            }
+            stdout.printf("user_view_indexes = [");
+            for ( int s=0; s < user_view_indexes.length; ++s)
+                 stdout.printf("%d ", user_view_indexes[s]);
+            stdout.printf("]\n");
+            
         }
 
         /**
@@ -104,39 +142,39 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff53: /* Cursor right */
                     case 0xff56: /* Page down */
                     case 0x020:  /* Space */
-                        this.controllables_next_page();
+                        this.next_page();
                     break;
-                    case 0x06e:  /* n */
-                        this.controllables_jump10();
-                    break;
-                    case 0xff51: /* Cursor left */
-                    case 0xff55: /* Page Up */
-                        this.controllables_previous_page();
-                    break;
-                    case 0xff08: /* Backspace */
-                    case 0x070:
-                        this.controllables_back10();
-                    break;
+                    //case 0x06e:  /* n */
+                    //    this.controllables_jump10();
+                    //break;
+                    //case 0xff51: /* Cursor left */
+                    //case 0xff55: /* Page Up */
+                    //    this.controllables_previous_page();
+                    //break;
+                    //case 0xff08: /* Backspace */
+                    //case 0x070:
+                    //    this.controllables_back10();
+                    //break;
                     case 0xff1b: /* Escape */
                     case 0x071:  /* q */
                         this.notes.save_to_disk();
                         Gtk.main_quit();
                     break;
-                    case 0xff50: /* Home */
-                        this.controllables_reset();
-                    break;
-                    case 0x062: /* b*/
-                        this.controllables_fade_to_black();
-                    break;
-                    case 0x065: /* e */
-                        this.controllables_edit_note();
-                    break;
-                    case 0x073: /* s */
-                        this.notes.save_to_disk();
-                    break;
-                    case 0x067: /* g */
-                        this.controllables_ask_goto_page();
-                    break;
+                    //case 0xff50: /* Home */
+                    //    this.controllables_reset();
+                    //break;
+                    //case 0x062: /* b*/
+                    //    this.controllables_fade_to_black();
+                    //break;
+                    //case 0x065: /* e */
+                    //    this.controllables_edit_note();
+                    //break;
+                    //case 0x073: /* s */
+                    //    this.notes.save_to_disk();
+                    //break;
+                    //case 0x067: /* g */
+                    //    this.controllables_ask_goto_page();
+                    //break;
                 }
                 return true;
             } else {
@@ -151,10 +189,10 @@ namespace org.westhoffswelt.pdfpresenter {
             if ( !ignore_input_events ) {
                 switch( button.button ) {
                     case 1: /* Left button */
-                        this.controllables_next_page();
+                        this.next_page();
                     break;
                     case 3: /* Right button */
-                        this.controllables_previous_page();
+                        //this.controllables_previous_page();
                     break;
                 }
                 return true;
@@ -162,12 +200,16 @@ namespace org.westhoffswelt.pdfpresenter {
                 return false;
             }
         }
+        
+        public int get_current_slide() {
+            return current_slide_number;
+        }
 
         /**
          * A request to change the page has been issued
          */
         public void page_change_request( int page_number ) {
-            this.controllables_goto_page( page_number );
+            //this.controllables_goto_page( page_number );
         }
 
         /**
@@ -194,66 +236,27 @@ namespace org.westhoffswelt.pdfpresenter {
             
             return true;
         }
-        
+
         /**
-         * Move all registered controllables to the next page
+         * Goto the next slide
          */
-        protected void controllables_next_page() {
-            foreach( Controllable c in this.controllables ) {
-                c.next_page();
+        public void next_page() {
+            if ( this.current_slide_number < this.slide_limit - 1 ) {
+                ++this.current_slide_number;
+                this.controllables_update();
             }
         }
 
-        /**
-         * Move all registered controllables 10 pages forward
-         */
-        protected void controllables_jump10() {
-            foreach( Controllable c in this.controllables ) {
-                c.jump10();
-            }
+        public void goto_page(int page_number) {
         }
 
         /**
-         * Move all registered controllables to the previous page
+         * Notify the controllables that they have to update the view
          */
-        protected void controllables_previous_page() {
+        protected void controllables_update() {
             foreach( Controllable c in this.controllables ) {
-                c.previous_page();
+                c.update();
             }
-        }
-
-        /**
-         * Go back 10 pages in all registered controllables
-         */
-        protected void controllables_back10() {
-            foreach( Controllable c in this.controllables ) {
-                c.back10();
-            }
-        }
-
-        /**
-         * Reset all registered controllables to their initial state
-         */
-        protected void controllables_reset() {
-            foreach( Controllable c in this.controllables ) {
-                c.reset();
-            }
-        }
-
-        /**
-         * Have all controllables display a certain page
-         */
-        protected void controllables_goto_page( int page_number ) {
-            foreach( Controllable c in this.controllables ) {
-                c.goto_page( page_number );
-            }
-        }
-
-        /**
-         * public interface for the above function
-         */
-        public void goto_page( int page_number ) {
-            controllables_goto_page(page_number);
         }
 
         /**
