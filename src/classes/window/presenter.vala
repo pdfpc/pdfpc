@@ -324,8 +324,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected void update_slide_count() {
             this.slide_progress.set_text( 
                 "%d/%u".printf( 
-                    this.current_view.get_current_slide_number() + 1, 
-                    this.slide_count
+                    this.presentation_controller.get_current_user_slide_number() + 1, 
+                    this.presentation_controller.get_user_n_slides()
                 )        
             );
         }
@@ -346,94 +346,26 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         public void update() {
-            int current_slide = this.presentation_controller.get_current_slide();
-            this.current_view.display(current_slide);
-            this.next_view.display(current_slide + 1);
+            int current_slide_number = this.presentation_controller.get_current_slide_number();
+            try {
+                this.current_view.display(current_slide_number);
+                this.next_view.display(current_slide_number + 1);
+            }
+            catch( Renderer.RenderError e ) {
+                GLib.error( "The pdf page %d could not be rendered: %s", current_slide_number, e.message );
+            }
+            this.update_slide_count();
+            this.update_note();
+            this.timer.start();
+            this.blank_label.hide();
+            this.faded_to_black = false;
         }
-
-        /**
-         * Switch the shown pdf to the next page
-         */
-        //public void next_page() {
-        //    this.current_view.next();
-        //    this.next_view.next();
-        //    this.update_slide_count();
-        //    this.update_note();
-        //    this.blank_label.hide();
-
-        //    this.timer.start();
-        //}
-
-        ///**
-        // * Switch the shown pdf to the next page
-        // */
-        //public void jump10() {
-        //    this.current_view.jumpN(10);
-        //    this.next_view.jumpN(10);
-        //    this.update_slide_count();
-        //    this.update_note();
-        //    this.blank_label.hide();
-
-        //    this.timer.start();
-        //}
-
-        ///**
-        // * Switch to the previous page
-        // */
-        //public void previous_page() {
-        //    if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1
-        //      && this.current_view.get_current_slide_number() != 0 ) {
-        //        // Only move the next slide back if there is a difference of at
-        //        // least one slide between current and next
-        //        this.next_view.previous();
-        //    }
-        //    this.current_view.previous();
-        //    this.update_slide_count();
-        //    this.update_note();
-        //    this.blank_label.hide();
-        //}
-
-        ///**
-        // * Go back 10 slides
-        // */
-        //public void back10() {
-        //    if (this.current_view.get_current_slide_number() > 10) {
-        //    if ( (int)Math.fabs( (double)( this.current_view.get_current_slide_number() - this.next_view.get_current_slide_number() ) ) >= 1) {
-        //        // Only move the next slide back 10 if there is a difference of at
-        //        // least one slide between current and next
-        //            this.next_view.backN(10);
-        //        } else {
-        //            this.next_view.backN(9);
-        //        }
-        //        this.current_view.backN(10);
-        //        this.update_slide_count();
-        //        this.update_note();
-        //        this.blank_label.hide();
-        //    } else {
-        //        this.goto_page(0);
-        //    }
-        //}
 
         /**
          * Reset the presentation display to the initial status
          */
         public void reset() {
-            try {
-                this.current_view.display( 0 );
-                this.next_view.display( 1 );
-                //this.next_view.next();
-            }
-            catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page could not be rendered: %s", e.message );
-            }
-
             this.timer.reset();
-
-            this.update_slide_count();
-            
-            this.update_note();
-
-            this.blank_label.hide();
         }
 
         /**
@@ -460,7 +392,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Ask for the page to jump to
          */
         public void ask_goto_page() {
-           this.slide_jump.set_text("/%u".printf(this.slide_count));
+           this.slide_jump.set_text("/%u".printf(this.presentation_controller.get_user_n_slides()));
            this.slide_jump.editable = true;
            this.slide_jump.grab_focus();
            this.slide_jump.set_position(0);
@@ -482,7 +414,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                this.slide_progress.show();
                this.presentation_controller.set_ignore_input_events( false );
                if ( destination != 0 )
-                  this.presentation_controller.goto_page(destination-1);
+                  this.presentation_controller.goto_user_page(destination);
                return true;
             } else {
                return false;
@@ -518,7 +450,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if ( key.keyval == 0xff1b) { /* Escape */
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;
-                this.notes.set_note( this.notes_view.buffer.text, this.current_view.get_current_slide_number() );
+                this.notes.set_note( this.notes_view.buffer.text, this.presentation_controller.get_current_user_slide_number() );
                 this.presentation_controller.set_ignore_input_events( false );
                 return true;
             } else {
@@ -530,7 +462,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Update the text of the current note
          */
         protected void update_note() {
-            string this_note = notes.get_note_for_slide(this.current_view.get_current_slide_number());
+            string this_note = notes.get_note_for_slide(this.presentation_controller.get_current_user_slide_number());
             this.notes_view.buffer.text = this_note;
         }
 

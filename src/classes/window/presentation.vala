@@ -134,62 +134,21 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Update the display
          */
         public void update() {
-            this.view.display(this.presentation_controller.get_current_slide());
+            try {
+                this.view.display(this.presentation_controller.get_current_slide_number());
+            }
+            catch( Renderer.RenderError e ) {
+                GLib.error( "The pdf page %d could not be rendered: %s", this.presentation_controller.get_current_slide_number(), e.message );
+            }
+            this.faded_to_black = false;
         }
             
-
-        ///**
-        // * Switch the shown pdf to the next page
-        // */
-        //public void next_page() {
-        //    this.view.next();
-        //}
-
-        ///**
-        // * Go forward 10 slides
-        // */
-        //public void jump10() {
-        //    this.view.jumpN(10);
-        //}
-
-        ///**
-        // * Switch the shown pdf to the previous page
-        // */
-        //public void previous_page() {
-        //    this.view.previous();
-        //}
-
-        ///**
-        // * Switch the shown pdf to the previous page
-        // */
-        //public void back10() {
-        //    this.view.backN(10);
-        //}
-
         /**
          * Reset to the initial presentation state
          */
         public void reset() {
-            try {
-                this.view.display( 0 );
-            }
-            catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page 0 could not be rendered: %s", e.message );
-            }
         }
 
-        ///**
-        // * Display a specific page
-        // */
-        //public void goto_page( int page_number ) {
-        //    try {
-        //        this.view.display( page_number );
-        //    }
-        //    catch( Renderer.RenderError e ) {
-        //        GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
-        //    }
-        //}
-        
         public void fade_to_black() {
             if (this.faded_to_black) {
                 try {

@@ -70,7 +70,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Reset the presentation to it's initial state
          */
-        //public abstract void reset();
+        public abstract void reset();
 
         /**
          * Display a certain page

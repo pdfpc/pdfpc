@@ -85,13 +85,16 @@ namespace org.westhoffswelt.pdfpresenter {
             this.controllables = new List<Controllable>();
             this.notes = notes;
 
-           this.n_slides = (int)metadata.get_slide_count();
-           stdout.printf("n_slides = %d\n", this.n_slides);
-           this.black_on_end = allow_black_on_end;
-           if (this.black_on_end)
-               this.slide_limit = this.n_slides + 1;
-           else
-               this.slide_limit = this.n_slides;
+            this.n_slides = (int)metadata.get_slide_count();
+            stdout.printf("n_slides = %d\n", this.n_slides);
+            this.black_on_end = allow_black_on_end;
+            if (this.black_on_end)
+                this.slide_limit = this.n_slides + 1;
+            else
+                this.slide_limit = this.n_slides;
+            
+            this.current_slide_number = 0;
+            this.current_user_slide_number = 0;
 
             // Read which slides we have to skip
             try {
@@ -144,37 +147,34 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x020:  /* Space */
                         this.next_page();
                     break;
-                    //case 0x06e:  /* n */
-                    //    this.controllables_jump10();
-                    //break;
-                    //case 0xff51: /* Cursor left */
-                    //case 0xff55: /* Page Up */
-                    //    this.controllables_previous_page();
-                    //break;
-                    //case 0xff08: /* Backspace */
-                    //case 0x070:
-                    //    this.controllables_back10();
-                    //break;
+                    case 0x06e:  /* n */
+                        this.jump10();
+                    break;
+                    case 0xff51: /* Cursor left */
+                    case 0xff55: /* Page Up */
+                        this.previous_page();
+                    break;
+                    case 0xff08: /* Backspace */
+                    case 0x070: /* p */
+                        this.back10();
+                    break;
                     case 0xff1b: /* Escape */
                     case 0x071:  /* q */
                         this.notes.save_to_disk();
                         Gtk.main_quit();
                     break;
-                    //case 0xff50: /* Home */
-                    //    this.controllables_reset();
-                    //break;
-                    //case 0x062: /* b*/
-                    //    this.controllables_fade_to_black();
-                    //break;
-                    //case 0x065: /* e */
-                    //    this.controllables_edit_note();
-                    //break;
-                    //case 0x073: /* s */
-                    //    this.notes.save_to_disk();
-                    //break;
-                    //case 0x067: /* g */
-                    //    this.controllables_ask_goto_page();
-                    //break;
+                    case 0xff50: /* Home */
+                        this.controllables_reset();
+                    break;
+                    case 0x062: /* b*/
+                        this.controllables_fade_to_black();
+                    break;
+                    case 0x065: /* e */
+                        this.controllables_edit_note();
+                    break;
+                    case 0x067: /* g */
+                        this.controllables_ask_goto_page();
+                    break;
                 }
                 return true;
             } else {
@@ -192,7 +192,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.next_page();
                     break;
                     case 3: /* Right button */
-                        //this.controllables_previous_page();
+                        this.previous_page();
                     break;
                 }
                 return true;
@@ -201,15 +201,48 @@ namespace org.westhoffswelt.pdfpresenter {
             }
         }
         
-        public int get_current_slide() {
+        /**
+         * Get the current (real) slide number
+         */
+        public int get_current_slide_number() {
             return current_slide_number;
+        }
+
+        /**
+         * Get the current (user) slide number
+         */
+        public int get_current_user_slide_number() {
+            return current_user_slide_number;
+        }
+
+        /**
+         * Get the real total number of slides
+         */
+        public int get_n_slide() {
+            return this.n_slides;
+        }
+
+        /**
+         * Get the user total number of slides
+         */
+        public int get_user_n_slides() {
+            return this.user_view_indexes.length;
         }
 
         /**
          * A request to change the page has been issued
          */
         public void page_change_request( int page_number ) {
-            //this.controllables_goto_page( page_number );
+            stdout.printf("page_change_request(%d)\n", page_number);
+            this.current_slide_number = page_number;
+            // Here we could do a binary search
+            for (int u = 0; u < this.user_view_indexes.length; ++u) {
+                if (page_number <= this.user_view_indexes[u]) {
+                    this.current_user_slide_number = u;
+                    break;
+                }
+            }
+            this.controllables_update();
         }
 
         /**
@@ -238,16 +271,64 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Goto the next slide
+         * Go to the next slide
          */
         public void next_page() {
             if ( this.current_slide_number < this.slide_limit - 1 ) {
                 ++this.current_slide_number;
+                if (this.current_slide_number == this.user_view_indexes[this.current_user_slide_number + 1])
+                    ++this.current_user_slide_number;
                 this.controllables_update();
             }
         }
 
-        public void goto_page(int page_number) {
+        /**
+         * Go to the previous slide
+         */
+        public void previous_page() {
+            if ( this.current_slide_number > 0) {
+                if (this.current_slide_number != this.user_view_indexes[this.current_user_slide_number]) {
+                    --this.current_slide_number;
+                } else {
+                    --this.current_user_slide_number;
+                    this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+                }
+                this.controllables_update();
+            }
+        }
+
+        /**
+         * Jump 10 (user) slides forward
+         */
+        public void jump10() {
+            this.current_user_slide_number += 10;
+            int max_user_slide = this.user_view_indexes.length;
+            if ( this.current_user_slide_number >= max_user_slide )
+                this.current_user_slide_number = max_user_slide - 1;
+            this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+            this.controllables_update();
+        }
+
+        /**
+         * Jump 10 (user) slides backward
+         */
+        public void back10() {
+            this.current_user_slide_number -= 10;
+            if ( this.current_user_slide_number < 0 )
+                this.current_user_slide_number = 0;
+            this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+            this.controllables_update();
+        }
+
+        public void goto_user_page(int page_number) {
+            int destination = page_number-1;
+            if (page_number < 1)
+                destination = 0;
+            else if (page_number >= user_view_indexes.length)
+                destination = user_view_indexes.length - 1;
+            this.current_user_slide_number = destination;
+            this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+            this.controllables_update();
         }
 
         /**
@@ -256,6 +337,18 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_update() {
             foreach( Controllable c in this.controllables ) {
                 c.update();
+            }
+        }
+
+        /**
+         * Reset all registered controllables to their initial state
+         */
+        protected void controllables_reset() {
+            this.current_slide_number = 0;
+            this.current_user_slide_number = 0;
+            foreach( Controllable c in this.controllables ) {
+                c.update();
+                c.reset();
             }
         }
 
