@@ -135,7 +135,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // The next slide is right to the current one and takes up the
             // remaining width
             Rectangle next_scale_rect;
-            var next_allocated_width = this.screen_geometry.width - current_allocated_width-10; // We leave a bit of margin between the two views
+            var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 next_allocated_width,
@@ -231,7 +231,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         protected void build_layout() {
-            var slideViews = new HBox(false, 2);
+            var slideViews = new HBox(false, 4);
             var center_current_view = new Alignment(0, (float)0.5, 0, 0);
             center_current_view.add(this.current_view);
             slideViews.add( center_current_view );

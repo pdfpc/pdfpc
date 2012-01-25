@@ -106,6 +106,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 // the before mentioned maximized window problem. Therefore it is
                 // done again
                 this.move( this.screen_geometry.x, this.screen_geometry.y );
+                this.resize( this.screen_geometry.width, this.screen_geometry.height );
 
                 this.fullscreen();
             }
