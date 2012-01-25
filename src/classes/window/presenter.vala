@@ -57,9 +57,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Slide progress label ( eg. "23/42" )
          */
-        protected Label slide_progress;
-        
-        protected Entry slide_jump;
+        protected Entry slide_progress;
 
         /**
          * Indication that the slide is blanked (faded to black)
@@ -72,9 +70,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected TextView notes_view;
 
         /**
-         * Fixed layout to position all the elements inside the window
+         * Layout to position all the elements inside the window
          */
-        protected Fixed fixedLayout = null;
+        protected VBox fullLayout = null;
 
         /**
          * Number of slides inside the presentation
@@ -90,6 +88,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected SlidesNotes notes;
 
         /**
+         * Useful colors
+         */
+        protected Color black;
+        protected Color white;
+
+        /**
          * Base constructor instantiating a new presenter window
          */
         public Presenter( string pdf_filename, int screen_num, SlidesNotes slides_notes ) {
@@ -99,12 +103,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 Gtk.main_quit();
             } );
 
-            Color black;
-            Color.parse( "black", out black );
-            this.modify_bg( StateType.NORMAL, black );
+            Color.parse( "black", out this.black );
+            Color.parse( "white", out white );
 
-            this.fixedLayout = new Fixed();
-            this.add( this.fixedLayout );
+            this.modify_bg( StateType.NORMAL, this.black );
 
             // We need the value of 90% height a lot of times. Therefore store it
             // in advance
@@ -123,17 +125,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 current_allocated_width,
-                bottom_position,
+                0,
+                //bottom_position,
                 Options.black_on_end,
                 out current_scale_rect
             );
             this.notes = slides_notes;
-
-            // Position it in the top left corner.
-            // The scale rect information is used to center the image inside
-            // its area.
-            this.fixedLayout.put( this.current_view, current_scale_rect.x, current_scale_rect.y );
-            //this.fixedLayout.put( this.current_view, 0, 0);
 
             // The next slide is right to the current one and takes up the
             // remaining width
@@ -142,29 +139,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.next_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 next_allocated_width,
-                bottom_position,
+                0,
+                //bottom_position,
                 true,
                 out next_scale_rect
             );
-            // Set the second slide as starting point
-            //this.next_view.next();
-
-            // Position it at the top and right of the current slide
-            int next_view_y_pos;
-            if (this.notes.has_notes())
-                next_view_y_pos = 5;
-            else
-                next_view_y_pos = next_scale_rect.y;
-            this.fixedLayout.put( 
-                this.next_view, 
-                current_allocated_width + next_scale_rect.x + 5,
-                next_view_y_pos
-                //next_scale_rect.y 
-            );
-
-            // Color needed for the labels
-            Color white;
-            Color.parse( "white", out white );
 
             // TextView for notes in the slides
             var notes_font = Pango.FontDescription.from_string( "Verdana" );
@@ -178,16 +157,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.notes_view.modify_font(notes_font); 
             this.notes_view.modify_base(StateType.NORMAL, black);
             this.notes_view.modify_text(StateType.NORMAL, white);
-            this.notes_view.set_size_request(next_scale_rect.width, 
-                                             bottom_position - next_scale_rect.height - 15);
             this.notes_view.buffer.text = "";
             this.notes_view.key_press_event.connect( this.on_key_press_notes_view );
-            if (this.notes.has_notes()) {
-                this.fixedLayout.put(this.notes_view,
-                                     current_allocated_width + next_scale_rect.x + 5,
-                                     2*next_scale_rect.y
-                );
-            }
 
             // Initial font needed for the labels
             // We approximate the point size using pt = px * .75
@@ -211,62 +182,25 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.timer = new TimerLabel( (int)Options.duration * 60, start_time );
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
-            this.timer.set_size_request( 
-                (int)Math.floor( this.screen_geometry.width * 0.75 ),
-                bottom_height - 10
-            );
             this.timer.set_last_minutes( Options.last_minutes );
-            this.fixedLayout.put( this.timer, 0, bottom_position - 10 );
 
 
             // The slide counter is centered in the 90% bottom part of the screen
             // It takes 1/4 of the available width on the right
-            this.slide_progress = new Label( "23/42" );
-            this.slide_progress.set_justify( Justification.CENTER );
-            this.slide_progress.modify_fg( StateType.NORMAL, white );
+            this.slide_progress = new Entry();
+            this.slide_progress.set_alignment(1f);
+            this.slide_progress.modify_base(StateType.NORMAL, this.black);
+            this.slide_progress.modify_text(StateType.NORMAL, this.white);
             this.slide_progress.modify_font( font );
-            this.slide_progress.set_size_request(
-                (int)Math.floor( this.screen_geometry.width * 0.25 ),
-                bottom_height - 10
-            );
-            this.fixedLayout.put(
-                this.slide_progress,
-                (int)Math.ceil( this.screen_geometry.width * 0.75 ),
-                bottom_position - 10
-            );
-    
-            this.slide_jump = new Entry();
-            this.slide_jump.set_alignment(0.5f);
-            //this.slide_jump.modify_base(StateType.NORMAL, black);
-            //this.slide_jump.modify_text(StateType.NORMAL, white);
-            this.slide_jump.modify_font( font );
-            this.slide_jump.editable = false;
-            this.slide_jump.no_show_all = true; 
-            this.slide_jump.key_press_event.connect( this.on_key_press_slide_jump );
-            this.slide_jump.set_size_request( 
-                (int)Math.floor( this.screen_geometry.width * 0.25 ),
-                bottom_height - 10 
-            );
-            this.fixedLayout.put(
-                this.slide_jump,
-                (int)Math.ceil( this.screen_geometry.width * 0.75 ),
-                bottom_position - 10
-            );
+            this.slide_progress.editable = false;
+            this.slide_progress.has_frame = false;
+            this.slide_progress.key_press_event.connect( this.on_key_press_slide_progress );
 
             this.blank_label = new Label( "Blank" );
             this.blank_label.set_justify( Justification.LEFT );
-            this.blank_label.modify_fg( StateType.NORMAL, white );
+            this.blank_label.modify_fg( StateType.NORMAL, this.white );
             this.blank_label.modify_font( font );
             this.blank_label.no_show_all = true;
-            this.blank_label.set_size_request( 
-                (int)Math.floor( this.screen_geometry.width * 0.25 ),
-                bottom_height - 10 
-            );
-            this.fixedLayout.put(
-                this.blank_label,
-                0,
-                bottom_position - 10
-            );
 
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.add_events(EventMask.BUTTON_PRESS_MASK);
@@ -292,6 +226,38 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     )
                 );
             }
+
+            this.build_layout();
+        }
+
+        protected void build_layout() {
+            var slideViews = new HBox(false, 2);
+            var center_current_view = new Alignment(0, (float)0.5, 0, 0);
+            center_current_view.add(this.current_view);
+            slideViews.add( center_current_view );
+
+            var nextViewWithNotes = new VBox(false, 0);
+            nextViewWithNotes.pack_start( this.next_view, false, false, 0 );
+            nextViewWithNotes.pack_start( this.notes_view, true, true, 5 );
+            slideViews.add(nextViewWithNotes);
+
+            var bottomRow = new HBox(true, 0);
+            var blank_label_alignment = new Alignment(0, 0.5f, 0, 0);
+            var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
+            var slide_progress_alignment = new Alignment(1, 0.5f, 1, 0);
+            blank_label_alignment.add( this.blank_label );
+            timer_alignment.add( this.timer );
+            slide_progress_alignment.add( this.slide_progress );
+            bottomRow.pack_start( blank_label_alignment, true, true, 0);
+            bottomRow.pack_start( timer_alignment, true, true, 0 );
+            bottomRow.pack_end( slide_progress_alignment, true, true, 0);
+
+            //var fullLayout = new VBox(false, 0);
+            this.fullLayout = new VBox(false, 0);
+            fullLayout.pack_start( slideViews );
+            fullLayout.pack_start( bottomRow );
+            
+            this.add( fullLayout );
         }
 
         /**
@@ -392,26 +358,24 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Ask for the page to jump to
          */
         public void ask_goto_page() {
-           this.slide_jump.set_text("/%u".printf(this.presentation_controller.get_user_n_slides()));
-           this.slide_jump.editable = true;
-           this.slide_jump.grab_focus();
-           this.slide_jump.set_position(0);
-           this.slide_jump.show();
-           this.slide_progress.hide();
+           this.slide_progress.set_text("/%u".printf(this.presentation_controller.get_user_n_slides()));
+           this.slide_progress.modify_cursor(white, null);
+           this.slide_progress.editable = true;
+           this.slide_progress.grab_focus();
+           this.slide_progress.set_position(0);
            this.presentation_controller.set_ignore_input_events( true );
         }
     
         /**
-         * Handle key events for the slide_jump entry field
+         * Handle key events for the slide_progress entry field
          */
-        protected bool on_key_press_slide_jump( Gtk.Widget source, EventKey key ) {
+        protected bool on_key_press_slide_progress( Gtk.Widget source, EventKey key ) {
             if ( key.keyval == 0xff0d ) {
                 // Try to parse the input
-               string input_text = this.slide_jump.text;
+               string input_text = this.slide_progress.text;
                int destination = int.parse(input_text.substring(0, input_text.index_of("/")));
-               this.slide_jump.editable = false;
-               this.slide_jump.hide();
-               this.slide_progress.show();
+               this.slide_progress.modify_cursor(black, null);
+               this.slide_progress.editable = false;
                this.presentation_controller.set_ignore_input_events( false );
                if ( destination != 0 )
                   this.presentation_controller.goto_user_page(destination);
@@ -486,11 +450,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Add the cache status widget to be displayed
             observer.set_height( 6 );
             observer.set_width( this.screen_geometry.width );
-            this.fixedLayout.put( 
-                observer,
-                0,
-                this.screen_geometry.height - 6 
-            );
+            //this.fixedLayout.put( 
+            //    observer,
+            //    0,
+            //    this.screen_geometry.height - 6 
+            //);
+            this.fullLayout.pack_end( observer, false, false, 0 );
             observer.show();
         }
 

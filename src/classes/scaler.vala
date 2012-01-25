@@ -61,7 +61,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public Rectangle scale_to( int width, int height, bool centered = true, bool allow_cutoff = false ) {
             Rectangle target = Rectangle();
             double factor = 1.0f;
-            if ( allow_cutoff == true ) {
+            if ( width == 0 ) {
+                factor = height / this.initial_height;
+            } else if ( height == 0 ) {
+                factor = width / this.initial_width;
+            } else if ( allow_cutoff == true ) {
                 factor = Math.fmax( 
                     width / this.initial_width,
                     height / this.initial_height
