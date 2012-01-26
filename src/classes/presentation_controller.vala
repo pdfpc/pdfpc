@@ -80,7 +80,6 @@ namespace org.westhoffswelt.pdfpresenter {
             this.metadata = metadata;
 
             this.n_slides = (int)metadata.get_slide_count();
-            stdout.printf("n_slides = %d\n", this.n_slides);
             this.black_on_end = allow_black_on_end;
             if (this.black_on_end)
                 this.slide_limit = this.n_slides + 1;

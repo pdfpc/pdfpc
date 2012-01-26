@@ -76,36 +76,50 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 out this.page_width,
                 out this.page_height
             );
+    
+            // Auto-detect which pages to skip
+            string previous_label = null;
+            this.user_view_indexes.resize((int)this.page_count);
+            int user_pages = 0;
+            for ( int i = 0; i < this.page_count; ++i ) {
+                string this_label = this.document.get_page(i).label;
+                if (this_label != previous_label) {
+                    this.user_view_indexes[user_pages] = i;
+                    previous_label = this_label;
+                    ++user_pages;
+                }
+            }
+            this.user_view_indexes.resize(user_pages);
             MutexLocks.poppler.unlock();
 
-            // Read which slides we have to skip
-            try {
-                 string raw_data;
-                 FileUtils.get_contents("skip", out raw_data);
-                 string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
-                 int s = 0; // Counter over real slides
-                 int us = 0; // Counter over user slides
-                 user_view_indexes.resize((int)this.page_count - lines.length + 1);
-                 for ( int l=0; l < lines.length-1; ++l ) {
-                     int current_skip = int.parse( lines[l] ) - 1;
-                     while ( s < current_skip ) {
-                         user_view_indexes[us++] = s;
-                         ++s;
-                     }
-                     ++s;
-                 }
-                 // Now we have to reach the end
-                 while ( s < this.page_count ) {
-                     user_view_indexes[us++] = s;
-                     ++s;
-                 }
-            } catch (GLib.FileError e) {
-                 stderr.printf("Could not read skip information\n");
-            }
-            stdout.printf("user_view_indexes = [");
-            for ( int s=0; s < user_view_indexes.length; ++s)
-                 stdout.printf("%d ", user_view_indexes[s]);
-            stdout.printf("]\n");
+            //// Read which slides we have to skip
+            //try {
+            //     string raw_data;
+            //     FileUtils.get_contents("skip", out raw_data);
+            //     string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
+            //     int s = 0; // Counter over real slides
+            //     int us = 0; // Counter over user slides
+            //     user_view_indexes.resize((int)this.page_count - lines.length + 1);
+            //     for ( int l=0; l < lines.length-1; ++l ) {
+            //         int current_skip = int.parse( lines[l] ) - 1;
+            //         while ( s < current_skip ) {
+            //             user_view_indexes[us++] = s;
+            //             ++s;
+            //         }
+            //         ++s;
+            //     }
+            //     // Now we have to reach the end
+            //     while ( s < this.page_count ) {
+            //         user_view_indexes[us++] = s;
+            //         ++s;
+            //     }
+            //} catch (GLib.FileError e) {
+            //     stderr.printf("Could not read skip information\n");
+            //}
+            //stdout.printf("user_view_indexes = [");
+            //for ( int s=0; s < user_view_indexes.length; ++s)
+            //     stdout.printf("%d ", user_view_indexes[s]);
+            //stdout.printf("]\n");
         }
     
         public void open_notes( string fname ) {
