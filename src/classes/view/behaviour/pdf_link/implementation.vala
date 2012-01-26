@@ -36,13 +36,19 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
         protected PdfLink.SignalProvider signal_provider = null;
 
         /**
+         * The presentation controller
+         */
+        protected PresentationController presentation_controller;
+
+        /**
          * Base constructor not taking any arguments
          */
-        public Implementation() {
+        public Implementation(PresentationController presentation_controller) {
             base();
             // Make sure a PdfLink.SignalProvider is ready to create the needed
             // pdf link based signals.
             this.signal_provider = new PdfLink.SignalProvider();
+            this.presentation_controller = presentation_controller;
         }        
 
         /**
@@ -113,10 +119,11 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
             // @TODO: Think of something different to access the controller
             // instead of this ugly HACK. Maybe the whole controller concept as
             // it is implemented right now should be reconsidered.
-            var window = this.target.get_parent().get_parent();
-            ((Controllable)window).get_controller().page_change_request( 
-                (int)target_page_number
-            );
+            //var window = this.target.get_parent().get_parent();
+            //((Controllable)window).get_controller().page_change_request( 
+            //    (int)target_page_number
+            //);
+            this.presentation_controller.page_change_request( (int)target_page_number );
         }
 
         /**

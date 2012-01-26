@@ -128,9 +128,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 current_allocated_width,
-                0,
-                //bottom_position,
+                bottom_position,
                 Options.black_on_end,
+                this.presentation_controller,
                 out current_scale_rect
             );
             this.notes = slides_notes;
@@ -142,9 +142,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.next_view = View.Pdf.from_pdf_file( 
                 pdf_filename,
                 next_allocated_width,
-                0,
-                //bottom_position,
+                bottom_position,
                 true,
+                this.presentation_controller,
                 out next_scale_rect
             );
 

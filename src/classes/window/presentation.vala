@@ -68,6 +68,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.screen_geometry.width, 
                 this.screen_geometry.height,
                 Options.black_on_end,
+                this.presentation_controller,
                 out scale_rect
             );
 
