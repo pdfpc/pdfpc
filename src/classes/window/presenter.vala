@@ -96,15 +96,18 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Base constructor instantiating a new presenter window
          */
-        public Presenter( string pdf_filename, int screen_num, SlidesNotes slides_notes ) {
+        public Presenter( string pdf_filename, int screen_num, SlidesNotes slides_notes, PresentationController presentation_controller ) {
             base( screen_num );
 
             this.destroy.connect( (source) => {
                 Gtk.main_quit();
             } );
 
+            this.presentation_controller = presentation_controller;
+            this.presentation_controller.register_controllable( this );
+
             Color.parse( "black", out this.black );
-            Color.parse( "white", out white );
+            Color.parse( "white", out this.white );
 
             this.modify_bg( StateType.NORMAL, this.black );
 
@@ -211,6 +214,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Store the slide count once
             this.slide_count = this.current_view.get_renderer().get_metadata().get_slide_count();
 
+            this.update();
             this.reset();
 
             // Enable the render caching if it hasn't been forcefully disabled.
@@ -300,9 +304,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Set the presentation controller which is notified of keypresses and
          * other observed events
          */
-        public void set_controller( PresentationController controller ) {
-            this.presentation_controller = controller;
-        }
+        //public void set_controller( PresentationController controller ) {
+        //    this.presentation_controller = controller;
+        //}
 
         /**
          * Return the registered PresentationController

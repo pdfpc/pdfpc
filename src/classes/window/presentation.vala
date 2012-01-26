@@ -44,12 +44,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public Presentation( string pdf_filename, int screen_num ) {
+        public Presentation( string pdf_filename, int screen_num, PresentationController presentation_controller ) {
             base( screen_num );
 
             this.destroy.connect( (source) => {
                 Gtk.main_quit();
             } );
+
+            this.presentation_controller = presentation_controller;
+            this.presentation_controller.register_controllable( this );
 
             Color black;
             Color.parse( "black", out black );
@@ -90,6 +93,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
 
+            this.update();
             this.reset();
         }
 

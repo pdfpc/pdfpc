@@ -30,7 +30,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Set the presentation controller which needs to be informed of key
          * presses and such.
          */
-        public abstract void set_controller( PresentationController controller ) ;
+        //public abstract void set_controller( PresentationController controller ) ;
 
         /**
          * Return the registered PresentationController

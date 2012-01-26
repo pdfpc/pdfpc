@@ -124,7 +124,6 @@ namespace org.westhoffswelt.pdfpresenter {
             for ( int s=0; s < user_view_indexes.length; ++s)
                  stdout.printf("%d ", user_view_indexes[s]);
             stdout.printf("]\n");
-            
         }
 
         /**
@@ -264,7 +263,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 return false;
             }
 
-            controllable.set_controller( this );
+            //controllable.set_controller( this );
             this.controllables.append( controllable );
             
             return true;

@@ -106,8 +106,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * while displaying the given file
          */
         private Window.Presenter create_presenter_window( string filename, int monitor, SlidesNotes notes ) {
-            var presenter_window = new Window.Presenter( filename, monitor, notes );
-            controller.register_controllable( presenter_window );
+            var presenter_window = new Window.Presenter( filename, monitor, notes, this.controller );
+            //controller.register_controllable( presenter_window );
             presenter_window.set_cache_observer( this.cache_status );
 
             return presenter_window;
@@ -118,8 +118,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * while displaying the given file
          */
         private Window.Presentation create_presentation_window( string filename, int monitor ) {
-            var presentation_window = new Window.Presentation( filename, monitor );
-            controller.register_controllable( presentation_window );
+            var presentation_window = new Window.Presentation( filename, monitor, this.controller );
+            //controller.register_controllable( presentation_window );
             presentation_window.set_cache_observer( this.cache_status );
 
             return presentation_window;
