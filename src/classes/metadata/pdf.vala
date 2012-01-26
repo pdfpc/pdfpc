@@ -54,6 +54,13 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         protected slides_notes notes;
 
         /**
+         * The a virtual mapping of "real pages" to "user-view pages". The
+         * indexes in the vector are the user-view slide, the contents are the
+         * real slide numbers.
+         */
+        protected int[] user_view_indexes;
+
+        /**
          * Base constructor taking the file url to the pdf file
          */
         public Pdf( string url ) {
@@ -70,6 +77,35 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 out this.page_height
             );
             MutexLocks.poppler.unlock();
+
+            // Read which slides we have to skip
+            try {
+                 string raw_data;
+                 FileUtils.get_contents("skip", out raw_data);
+                 string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
+                 int s = 0; // Counter over real slides
+                 int us = 0; // Counter over user slides
+                 user_view_indexes.resize((int)this.page_count - lines.length + 1);
+                 for ( int l=0; l < lines.length-1; ++l ) {
+                     int current_skip = int.parse( lines[l] ) - 1;
+                     while ( s < current_skip ) {
+                         user_view_indexes[us++] = s;
+                         ++s;
+                     }
+                     ++s;
+                 }
+                 // Now we have to reach the end
+                 while ( s < this.page_count ) {
+                     user_view_indexes[us++] = s;
+                     ++s;
+                 }
+            } catch (GLib.FileError e) {
+                 stderr.printf("Could not read skip information\n");
+            }
+            stdout.printf("user_view_indexes = [");
+            for ( int s=0; s < user_view_indexes.length; ++s)
+                 stdout.printf("%d ", user_view_indexes[s]);
+            stdout.printf("]\n");
         }
     
         public void open_notes( string fname ) {
@@ -81,6 +117,23 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          */
         public override uint get_slide_count() {
             return this.page_count;
+        }
+
+        /**
+         * Return the number of user slides
+         */
+        public int get_user_slide_count() {
+            return this.user_view_indexes.length;
+        }
+
+        /**
+         * Transform from user slide numbers to real slide numbers
+         */
+        public int user_slide_to_real_slide(int number) {
+            if ( number < user_view_indexes.length )
+                return this.user_view_indexes[number];
+            else
+                return (int)this.page_count;
         }
 
         /**

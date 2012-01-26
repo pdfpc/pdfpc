@@ -39,13 +39,6 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int current_user_slide_number;
 
         /**
-         * The a virtual mapping of "real pages" to "user-view pages". The
-         * indexes in the vector are the user-view slide, the contents are the
-         * real slide numbers.
-         */
-        protected int[] user_view_indexes;
-
-        /**
          * A flag signaling if we allow for a black slide at the end. Tis is
          * useful for the next view and (for some presenters) also for the main
          * view.
@@ -96,35 +89,6 @@ namespace org.westhoffswelt.pdfpresenter {
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
-
-            // Read which slides we have to skip
-            try {
-                 string raw_data;
-                 FileUtils.get_contents("skip", out raw_data);
-                 string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
-                 int s = 0; // Counter over real slides
-                 int us = 0; // Counter over user slides
-                 user_view_indexes.resize(this.n_slides - lines.length + 1);
-                 for ( int l=0; l < lines.length-1; ++l ) {
-                     int current_skip = int.parse( lines[l] ) - 1;
-                     while ( s < current_skip ) {
-                         user_view_indexes[us++] = s;
-                         ++s;
-                     }
-                     ++s;
-                 }
-                 // Now we have to reach the end
-                 while ( s < this.n_slides ) {
-                     user_view_indexes[us++] = s;
-                     ++s;
-                 }
-            } catch (GLib.FileError e) {
-                 stderr.printf("Could not read skip information\n");
-            }
-            stdout.printf("user_view_indexes = [");
-            for ( int s=0; s < user_view_indexes.length; ++s)
-                 stdout.printf("%d ", user_view_indexes[s]);
-            stdout.printf("]\n");
         }
 
         /**
@@ -216,31 +180,21 @@ namespace org.westhoffswelt.pdfpresenter {
         }
     
         /**
-         * Transform from user slide numbers to real slide numbers
-         */
-        public int user_slide_to_real_slide(int number) {
-            if ( number < user_view_indexes.length )
-                return user_view_indexes[number];
-            else
-                return this.n_slides;
-        }
-
-        /**
          * Was the previous slide a skip one?
          */
         public bool skip_previous() {
-            return this.current_slide_number > this.user_view_indexes[this.current_user_slide_number];
+            return this.current_slide_number > this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
         }
 
         /**
          * Is the next slide a skip one?
          */
         public bool skip_next() {
-            return (this.current_user_slide_number >= this.user_view_indexes.length - 1
+            return (this.current_user_slide_number >= this.metadata.get_user_slide_count() - 1
                     &&
                     this.current_slide_number < this.n_slides)
                    ||
-                   (this.current_slide_number+1 < this.user_view_indexes[this.current_user_slide_number+1]);
+                   (this.current_slide_number+1 < this.metadata.user_slide_to_real_slide(this.current_user_slide_number+1));
         }
 
         /**
@@ -254,7 +208,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Get the user total number of slides
          */
         public int get_user_n_slides() {
-            return this.user_view_indexes.length;
+            return this.metadata.get_user_slide_count();;
         }
 
         /**
@@ -264,8 +218,8 @@ namespace org.westhoffswelt.pdfpresenter {
             stdout.printf("page_change_request(%d)\n", page_number);
             this.current_slide_number = page_number;
             // Here we could do a binary search
-            for (int u = 0; u < this.user_view_indexes.length; ++u) {
-                if (page_number <= this.user_view_indexes[u]) {
+            for (int u = 0; u < this.metadata.get_user_slide_count(); ++u) {
+                if (page_number <= this.metadata.user_slide_to_real_slide(u)) {
                     this.current_user_slide_number = u;
                     break;
                 }
@@ -304,7 +258,7 @@ namespace org.westhoffswelt.pdfpresenter {
         public void next_page() {
             if ( this.current_slide_number < this.slide_limit - 1 ) {
                 ++this.current_slide_number;
-                if (this.current_slide_number == this.user_view_indexes[this.current_user_slide_number + 1])
+                if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1))
                     ++this.current_user_slide_number;
                 this.controllables_update();
             }
@@ -315,11 +269,11 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void previous_page() {
             if ( this.current_slide_number > 0) {
-                if (this.current_slide_number != this.user_view_indexes[this.current_user_slide_number]) {
+                if (this.current_slide_number != this.metadata.user_slide_to_real_slide(this.current_user_slide_number)) {
                     --this.current_slide_number;
                 } else {
                     --this.current_user_slide_number;
-                    this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+                    this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
                 }
                 this.controllables_update();
             }
@@ -330,10 +284,10 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public void jump10() {
             this.current_user_slide_number += 10;
-            int max_user_slide = this.user_view_indexes.length;
+            int max_user_slide = this.metadata.get_user_slide_count();
             if ( this.current_user_slide_number >= max_user_slide )
                 this.current_user_slide_number = max_user_slide - 1;
-            this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             this.controllables_update();
         }
 
@@ -344,18 +298,19 @@ namespace org.westhoffswelt.pdfpresenter {
             this.current_user_slide_number -= 10;
             if ( this.current_user_slide_number < 0 )
                 this.current_user_slide_number = 0;
-            this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             this.controllables_update();
         }
 
         public void goto_user_page(int page_number) {
             int destination = page_number-1;
+            int n_user_slides = this.metadata.get_user_slide_count();
             if (page_number < 1)
                 destination = 0;
-            else if (page_number >= user_view_indexes.length)
-                destination = user_view_indexes.length - 1;
+            else if (page_number >= n_user_slides)
+                destination = n_user_slides - 1;
             this.current_user_slide_number = destination;
-            this.current_slide_number = this.user_view_indexes[this.current_user_slide_number];
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             this.controllables_update();
         }
 

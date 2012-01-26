@@ -89,9 +89,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected uint slide_count;
 
         /**
-         * Notes for the slides
+         * Metadata of the slides
          */
-        protected slides_notes notes;
+        protected Metadata.Pdf metadata;
 
         /**
          * Useful colors
@@ -111,6 +111,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.presentation_controller = presentation_controller;
             this.presentation_controller.register_controllable( this );
+            
+            this.metadata = metadata;
 
             Color.parse( "black", out this.black );
             Color.parse( "white", out this.white );
@@ -139,7 +141,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.presentation_controller,
                 out current_scale_rect
             );
-            this.notes = metadata.get_notes();
 
             // The next slide is right to the current one and takes up the
             // remaining width
@@ -352,7 +353,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
             try {
                 this.current_view.display(current_slide_number);
-                this.next_view.display(this.presentation_controller.user_slide_to_real_slide(current_user_slide_number + 1));
+                this.next_view.display(this.metadata.user_slide_to_real_slide(current_user_slide_number + 1));
                 if (this.presentation_controller.skip_next()) {
                     this.strict_next_view.display(current_slide_number + 1, true);
                     //this.strict_next_view.show();
@@ -465,7 +466,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if ( key.keyval == 0xff1b) { /* Escape */
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;
-                this.notes.set_note( this.notes_view.buffer.text, this.presentation_controller.get_current_user_slide_number() );
+                this.metadata.get_notes().set_note( this.notes_view.buffer.text, this.presentation_controller.get_current_user_slide_number() );
                 this.presentation_controller.set_ignore_input_events( false );
                 return true;
             } else {
@@ -477,7 +478,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Update the text of the current note
          */
         protected void update_note() {
-            string this_note = notes.get_note_for_slide(this.presentation_controller.get_current_user_slide_number());
+            string this_note = this.metadata.get_notes().get_note_for_slide(this.presentation_controller.get_current_user_slide_number());
             this.notes_view.buffer.text = this_note;
         }
 
