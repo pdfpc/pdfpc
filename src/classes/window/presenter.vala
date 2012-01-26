@@ -46,8 +46,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         /**
          * View showing a preview of the next slide
-        */
+         */
         protected View.Base next_view;
+
+        /**
+         * Small views for (non-user) next slides
+         */
+        protected View.Base strict_next_view;
+        protected View.Base strict_prev_view;
 
         /**
          * Countdown until the presentation ends
@@ -148,6 +154,23 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 out next_scale_rect
             );
 
+            this.strict_next_view = View.Pdf.from_pdf_file(
+                pdf_filename,
+                (int)Math.floor(0.2*current_allocated_width),
+                bottom_position,
+                true,
+                this.presentation_controller,
+                out next_scale_rect
+            );
+            this.strict_prev_view = View.Pdf.from_pdf_file(
+                pdf_filename,
+                (int)Math.floor(0.2*current_allocated_width),
+                bottom_position,
+                true,
+                this.presentation_controller,
+                out next_scale_rect
+            );
+
             // TextView for notes in the slides
             var notes_font = Pango.FontDescription.from_string( "Verdana" );
             notes_font.set_size( 
@@ -236,9 +259,18 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         protected void build_layout() {
             var slideViews = new HBox(false, 4);
-            var center_current_view = new Alignment(0, (float)0.5, 0, 0);
-            center_current_view.add(this.current_view);
-            slideViews.add( center_current_view );
+
+            var strict_views = new HBox(false, 0);
+            strict_views.pack_start(this.strict_prev_view, false, false, 0);
+            strict_views.pack_end(this.strict_next_view, false, false, 0);
+
+            var current_view_and_stricts = new VBox(false, 2);
+            current_view_and_stricts.pack_start(this.current_view, false, false, 2);
+            current_view_and_stricts.pack_start(strict_views, false, false, 2);
+
+            //var center_current_view = new Alignment(0, (float)0.5, 0, 0);
+            //center_current_view.add(this.current_view);
+            slideViews.add( current_view_and_stricts );
 
             var nextViewWithNotes = new VBox(false, 0);
             nextViewWithNotes.pack_start( this.next_view, false, false, 0 );
@@ -317,9 +349,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public void update() {
             int current_slide_number = this.presentation_controller.get_current_slide_number();
+            int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
             try {
                 this.current_view.display(current_slide_number);
-                this.next_view.display(current_slide_number + 1);
+                this.next_view.display(this.presentation_controller.user_slide_to_real_slide(current_user_slide_number + 1));
+                this.strict_next_view.display(current_slide_number + 1);
+                if (current_slide_number > 0)
+                    this.strict_prev_view.display(current_slide_number - 1);
             }
             catch( Renderer.RenderError e ) {
                 GLib.error( "The pdf page %d could not be rendered: %s", current_slide_number, e.message );

@@ -213,6 +213,13 @@ namespace org.westhoffswelt.pdfpresenter {
         public int get_current_user_slide_number() {
             return current_user_slide_number;
         }
+    
+        public int user_slide_to_real_slide(int number) {
+            if ( number < user_view_indexes.length )
+                return user_view_indexes[number];
+            else
+                return this.n_slides;
+        }
 
         /**
          * Get the real total number of slides
