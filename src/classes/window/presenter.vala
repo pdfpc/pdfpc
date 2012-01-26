@@ -353,9 +353,20 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             try {
                 this.current_view.display(current_slide_number);
                 this.next_view.display(this.presentation_controller.user_slide_to_real_slide(current_user_slide_number + 1));
-                this.strict_next_view.display(current_slide_number + 1);
-                if (current_slide_number > 0)
-                    this.strict_prev_view.display(current_slide_number - 1);
+                if (this.presentation_controller.skip_next()) {
+                    this.strict_next_view.display(current_slide_number + 1, true);
+                    //this.strict_next_view.show();
+                } else {
+                    this.strict_next_view.fade_to_black();
+                    //this.strict_next_view.hide();
+                }
+                if (this.presentation_controller.skip_previous()) {
+                    this.strict_prev_view.display(current_slide_number - 1, true);
+                    //this.strict_prev_view.show();
+                } else {
+                    this.strict_prev_view.fade_to_black();
+                    //this.strict_prev_view.hide();
+                }
             }
             catch( Renderer.RenderError e ) {
                 GLib.error( "The pdf page %d could not be rendered: %s", current_slide_number, e.message );

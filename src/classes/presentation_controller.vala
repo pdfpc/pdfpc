@@ -214,11 +214,32 @@ namespace org.westhoffswelt.pdfpresenter {
             return current_user_slide_number;
         }
     
+        /**
+         * Transform from user slide numbers to real slide numbers
+         */
         public int user_slide_to_real_slide(int number) {
             if ( number < user_view_indexes.length )
                 return user_view_indexes[number];
             else
                 return this.n_slides;
+        }
+
+        /**
+         * Was the previous slide a skip one?
+         */
+        public bool skip_previous() {
+            return this.current_slide_number > this.user_view_indexes[this.current_user_slide_number];
+        }
+
+        /**
+         * Is the next slide a skip one?
+         */
+        public bool skip_next() {
+            return (this.current_user_slide_number >= this.user_view_indexes.length - 1
+                    &&
+                    this.current_slide_number < this.n_slides)
+                   ||
+                   (this.current_slide_number+1 < this.user_view_indexes[this.current_user_slide_number+1]);
         }
 
         /**
