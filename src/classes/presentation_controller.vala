@@ -74,16 +74,17 @@ namespace org.westhoffswelt.pdfpresenter {
         protected bool ignore_input_events = false;
 
         /**
-         * Notes for the slides
+         * The metadata of the presentation
          */
-        protected SlidesNotes notes;
+        protected Metadata.Pdf metadata;
 
         /**
          * Instantiate a new controller
          */
-        public PresentationController( Metadata.Base metadata, bool allow_black_on_end, SlidesNotes notes ) {
+        public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
             this.controllables = new List<Controllable>();
-            this.notes = notes;
+
+            this.metadata = metadata;
 
             this.n_slides = (int)metadata.get_slide_count();
             stdout.printf("n_slides = %d\n", this.n_slides);
@@ -159,7 +160,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     break;
                     case 0xff1b: /* Escape */
                     case 0x071:  /* q */
-                        this.notes.save_to_disk();
+                        this.metadata.get_notes().save_to_disk();
                         Gtk.main_quit();
                     break;
                     case 0xff50: /* Home */

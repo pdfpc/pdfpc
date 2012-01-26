@@ -24,7 +24,7 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Class for providing storage for the notes associate with a presentation
      */
-    public class SlidesNotes: Object {
+    public class slides_notes: Object {
         /**
          * The array where we will store the text of the notes
          */
@@ -84,7 +84,7 @@ namespace org.westhoffswelt.pdfpresenter {
             }
         }
 
-        public SlidesNotes( string? filename ) {
+        public slides_notes( string? filename ) {
             if (filename != null) {
                 fname = filename;
                 try {

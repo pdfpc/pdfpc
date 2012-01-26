@@ -44,7 +44,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public Presentation( string pdf_filename, int screen_num, PresentationController presentation_controller ) {
+        public Presentation( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
             base( screen_num );
 
             this.destroy.connect( (source) => {
@@ -63,8 +63,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             
             Rectangle scale_rect;
             
-            this.view = View.Pdf.from_pdf_file( 
-                pdf_filename,
+            this.view = View.Pdf.from_metadata( 
+                metadata,
                 this.screen_geometry.width, 
                 this.screen_geometry.height,
                 Options.black_on_end,
@@ -75,7 +75,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if ( !Options.disable_caching ) {
                 ((Renderer.Caching)this.view.get_renderer()).set_cache( 
                     Renderer.Cache.OptionFactory.create( 
-                        this.view.get_renderer().get_metadata()
+                        metadata
                     )
                 );
             }

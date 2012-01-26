@@ -105,8 +105,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presenter create_presenter_window( string filename, int monitor, SlidesNotes notes ) {
-            var presenter_window = new Window.Presenter( filename, monitor, notes, this.controller );
+        private Window.Presenter create_presenter_window( Metadata.Pdf metadata, int monitor ) {
+            var presenter_window = new Window.Presenter( metadata, monitor, this.controller );
             //controller.register_controllable( presenter_window );
             presenter_window.set_cache_observer( this.cache_status );
 
@@ -117,8 +117,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation_window( string filename, int monitor ) {
-            var presentation_window = new Window.Presentation( filename, monitor, this.controller );
+        private Window.Presentation create_presentation_window( Metadata.Pdf metadata, int monitor ) {
+            var presentation_window = new Window.Presentation( metadata, monitor, this.controller );
             //controller.register_controllable( presentation_window );
             presentation_window.set_cache_observer( this.cache_status );
 
@@ -142,14 +142,13 @@ namespace org.westhoffswelt.pdfpresenter {
 
             stdout.printf( "Initializing rendering...\n" );
 
-            SlidesNotes notes = new SlidesNotes(Options.notes_fname);
-
             var pdffile = File.new_for_commandline_arg( args[1] );
             var metadata = new Metadata.Pdf( pdffile.get_uri() );
+            metadata.open_notes(Options.notes_fname);
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
-            this.controller = new PresentationController(metadata, false, notes);
+            this.controller = new PresentationController( metadata, false );
             this.cache_status = new CacheStatus();
 
             int presenter_monitor, presentation_monitor;
@@ -164,9 +163,9 @@ namespace org.westhoffswelt.pdfpresenter {
 
             if ( Options.single_screen == 100 && Gdk.Screen.get_default().get_n_monitors() > 1 ) {
                 this.presentation_window = 
-                    this.create_presentation_window( args[1], presentation_monitor );
+                    this.create_presentation_window( metadata, presentation_monitor );
                 this.presenter_window = 
-                    this.create_presenter_window( args[1], presenter_monitor , notes);
+                    this.create_presenter_window( metadata, presenter_monitor );
             }
             else {
                 stdout.printf( "Only one screen detected falling back to simple presentation mode.\n" );
@@ -178,11 +177,11 @@ namespace org.westhoffswelt.pdfpresenter {
                 // one monitor displaying the presenter screen
                 if ( presenter_monitor == monitor ) {
                     this.presentation_window = 
-                        this.create_presentation_window( args[1], monitor );
+                        this.create_presentation_window( metadata, monitor );
                 }
                 else {
                     this.presenter_window = 
-                        this.create_presenter_window( args[1], monitor, notes );
+                        this.create_presenter_window( metadata, monitor );
                 }
             }
 

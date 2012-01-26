@@ -91,7 +91,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Notes for the slides
          */
-        protected SlidesNotes notes;
+        protected slides_notes notes;
 
         /**
          * Useful colors
@@ -102,7 +102,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Base constructor instantiating a new presenter window
          */
-        public Presenter( string pdf_filename, int screen_num, SlidesNotes slides_notes, PresentationController presentation_controller ) {
+        public Presenter( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
             base( screen_num );
 
             this.destroy.connect( (source) => {
@@ -131,22 +131,22 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             int current_allocated_width = (int)Math.floor( 
                 this.screen_geometry.width * Options.current_size / (double)100 
             );
-            this.current_view = View.Pdf.from_pdf_file( 
-                pdf_filename,
+            this.current_view = View.Pdf.from_metadata( 
+                metadata,
                 current_allocated_width,
                 bottom_position,
                 Options.black_on_end,
                 this.presentation_controller,
                 out current_scale_rect
             );
-            this.notes = slides_notes;
+            this.notes = metadata.get_notes();
 
             // The next slide is right to the current one and takes up the
             // remaining width
             Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
-            this.next_view = View.Pdf.from_pdf_file( 
-                pdf_filename,
+            this.next_view = View.Pdf.from_metadata( 
+                metadata,
                 next_allocated_width,
                 bottom_position,
                 true,
@@ -154,16 +154,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 out next_scale_rect
             );
 
-            this.strict_next_view = View.Pdf.from_pdf_file(
-                pdf_filename,
+            this.strict_next_view = View.Pdf.from_metadata(
+                metadata,
                 (int)Math.floor(0.2*current_allocated_width),
                 bottom_position,
                 true,
                 this.presentation_controller,
                 out next_scale_rect
             );
-            this.strict_prev_view = View.Pdf.from_pdf_file(
-                pdf_filename,
+            this.strict_prev_view = View.Pdf.from_metadata(
+                metadata,
                 (int)Math.floor(0.2*current_allocated_width),
                 bottom_position,
                 true,
@@ -235,7 +235,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.button_press_event.connect( this.on_button_press );
 
             // Store the slide count once
-            this.slide_count = this.current_view.get_renderer().get_metadata().get_slide_count();
+            this.slide_count = metadata.get_slide_count();
 
             this.update();
             this.reset();
@@ -244,12 +244,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if ( !Options.disable_caching ) {               
                 ((Renderer.Caching)this.current_view.get_renderer()).set_cache( 
                     Renderer.Cache.OptionFactory.create( 
-                        this.current_view.get_renderer().get_metadata()
+                        metadata
                     )
                 );
                 ((Renderer.Caching)this.next_view.get_renderer()).set_cache( 
                     Renderer.Cache.OptionFactory.create( 
-                        this.next_view.get_renderer().get_metadata()
+                        metadata
                     )
                 );
             }

@@ -49,6 +49,11 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         protected uint page_count;
 
         /**
+         * Notes for the slides (text only)
+         */
+        protected slides_notes notes;
+
+        /**
          * Base constructor taking the file url to the pdf file
          */
         public Pdf( string url ) {
@@ -65,6 +70,10 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 out this.page_height
             );
             MutexLocks.poppler.unlock();
+        }
+    
+        public void open_notes( string fname ) {
+            notes = new slides_notes(fname);
         }
 
         /**
@@ -99,6 +108,13 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          */
         public Poppler.Document get_document() {
             return this.document;
+        }
+
+        /**
+         * Return the notes for the presentation
+         */
+        public slides_notes get_notes() {
+            return this.notes;
         }
 
         /**
