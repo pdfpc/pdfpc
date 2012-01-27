@@ -141,6 +141,39 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         }
 
         /**
+         * Toggle the skip flag for one slide
+         *
+         * We require to be provided also with the user_slide_number, as this
+         * info should be available and so we do not need to perform a search.
+         *
+         * Returns the offset to move the current user_slide_number
+         */
+        public int toggle_skip( int slide_number, int user_slide_number ) {
+            int converted_user_slide = user_slide_to_real_slide(user_slide_number);
+            int offset;
+            int l = this.user_view_indexes.length;
+            if (converted_user_slide == slide_number) { // Activate skip
+                int[] new_indexes = new int[ l-1 ];
+                for ( int i=0; i<user_slide_number; ++i)
+                    new_indexes[i] = this.user_view_indexes[i];
+                for ( int i=user_slide_number+1; i<l; ++i)
+                    new_indexes[i-1] = this.user_view_indexes[i];
+                this.user_view_indexes = new_indexes;
+                offset = -1;
+            } else {
+                int[] new_indexes = new int[ l+1 ];
+                for ( int i=0; i<=user_slide_number; ++i)
+                    new_indexes[i] = this.user_view_indexes[i];
+                new_indexes[user_slide_number+1] = slide_number;
+                for ( int i=user_slide_number+1; i<l; ++i)
+                    new_indexes[i+1] = this.user_view_indexes[i];
+                this.user_view_indexes = new_indexes;
+                offset = +1;
+            }
+            return offset;
+        }
+
+        /**
          * Transform from user slide numbers to real slide numbers
          */
         public int user_slide_to_real_slide(int number) {

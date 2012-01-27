@@ -138,6 +138,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x067: /* g */
                         this.controllables_ask_goto_page();
                     break;
+                    case 0x073: /* s */
+                        this.toggle_skip();
+                    break;
                 }
                 return true;
             } else {
@@ -359,6 +362,15 @@ namespace org.westhoffswelt.pdfpresenter {
             foreach( Controllable c in this.controllables ) {
                 c.ask_goto_page();
             }
+        }
+        
+        /**
+         * Toggle skip for current slide
+         */
+        protected void toggle_skip() {
+            this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
+            //stdout.printf("After skipping: current_user_slide_number = %d
+            this.controllables_update();
         }
     }
 }
