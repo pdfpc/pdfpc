@@ -122,7 +122,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
             //stdout.printf("]\n");
         }
     
-        public void open_notes( string fname ) {
+        public void open_notes( string? fname ) {
             notes = new slides_notes(fname);
         }
 
