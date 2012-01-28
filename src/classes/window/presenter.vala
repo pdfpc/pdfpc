@@ -65,6 +65,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected Entry slide_progress;
 
+        protected ProgressBar prerender_progress;
+
         /**
          * Indication that the slide is blanked (faded to black)
          */
@@ -222,6 +224,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slide_progress.editable = false;
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect( this.on_key_press_slide_progress );
+            this.slide_progress.inner_border = new Border();
+    
+            this.prerender_progress = new ProgressBar();
+            this.prerender_progress.text = "Prerendering...";
+            this.prerender_progress.modify_font( notes_font );
+            this.prerender_progress.modify_bg( StateType.NORMAL, this.black );
+            this.prerender_progress.modify_bg( StateType.PRELIGHT, this.white );
+            this.prerender_progress.modify_fg( StateType.NORMAL, this.white );
+            this.prerender_progress.modify_fg( StateType.PRELIGHT, this.black );
+            this.prerender_progress.no_show_all = true;
 
             this.blank_label = new Label( "Blank" );
             this.blank_label.set_justify( Justification.LEFT );
@@ -279,15 +291,22 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             slideViews.add(nextViewWithNotes);
 
             var bottomRow = new HBox(true, 0);
+
             var blank_label_alignment = new Alignment(0, 0.5f, 0, 0);
-            var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
-            var slide_progress_alignment = new Alignment(1, 0.5f, 1, 0);
             blank_label_alignment.add( this.blank_label );
+
+            var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
             timer_alignment.add( this.timer );
-            slide_progress_alignment.add( this.slide_progress );
+
+            var progress_alignment = new HBox(false, 0);
+            progress_alignment.pack_end(this.slide_progress);
+            var prerender_alignment = new Alignment(0, 0.5f, 1, 0);
+            prerender_alignment.add(this.prerender_progress);
+            progress_alignment.pack_start(prerender_alignment);
+
             bottomRow.pack_start( blank_label_alignment, true, true, 0);
             bottomRow.pack_start( timer_alignment, true, true, 0 );
-            bottomRow.pack_end( slide_progress_alignment, true, true, 0);
+            bottomRow.pack_end( progress_alignment, true, true, 0);
 
             //var fullLayout = new VBox(false, 0);
             this.fullLayout = new VBox(false, 0);
@@ -498,19 +517,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if( next_prerendering_view != null ) {
                 observer.monitor_view( next_prerendering_view );
             }
-
-            // Add the cache status widget to be displayed
-            observer.set_height( 6 );
-            observer.set_width( this.screen_geometry.width );
-            //this.fixedLayout.put( 
-            //    observer,
-            //    0,
-            //    this.screen_geometry.height - 6 
-            //);
-            this.fullLayout.pack_end( observer, false, false, 0 );
-            observer.show();
+            
+            //observer.register_entry( this.slide_progress );
+            observer.register_update( this.prerender_progress.set_fraction, () => this.prerender_progress.hide() );
+            this.prerender_progress.show();
         }
-
+    
         /**
          * Parse the given start time string to a Time object
          */

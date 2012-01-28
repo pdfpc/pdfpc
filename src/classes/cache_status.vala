@@ -26,9 +26,9 @@ using Cairo;
 
 namespace org.westhoffswelt.pdfpresenter {
     /**
-     * Status widget showing the fill status of all registered pdf image caches
+     * Interface for showing the fill status of all registered pdf image caches
      */
-    public class CacheStatus: Gtk.Image
+    public class CacheStatus
     {
         /**
          * The number of entries currently inside the cache
@@ -41,61 +41,37 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int max_value = 0;
 
         /**
-         * Width of the widget
+         * The function for updating the display with the current progress
          */
-        protected int width = 0;
+        public delegate void UpdateFunction(double progress);
+        UpdateFunction? update_function = null;
 
         /**
-         * Height of the widget
+         * The function to notify that we are finished
          */
-        protected int height = 0;
-        
+        public delegate void UpdateComplete();
+        UpdateComplete? update_complete = null;
+
         /**
-         * Set the height of the widget
+         * Register the functions for updating
          */
-        public void set_height( int height ) {
-            this.height = height;
+        public void register_update(UpdateFunction update, UpdateComplete complete) {
+            this.update_function = update;
+            this.update_complete = complete;
         }
-
-        /**
-         * Set the width of the widget
-         */
-        public void set_width( int width ) {
-            this.width = width;
-        }
-
+    
         /**
          * Draw the current state to the widgets surface
          */
-        public void redraw() {
+        public void update() {
             // Only draw if the widget is actually added to some parent
-            if ( this.get_parent() == null ) {
-                return;
+            if (this.current_value == this.max_value) {
+                if (update_complete != null)
+                    update_complete();
+            } else {
+                if (update_function != null)
+                    update_function((double)this.current_value / this.max_value);
             }
-
-            Pixmap background_pixmap = new Pixmap(
-                null,
-                this.width,
-                this.height,
-                24
-            );
-
-            Context cr = Gdk.cairo_create( background_pixmap );
-            
-            cr.set_source_rgb( 0, 0, 0 );
-            cr.rectangle( 0,0, this.width, this.height );
-            cr.fill();
-
-            cr.set_source_rgb( 1, 1, 1 );
-            cr.rectangle( 
-                0,
-                0,
-                (int)Math.ceil( this.width * ( (double)this.current_value / this.max_value ) ),
-                this.height
-            );
-            cr.fill();
-
-            this.set_from_pixmap( background_pixmap, null );
         }
 
         /**
@@ -107,7 +83,7 @@ namespace org.westhoffswelt.pdfpresenter {
             });
             view.slide_prerendered.connect( () => {
                 ++this.current_value;
-                this.redraw();
+                this.update();
             });
         }
     }
