@@ -4,6 +4,7 @@ pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(POPPLER REQUIRED poppler-glib)
 pkg_check_modules(GTK REQUIRED gtk+-2.0)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
+pkg_check_modules(RSVG REQUIRED librsvg-2.0)
 
 set(CFLAGS
 	${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
@@ -11,6 +12,7 @@ set(CFLAGS
 	${POPPLER_CFLAGS} ${POPPLER_CFLAGS_OTHER}
 	${GTK_CFLAGS} ${GTK_CFLAGS_OTHER}
 	${GTHREAD_CFLAGS} ${GTHREAD_CFLAGS_OTHER}
+        ${RSVG_CFLAGS} ${RSVG_CFLAGS_OTHER}
 )
 add_definitions(${CFLAGS})
 
@@ -20,6 +22,7 @@ set(LIBS
 	${POPPLER_LIBRARIES}
 	${GTK_LIBRARIES}
 	${GTHREAD_LIBRARIES}
+        ${RSVG_LIBRARIES}
 )
 link_libraries(${LIBS})
 
@@ -29,6 +32,7 @@ set(LIB_PATHS
 	${POPPLER_LIBRARY_DIRS}
 	${GTK_LIBRARY_DIRS}
 	${GTHREAD_LIBRARY_DIRS}
+        ${RSVG_LIBRARY_DIRS}
 )
 link_directories(${LIB_PATHS})
 
@@ -80,6 +84,7 @@ PACKAGES
 	poppler-glib
 	gtk+-2.0
 	posix
+        librsvg-2.0
 OPTIONS 
 	--thread
 	--debug

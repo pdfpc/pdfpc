@@ -71,6 +71,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Indication that the slide is blanked (faded to black)
          */
         protected Label blank_label;
+        protected Gtk.Image blank_icon;
 
         /**
          * Text box for displaying notes for the slides
@@ -241,6 +242,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.blank_label.modify_font( font );
             this.blank_label.no_show_all = true;
 
+            try {
+                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size("/usr/share/pixmaps/pdfpc/blank.svg", 100, 94);
+                this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
+                this.blank_icon.no_show_all = true;
+            } catch (Error e) {
+                error("%s", e.message);
+            }
+
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.add_events(EventMask.BUTTON_PRESS_MASK);
 
@@ -293,7 +302,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             var bottomRow = new HBox(true, 0);
 
             var blank_label_alignment = new Alignment(0, 0.5f, 0, 0);
-            blank_label_alignment.add( this.blank_label );
+            //blank_label_alignment.add( this.blank_label );
+            blank_label_alignment.add( this.blank_icon );
 
             var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
             timer_alignment.add( this.timer );
@@ -394,7 +404,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             this.update_note();
             this.timer.start();
-            this.blank_label.hide();
+            this.blank_icon.hide();
             this.faded_to_black = false;
         }
 
@@ -421,7 +431,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.update_slide_count();
             this.update_note();
-            this.blank_label.hide();
+            this.blank_icon.hide();
             this.timer.start();
         }
 
@@ -462,9 +472,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         public void fade_to_black() {
             if (this.faded_to_black)
-                this.blank_label.hide();
+                this.blank_icon.hide();
             else
-                this.blank_label.show();
+                this.blank_icon.show();
             this.faded_to_black = !this.faded_to_black;
         }
 
