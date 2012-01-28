@@ -123,7 +123,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     break;
                     case 0xff1b: /* Escape */
                     case 0x071:  /* q */
-                        this.metadata.get_notes().save_to_disk();
+                        this.metadata.save_to_disk();
                         Gtk.main_quit();
                     break;
                     case 0xff50: /* Home */

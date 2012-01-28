@@ -30,6 +30,11 @@ namespace org.westhoffswelt.pdfpresenter {
     public abstract class Metadata.Base: Object
     {
         /**
+          * Filename given in the command line
+          */
+        protected string fname;
+
+        /**
          * Unique Resource Locator for the given slideset
          */
         protected string url;
@@ -37,8 +42,9 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Base constructor taking the url to specifiy the slideset as argument
          */
-        public Base( string url ) {
-            this.url = url;
+        public Base( string fname ) {
+            this.fname = fname;
+            this.url = File.new_for_commandline_arg(fname).get_uri();
         }
 
         /**

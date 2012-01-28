@@ -68,7 +68,6 @@ namespace org.westhoffswelt.pdfpresenter {
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
-            { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_fname, "File containing the notes to display with the slides", "F" },
             { "black-on-end", 'b', 0, 0, ref Options.black_on_end, "Add an additional black slide at the end of the presentation", null },
             { "single-screen", 'S', 0, OptionArg.INT, ref Options.single_screen, "Force to use only one screen", "S" },
             { null }
@@ -142,9 +141,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
             stdout.printf( "Initializing rendering...\n" );
 
-            var pdffile = File.new_for_commandline_arg( args[1] );
-            var metadata = new Metadata.Pdf( pdffile.get_uri() );
-            metadata.open_notes(Options.notes_fname);
+            var metadata = new Metadata.Pdf( args[1] );
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.

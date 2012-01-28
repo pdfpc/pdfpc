@@ -28,6 +28,10 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
      */
     public class Pdf: Base
     {
+        protected string? pdf_fname = null;
+        protected string? pdf_url = null;
+        protected string? pdfpc_url = null;
+
         /**
          * Poppler document which belongs to the associated pdf file
          */
@@ -58,15 +62,160 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          * indexes in the vector are the user-view slide, the contents are the
          * real slide numbers.
          */
-        protected int[] user_view_indexes;
+        private int[] user_view_indexes;
+
+        /**
+         * Were the skips modified by the user?
+         */
+        protected bool skips_by_user;
+
+        /**
+         * The parsing states for the pdfpc file
+         */
+        enum ParseState {
+            FILE,
+            SKIP,
+            NOTES,
+            NOTHING
+        }
+
+        /**
+         * Parse the given pdfpc file
+         */
+        void parse_pdfpc_file(out string? skip_line) {
+            skip_line = null;
+            try {
+                var file = File.new_for_uri(this.pdfpc_url);
+                uint8[] raw_datau8;
+                file.load_contents(null, out raw_datau8);
+                string[] lines = ((string) raw_datau8).split("\n");
+                ParseState state = ParseState.NOTHING;
+                for (int i=0; i < lines.length; ++i) {
+                    string l = lines[i].strip();
+                    if (l == "")
+                        continue;
+                    if (l == "[file]")
+                        state = ParseState.FILE;
+                    else if (l == "[skip]")
+                        state = ParseState.SKIP;
+                    else if (l == "[notes]") {
+                        notes.parse_lines(lines[i+1:lines.length]);
+                        break;
+                    } else {
+                        // How this line should be interpreted depends on the state
+                        switch (state) {
+                        case ParseState.FILE:
+                            this.pdf_fname = l;
+                            var pdffile = file.get_parent().get_child(this.pdf_fname);
+                            this.pdf_url = pdffile.get_uri();
+                            state = ParseState.NOTHING;
+                            break;
+                        case ParseState.SKIP:
+                            // This must be delayed until we know how many pages we have in the document
+                            skip_line = l;
+                            skips_by_user = true;
+                            state = ParseState.NOTHING;
+                            break;
+                        }
+                    }
+                }
+            } catch (Error e) {
+                error("%s", e.message);
+            }
+        }
+
+        /**
+         * Parse the line for the skip slides
+         */
+        void parse_skip_line(string line) {
+            int s = 0; // Counter over real slides
+            string[] fields = line.split(",");
+            for ( int f=0; f < fields.length-1; ++f ) {
+                if ( fields[f] == "")
+                    continue;
+                int current_skip = int.parse( fields[f] ) - 1;
+                while ( s < current_skip ) {
+                    user_view_indexes += s;
+                    ++s;
+                }
+                ++s;
+            }
+            // Now we have to reach the end
+            while ( s < this.page_count ) {
+                user_view_indexes += s;
+                ++s;
+            }
+        }
+
+        /**
+         * Fill the path information starting from the user provided filename
+         */
+        void fill_path_info(string fname) {
+            int l = fname.length;
+            var file = File.new_for_commandline_arg(fname);
+
+            if (fname.length < 6 || fname[l-6:l] != ".pdfpc") {
+                this.pdf_fname = file.get_basename(); 
+                this.pdf_url = file.get_uri();
+                string pdf_basefname = file.get_basename();
+                int extension_index = pdf_basefname.last_index_of(".");
+                string pdfpc_basefname = pdf_basefname[0:extension_index] + ".pdfpc";
+                var pdfpc_file = file.get_parent().get_child(pdfpc_basefname);
+                this.pdfpc_url = pdfpc_file.get_uri();
+            } else {
+                this.pdfpc_url = file.get_uri();
+            } 
+        }
+
+        /**
+         * Save the metadata to disk, if needed (i.e. if the user did something with the notes or the skips)
+         */
+        public void save_to_disk() {
+            bool write_notes = this.notes.has_notes();
+            bool write_skips = this.user_view_indexes.length < this.page_count && this.skips_by_user;
+
+            if (!write_notes && !write_skips)
+                return;
+
+            string contents = "";
+            contents += ("[file]\n" + this.pdf_fname + "\n");
+
+            if (write_skips) {
+                contents += "[skip]\n";
+                int user_slide = 0;
+                for (int slide = 0; slide < this.page_count; ++slide) {
+                    if (slide != user_view_indexes[user_slide])
+                        contents += "%d,".printf(slide + 1);
+                    else
+                        ++user_slide;
+                }
+                contents += "\n";
+            }
+            
+            if (write_notes)
+                contents += ("[notes]\n" + this.notes.format_to_save());
+            
+            try {
+                var pdfpc_file = File.new_for_uri(this.pdfpc_url);
+                FileUtils.set_contents(pdfpc_file.get_path(), contents, contents.length-1);
+            } catch (Error e) {
+                error("%s", e.message);
+            }
+        }
 
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf( string url ) {
-            base( url );
-        
-            this.document = this.open_pdf_document( url );
+        public Pdf( string fname ) {
+            base( fname );
+
+            fill_path_info(fname);
+            notes = new slides_notes();
+            skips_by_user = false;
+            string? skip_line = null;
+            if (File.new_for_uri(this.pdfpc_url).query_exists())
+                parse_pdfpc_file(out skip_line);
+            this.document = this.open_pdf_document( this.pdf_url );
             
             // Cache some often used values to minimize thread locking in the
             // future.
@@ -77,55 +226,24 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 out this.page_height
             );
     
-            // Auto-detect which pages to skip
-            string previous_label = null;
-            this.user_view_indexes.resize((int)this.page_count);
-            int user_pages = 0;
-            for ( int i = 0; i < this.page_count; ++i ) {
-                string this_label = this.document.get_page(i).label;
-                if (this_label != previous_label) {
-                    this.user_view_indexes[user_pages] = i;
-                    previous_label = this_label;
-                    ++user_pages;
+            if (!skips_by_user) {
+                // Auto-detect which pages to skip
+                string previous_label = null;
+                int user_pages = 0;
+                for ( int i = 0; i < this.page_count; ++i ) {
+                    string this_label = this.document.get_page(i).label;
+                    if (this_label != previous_label) {
+                        this.user_view_indexes += i;
+                        previous_label = this_label;
+                        ++user_pages;
+                    }
                 }
+            } else {
+                parse_skip_line(skip_line);
             }
-            this.user_view_indexes.resize(user_pages);
             MutexLocks.poppler.unlock();
-
-            //// Read which slides we have to skip
-            //try {
-            //     string raw_data;
-            //     FileUtils.get_contents("skip", out raw_data);
-            //     string[] lines = raw_data.split("\n"); // Note, there is a "ficticious" line at the end
-            //     int s = 0; // Counter over real slides
-            //     int us = 0; // Counter over user slides
-            //     user_view_indexes.resize((int)this.page_count - lines.length + 1);
-            //     for ( int l=0; l < lines.length-1; ++l ) {
-            //         int current_skip = int.parse( lines[l] ) - 1;
-            //         while ( s < current_skip ) {
-            //             user_view_indexes[us++] = s;
-            //             ++s;
-            //         }
-            //         ++s;
-            //     }
-            //     // Now we have to reach the end
-            //     while ( s < this.page_count ) {
-            //         user_view_indexes[us++] = s;
-            //         ++s;
-            //     }
-            //} catch (GLib.FileError e) {
-            //     stderr.printf("Could not read skip information\n");
-            //}
-            //stdout.printf("user_view_indexes = [");
-            //for ( int s=0; s < user_view_indexes.length; ++s)
-            //     stdout.printf("%d ", user_view_indexes[s]);
-            //stdout.printf("]\n");
         }
     
-        public void open_notes( string? fname ) {
-            notes = new slides_notes(fname);
-        }
-
         /**
          * Return the number of pages in the pdf document
          */
@@ -149,6 +267,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          * Returns the offset to move the current user_slide_number
          */
         public int toggle_skip( int slide_number, int user_slide_number ) {
+            skips_by_user = true;
             int converted_user_slide = user_slide_to_real_slide(user_slide_number);
             int offset;
             int l = this.user_view_indexes.length;

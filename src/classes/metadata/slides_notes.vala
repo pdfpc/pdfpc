@@ -28,12 +28,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * The array where we will store the text of the notes
          */
-        protected string?[] notes;
-
-        /**
-         * File name for notes
-         */
-        protected string? fname = null;
+        protected string?[] notes = null;
 
         /**
          * Set a note for a given slide
@@ -60,56 +55,43 @@ namespace org.westhoffswelt.pdfpresenter {
          * Does the user want notes?
          */
         public bool has_notes() {
-            return fname != null;
+            return notes != null;
         }
 
         /**
-         * Save the notes to the filename given in the constructor
+         * Returns the string that should be written to the pdfpc file
          */
-        public void save_to_disk() {
-            if (fname != null) {
-                try {
-                    string text="";
-                    for (int i = 0; i < notes.length; ++i) {
-                        if (notes[i] != null) {
-                            text += @"### $(i+1)\n" + notes[i];
-                            if (text[text.length-1] != '\n') // [last] == '\0'
-                                text += "\n";
-                        }
-                    }
-                    FileUtils.set_contents(fname, text.substring(0, text.length-1));
-                } catch (Error e) {
-                    stderr.printf ("%s\n", e.message);
+        public string format_to_save() {
+            string text="";
+            for (int i = 0; i < notes.length; ++i) {
+                if (notes[i] != null) {
+                    text += @"### $(i+1)\n" + notes[i];
+                    if (text[text.length-1] != '\n') // [last] == '\0'
+                        text += "\n";
                 }
             }
+            return text;
         }
 
-        public slides_notes( string? filename ) {
-            if (filename != null) {
-                fname = filename;
-                try {
-                    string raw_data;
-                    FileUtils.get_contents(fname, out raw_data);
-                    string[] lines = raw_data.split("\n");
-                    int current_slide = -1;
-                    string current_note = "";
-                    for (int i=0; i < lines.length; ++i) {
-                        if (lines[i].length > 3 && lines[i][0:3] == "###") {
-                            set_note(current_note, current_slide);
-                            current_slide = int.parse(lines[i].substring(3)) - 1;
-                            current_note = "";
-                        } else {
-                            current_note += lines[i] + "\n";
-                        }
-                    }
+        /**
+         * Parse the notes line of the pdfpc file
+         */
+        public void parse_lines(string[] lines) {
+            int current_slide = -1;
+            string current_note = "";
+            int last_line = lines.length;
+            while (lines[last_line-1].strip() == "")
+                --last_line;
+            for (int i=0; i < lines.length; ++i) {
+                if (lines[i].length > 3 && lines[i][0:3] == "###") {
                     set_note(current_note, current_slide);
-                } catch(GLib.FileError e) {
-                    if (e is FileError.NOENT) // If file doesn't exits this is no problem
-                        stdout.printf("Creating new file %s for notes\n", fname);
-                    else
-                        stderr.printf("Could not read notes from file %s\n", fname);
+                    current_slide = int.parse(lines[i].substring(3)) - 1;
+                    current_note = "";
+                } else {
+                    current_note += lines[i] + "\n";
                 }
             }
+            set_note(current_note, current_slide);
         }
     }
 }
