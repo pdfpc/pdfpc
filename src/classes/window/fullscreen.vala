@@ -48,6 +48,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected bool faded_to_black = false;
 
+        /**
+         * Stores if the view is frozen
+         */
+        protected bool frozen = false;
+
         public Fullscreen( int screen_num ) {
             var screen = Screen.get_default();
             screen.get_monitor_geometry( screen_num, out this.screen_geometry );

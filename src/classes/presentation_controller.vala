@@ -138,6 +138,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x067: /* g */
                         this.controllables_ask_goto_page();
                     break;
+                    case 0x066: /* f */
+                        this.controllables_toggle_freeze();
+                    break;
                     case 0x073: /* s */
                         this.toggle_skip();
                     break;
@@ -361,6 +364,15 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_ask_goto_page() {
             foreach( Controllable c in this.controllables ) {
                 c.ask_goto_page();
+            }
+        }
+
+        /**
+         * Freeze the display
+         */
+        protected void controllables_toggle_freeze() {
+            foreach( Controllable c in this.controllables ) {
+                c.toggle_freeze();
             }
         }
         

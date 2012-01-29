@@ -70,8 +70,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Indication that the slide is blanked (faded to black)
          */
-        protected Label blank_label;
         protected Gtk.Image blank_icon;
+
+        /**
+         * Indication that the presentation display is frozen
+         */
+        protected Gtk.Image frozen_icon;
 
         /**
          * Text box for displaying notes for the slides
@@ -236,16 +240,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.prerender_progress.modify_fg( StateType.PRELIGHT, this.black );
             this.prerender_progress.no_show_all = true;
 
-            this.blank_label = new Label( "Blank" );
-            this.blank_label.set_justify( Justification.LEFT );
-            this.blank_label.modify_fg( StateType.NORMAL, this.white );
-            this.blank_label.modify_font( font );
-            this.blank_label.no_show_all = true;
-
             try {
-                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", 100, 94);
+                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", 106, 100);
                 this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
                 this.blank_icon.no_show_all = true;
+
+                var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", 100, 100);
+                this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
+                this.frozen_icon.no_show_all = true;
             } catch (Error e) {
                 error("%s", e.message);
             }
@@ -301,9 +303,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             var bottomRow = new HBox(true, 0);
 
-            var blank_label_alignment = new Alignment(0, 0.5f, 0, 0);
+            var status = new HBox(false, 2);
             //blank_label_alignment.add( this.blank_label );
-            blank_label_alignment.add( this.blank_icon );
+            status.pack_start( this.blank_icon, false, false, 0 );
+            status.pack_start( this.frozen_icon, false, false, 0 );
 
             var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
             timer_alignment.add( this.timer );
@@ -314,7 +317,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             prerender_alignment.add(this.prerender_progress);
             progress_alignment.pack_start(prerender_alignment);
 
-            bottomRow.pack_start( blank_label_alignment, true, true, 0);
+            bottomRow.pack_start( status, true, true, 0);
             bottomRow.pack_start( timer_alignment, true, true, 0 );
             bottomRow.pack_end( progress_alignment, true, true, 0);
 
@@ -445,6 +448,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
            this.slide_progress.grab_focus();
            this.slide_progress.set_position(0);
            this.presentation_controller.set_ignore_input_events( true );
+        }
+
+        /**
+         * Freeze the display
+         */
+        public void toggle_freeze() {
+            this.frozen = !this.frozen;
+            if (this.frozen)
+                this.frozen_icon.show();
+            else
+                this.frozen_icon.hide();
         }
     
         /**

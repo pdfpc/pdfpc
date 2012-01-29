@@ -139,6 +139,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Update the display
          */
         public void update() {
+            if (this.frozen)
+                return;
             try {
                 this.view.display(this.presentation_controller.get_current_slide_number());
             }
@@ -178,6 +180,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Ask for the page to jump to. We don't do anything
          */
         public void ask_goto_page() {
+        }
+
+        /**
+         * Freeze the display
+         */
+        public void toggle_freeze() {
+            this.frozen = !this.frozen;
+            if (!this.frozen)
+                this.update();
         }
 
         /**
