@@ -243,7 +243,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.blank_label.no_show_all = true;
 
             try {
-                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size("/usr/share/pixmaps/pdfpc/blank.svg", 100, 94);
+                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", 100, 94);
                 this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
                 this.blank_icon.no_show_all = true;
             } catch (Error e) {

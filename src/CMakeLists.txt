@@ -36,6 +36,8 @@ set(LIB_PATHS
 )
 link_directories(${LIB_PATHS})
 
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/icon_path.in ${CMAKE_CURRENT_SOURCE_DIR}/icon_path.vala)
+
 set(VALA_SRC
 	classes/cache_status.vala
 	classes/metadata/base.vala
@@ -67,6 +69,7 @@ set(VALA_SRC
 	interfaces/view/behaviour/decoratable.vala
 	interfaces/controllable.vala
 	pdf_presenter_console.vala
+        icon_path.vala
 )
 
 # Vala segfaults if its output dirs are not existant. Therefore make sure they
