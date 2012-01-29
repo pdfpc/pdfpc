@@ -237,7 +237,6 @@ namespace org.westhoffswelt.pdfpresenter {
          * A request to change the page has been issued
          */
         public void page_change_request( int page_number ) {
-            stdout.printf("page_change_request(%d)\n", page_number);
             this.current_slide_number = page_number;
             // Here we could do a binary search
             for (int u = 0; u < this.metadata.get_user_slide_count(); ++u) {
@@ -457,7 +456,6 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected void toggle_skip() {
             this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
-            //stdout.printf("After skipping: current_user_slide_number = %d
             this.controllables_update();
         }
     }
