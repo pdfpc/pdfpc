@@ -121,12 +121,18 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x020:  /* Space */
                         this.next_page();
                     break;
+                    case 0xff54: /* Cursor down */
+                        this.next_user_page();
+                    break;
                     case 0x06e:  /* n */
                         this.jump10();
                     break;
                     case 0xff51: /* Cursor left */
                     case 0xff55: /* Page Up */
                         this.previous_page();
+                    break;
+                    case 0xff52: /* Cursor up */
+                        this.previous_user_page();
                     break;
                     case 0xff08: /* Backspace */
                     case 0x070: /* p */
@@ -283,6 +289,22 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Go to the next user slide
+         */
+        public void next_user_page() {
+            if ( this.current_user_slide_number < this.metadata.get_user_slide_count()-1 ) {
+                ++this.current_user_slide_number;
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            } else {
+                this.current_user_slide_number = this.metadata.get_user_slide_count() - 1;
+                this.current_slide_number = this.n_slides - 1;
+            }
+            if (!this.frozen)
+                this.faded_to_black = false;
+            this.controllables_update();
+        }
+            
+        /**
          * Go to the previous slide
          */
         public void previous_page() {
@@ -297,6 +319,22 @@ namespace org.westhoffswelt.pdfpresenter {
                     this.faded_to_black = false;
                 this.controllables_update();
             }
+        }
+
+        /**
+         * Go to the previous user slide
+         */
+        public void previous_user_page() {
+            if ( this.current_user_slide_number > 0 ) {
+                --this.current_user_slide_number;
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            } else {
+                this.current_user_slide_number = 0;
+                this.current_slide_number = 0;
+            }
+            if (!this.frozen)
+                this.faded_to_black = false;
+            this.controllables_update();
         }
 
         /**
