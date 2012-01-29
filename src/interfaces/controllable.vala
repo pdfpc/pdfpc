@@ -43,19 +43,9 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void update();
 
         /**
-         * Make the presentation go black, if applicable
-         */
-        public abstract void fade_to_black();
-
-        /**
          * Reset the presentation to it's initial state
          */
         public abstract void reset();
-
-        /**
-         * Display a certain page
-         */
-        //public abstract void goto_page( int page_number );
 
         /**
          * Edit note for current slide
@@ -66,10 +56,5 @@ namespace org.westhoffswelt.pdfpresenter {
          * Ask for the page to jump to
          */
         public abstract void ask_goto_page();
-
-        /**
-         * Freeze display
-         */
-        public abstract void toggle_freeze();
     }
 }

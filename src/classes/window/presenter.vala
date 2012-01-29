@@ -407,7 +407,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             this.update_note();
             this.timer.start();
-            this.blank_icon.hide();
+            if (this.presentation_controller.is_faded_to_black())
+                this.blank_icon.show();
+            else
+                this.blank_icon.hide();
+            if (this.presentation_controller.is_frozen())
+                this.frozen_icon.show();
+            else
+                this.frozen_icon.hide();
             this.faded_to_black = false;
         }
 
@@ -451,17 +458,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Freeze the display
-         */
-        public void toggle_freeze() {
-            this.frozen = !this.frozen;
-            if (this.frozen)
-                this.frozen_icon.show();
-            else
-                this.frozen_icon.hide();
-        }
-    
-        /**
          * Handle key events for the slide_progress entry field
          */
         protected bool on_key_press_slide_progress( Gtk.Widget source, EventKey key ) {
@@ -478,18 +474,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             } else {
                return false;
             }
-        }
-
-        /**
-         * We will notify the presenter that the screen is faded to black, but
-         * we will retain the slide view.
-         */
-        public void fade_to_black() {
-            if (this.faded_to_black)
-                this.blank_icon.hide();
-            else
-                this.blank_icon.show();
-            this.faded_to_black = !this.faded_to_black;
         }
 
         /**

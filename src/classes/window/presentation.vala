@@ -139,35 +139,24 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Update the display
          */
         public void update() {
-            if (this.frozen)
+            if (this.presentation_controller.is_faded_to_black()) {
+                this.view.fade_to_black();
+                return;
+            }
+            if (this.presentation_controller.is_frozen())
                 return;
             try {
-                this.view.display(this.presentation_controller.get_current_slide_number());
+                this.view.display(this.presentation_controller.get_current_slide_number(), true);
             }
             catch( Renderer.RenderError e ) {
                 GLib.error( "The pdf page %d could not be rendered: %s", this.presentation_controller.get_current_slide_number(), e.message );
             }
-            this.faded_to_black = false;
         }
             
         /**
          * Reset to the initial presentation state
          */
         public void reset() {
-        }
-
-        public void fade_to_black() {
-            if (this.faded_to_black) {
-                try {
-                    this.view.redraw();
-                }
-                catch ( Renderer.RenderError e ) {
-                    GLib.error( "Could not redraw slide: %s", e.message);
-                }
-            } else {
-                this.view.fade_to_black();
-            }
-            this.faded_to_black = !this.faded_to_black;
         }
 
         /**
@@ -180,15 +169,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Ask for the page to jump to. We don't do anything
          */
         public void ask_goto_page() {
-        }
-
-        /**
-         * Freeze the display
-         */
-        public void toggle_freeze() {
-            this.frozen = !this.frozen;
-            if (!this.frozen)
-                this.update();
         }
 
         /**

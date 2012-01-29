@@ -39,6 +39,17 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int current_user_slide_number;
 
         /**
+         * Stores if the view is faded to black
+         */
+        protected bool faded_to_black = false;
+
+        /**
+         * Stores if the view is frozen
+         */
+        protected bool frozen = false;
+
+
+        /**
          * A flag signaling if we allow for a black slide at the end. Tis is
          * useful for the next view and (for some presenters) also for the main
          * view.
@@ -130,7 +141,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.controllables_reset();
                     break;
                     case 0x062: /* b*/
-                        this.controllables_fade_to_black();
+                        this.fade_to_black();
                     break;
                     case 0x065: /* e */
                         this.controllables_edit_note();
@@ -139,7 +150,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.controllables_ask_goto_page();
                     break;
                     case 0x066: /* f */
-                        this.controllables_toggle_freeze();
+                        this.toggle_freeze();
                     break;
                     case 0x073: /* s */
                         this.toggle_skip();
@@ -265,6 +276,8 @@ namespace org.westhoffswelt.pdfpresenter {
                 ++this.current_slide_number;
                 if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1))
                     ++this.current_user_slide_number;
+                if (!this.frozen)
+                    this.faded_to_black = false;
                 this.controllables_update();
             }
         }
@@ -280,6 +293,8 @@ namespace org.westhoffswelt.pdfpresenter {
                     --this.current_user_slide_number;
                     this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
                 }
+                if (!this.frozen)
+                    this.faded_to_black = false;
                 this.controllables_update();
             }
         }
@@ -293,6 +308,8 @@ namespace org.westhoffswelt.pdfpresenter {
             if ( this.current_user_slide_number >= max_user_slide )
                 this.current_user_slide_number = max_user_slide - 1;
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            if (!this.frozen)
+                this.faded_to_black = false;
             this.controllables_update();
         }
 
@@ -304,9 +321,14 @@ namespace org.westhoffswelt.pdfpresenter {
             if ( this.current_user_slide_number < 0 )
                 this.current_user_slide_number = 0;
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            if (!this.frozen)
+                this.faded_to_black = false;
             this.controllables_update();
         }
 
+        /**
+         * Goto a slide in user page numbers
+         */
         public void goto_user_page(int page_number) {
             int destination = page_number-1;
             int n_user_slides = this.metadata.get_user_slide_count();
@@ -316,6 +338,8 @@ namespace org.westhoffswelt.pdfpresenter {
                 destination = n_user_slides - 1;
             this.current_user_slide_number = destination;
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            if (!this.frozen)
+                this.faded_to_black = false;
             this.controllables_update();
         }
 
@@ -343,10 +367,16 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Fill the presentation display with black
          */
-        protected void controllables_fade_to_black() {
-            foreach( Controllable c in this.controllables ) {
-                c.fade_to_black();
-            }
+        protected void fade_to_black() {
+            this.faded_to_black = !this.faded_to_black;
+            this.controllables_update();
+        }
+
+        /**
+         * Is the presentation blanked?
+         */
+        public bool is_faded_to_black() {
+            return this.faded_to_black;
         }
 
         /**
@@ -370,10 +400,18 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Freeze the display
          */
-        protected void controllables_toggle_freeze() {
-            foreach( Controllable c in this.controllables ) {
-                c.toggle_freeze();
-            }
+        protected void toggle_freeze() {
+            this.frozen = !this.frozen;
+            if (!this.frozen)
+                this.faded_to_black = false;
+            this.controllables_update();
+        }
+
+        /**
+         * Is the presentation frozen?
+         */
+        public bool is_frozen() {
+            return this.frozen;
         }
         
         /**
