@@ -263,15 +263,18 @@ forward movement command (page down, enter, etc.) moves through one slide at a
 time, as expected. That means that every step in the overlay is traversed.
 The backward movement command works differently depending if the current and
 previous slides are part of an overlay:
+
 - If the current slide is part of an overlay we just jump to the previous
   slide. That means that we are in the middle of an overlay we can jump
   forward and backward through the single steps of it
+
 - If the current slide is not part of an overlay (or if it is the first one),
   but the previous slides are, we jump to the previous user slide. This means
   that when going back in the presentation you do not have to go through every
   step of the overlay, Pdf Presenter Console just shows the first slide of
   the each overlay. As you normally only go back in a presentation when looking
   for a concrete slide, this is more convenient.
+
 The up and down cursor keys work on a user slide basis. You can use them to
 skip the rest of an overlay or to jump to the previous user slide, ignoring the
 state of the current slide. The 'n' and 'p' commands also work on a user slide
