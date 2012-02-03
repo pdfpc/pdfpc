@@ -92,10 +92,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
             this.n_slides = (int)metadata.get_slide_count();
             this.black_on_end = allow_black_on_end;
-            if (this.black_on_end)
-                this.slide_limit = this.n_slides + 1;
-            else
-                this.slide_limit = this.n_slides;
+            this.slide_limit = this.n_slides;
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
@@ -284,6 +281,8 @@ namespace org.westhoffswelt.pdfpresenter {
                 if (!this.frozen)
                     this.faded_to_black = false;
                 this.controllables_update();
+            } else if (this.black_on_end && !this.is_faded_to_black()) {
+                this.fade_to_black();
             }
         }
 
@@ -291,18 +290,29 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the next user slide
          */
         public void next_user_page() {
+            bool needs_update; // Did we change anything?
             if ( this.current_user_slide_number < this.metadata.get_user_slide_count()-1 ) {
                 ++this.current_user_slide_number;
                 this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+                needs_update = true;
             } else {
-                this.current_user_slide_number = this.metadata.get_user_slide_count() - 1;
-                this.current_slide_number = this.n_slides - 1;
+                if ( this.current_slide_number == this.slide_limit - 1) {
+                    needs_update = false;
+                    if (this.black_on_end && !this.is_faded_to_black())
+                        this.fade_to_black();
+                } else {
+                    this.current_user_slide_number = this.metadata.get_user_slide_count() - 1;
+                    this.current_slide_number = this.n_slides - 1;
+                    needs_update = false;
+                }
             }
-            if (!this.frozen)
-                this.faded_to_black = false;
-            this.controllables_update();
+            if (needs_update) {
+                if (!this.frozen)
+                    this.faded_to_black = false;
+                this.controllables_update();
+            }
         }
-            
+
         /**
          * Go to the previous slide
          */

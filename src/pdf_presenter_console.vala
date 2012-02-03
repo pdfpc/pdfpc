@@ -145,7 +145,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
-            this.controller = new PresentationController( metadata, false );
+            this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
 
             int presenter_monitor, presentation_monitor;
