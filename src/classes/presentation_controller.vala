@@ -62,12 +62,6 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int n_slides;
 
         /**
-         * The biggest slide number that we allow (dependent on black_on_end)
-         */
-        protected int slide_limit;
-
-
-        /**
          * Controllables which are registered with this presentation controller.
          */
         protected List<Controllable> controllables;
@@ -92,7 +86,6 @@ namespace org.westhoffswelt.pdfpresenter {
 
             this.n_slides = (int)metadata.get_slide_count();
             this.black_on_end = allow_black_on_end;
-            this.slide_limit = this.n_slides;
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
@@ -274,7 +267,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the next slide
          */
         public void next_page() {
-            if ( this.current_slide_number < this.slide_limit - 1 ) {
+            if ( this.current_slide_number < this.n_slides - 1 ) {
                 ++this.current_slide_number;
                 if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1))
                     ++this.current_user_slide_number;
@@ -296,7 +289,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
                 needs_update = true;
             } else {
-                if ( this.current_slide_number == this.slide_limit - 1) {
+                if ( this.current_slide_number == this.n_slides - 1) {
                     needs_update = false;
                     if (this.black_on_end && !this.is_faded_to_black())
                         this.fade_to_black();
