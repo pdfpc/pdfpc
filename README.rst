@@ -43,6 +43,7 @@ requirements need to be met:
 - CMake Version >=2.6
 - Gtk+ 2.x
 - libPoppler with glib bindings
+- librsvg
 
 Compile and install
 ===================
@@ -150,7 +151,6 @@ your likings::
       -s, --switch-screens          Switch the presentation and the presenter screen.
       -c, --disable-cache           Disable caching and pre-rendering of slides to save memory at the cost of speed.
       -z, --disable-compression     Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)
-      -n, --notes=F                 File containing the notes to display with the slides
       -b, --black-on-end            Add an additional black slide at the end of the presentation
       -S, --single-screen=S         Force to use only one screen
 
@@ -158,7 +158,7 @@ Caching / Prerendering
 ----------------------
 
 To allow fast changes between the different slides of the presentation the pdf
-pages are prerendered to memory. The small white line on the bottom of the
+pages are prerendered to memory. The progress bar on the bottom of the
 presenter screen indicates how many percent of the slides have been
 pre-rendered already. During the initial rendering phase this will slow-down
 slide changes, as a lot of cpu power is used for the rendering process in the
@@ -193,10 +193,14 @@ and interpreted:
 
 - Left cursor key / Page up / Right mouse button 
     - Go back one slide
+- Up cursor key
+    - Go back on "user slide" (see section about overlays below)
 - Backspace / p
     - Go back 10 slides
 - Right cursor key / Page down / Return / Space / Left mouse button
     - Go forward one slide
+- Down cursor key
+    - Go forward one user slide
 - n
     - Go forward 10 slides
 - Home
@@ -206,11 +210,15 @@ and interpreted:
 - Escape / q /Alt+F4
     - Quit the presentation viewer
 - b
-    - Turn off the presentation view (i.e. fill it with a black color)
+    - Turn off the presentation view at the end (i.e. fill it with a black color)
 - e
-    - Edit note for current slide (if option -n is given in the command line)
-- s
-    - Save notes to disk (they are also saved automatically on exit)
+    - Edit note for current slide
+- f
+    - Freeze the current presentation display (the presenter display is still
+      fully active)
+- o
+    - Toggle the not-user-slide flag for one particular slide (see Overlays
+      below)
 
 Timer
 -----
@@ -232,14 +240,75 @@ minutes you are overtime.
 Notes
 -----
 
-Textual notes can be displayed for each slide. To activate notes use the -n
-command line option, giving a filename, which does not need to exist. While in
-the presentation, pressing 'e' will allow you to take notes for the screen.
-To go out of editing mode, press the Escape key. Note that while editing a note
-the keybindings stop working, i.e. you are not able to change slides.
+Textual notes can be displayed for each slide. While in the presentation,
+pressing 'e' will allow you to take notes for the screen.  To go out of editing
+mode, press the Escape key. Note that while editing a note the keybindings stop
+working, i.e. you are not able to change slides.
 
 The notes are stored in the given file in a plain text format, easy to edit
-also from outside the program.
+also from outside the program. See the section about the pdfpc format below.
+
+Overlays
+--------
+
+Many slide preparation systems allow for overlays, i.e. sets of slides that
+are logically grouped together as a single, changing slide. Examples include
+enumerations where the single items are displayed one after another or rough
+"animations", where parts of a picture change from slide to slide. Pdf
+Presenter Console includes facilities for dealing with such overlays.
+
+In this description, we will differentiation between slides (i.e. pages in the
+pdf document) and "user slides", that are the logical slides. The standard
+forward movement command (page down, enter, etc.) moves through one slide at a
+time, as expected. That means that every step in the overlay is traversed.
+The backward movement command works differently depending if the current and
+previous slides are part of an overlay:
+- If the current slide is part of an overlay we just jump to the previous
+  slide. That means that we are in the middle of an overlay we can jump
+  forward and backward through the single steps of it
+- If the current slide is not part of an overlay (or if it is the first one),
+  but the previous slides are, we jump to the previous user slide. This means
+  that when going back in the presentation you do not have to go through every
+  step of the overlay, Pdf Presenter Console just shows the first slide of
+  the each overlay. As you normally only go back in a presentation when looking
+  for a concrete slide, this is more convenient.
+The up and down cursor keys work on a user slide basis. You can use them to
+skip the rest of an overlay or to jump to the previous user slide, ignoring the
+state of the current slide. The 'n' and 'p' commands also work on a user slide
+basis.
+
+When going through an overlay, two additional previews may be activated in the
+presenter view, just below the main view, showing the next and the previous
+slide in an overlay.
+
+Pdf Presenter Console tries to find these overlays automatically by looking
+into the page labels in the pdf file. For LaTeX this works correctly at least
+with the beamer class and also modifying the page numbers manually (compiling
+with pdflatex). If you preferred slide-producing method does not work correctly
+with this detection, you can supply this information using the 'o' key for each
+slide that is part of an overlay (except the first one!). The page numbering is
+also adapted. This information is automatically stored.
+
+pdfpc Files
+-----------
+
+The notes and the overlay information (if manually edited) are stored in a file
+with the extension "pdfpc". When invoking Pdf Presenter Console with a non
+pdfpc file, it automatically checks if there exists such a file and in this
+case loads the additional information. This means that you normally do not have
+to deal with this kind of files explicitly.
+
+There are however cases where you may want to edit the files manually. The most
+typical case is if you add or remove some slides after you have edited notes or
+defined overlays. It may be quicker to edit the pdfpc file than to re-enter the
+whole information. Future versions may include external tools for dealing with
+this case automatically.
+
+The files are plain-text files that should be fairly self-explanatory. A couple
+of things to note
+- The slide numbers of the notes refer to user slides
+- The [notes] sections must be the last one in the file
+- For the programmers out there: slide indexes start at 1
 
 Download
 ========
