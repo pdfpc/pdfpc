@@ -148,7 +148,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x066: /* f */
                         this.toggle_freeze();
                     break;
-                    case 0x073: /* s */
+                    case 0x06f: /* o */
                         this.toggle_skip();
                     break;
                 }
