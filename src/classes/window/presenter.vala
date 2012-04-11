@@ -241,11 +241,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.prerender_progress.no_show_all = true;
 
             try {
-                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", 106, 100);
+                int icon_height = bottom_height - 10;
+
+                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", (int)Math.floor(1.06*icon_height), icon_height);
                 this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
                 this.blank_icon.no_show_all = true;
 
-                var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", 100, 100);
+                var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", icon_height, icon_height);
                 this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
                 this.frozen_icon.no_show_all = true;
             } catch (Error e) {
