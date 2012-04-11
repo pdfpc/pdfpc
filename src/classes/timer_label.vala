@@ -27,7 +27,7 @@ namespace org.westhoffswelt.pdfpresenter {
     /**
      * Specialized label, which is capable of easily displaying a timer
      */
-    public class TimerLabel: Gtk.Label {
+    public abstract class TimerLabel: Gtk.Label {
 
         /**
          * Time which is currently displayed
@@ -49,7 +49,7 @@ namespace org.westhoffswelt.pdfpresenter {
         protected int _time = 0;
 
         /*
-         * Duration the timer is reset too if reset is called during
+         * Duration the timer is reset to if reset is called during
          * presentation mode.
          */
         protected int duration;
@@ -141,7 +141,7 @@ namespace org.westhoffswelt.pdfpresenter {
             }
             // Start the timer if it is not running and the currently set time
             // is non zero
-            else if ( this._time != 0 && this.timeout == 0 ) {
+            else if ( this.timeout == 0 ) {
                 this.timeout = Timeout.add( 1000, this.on_timeout );
             }
         }
@@ -180,7 +180,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     this.start();
                 break;
                 case MODE.talk:
-                    this._time = this.duration;
+                    this._time = 0;
                 break;
             }
            
@@ -228,24 +228,33 @@ namespace org.westhoffswelt.pdfpresenter {
             // Already switch to presentation mode if the timeout counter has
             // reached one, because after adding the new timer a second will
             // pass before the new value is filled in.
-            if ( this._time-- <= 1 && this.current_mode == MODE.pretalk ) 
-            {
-                // The zero has been reached on the way down to a presentation
-                // start time. Therefore a mode switch is needed
-                this.current_mode = MODE.talk;
-                this.reset();
-                this.start();
-            }
+            //if ( this._time-- <= 1 && this.current_mode == MODE.pretalk ) 
+            //{
+            //    // The zero has been reached on the way down to a presentation
+            //    // start time. Therefore a mode switch is needed
+            //    this.current_mode = MODE.talk;
+            //    this.reset();
+            //    this.start();
+            //}
 
+            ++this._time;
             this.format_time();
             return true;
+        }
+
+        protected abstract void format_time();
+    }
+
+    public class CountdownTimer : TimerLabel {
+        public CountdownTimer( int duration, time_t start_time = 0 ) {
+            base(duration, start_time);
         }
 
         /**
          * Format the given time in a readable hh:mm:ss way and update the
          * label text
          */
-        protected void format_time() {
+        protected override void format_time() {
             uint time;
             uint hours, minutes, seconds;
 
@@ -260,10 +269,10 @@ namespace org.westhoffswelt.pdfpresenter {
                 prefix = "-";
             }
 
-            if ( this._time >= 0 ) {
-                // Time is positive
-                if ( this.duration != 0 
-                  && this._time < this.last_minutes * 60 ) {
+            if ( this._time < this.duration ) {
+                time = duration - this._time;
+                // Still on presentation time
+                if ( time < this.last_minutes * 60 ) {
                     this.modify_fg( 
                         StateType.NORMAL, 
                         this.last_minutes_color
@@ -276,20 +285,64 @@ namespace org.westhoffswelt.pdfpresenter {
                     );
                 }
                 
-                time = this._time;
             }
             else {
-                // We passed the duration therefore time is negative
+                // Time is over!
                 this.modify_fg( 
                     StateType.NORMAL, 
                     this.negative_color
                 );
-                time = this._time * (-1);
+                time = this.time - duration;
 
                 // The prefix used for negative time values is a simple minus sign.
                 prefix = "-";
             }
 
+            hours = time / 60 / 60;
+            minutes = time / 60 % 60;
+            seconds = time % 60 % 60;
+            
+            this.set_text( 
+                "%s%.2u:%.2u:%.2u".printf(
+                    prefix,
+                    hours,
+                    minutes,
+                    seconds
+                )
+            );
+        }
+    }
+
+    public class CountupTimer : TimerLabel {
+        public CountupTimer( int duration, time_t start_time = 0 ) {
+            base(0, start_time);
+        }
+
+        /**
+         * Format the given time in a readable hh:mm:ss way and update the
+         * label text
+         */
+        protected override void format_time() {
+            uint time;
+            uint hours, minutes, seconds;
+
+            // In pretalk mode we display a negative sign before the the time,
+            // to indicate that we are actually counting down to the start of
+            // the presentation.
+            // Normally the default is a positive number. Therefore a negative
+            // sign is not needed and the prefix is just an empty string.
+            string prefix = "";
+            if ( this.current_mode == MODE.pretalk ) 
+            {
+                prefix = "-";
+            }
+
+            this.modify_fg( 
+                StateType.NORMAL, 
+                this.normal_color
+            );
+            time = this._time;
+            
             hours = time / 60 / 60;
             minutes = time / 60 % 60;
             seconds = time % 60 % 60;

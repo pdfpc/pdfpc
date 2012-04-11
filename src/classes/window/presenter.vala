@@ -213,7 +213,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
-            this.timer = new TimerLabel( (int)Options.duration * 60, start_time );
+            this.timer = new CountupTimer( (int)Options.duration * 60, start_time );
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
             this.timer.set_last_minutes( Options.last_minutes );
