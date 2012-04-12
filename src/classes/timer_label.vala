@@ -24,6 +24,18 @@ using Gtk;
 using Gdk;
 
 namespace org.westhoffswelt.pdfpresenter {
+
+    /**
+      * Factory function for creating TimerLabels, depending if a duration was
+      * given.
+      */
+    TimerLabel getTimerLabel( int duration, time_t start_time = 0 ) {
+        if ( duration > 0 )
+            return new CountdownTimer( duration, start_time );
+        else
+            return new CountupTimer( start_time );
+    }
+
     /**
      * Specialized label, which is capable of easily displaying a timer
      */
@@ -314,7 +326,7 @@ namespace org.westhoffswelt.pdfpresenter {
     }
 
     public class CountupTimer : TimerLabel {
-        public CountupTimer( int duration, time_t start_time = 0 ) {
+        public CountupTimer( time_t start_time = 0 ) {
             base(0, start_time);
         }
 
