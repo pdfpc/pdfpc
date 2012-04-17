@@ -213,10 +213,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
-            this.timer = new TimerLabel( (int)Options.duration * 60, start_time );
+            this.timer = getTimerLabel( (int)Options.duration * 60, Options.last_minutes, start_time );
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
-            this.timer.set_last_minutes( Options.last_minutes );
 
 
             // The slide counter is centered in the 90% bottom part of the screen
@@ -241,11 +240,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.prerender_progress.no_show_all = true;
 
             try {
-                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", 106, 100);
+                int icon_height = bottom_height - 10;
+
+                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", (int)Math.floor(1.06*icon_height), icon_height);
                 this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
                 this.blank_icon.no_show_all = true;
 
-                var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", 100, 100);
+                var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", icon_height, icon_height);
                 this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
                 this.frozen_icon.no_show_all = true;
             } catch (Error e) {
