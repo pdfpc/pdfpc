@@ -70,11 +70,17 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         protected bool skips_by_user;
 
         /**
+         * Duration of the presentation
+         */
+        protected uint duration;
+
+        /**
          * The parsing states for the pdfpc file
          */
         enum ParseState {
             FILE,
             SKIP,
+            DURATION,
             NOTES,
             NOTHING
         }
@@ -98,6 +104,8 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                         state = ParseState.FILE;
                     else if (l == "[skip]")
                         state = ParseState.SKIP;
+                    else if (l == "[duration]")
+                        state = ParseState.DURATION;
                     else if (l == "[notes]") {
                         notes.parse_lines(lines[i+1:lines.length]);
                         break;
@@ -115,6 +123,9 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                             skip_line = l;
                             skips_by_user = true;
                             state = ParseState.NOTHING;
+                            break;
+                        case ParseState.DURATION:
+                            this.duration = int.parse(l);
                             break;
                         }
                     }
@@ -171,13 +182,10 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          * Save the metadata to disk, if needed (i.e. if the user did something with the notes or the skips)
          */
         public void save_to_disk() {
-            bool write_notes = this.notes.has_notes();
-            bool write_skips = this.user_view_indexes.length < this.page_count && this.skips_by_user;
-
-            if (!write_notes && !write_skips)
-                return;
-
-            string contents = "";
+            string contents =   format_duration()
+                              + format_skips()
+                              + format_notes();
+            if ( !contents.empty() ) {
             contents += ("[file]\n" + this.pdf_fname + "\n");
 
             if (write_skips) {
@@ -201,6 +209,42 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
             } catch (Error e) {
                 error("%s", e.message);
             }
+        }
+
+        /**
+         * Format the skip information for saving to disk
+         */
+        protected string format_skips() {
+            string contents = "";
+            if ( this.user_view_indexes.length < this.page_count && this.skips_by_user ) {
+                contents += "[skip]\n";
+                int user_slide = 0;
+                for (int slide = 0; slide < this.page_count; ++slide) {
+                    if (slide != user_view_indexes[user_slide])
+                        contents += "%d,".printf(slide + 1);
+                    else
+                        ++user_slide;
+                }
+                contents += "\n";
+            }
+            return contents;
+        }
+
+        /**
+         * Format the notes for saving to disk
+         */
+        protected string format_notes() {
+            string contents = "";
+            if ( this.notes.has_notes() ) 
+                contents += ("[notes]\n" + this.notes.format_to_save());
+            return contents;
+        }
+
+        protected string format_duration() {
+            string contents = "";
+            if ( this.duration > 0 )
+                contents += "[duration]\n%u\n".printf(duration);
+            return contents;
         }
 
         /**
