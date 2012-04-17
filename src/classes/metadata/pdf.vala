@@ -185,29 +185,15 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
             string contents =   format_duration()
                               + format_skips()
                               + format_notes();
-            if ( !contents.empty() ) {
-            contents += ("[file]\n" + this.pdf_fname + "\n");
+            if ( contents != "" ) {
+                contents = "[file]\n" + this.pdf_fname + "\n" + contents;
 
-            if (write_skips) {
-                contents += "[skip]\n";
-                int user_slide = 0;
-                for (int slide = 0; slide < this.page_count; ++slide) {
-                    if (slide != user_view_indexes[user_slide])
-                        contents += "%d,".printf(slide + 1);
-                    else
-                        ++user_slide;
+                try {
+                    var pdfpc_file = File.new_for_uri(this.pdfpc_url);
+                    FileUtils.set_contents(pdfpc_file.get_path(), contents, contents.length-1);
+                } catch (Error e) {
+                    error("%s", e.message);
                 }
-                contents += "\n";
-            }
-            
-            if (write_notes)
-                contents += ("[notes]\n" + this.notes.format_to_save());
-            
-            try {
-                var pdfpc_file = File.new_for_uri(this.pdfpc_url);
-                FileUtils.set_contents(pdfpc_file.get_path(), contents, contents.length-1);
-            } catch (Error e) {
-                error("%s", e.message);
             }
         }
 
@@ -378,6 +364,20 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          */
         public slides_notes get_notes() {
             return this.notes;
+        }
+
+        /**
+         * Get the duration of the presentation
+         */
+        public uint get_duration() {
+            return this.duration;
+        }
+
+        /**
+         * Get the duration of the presentation
+         */
+        public void set_duration(uint d) {
+            this.duration = d;
         }
 
         /**

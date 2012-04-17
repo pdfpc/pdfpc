@@ -54,8 +54,10 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Commandline option providing the talk duration, which will be used to
          * display a timer
+         *
+         * Same problem as above with default value
          */
-        public static uint duration = 0;
+        public static uint duration = 987654321u;
 
         /**
          * Commandline option providing the time from which on the timer should

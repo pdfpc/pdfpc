@@ -142,6 +142,8 @@ namespace org.westhoffswelt.pdfpresenter {
             stdout.printf( "Initializing rendering...\n" );
 
             var metadata = new Metadata.Pdf( args[1] );
+            if ( Options.duration != 987654321u )
+                metadata.set_duration(Options.duration);
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
