@@ -133,8 +133,11 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.metadata.save_to_disk();
                         Gtk.main_quit();
                     break;
-                    case 0xff50: /* Home */
+                    case 0x072: /* r */
                         this.controllables_reset();
+                    break;
+                    case 0xff50: /* Home */
+                        this.goto_first();
                     break;
                     case 0x062: /* b*/
                         this.fade_to_black();
@@ -149,6 +152,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.toggle_freeze();
                     break;
                     case 0x06f: /* o */
+                    case 0x073: /* s */
                         this.toggle_skip();
                     break;
                 }
@@ -334,6 +338,17 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.current_user_slide_number = 0;
                 this.current_slide_number = 0;
             }
+            if (!this.frozen)
+                this.faded_to_black = false;
+            this.controllables_update();
+        }
+
+        /**
+         * Go to the first slide
+         */
+        public void goto_first() {
+            this.current_slide_number = 0;
+            this.current_user_slide_number = 0;
             if (!this.frozen)
                 this.faded_to_black = false;
             this.controllables_update();
