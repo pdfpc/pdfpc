@@ -471,6 +471,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                this.presentation_controller.set_ignore_input_events( false );
                if ( destination != 0 )
                   this.presentation_controller.goto_user_page(destination);
+               else
+                  this.update_slide_count(); // Reset the display we had before
                return true;
             } else {
                return false;
