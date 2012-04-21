@@ -109,24 +109,23 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff53: /* Cursor right */
                     case 0xff56: /* Page down */
                     case 0x020:  /* Space */
-                        this.next_page();
+                        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                            this.jump10();
+                        else
+                            this.next_page();
                     break;
                     case 0xff54: /* Cursor down */
                         this.next_user_page();
                     break;
-                    case 0x05d:  /* ] */
-                        this.jump10();
-                    break;
                     case 0xff51: /* Cursor left */
                     case 0xff55: /* Page Up */
-                        this.previous_page();
+                        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                            this.back10();
+                        else
+                            this.previous_page();
                     break;
                     case 0xff52: /* Cursor up */
                         this.previous_user_page();
-                    break;
-                    case 0xff08: /* Backspace */
-                    case 0x05b: /* [ */
-                        this.back10();
                     break;
                     case 0xff1b: /* Escape */
                     case 0x071:  /* q */
