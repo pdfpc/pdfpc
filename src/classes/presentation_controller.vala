@@ -157,6 +157,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x073: /* s */
                         this.start();
                     break;
+                    case 0x070: /* p */
                     case 0xff13: /* pause */
                         this.toggle_pause();
                     break;
