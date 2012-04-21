@@ -61,6 +61,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected TimerLabel timer;
 
         /**
+         * Is the timer paused
+         */
+        protected bool timer_paused;
+
+        /**
          * Slide progress label ( eg. "23/42" )
          */
         protected Entry slide_progress;
@@ -413,7 +418,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
             this.update_slide_count();
             this.update_note();
-            this.timer.start();
+            if (!this.timer_paused)
+                this.timer.start();
             if (this.presentation_controller.is_faded_to_black())
                 this.blank_icon.show();
             else
@@ -442,7 +448,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             this.update_note();
             this.blank_icon.hide();
-            this.timer.start();
+            if (!this.timer_paused)
+                this.timer.start();
         }
 
         /**
@@ -547,8 +554,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Pause the presentation
          */
         public void toggle_pause() {
-            bool paused = this.timer.pause();
-            if ( paused )
+            this.timer_paused = this.timer.pause();
+            if ( this.timer_paused )
                 this.pause_icon.show();
             else
                 this.pause_icon.hide();
@@ -559,6 +566,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         public void reset_timer() {
             this.timer.reset();
+            this.timer_paused = false;
             this.pause_icon.hide();
         }
     }
