@@ -43,11 +43,6 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void update();
 
         /**
-         * Reset the presentation to it's initial state
-         */
-        public abstract void reset();
-
-        /**
          * Edit note for current slide
          */
         public abstract void edit_note();
@@ -56,5 +51,15 @@ namespace org.westhoffswelt.pdfpresenter {
          * Ask for the page to jump to
          */
         public abstract void ask_goto_page();
+
+        /**
+         * Pause the timer
+         */
+        public abstract void toggle_pause();
+
+        /**
+         * Reset the timer
+         */
+        public abstract void reset_timer();
     }
 }

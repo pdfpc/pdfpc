@@ -78,6 +78,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected Gtk.Image frozen_icon;
 
         /**
+         * Indication that the timer is paused
+         */
+        protected Gtk.Image pause_icon;
+
+        /**
          * Text box for displaying notes for the slides
          */
         protected TextView notes_view;
@@ -249,6 +254,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", icon_height, icon_height);
                 this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
                 this.frozen_icon.no_show_all = true;
+
+                var pause_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "pause.svg", icon_height, icon_height);
+                this.pause_icon = new Gtk.Image.from_pixbuf(pause_pixbuf);
+                this.pause_icon.no_show_all = true;
             } catch (Error e) {
                 error("%s", e.message);
             }
@@ -263,7 +272,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slide_count = metadata.get_slide_count();
 
             this.update();
-            this.reset();
+            this.reset_timer();
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
@@ -308,6 +317,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             //blank_label_alignment.add( this.blank_label );
             status.pack_start( this.blank_icon, false, false, 0 );
             status.pack_start( this.frozen_icon, false, false, 0 );
+            status.pack_start( this.pause_icon, false, false, 0 );
 
             var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
             timer_alignment.add( this.timer );
@@ -389,17 +399,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.next_view.display(this.metadata.user_slide_to_real_slide(current_user_slide_number + 1));
                 if (this.presentation_controller.skip_next()) {
                     this.strict_next_view.display(current_slide_number + 1, true);
-                    //this.strict_next_view.show();
                 } else {
                     this.strict_next_view.fade_to_black();
-                    //this.strict_next_view.hide();
                 }
                 if (this.presentation_controller.skip_previous()) {
                     this.strict_prev_view.display(current_slide_number - 1, true);
-                    //this.strict_prev_view.show();
                 } else {
                     this.strict_prev_view.fade_to_black();
-                    //this.strict_prev_view.hide();
                 }
             }
             catch( Renderer.RenderError e ) {
@@ -417,13 +423,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             else
                 this.frozen_icon.hide();
             this.faded_to_black = false;
-        }
-
-        /**
-         * Reset the presentation display to the initial status
-         */
-        public void reset() {
-            this.timer.reset();
         }
 
         /**
@@ -542,6 +541,25 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             var tm = Time.local( time_t() );
             tm.strptime( start_time, "%H:%M:%S" );
             return tm.mktime();
+        }
+
+        /**
+         * Pause the presentation
+         */
+        public void toggle_pause() {
+            bool paused = this.timer.pause();
+            if ( paused )
+                this.pause_icon.show();
+            else
+                this.pause_icon.hide();
+        }
+
+        /**
+         * Pause the presentation
+         */
+        public void reset_timer() {
+            this.timer.reset();
+            this.pause_icon.hide();
         }
     }
 }

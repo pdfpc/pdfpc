@@ -83,7 +83,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Start the timer
          */
         public void start() {
-            if ( this.timeout != 0 && this.time < 0) { 
+            if ( this.timeout != 0 && this.time < 0 ) { 
                 // We are in pretalk, with timeout already running.
                 // Jump to talk mode
                 this.time = 0;
@@ -101,6 +101,22 @@ namespace org.westhoffswelt.pdfpresenter {
                 Source.remove( this.timeout );
                 this.timeout = 0;
             }
+        }
+
+        /**
+         * Pauses the timer if it's running. Returns if the timer is paused.
+         */
+        public bool pause() {
+            bool paused = false;
+            if ( this.time > 0 ) { // In pretalk mode it doesn't make much sense to pause
+                if ( this.timeout != 0 ) {
+                    this.stop();
+                    paused = true;
+                } else {
+                    this.start();
+                }
+            }
+            return paused;
         }
 
         /**
@@ -142,6 +158,9 @@ namespace org.westhoffswelt.pdfpresenter {
             return true;
         }
 
+        /**
+         * Shows the corresponding time
+         */
         protected abstract void format_time();
 
         /**

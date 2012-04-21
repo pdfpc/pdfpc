@@ -152,8 +152,13 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.toggle_freeze();
                     break;
                     case 0x06f: /* o */
-                    case 0x073: /* s */
                         this.toggle_skip();
+                    break;
+                    case 0x073: /* s */
+                        this.start();
+                    break;
+                    case 0xff13: /* pause */
+                        this.toggle_pause();
                     break;
                 }
                 return true;
@@ -402,9 +407,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Notify the controllables that they have to update the view
          */
         protected void controllables_update() {
-            foreach( Controllable c in this.controllables ) {
+            foreach( Controllable c in this.controllables )
                 c.update();
-            }
         }
 
         /**
@@ -413,10 +417,8 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void controllables_reset() {
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
-            foreach( Controllable c in this.controllables ) {
-                c.update();
-                c.reset();
-            }
+            this.controllables_update();
+            this.reset_timer();
         }
 
         /**
@@ -475,6 +477,30 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void toggle_skip() {
             this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
             this.controllables_update();
+        }
+
+        /**
+         * Start the presentation (-> timer)
+         */
+        protected void start() {
+            // The update implicitely starts the timer
+            this.controllables_update();
+        }
+        
+        /**
+         * Pause the timer
+         */
+        protected void toggle_pause() {
+            foreach( Controllable c in this.controllables )
+                c.toggle_pause();
+        }
+
+        /**
+         * Reset the timer
+         */
+        protected void reset_timer() {
+            foreach( Controllable c in this.controllables )
+                c.reset_timer();
         }
     }
 }

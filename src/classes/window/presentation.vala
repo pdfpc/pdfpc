@@ -95,7 +95,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.button_press_event.connect( this.on_button_press );
 
             this.update();
-            this.reset();
         }
 
         /**
@@ -154,12 +153,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
             
         /**
-         * Reset to the initial presentation state
-         */
-        public void reset() {
-        }
-
-        /**
          * Edit note for current slide. We don't do anything.
          */
         public void edit_note() {
@@ -169,6 +162,18 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Ask for the page to jump to. We don't do anything
          */
         public void ask_goto_page() {
+        }
+
+        /**
+         * Pause the timer. We don't do anything
+         */
+        public void toggle_pause() {
+        }
+
+        /**
+         * Reset the timer. We don't do anything
+         */
+        public void reset_timer() {
         }
 
         /**
