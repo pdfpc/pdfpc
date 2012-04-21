@@ -138,6 +138,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff50: /* Home */
                         this.goto_first();
                     break;
+                    case 0xff57: /* End */
+                        this.goto_last();
+                    break;
                     case 0x062: /* b */
                         this.fade_to_black();
                     break;
@@ -372,6 +375,17 @@ namespace org.westhoffswelt.pdfpresenter {
         public void goto_first() {
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
+            if (!this.frozen)
+                this.faded_to_black = false;
+            this.controllables_update();
+        }
+
+        /**
+         * Go to the last slide
+         */
+        public void goto_last() {
+            this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             if (!this.frozen)
                 this.faded_to_black = false;
             this.controllables_update();
