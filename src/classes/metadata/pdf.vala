@@ -86,6 +86,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
             FILE,
             SKIP,
             DURATION,
+            END_USER_SLIDE,
             NOTES,
             NOTHING
         }
@@ -111,6 +112,8 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                         state = ParseState.SKIP;
                     else if (l == "[duration]")
                         state = ParseState.DURATION;
+                    else if (l == "[end_user_slide]")
+                        state = ParseState.END_USER_SLIDE;
                     else if (l == "[notes]") {
                         notes.parse_lines(lines[i+1:lines.length]);
                         break;
@@ -131,6 +134,9 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                             break;
                         case ParseState.DURATION:
                             this.duration = int.parse(l);
+                            break;
+                        case ParseState.END_USER_SLIDE:
+                            this.end_user_slide = int.parse(l);
                             break;
                         }
                     }
@@ -189,6 +195,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         public void save_to_disk() {
             string contents =   format_duration()
                               + format_skips()
+                              + format_end_user_slide()
                               + format_notes();
             if ( contents != "" ) {
                 contents = "[file]\n" + this.pdf_fname + "\n" + contents;
@@ -218,6 +225,13 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 }
                 contents += "\n";
             }
+            return contents;
+        }
+
+        protected string format_end_user_slide() {
+            string contents = "";
+            if ( this.end_user_slide >= 0 )
+                contents += "[end_user_slide]\n%d\n".printf(this.end_user_slide);
             return contents;
         }
 
