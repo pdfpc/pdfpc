@@ -376,18 +376,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slide_progress.set_text( 
                 "%d/%u".printf( 
                     this.presentation_controller.get_current_user_slide_number() + 1, 
-                    this.presentation_controller.get_user_n_slides()
+                    this.presentation_controller.get_end_user_slide()
                 )        
             );
         }
-
-        /**
-         * Set the presentation controller which is notified of keypresses and
-         * other observed events
-         */
-        //public void set_controller( PresentationController controller ) {
-        //    this.presentation_controller = controller;
-        //}
 
         /**
          * Return the registered PresentationController

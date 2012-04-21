@@ -65,6 +65,11 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         private int[] user_view_indexes;
 
         /**
+         * The "end slide" defined by the user
+         */
+        private int end_user_slide = -1;
+
+        /**
          * Were the skips modified by the user?
          */
         protected bool skips_by_user;
@@ -286,6 +291,24 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
          */
         public int get_user_slide_count() {
             return this.user_view_indexes.length;
+        }
+
+        /**
+         * Return the last slide defined by the user. It may be different as
+         * get_user_slide_count()!
+         */
+        public int get_end_user_slide() {
+            if (this.end_user_slide >= 0)
+                return this.end_user_slide;
+            else
+                return this.get_user_slide_count();
+        }
+
+        /**
+         * Set the last slide defined by the user
+         */
+        public void set_end_user_slide(int slide) {
+            this.end_user_slide = slide;
         }
 
         /**

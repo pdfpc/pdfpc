@@ -114,7 +114,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff54: /* Cursor down */
                         this.next_user_page();
                     break;
-                    case 0x06e:  /* n */
+                    case 0x05d:  /* ] */
                         this.jump10();
                     break;
                     case 0xff51: /* Cursor left */
@@ -125,7 +125,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.previous_user_page();
                     break;
                     case 0xff08: /* Backspace */
-                    case 0x070: /* p */
+                    case 0x05b: /* [ */
                         this.back10();
                     break;
                     case 0xff1b: /* Escape */
@@ -139,10 +139,10 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff50: /* Home */
                         this.goto_first();
                     break;
-                    case 0x062: /* b*/
+                    case 0x062: /* b */
                         this.fade_to_black();
                     break;
-                    case 0x065: /* e */
+                    case 0x06e: /* n */
                         this.controllables_edit_note();
                     break;
                     case 0x067: /* g */
@@ -159,6 +159,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     break;
                     case 0xff13: /* pause */
                         this.toggle_pause();
+                    break;
+                    case 0x065: /* e */
+                        this.set_end_user_slide();
                     break;
                 }
                 return true;
@@ -230,6 +233,21 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         public int get_user_n_slides() {
             return this.metadata.get_user_slide_count();;
+        }
+
+        /**
+         * Get the last slide as defined by the user
+         */
+        public int get_end_user_slide() {
+            return this.metadata.get_end_user_slide();
+        }
+    
+        /**
+         * Set the last slide as defined by the user
+         */
+        public void set_end_user_slide() {
+            this.metadata.set_end_user_slide(this.current_user_slide_number + 1);
+            this.controllables_update();
         }
 
         /**
