@@ -347,8 +347,10 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 for ( int i=user_slide_number+1; i<l; ++i)
                     new_indexes[i-1] = this.user_view_indexes[i];
                 this.user_view_indexes = new_indexes;
+                if ( this.end_user_slide >= 0 )
+                    --this.end_user_slide;
                 offset = -1;
-            } else {
+            } else { // Deactivate skip
                 int[] new_indexes = new int[ l+1 ];
                 for ( int i=0; i<=user_slide_number; ++i)
                     new_indexes[i] = this.user_view_indexes[i];
@@ -356,6 +358,8 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 for ( int i=user_slide_number+1; i<l; ++i)
                     new_indexes[i+1] = this.user_view_indexes[i];
                 this.user_view_indexes = new_indexes;
+                if ( this.end_user_slide >= 0 )
+                    ++this.end_user_slide;
                 offset = +1;
             }
             return offset;
