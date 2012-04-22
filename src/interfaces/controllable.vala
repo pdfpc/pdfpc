@@ -61,5 +61,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * Reset the timer
          */
         public abstract void reset_timer();
+
+        /**
+         * Show an overview of all slides
+         */
+        public abstract void show_overview();
     }
 }

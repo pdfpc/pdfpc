@@ -166,6 +166,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x065: /* e */
                         this.set_end_user_slide();
                     break;
+                    case 0xff09:
+                        this.controllables_show_overview();
+                    break;
                 }
                 return true;
             } else {
@@ -451,6 +454,11 @@ namespace org.westhoffswelt.pdfpresenter {
             this.current_user_slide_number = 0;
             this.controllables_update();
             this.reset_timer();
+        }
+
+        protected void controllables_show_overview() {
+            foreach( Controllable c in this.controllables )
+                c.show_overview();
         }
 
         /**

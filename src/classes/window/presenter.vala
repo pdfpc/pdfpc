@@ -97,6 +97,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected VBox fullLayout = null;
 
+        protected HBox slideViews = null;
+        
+        protected Overview overview = null;
+
         /**
          * Number of slides inside the presentation
          *
@@ -291,13 +295,23 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                         metadata
                     )
                 );
+                ((Renderer.Caching)this.strict_next_view.get_renderer()).set_cache( 
+                    Renderer.Cache.OptionFactory.create( 
+                        metadata
+                    )
+                );
+                ((Renderer.Caching)this.strict_prev_view.get_renderer()).set_cache( 
+                    Renderer.Cache.OptionFactory.create( 
+                        metadata
+                    )
+                );
             }
 
             this.build_layout();
         }
 
         protected void build_layout() {
-            var slideViews = new HBox(false, 4);
+            this.slideViews = new HBox(false, 4);
 
             var strict_views = new HBox(false, 0);
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
@@ -309,12 +323,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             //var center_current_view = new Alignment(0, (float)0.5, 0, 0);
             //center_current_view.add(this.current_view);
-            slideViews.add( current_view_and_stricts );
+            this.slideViews.add( current_view_and_stricts );
 
             var nextViewWithNotes = new VBox(false, 0);
             nextViewWithNotes.pack_start( this.next_view, false, false, 0 );
             nextViewWithNotes.pack_start( this.notes_view, true, true, 5 );
-            slideViews.add(nextViewWithNotes);
+            this.slideViews.add(nextViewWithNotes);
 
             var bottomRow = new HBox(true, 0);
 
@@ -339,10 +353,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             //var fullLayout = new VBox(false, 0);
             this.fullLayout = new VBox(false, 0);
-            fullLayout.pack_start( slideViews );
-            fullLayout.pack_start( bottomRow );
+            fullLayout.pack_start( this.slideViews, true, true, 0 );
+            fullLayout.pack_end( bottomRow, false, false, 0 );
             
             this.add( fullLayout );
+
+            this.overview = new Overview();
+            this.overview.no_show_all = true;
+            this.overview.set_n_slides(22);
+            this.fullLayout.pack_start( this.overview, true, true, 0 );
         }
 
         /**
@@ -510,6 +529,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.notes_view.buffer.text = this_note;
         }
 
+        public void show_overview() {
+            this.slideViews.hide();
+            this.overview.show();
+        }
+
         /** 
          * Take a cache observer and register it with all prerendering Views
          * shown on the window.
@@ -528,8 +552,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
             
             //observer.register_entry( this.slide_progress );
-            observer.register_update( this.prerender_progress.set_fraction, () => this.prerender_progress.hide() );
+            //observer.register_update( this.prerender_progress.set_fraction, () => this.prerender_progress.hide() );
+            observer.register_update( this.prerender_progress.set_fraction, this.prerender_finished );
             this.prerender_progress.show();
+        }
+
+        public void prerender_finished() {
+            this.prerender_progress.hide();
+            this.overview.fill(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
     
         /**
@@ -560,6 +590,57 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.timer.reset();
             this.timer_paused = false;
             this.pause_icon.hide();
+        }
+    }
+
+    public class Overview: Gtk.Table {
+        private Gtk.Button[] button;
+
+        uint n_slides = 0;
+        
+        public void set_n_slides(uint n) {
+            this.n_slides = n;
+            int rows = (int)Math.ceil(Math.sqrt(n));
+            base.resize(rows, rows);
+            int currentButton = 0;
+            for (int r = 0; currentButton < n && r < rows; ++r) {
+                for (int c = 0; currentButton < n && c < rows; ++c) {
+                    var newButton = new Gtk.Button();
+                    newButton.set_label("%d".printf(currentButton + 1));
+                    newButton.show();
+                    base.attach_defaults(newButton, c, c+1, r, r+1);
+                    button += newButton;
+                    ++currentButton;
+                    stdout.printf("height: %d\n", newButton.allocation.width);
+                }
+            }
+        }
+
+        public void fill(Renderer.Cache.Base cache) {
+            // We get the dimensions from the first button and first slide, should be the same for all
+            int buttonWidth = button[0].allocation.width;
+            int buttonHeight = button[0].allocation.height;
+            int pixmapWidth, pixmapHeight;
+            cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
+
+            int targetWidth, targetHeight;
+            Scaler scaler = new Scaler(pixmapWidth, pixmapHeight);
+            Rectangle rect = scaler.scale_to(buttonWidth-10, buttonHeight-10);
+            targetWidth = rect.width;
+            targetHeight = rect.height;
+
+            //double scaling_factor = Math.fmin((double)buttonWidth/pixmapWidth, (double)buttonHeight/pixmapHeight);
+            //targetWidth = (int)Math.round(pixmapWidth * scaling_factor);
+            //targetHeight = (int)Math.round(pixmapWidth * scaling_factor);
+
+            for ( uint i = 0; i < n_slides; ++i ) {
+                var thisButton = button[i];
+                var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmapWidth, pixmapHeight);
+                Gdk.pixbuf_get_from_drawable(pixbuf, cache.retrieve(i), null, 0, 0, 0, 0, pixmapWidth, pixmapHeight);
+                var image = new Gtk.Image.from_pixbuf(pixbuf.scale_simple(targetWidth, targetHeight, Gdk.InterpType.BILINEAR));
+                thisButton.set_label("");
+                thisButton.set_image(image);
+            }
         }
     }
 }

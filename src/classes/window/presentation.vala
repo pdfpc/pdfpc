@@ -177,6 +177,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
+         * Show an overview. We don't do anything (yet?)
+         */
+        public void show_overview() {
+        }
+
+        /**
          * Set the cache observer for the Views on this window
          *
          * This method takes care of registering all Prerendering Views used by
