@@ -596,7 +596,21 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     public class Overview: Gtk.Table {
         private Gtk.Button[] button;
 
+        Pango.FontDescription font;
+
+        protected Color black;
+        protected Color white;
+        protected Color yellow;
+
         uint n_slides = 0;
+
+        public Overview() {
+            this.font = Pango.FontDescription.from_string( "Verdana" );
+            this.font.set_size( 20 * Pango.SCALE );
+            Color.parse( "black", out this.black );
+            Color.parse( "white", out this.white );
+            Color.parse( "yellow", out this.yellow );
+        }
         
         public void set_n_slides(uint n) {
             this.n_slides = n;
@@ -606,12 +620,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             for (int r = 0; currentButton < n && r < rows; ++r) {
                 for (int c = 0; currentButton < n && c < rows; ++c) {
                     var newButton = new Gtk.Button();
+                    newButton.modify_font(this.font);
                     newButton.set_label("%d".printf(currentButton + 1));
+                    //var buttonLabel = newButton.get_children().first();
+                    //buttonLabel.modify_fg(StateType.NORMAL, this.white);
+                    newButton.modify_bg(StateType.NORMAL, this.black);
+                    newButton.modify_bg(StateType.PRELIGHT, this.yellow);
+                    newButton.modify_bg(StateType.ACTIVE, this.yellow);
                     newButton.show();
                     base.attach_defaults(newButton, c, c+1, r, r+1);
                     button += newButton;
                     ++currentButton;
-                    stdout.printf("height: %d\n", newButton.allocation.width);
                 }
             }
         }
