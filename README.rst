@@ -191,27 +191,29 @@ Keybindings
 During the presentation the following key strokes and mouse clicks are detected
 and interpreted:
 
-- Left cursor key / Page up / Right mouse button 
+- Left cursor key / Page up / Right mouse button
     - Go back one slide
-- Up cursor key
-    - Go back on "user slide" (see section about overlays below)
-- Backspace / p
+- Left cursor key / Page up / Right mouse button
     - Go back 10 slides
+- Up cursor key
+    - Go back one "user slide" (see section about overlays below)
 - Right cursor key / Page down / Return / Space / Left mouse button
     - Go forward one slide
+- Shift + Right cursor key / Page down / Return / Space / Left mouse button
+    - Go forward 10 slides
 - Down cursor key
     - Go forward one user slide
-- n
-    - Go forward 10 slides
 - Home
-    - Go back to the first slide and reset the timer
+    - Go back to the first slide
+- End
+    - Jump to the last slide
 - g
     - Input a slide number to jump to
-- Escape / q /Alt+F4
+- Escape / q
     - Quit the presentation viewer
 - b
-    - Turn off the presentation view at the end (i.e. fill it with a black color)
-- e
+    - Turn off the presentation view (i.e. fill it with a black color)
+- n
     - Edit note for current slide
 - f
     - Freeze the current presentation display (the presenter display is still
@@ -219,21 +221,30 @@ and interpreted:
 - o
     - Toggle the not-user-slide flag for one particular slide (see Overlays
       below)
+- p
+    - Pause timer
+- r
+    - Reset timer
+- e
+    - Define end slide
 
 Timer
 -----
+
+If a duration is given (-d option), the timer will show a countdown with the
+given parameters. If no duration is specified (or if a value of 0 is given to
+the -d option), the timer will show how much time has been spent. The duration
+is stored automatically, so you do not need to repeat it for every invocation.
 
 The timer is started if you are navigating away from the first page for the
 first time. This feature is quite useful as you may want to show the titlepage
 of your presentation while people are still entering the room and the
 presentation hasn't really begun yet. If you want to start over you can use the
-*Home* key which will make the presenter go back to the first page and reset
-the timer as well.
+*r* key which will make the presenter reset the timer.
 
-At the moment the timer reaches the defined ``last-minutes`` value it will
-change color to indicate your talk is nearing its end.
-
-As soon as the timer reaches the zero mark (00:00:00) it will turn red and
+If a duration is given, at the moment the timer reaches the defined
+``last-minutes`` value it will change color to indicate your talk is nearing its
+end.  As soon as the timer reaches the zero mark (00:00:00) it will turn red and
 count further down showing a negative time, to provide information on how many
 minutes you are overtime.
 
@@ -241,7 +252,7 @@ Notes
 -----
 
 Textual notes can be displayed for each slide. While in the presentation,
-pressing 'e' will allow you to take notes for the screen.  To go out of editing
+pressing 'n' will allow you to take notes for the screen.  To go out of editing
 mode, press the Escape key. Note that while editing a note the keybindings stop
 working, i.e. you are not able to change slides.
 
@@ -287,19 +298,29 @@ slide in an overlay.
 Pdf Presenter Console tries to find these overlays automatically by looking
 into the page labels in the pdf file. For LaTeX this works correctly at least
 with the beamer class and also modifying the page numbers manually (compiling
-with pdflatex). If you preferred slide-producing method does not work correctly
+with pdflatex). If your preferred slide-producing method does not work correctly
 with this detection, you can supply this information using the 'o' key for each
 slide that is part of an overlay (except the first one!). The page numbering is
 also adapted. This information is automatically stored.
 
+End slide
+---------
+
+Some people like to have some additional, backup slides after the last slide in
+the actual presentation. Things like bibliographic references or slides
+referring to specialized questions are typical examples. Pdf Presenter Console
+lets you define which is the last slide in the actual presentation vie the 'e'
+key. This just changes the progress display in the presenter screen, as to have
+a better overview of how many slides are left.
+
 pdfpc Files
 -----------
 
-The notes and the overlay information (if manually edited) are stored in a file
-with the extension "pdfpc". When invoking Pdf Presenter Console with a non
-pdfpc file, it automatically checks if there exists such a file and in this
-case loads the additional information. This means that you normally do not have
-to deal with this kind of files explicitly.
+The notes and other additional information are stored in a file with the
+extension "pdfpc". When invoking Pdf Presenter Console with a non pdfpc file, it
+automatically checks if there exists such a file and in this case loads the
+additional information. This means that you normally do not have to deal with
+this kind of files explicitly.
 
 There are however cases where you may want to edit the files manually. The most
 typical case is if you add or remove some slides after you have edited notes or
