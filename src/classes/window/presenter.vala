@@ -605,13 +605,19 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected uint n_slides = 0;
 
         protected uint dimension = 0;
+        protected int buttonWidth;
+        protected int buttonHeight;
+        protected int pixmapWidth;
+        protected int pixmapHeight;
+        protected int targetWidth;
+        protected int targetHeight;
 
         protected int currently_selected = 0;
 
         protected bool shown = false;
 
         protected bool structure_done = false;
-        protected bool previews_done = false;
+        protected int next_undone_preview = 0;
 
         protected Renderer.Cache.Base? cache = null;
 
@@ -641,11 +647,25 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     }
                 }
                 this.structure_done = true;
-                this.realize();
             } else {
                 stdout.printf("structure already done\n");
             }
-            GLib.Idle.add(this.fill_previews);
+            GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
+        }
+
+        public bool idle_get_button_size_and_queue_fill_previews() {
+            if (this.cache != null) {
+                this.buttonWidth = this.button[0].allocation.width;
+                this.buttonHeight = this.button[0].allocation.height;
+                this.cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
+                Scaler scaler = new Scaler(pixmapWidth, pixmapHeight);
+                Rectangle rect = scaler.scale_to(this.buttonWidth-10, this.buttonHeight-10);
+                this.targetWidth = rect.width;
+                this.targetHeight = rect.height;
+
+                GLib.Idle.add(this.fill_previews);
+            }
+            return false;
         }
 
         public override void hide() {
@@ -656,7 +676,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void set_cache(Renderer.Cache.Base cache) {
             this.cache = cache;
             if (this.shown)
-                GLib.Idle.add(this.fill_previews);
+                GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
         }
         
         public void set_n_slides(uint n) {
@@ -664,35 +684,27 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         protected bool fill_previews() {
-            if (this.cache == null || !this.shown || this.previews_done) {
+            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides) {
                 stdout.printf("fill_previews() skipped\n");
                 return false;
             }
             stdout.printf("fill_previews() *NOT* skipped\n");
             // We get the dimensions from the first button and first slide,
             // should be the same for all
-            int buttonWidth = this.button[0].allocation.width;
-            int buttonHeight = this.button[0].allocation.height;
-            int pixmapWidth, pixmapHeight;
-            this.cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
 
-            int targetWidth, targetHeight;
-            Scaler scaler = new Scaler(pixmapWidth, pixmapHeight);
-            Rectangle rect = scaler.scale_to(buttonWidth-10, buttonHeight-10);
-            targetWidth = rect.width;
-            targetHeight = rect.height;
+            var thisButton = button[this.next_undone_preview];
+            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, this.pixmapWidth, this.pixmapHeight);
+            Gdk.pixbuf_get_from_drawable(pixbuf, this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview)), null, 0, 0, 0, 0, this.pixmapWidth, this.pixmapHeight);
+            var image = new Gtk.Image.from_pixbuf(pixbuf.scale_simple(this.targetWidth, this.targetHeight, Gdk.InterpType.BILINEAR));
+            thisButton.set_label("");
+            thisButton.set_image(image);
 
-            for ( int i = 0; i < n_slides; ++i ) {
-                var thisButton = button[i];
-                var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmapWidth, pixmapHeight);
-                Gdk.pixbuf_get_from_drawable(pixbuf, this.cache.retrieve(metadata.user_slide_to_real_slide(i)), null, 0, 0, 0, 0, pixmapWidth, pixmapHeight);
-                var image = new Gtk.Image.from_pixbuf(pixbuf.scale_simple(targetWidth, targetHeight, Gdk.InterpType.BILINEAR));
-                thisButton.set_label("");
-                thisButton.set_image(image);
-            }
+            ++this.next_undone_preview;
 
-            this.previews_done = true;
-            return false;
+            if (this.next_undone_preview < this.n_slides)
+                return true;
+            else
+                return false;
         }
 
         public void set_current_button(int b) {
