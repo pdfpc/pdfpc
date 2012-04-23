@@ -358,7 +358,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             
             this.add( fullLayout );
 
-            this.overview = new Overview( this.metadata, this.presentation_controller );
+            this.overview = new Overview( this.metadata, this.presentation_controller, this );
             this.overview.no_show_all = true;
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
             this.fullLayout.pack_start( this.overview, true, true, 0 );
@@ -392,12 +392,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Update the slide count view
          */
         protected void update_slide_count() {
-            this.slide_progress.set_text( 
-                "%d/%u".printf( 
+            this.custom_slide_count(
                     this.presentation_controller.get_current_user_slide_number() + 1, 
                     this.presentation_controller.get_end_user_slide()
-                )        
             );
+        }
+
+        public void custom_slide_count(int current, int total) {
+            this.slide_progress.set_text( "%d/%u".printf(current, total) );
         }
 
         /**
@@ -536,6 +538,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void show_overview() {
             this.slideViews.hide();
             this.overview.show();
+            this.overview.set_current_button(this.presentation_controller.get_current_user_slide_number());
         }
 
         /** 
@@ -622,10 +625,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected Renderer.Cache.Base? cache = null;
 
         protected PresentationController presentation_controller;
+        protected Presenter presenter;
 
-        public Overview( Metadata.Pdf metadata, PresentationController presentation_controller ) {
+        public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
+            this.presenter = presenter;
         }
 
         public override void show() {
@@ -633,7 +638,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.shown = true;
 
             if (!this.structure_done) {
-                stdout.printf("build structure\n");
                 this.dimension = (int)Math.ceil(Math.sqrt(this.n_slides));
                 base.resize(this.dimension, this.dimension);
                 int currentButton = 0;
@@ -647,8 +651,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     }
                 }
                 this.structure_done = true;
-            } else {
-                stdout.printf("structure already done\n");
             }
             GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
         }
@@ -684,11 +686,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         protected bool fill_previews() {
-            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides) {
-                stdout.printf("fill_previews() skipped\n");
+            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides)
                 return false;
-            }
-            stdout.printf("fill_previews() *NOT* skipped\n");
             // We get the dimensions from the first button and first slide,
             // should be the same for all
 
@@ -711,6 +710,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             button[this.currently_selected].unset_current();
             button[b].set_current();
             this.currently_selected = b;
+            this.presenter.custom_slide_count(this.currently_selected+1, (int)this.n_slides);
         }
     }
 
@@ -752,5 +752,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.modify_bg(StateType.NORMAL, this.black);
             this.modify_bg(StateType.PRELIGHT, this.black);
         }
+
     }
 }
