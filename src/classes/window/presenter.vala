@@ -358,9 +358,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             
             this.add( fullLayout );
 
-            this.overview = new Overview();
+            this.overview = new Overview( this.metadata );
             this.overview.no_show_all = true;
-            this.overview.set_n_slides(22);
+            this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
             this.fullLayout.pack_start( this.overview, true, true, 0 );
         }
 
@@ -596,15 +596,18 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     public class Overview: Gtk.Table {
         private Gtk.Button[] button;
 
-        Pango.FontDescription font;
+        protected Pango.FontDescription font;
 
         protected Color black;
         protected Color white;
         protected Color yellow;
 
+        protected Metadata.Pdf metadata;
+
         uint n_slides = 0;
 
-        public Overview() {
+        public Overview( Metadata.Pdf metadata ) {
+            this.metadata = metadata;
             this.font = Pango.FontDescription.from_string( "Verdana" );
             this.font.set_size( 20 * Pango.SCALE );
             Color.parse( "black", out this.black );
@@ -620,10 +623,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             for (int r = 0; currentButton < n && r < rows; ++r) {
                 for (int c = 0; currentButton < n && c < rows; ++c) {
                     var newButton = new Gtk.Button();
-                    newButton.modify_font(this.font);
                     newButton.set_label("%d".printf(currentButton + 1));
-                    //var buttonLabel = newButton.get_children().first();
-                    //buttonLabel.modify_fg(StateType.NORMAL, this.white);
+                    var buttonLabel = newButton.get_children().nth_data(0);
+                    buttonLabel.modify_font(this.font);
+                    buttonLabel.modify_fg(StateType.NORMAL, this.white);
                     newButton.modify_bg(StateType.NORMAL, this.black);
                     newButton.modify_bg(StateType.PRELIGHT, this.yellow);
                     newButton.modify_bg(StateType.ACTIVE, this.yellow);
@@ -652,10 +655,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             //targetWidth = (int)Math.round(pixmapWidth * scaling_factor);
             //targetHeight = (int)Math.round(pixmapWidth * scaling_factor);
 
-            for ( uint i = 0; i < n_slides; ++i ) {
+            for ( int i = 0; i < n_slides; ++i ) {
                 var thisButton = button[i];
                 var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmapWidth, pixmapHeight);
-                Gdk.pixbuf_get_from_drawable(pixbuf, cache.retrieve(i), null, 0, 0, 0, 0, pixmapWidth, pixmapHeight);
+                Gdk.pixbuf_get_from_drawable(pixbuf, cache.retrieve(metadata.user_slide_to_real_slide(i)), null, 0, 0, 0, 0, pixmapWidth, pixmapHeight);
                 var image = new Gtk.Image.from_pixbuf(pixbuf.scale_simple(targetWidth, targetHeight, Gdk.InterpType.BILINEAR));
                 thisButton.set_label("");
                 thisButton.set_image(image);
