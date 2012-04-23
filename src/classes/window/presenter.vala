@@ -358,7 +358,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             
             this.add( fullLayout );
 
-            this.overview = new Overview( this.metadata );
+            this.overview = new Overview( this.metadata, this.presentation_controller );
             this.overview.no_show_all = true;
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
             this.fullLayout.pack_start( this.overview, true, true, 0 );
@@ -408,6 +408,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         public void update() {
+            if (this.overview != null) {
+                this.overview.hide();
+                this.slideViews.show();
+            }
             int current_slide_number = this.presentation_controller.get_current_slide_number();
             int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
             try {
@@ -559,7 +563,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public void prerender_finished() {
             this.prerender_progress.hide();
-            this.overview.fill(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
+            this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
     
         /**
@@ -594,56 +598,83 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     }
 
     public class Overview: Gtk.Table {
-        private Gtk.Button[] button;
-
-        protected Pango.FontDescription font;
-
-        protected Color black;
-        protected Color white;
-        protected Color yellow;
+        private OverviewButton[] button;
 
         protected Metadata.Pdf metadata;
 
-        uint n_slides = 0;
+        protected uint n_slides = 0;
 
-        public Overview( Metadata.Pdf metadata ) {
+        protected uint dimension = 0;
+
+        protected int currently_selected = 0;
+
+        protected bool shown = false;
+
+        protected bool structure_done = false;
+        protected bool previews_done = false;
+
+        protected Renderer.Cache.Base? cache = null;
+
+        protected PresentationController presentation_controller;
+
+        public Overview( Metadata.Pdf metadata, PresentationController presentation_controller ) {
             this.metadata = metadata;
-            this.font = Pango.FontDescription.from_string( "Verdana" );
-            this.font.set_size( 20 * Pango.SCALE );
-            Color.parse( "black", out this.black );
-            Color.parse( "white", out this.white );
-            Color.parse( "yellow", out this.yellow );
+            this.presentation_controller = presentation_controller;
+        }
+
+        public override void show() {
+            base.show();
+            this.shown = true;
+
+            if (!this.structure_done) {
+                stdout.printf("build structure\n");
+                this.dimension = (int)Math.ceil(Math.sqrt(this.n_slides));
+                base.resize(this.dimension, this.dimension);
+                int currentButton = 0;
+                for (int r = 0; currentButton < this.n_slides && r < this.dimension; ++r) {
+                    for (int c = 0; currentButton < this.n_slides && c < this.dimension; ++c) {
+                        var newButton = new OverviewButton(currentButton, this, this.presentation_controller);
+                        newButton.show();
+                        base.attach_defaults(newButton, c, c+1, r, r+1);
+                        this.button += newButton;
+                        ++currentButton;
+                    }
+                }
+                this.structure_done = true;
+                this.realize();
+            } else {
+                stdout.printf("structure already done\n");
+            }
+            GLib.Idle.add(this.fill_previews);
+        }
+
+        public override void hide() {
+            base.hide();
+            this.shown = false;
+        }
+
+        public void set_cache(Renderer.Cache.Base cache) {
+            this.cache = cache;
+            if (this.shown)
+                GLib.Idle.add(this.fill_previews);
         }
         
         public void set_n_slides(uint n) {
             this.n_slides = n;
-            int rows = (int)Math.ceil(Math.sqrt(n));
-            base.resize(rows, rows);
-            int currentButton = 0;
-            for (int r = 0; currentButton < n && r < rows; ++r) {
-                for (int c = 0; currentButton < n && c < rows; ++c) {
-                    var newButton = new Gtk.Button();
-                    newButton.set_label("%d".printf(currentButton + 1));
-                    var buttonLabel = newButton.get_children().nth_data(0);
-                    buttonLabel.modify_font(this.font);
-                    buttonLabel.modify_fg(StateType.NORMAL, this.white);
-                    newButton.modify_bg(StateType.NORMAL, this.black);
-                    newButton.modify_bg(StateType.PRELIGHT, this.yellow);
-                    newButton.modify_bg(StateType.ACTIVE, this.yellow);
-                    newButton.show();
-                    base.attach_defaults(newButton, c, c+1, r, r+1);
-                    button += newButton;
-                    ++currentButton;
-                }
-            }
         }
 
-        public void fill(Renderer.Cache.Base cache) {
-            // We get the dimensions from the first button and first slide, should be the same for all
-            int buttonWidth = button[0].allocation.width;
-            int buttonHeight = button[0].allocation.height;
+        protected bool fill_previews() {
+            if (this.cache == null || !this.shown || this.previews_done) {
+                stdout.printf("fill_previews() skipped\n");
+                return false;
+            }
+            stdout.printf("fill_previews() *NOT* skipped\n");
+            // We get the dimensions from the first button and first slide,
+            // should be the same for all
+            int buttonWidth = this.button[0].allocation.width;
+            int buttonHeight = this.button[0].allocation.height;
             int pixmapWidth, pixmapHeight;
-            cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
+            this.cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
 
             int targetWidth, targetHeight;
             Scaler scaler = new Scaler(pixmapWidth, pixmapHeight);
@@ -651,18 +682,63 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             targetWidth = rect.width;
             targetHeight = rect.height;
 
-            //double scaling_factor = Math.fmin((double)buttonWidth/pixmapWidth, (double)buttonHeight/pixmapHeight);
-            //targetWidth = (int)Math.round(pixmapWidth * scaling_factor);
-            //targetHeight = (int)Math.round(pixmapWidth * scaling_factor);
-
             for ( int i = 0; i < n_slides; ++i ) {
                 var thisButton = button[i];
                 var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmapWidth, pixmapHeight);
-                Gdk.pixbuf_get_from_drawable(pixbuf, cache.retrieve(metadata.user_slide_to_real_slide(i)), null, 0, 0, 0, 0, pixmapWidth, pixmapHeight);
+                Gdk.pixbuf_get_from_drawable(pixbuf, this.cache.retrieve(metadata.user_slide_to_real_slide(i)), null, 0, 0, 0, 0, pixmapWidth, pixmapHeight);
                 var image = new Gtk.Image.from_pixbuf(pixbuf.scale_simple(targetWidth, targetHeight, Gdk.InterpType.BILINEAR));
                 thisButton.set_label("");
                 thisButton.set_image(image);
             }
+
+            this.previews_done = true;
+            return false;
+        }
+
+        public void set_current_button(int b) {
+            button[this.currently_selected].unset_current();
+            button[b].set_current();
+            this.currently_selected = b;
+        }
+    }
+
+    public class OverviewButton : Gtk.Button {
+        protected Color black;
+        protected Color white;
+        protected Color yellow;
+
+        protected int id;
+
+        public OverviewButton(int id, Overview overview, PresentationController presentation_controller) {
+            this.id = id;
+
+            Color.parse( "black", out this.black );
+            Color.parse( "white", out this.white );
+            Color.parse( "yellow", out this.yellow );
+            var font = Pango.FontDescription.from_string( "Verdana" );
+            font.set_size( 20 * Pango.SCALE );
+
+            this.set_label("%d".printf(this.id + 1));
+            var buttonLabel = this.get_children().nth_data(0);
+            buttonLabel.modify_font(font);
+            buttonLabel.modify_fg(StateType.NORMAL, this.white);
+            buttonLabel.modify_fg(StateType.PRELIGHT, this.white);
+            this.modify_bg(StateType.NORMAL, this.black);
+            this.modify_bg(StateType.PRELIGHT, this.black);
+            this.modify_bg(StateType.ACTIVE, this.black);
+
+            this.enter.connect(() => overview.set_current_button(id));
+            this.clicked.connect(() => presentation_controller.goto_user_page(this.id + 1));
+        } 
+
+        public void set_current() {
+            this.modify_bg(StateType.NORMAL, this.yellow);
+            this.modify_bg(StateType.PRELIGHT, this.yellow);
+        }
+
+        public void unset_current() {
+            this.modify_bg(StateType.NORMAL, this.black);
+            this.modify_bg(StateType.PRELIGHT, this.black);
         }
     }
 }
