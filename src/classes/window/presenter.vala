@@ -633,7 +633,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.shown = true;
 
             if (!this.structure_done) {
-                stdout.printf("build structure\n");
                 this.dimension = (int)Math.ceil(Math.sqrt(this.n_slides));
                 base.resize(this.dimension, this.dimension);
                 int currentButton = 0;
@@ -647,8 +646,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     }
                 }
                 this.structure_done = true;
-            } else {
-                stdout.printf("structure already done\n");
             }
             GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
         }
@@ -684,11 +681,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         protected bool fill_previews() {
-            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides) {
-                stdout.printf("fill_previews() skipped\n");
+            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides)
                 return false;
-            }
-            stdout.printf("fill_previews() *NOT* skipped\n");
             // We get the dimensions from the first button and first slide,
             // should be the same for all
 
