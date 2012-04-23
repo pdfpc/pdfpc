@@ -347,7 +347,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 for ( int i=user_slide_number+1; i<l; ++i)
                     new_indexes[i-1] = this.user_view_indexes[i];
                 this.user_view_indexes = new_indexes;
-                if ( this.end_user_slide >= 0 )
+                if ( this.end_user_slide >= 0 && user_slide_number < this.end_user_slide )
                     --this.end_user_slide;
                 offset = -1;
             } else { // Deactivate skip
@@ -358,7 +358,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 for ( int i=user_slide_number+1; i<l; ++i)
                     new_indexes[i+1] = this.user_view_indexes[i];
                 this.user_view_indexes = new_indexes;
-                if ( this.end_user_slide >= 0 )
+                if ( this.end_user_slide >= 0 && user_slide_number < this.end_user_slide )
                     ++this.end_user_slide;
                 offset = +1;
             }
