@@ -99,7 +99,7 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
             try {
                 var file = File.new_for_uri(this.pdfpc_url);
                 uint8[] raw_datau8;
-                file.load_contents(null, out raw_datau8);
+                file.load_contents(null, out raw_datau8, null);
                 string[] lines = ((string) raw_datau8).split("\n");
                 ParseState state = ParseState.NOTHING;
                 for (int i=0; i < lines.length; ++i) {

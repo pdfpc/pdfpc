@@ -68,7 +68,8 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
         /**
          * Poppler.LinkMappings of the current page
          */
-        protected unowned GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
+        //protected unowned GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
+        protected GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
 
         /**
          * Precalculated Gdk.Rectangles for every link mapping
@@ -131,7 +132,8 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
                             MutexLocks.poppler.lock();
                             var metadata = this.target.get_renderer().get_metadata() as Metadata.Pdf;
                             var document = metadata.get_document();
-                            unowned Poppler.Dest destination = document.find_dest( 
+                            //unowned Poppler.Dest destination;
+                            Poppler.Dest destination = document.find_dest( 
                                 action.dest.named_dest
                             );
                             MutexLocks.poppler.unlock();
