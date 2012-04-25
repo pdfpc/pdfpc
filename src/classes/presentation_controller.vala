@@ -102,7 +102,24 @@ namespace org.westhoffswelt.pdfpresenter {
          * https://bugzilla.gnome.org/show_bug.cgi?id=551184
          *
          */
+        enum KeyMappings {
+            Normal,
+            Overview
+        }
+
+        KeyMappings current_key_mapping = KeyMappings.Normal;
+
         public bool key_press( Gdk.EventKey key ) {
+            switch (current_key_mapping) {
+                case KeyMappings.Normal:
+                    return key_press_normal(key);
+                case KeyMappings.Overview:
+                    return key_press_overview(key);
+            }
+            return true;
+        }
+
+        protected bool key_press_normal( Gdk.EventKey key ) {
             if ( !ignore_input_events ) {
                 switch( key.keyval ) {
                     case 0xff0d: /* Return */
@@ -174,6 +191,61 @@ namespace org.westhoffswelt.pdfpresenter {
             } else {
                 return false;
             }
+        }
+
+        /**
+         * Handle key presses when in overview mode
+         *
+         * This is a subset of the keybindings above
+         */
+        protected bool key_press_overview( Gdk.EventKey key ) {
+            bool handled = false;
+            switch( key.keyval ) {
+                case 0xff1b: /* Escape */
+                case 0x071:  /* q */
+                    this.metadata.save_to_disk();
+                    Gtk.main_quit();
+                    handled = true;
+                break;
+                case 0x072: /* r */
+                    this.controllables_reset();
+                    handled = true;
+                break;
+                case 0x062: /* b */
+                    this.fade_to_black();
+                    handled = true;
+                break;
+                case 0x067: /* g */
+                    this.controllables_ask_goto_page();
+                    handled = true;
+                break;
+                case 0x066: /* f */
+                    this.toggle_freeze();
+                    handled = true;
+                break;
+                case 0x06f: /* o */
+                    this.toggle_skip();
+                    handled = true;
+                break;
+                case 0x073: /* s */
+                    this.start();
+                    handled = true;
+                break;
+                case 0x070: /* p */
+                case 0xff13: /* pause */
+                    this.toggle_pause();
+                    handled = true;
+                break;
+                case 0x065: /* e */
+                    this.set_end_user_slide();
+                    handled = true;
+                break;
+                case 0xff09:
+                    this.controllables_hide_overview();
+                    handled = true;
+                break;
+            }
+            return handled;
         }
 
         /**
@@ -425,6 +497,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Goto a slide in user page numbers
          */
         public void goto_user_page(int page_number) {
+            this.controllables_hide_overview();
             int destination = page_number-1;
             int n_user_slides = this.metadata.get_user_slide_count();
             if (page_number < 1)
@@ -435,6 +508,7 @@ namespace org.westhoffswelt.pdfpresenter {
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             if (!this.frozen)
                 this.faded_to_black = false;
+            this.set_ignore_input_events( false );
             this.controllables_update();
         }
 
@@ -457,8 +531,15 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         protected void controllables_show_overview() {
+            this.current_key_mapping = this.KeyMappings.Overview;
             foreach( Controllable c in this.controllables )
                 c.show_overview();
+        }
+
+        protected void controllables_hide_overview() {
+            this.current_key_mapping = this.KeyMappings.Normal;
+            foreach( Controllable c in this.controllables )
+                c.hide_overview();
         }
 
         /**

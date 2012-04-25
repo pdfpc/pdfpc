@@ -541,6 +541,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.overview.set_current_button(this.presentation_controller.get_current_user_slide_number());
         }
 
+        public void hide_overview() {
+            this.overview.hide();
+            this.slideViews.show();
+        }
+
         /** 
          * Take a cache observer and register it with all prerendering Views
          * shown on the window.
@@ -605,9 +610,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         protected Metadata.Pdf metadata;
 
-        protected uint n_slides = 0;
+        protected int n_slides = 0;
 
-        protected uint dimension = 0;
+        protected int dimension = 0;
         protected int buttonWidth;
         protected int buttonHeight;
         protected int pixmapWidth;
@@ -631,6 +636,59 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
+
+            this.add_events(EventMask.KEY_PRESS_MASK);
+            this.key_press_event.connect( this.on_key_press );
+        }
+
+        public bool on_key_press(Gtk.Widget source, EventKey key) {
+            bool handled = false;
+            switch ( key.keyval ) {
+                case 0xff53: /* Cursor right */
+                    if ( this.currently_selected % this.dimension != this.dimension-1 &&
+                         this.currently_selected < this.n_slides - 1 )
+                        this.set_current_button( this.currently_selected + 1 );
+                    handled = true;
+                    break;
+                case 0xff51: /* Cursor left */
+                    if ( this.currently_selected % this.dimension != 0 )
+                        this.set_current_button( this.currently_selected - 1 );
+                    handled = true;
+                    break;
+                case 0xff55: /* Page Up */
+                    if ( this.currently_selected > 0)
+                        this.set_current_button( this.currently_selected - 1 );
+                    handled = true;
+                    break;
+                case 0xff56: /* Page down */
+                    if ( this.currently_selected < this.n_slides - 1 )
+                        this.set_current_button( this.currently_selected + 1 );
+                    handled = true;
+                    break;
+                case 0xff52: /* Cursor up */
+                    if ( this.currently_selected >= this.dimension )
+                        this.set_current_button( this.currently_selected - this.dimension );
+                    handled = true;
+                    break;
+                case 0xff54: /* Cursor down */
+                    if ( this.currently_selected <= this.n_slides - 1 - this.dimension )
+                        this.set_current_button( this.currently_selected + this.dimension );
+                    handled = true;
+                    break;
+                case 0xff50: /* Home */
+                    this.set_current_button( 0 );
+                    handled = true;
+                    break;
+                case 0xff57: /* End */
+                    this.set_current_button( this.n_slides - 1 );
+                    handled = true;
+                    break;
+                case 0xff0d: /* Return */
+                    this.presentation_controller.goto_user_page(this.currently_selected + 1);
+                    break;
+            }
+                    
+            return handled;
         }
 
         public override void show() {
@@ -681,7 +739,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
         }
         
-        public void set_n_slides(uint n) {
+        public void set_n_slides(int n) {
             this.n_slides = n;
         }
 

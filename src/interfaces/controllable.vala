@@ -66,5 +66,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * Show an overview of all slides
          */
         public abstract void show_overview();
+
+        /**
+         * Hide the overview
+         */
+        public abstract void hide_overview();
     }
 }
