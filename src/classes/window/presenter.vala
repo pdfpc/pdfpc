@@ -773,20 +773,23 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     }
 
     public class OverviewButton : Gtk.Button {
-        protected Color black;
-        protected Color white;
-        protected Color yellow;
+        protected static Color? black = null;
+        protected static Color? white = null;
+        protected static Color? yellow = null;
+        protected static Pango.FontDescription? font = null;
 
         protected int id;
 
         public OverviewButton(int id, Overview overview, PresentationController presentation_controller) {
             this.id = id;
 
-            Color.parse( "black", out this.black );
-            Color.parse( "white", out this.white );
-            Color.parse( "yellow", out this.yellow );
-            var font = Pango.FontDescription.from_string( "Verdana" );
-            font.set_size( 20 * Pango.SCALE );
+            if ( this.black == null ) {
+                Color.parse( "black", out this.black );
+                Color.parse( "white", out this.white );
+                Color.parse( "yellow", out this.yellow );
+                font = Pango.FontDescription.from_string( "Verdana" );
+                font.set_size( 20 * Pango.SCALE );
+            }
 
             this.set_label("%d".printf(this.id + 1));
             var buttonLabel = this.get_children().nth_data(0);
