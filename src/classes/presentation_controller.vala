@@ -556,6 +556,11 @@ namespace org.westhoffswelt.pdfpresenter {
 
         protected void controllables_hide_overview() {
             this.current_key_mapping = this.KeyMappings.Normal;
+            // It may happen that in overview mode, the number of (user) slides
+            // has changed due to overlay changes. We may need to correct our
+            // position
+            if (this.current_user_slide_number >= this.get_user_n_slides())
+                this.goto_last();
             this.controllables_update();
         }
 
