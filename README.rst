@@ -207,6 +207,8 @@ and interpreted:
     - Go back to the first slide
 - End
     - Jump to the last slide
+- Tab
+    - Toggle overview mode
 - g
     - Input a slide number to jump to
 - Escape / q
@@ -258,6 +260,14 @@ working, i.e. you are not able to change slides.
 
 The notes are stored in the given file in a plain text format, easy to edit
 also from outside the program. See the section about the pdfpc format below.
+
+Overview mode
+-------------
+
+Pressing tab you can enter the overview mode, where miniatures for the slides
+are shown. You can select one slide to jump to with the mouse or with the arrow
+keys. You can also define overlays and the end slide (see next sections) in
+this mode.
 
 Overlays
 --------
