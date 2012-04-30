@@ -98,15 +98,15 @@ GENERATE_VAPI
 	presenter
 )
 
-add_executable(pdf_presenter_console
+add_executable(pdfpc
   	${VALA_C}
 )
 
 # explicitly add libraries (needed e.g. for Fedora 13+)
-target_link_libraries(pdf_presenter_console -lm)
+target_link_libraries(pdfpc -lm)
 
 install(TARGETS 
-	pdf_presenter_console
+	pdfpc
 RUNTIME
 DESTINATION
 	bin

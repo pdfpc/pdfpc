@@ -1,4 +1,4 @@
-project("pdf-presenter-console" C)
+project("pdfpc" C)
 cmake_minimum_required(VERSION 2.6)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Vala_CMake/vala)
@@ -7,7 +7,7 @@ include(ValaVersion)
 
 find_package(Vala)
 
-ensure_vala_version("0.11.0" MINIMUM)
+ensure_vala_version("0.16.0" MINIMUM)
 
 add_subdirectory(src)
 add_subdirectory(icons)
