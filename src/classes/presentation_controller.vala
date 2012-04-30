@@ -77,6 +77,12 @@ namespace org.westhoffswelt.pdfpresenter {
         protected Metadata.Pdf metadata;
 
         /**
+         * The presenters overview. We need to communicate with it for toggling
+         * skips
+         */
+        protected Window.Overview overview;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
@@ -89,6 +95,10 @@ namespace org.westhoffswelt.pdfpresenter {
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
+        }
+
+        public void set_overview(Window.Overview o) {
+            this.overview = o;
         }
 
         /**
@@ -224,7 +234,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     handled = true;
                 break;
                 case 0x06f: /* o */
-                    this.toggle_skip();
+                    this.toggle_skip_overview();
                     handled = true;
                 break;
                 case 0x073: /* s */
@@ -237,7 +247,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     handled = true;
                 break;
                 case 0x065: /* e */
-                    this.set_end_user_slide();
+                    this.set_end_user_slide_overview();
                     handled = true;
                 break;
                 case 0xff09:
@@ -326,6 +336,14 @@ namespace org.westhoffswelt.pdfpresenter {
         public void set_end_user_slide() {
             this.metadata.set_end_user_slide(this.current_user_slide_number + 1);
             this.controllables_update();
+        }
+
+        /**
+         * Set the last slide as defined by the user
+         */
+        public void set_end_user_slide_overview() {
+            int user_selected = this.overview.get_current_button();
+            this.metadata.set_end_user_slide(user_selected + 1);
         }
 
         /**
@@ -538,8 +556,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
         protected void controllables_hide_overview() {
             this.current_key_mapping = this.KeyMappings.Normal;
-            foreach( Controllable c in this.controllables )
-                c.hide_overview();
+            this.controllables_update();
         }
 
         /**
@@ -597,7 +614,18 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected void toggle_skip() {
             this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
+            this.overview.set_n_slides(this.get_user_n_slides());
             this.controllables_update();
+        }
+
+        /**
+         * Toggle skip for current slide in overview mode
+         */
+        protected void toggle_skip_overview() {
+            int user_selected = this.overview.get_current_button();
+            int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
+            this.metadata.toggle_skip( slide_number, user_selected );
+            this.overview.set_n_slides( this.get_user_n_slides() );
         }
 
         /**

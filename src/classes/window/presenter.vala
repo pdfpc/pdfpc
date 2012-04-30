@@ -362,6 +362,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.overview.no_show_all = true;
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
             this.fullLayout.pack_start( this.overview, true, true, 0 );
+            this.presentation_controller.set_overview(this.overview);
         }
 
         /**
@@ -694,7 +695,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public override void show() {
             base.show();
             this.shown = true;
+            this.fill_structure();
+        }
 
+        protected void fill_structure() {
             if (!this.structure_done) {
                 this.dimension = (int)Math.ceil(Math.sqrt(this.n_slides));
                 base.resize(this.dimension, this.dimension);
@@ -740,7 +744,24 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
         
         public void set_n_slides(int n) {
-            this.n_slides = n;
+            if ( n != this.n_slides ) {
+                this.invalidate();
+                this.n_slides = n;
+                if ( this.shown ) {
+                    this.fill_structure();
+                    if ( this.currently_selected >= this.n_slides )
+                        this.currently_selected = this.n_slides - 1;
+                    this.set_current_button(this.currently_selected);
+                }
+            }
+        }
+
+        protected void invalidate() {
+            for (int b = 0; b < button.length; ++b)
+                this.remove(button[b]);
+            button.resize(0);
+            this.structure_done = false;
+            this.next_undone_preview = 0;
         }
 
         protected bool fill_previews() {
@@ -769,6 +790,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             button[b].set_current();
             this.currently_selected = b;
             this.presenter.custom_slide_count(this.currently_selected+1, (int)this.n_slides);
+        }
+
+        public int get_current_button() {
+            return this.currently_selected;
         }
     }
 
