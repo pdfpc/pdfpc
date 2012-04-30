@@ -69,7 +69,7 @@ namespace org.westhoffswelt.pdfpresenter {
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
             { "black-on-end", 'b', 0, 0, ref Options.black_on_end, "Add an additional black slide at the end of the presentation", null },
-            { "single-screen", 'S', 0, OptionArg.INT, ref Options.single_screen, "Force to use only one screen", "S" },
+            { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", "S" },
             { null }
         };
 
@@ -150,38 +150,28 @@ namespace org.westhoffswelt.pdfpresenter {
             this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
 
-            int presenter_monitor, presentation_monitor;
-            if ( Options.display_switch != true ) {
-                presenter_monitor    = 0;
-                presentation_monitor = 1;
-            }
-            else {
-                presenter_monitor    = 1;
-                presentation_monitor = 0;
-            }
 
-            if ( Options.single_screen == 100 && Gdk.Screen.get_default().get_n_monitors() > 1 ) {
+            var screen = Gdk.Screen.get_default();
+            if ( !Options.single_screen && screen.get_n_monitors() > 1 ) {
+                int presenter_monitor, presentation_monitor;
+                if ( Options.display_switch != true )
+                    presenter_monitor    = screen.get_primary_monitor();
+                else
+                    presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
+                presentation_monitor = (presenter_monitor + 1) % 2;
                 this.presentation_window = 
                     this.create_presentation_window( metadata, presentation_monitor );
                 this.presenter_window = 
                     this.create_presenter_window( metadata, presenter_monitor );
             }
             else {
-                stdout.printf( "Only one screen detected falling back to simple presentation mode.\n" );
-                int monitor = 0;
-                if ( Options.single_screen < 100)
-                    monitor = Options.single_screen;
-                // Decide which window to display by indirectly examining the
-                // display_switch flag This allows for training sessions with
-                // one monitor displaying the presenter screen
-                if ( presenter_monitor == monitor ) {
-                    this.presentation_window = 
-                        this.create_presentation_window( metadata, monitor );
-                }
-                else {
+                stdout.printf( "Using only one screen" );
+                if ( !Options.display_switch)
                     this.presenter_window = 
-                        this.create_presenter_window( metadata, monitor );
-                }
+                        this.create_presenter_window( metadata, -1 );
+                else
+                    this.presentation_window = 
+                        this.create_presentation_window( metadata, -1 );
             }
 
             // The windows are always displayed at last to be sure all caches have

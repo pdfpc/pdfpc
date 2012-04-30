@@ -54,9 +54,21 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected bool frozen = false;
 
         public Fullscreen( int screen_num ) {
-            var screen = Screen.get_default();
-            screen.get_monitor_geometry( screen_num, out this.screen_geometry );
+            Gdk.Screen screen;
 
+            if ( screen_num >= 0 ) {
+                // Start in the given monitor
+                screen = Screen.get_default();
+                screen.get_monitor_geometry( screen_num, out this.screen_geometry );
+            } else {
+                // Start in the monitor the cursor is in
+                var display = Gdk.Display.get_default();
+                int pointerx, pointery;
+                display.get_pointer(out screen, out pointerx, out pointery, null);
+                int current_screen = screen.get_monitor_at_point(pointerx, pointery);
+                screen.get_monitor_geometry( current_screen, out this.screen_geometry );
+            }
+                
             // Move to the correct monitor
             // This movement is done here and after mapping, to minimize flickering
             // with window managers, which correctly handle the movement command,
