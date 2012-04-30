@@ -62,6 +62,7 @@ set(VALA_SRC
 	classes/view/behaviour/pdf_link/implementation.vala
 	classes/view/behaviour/pdf_link/signal_provider.vala
 	classes/window/fullscreen.vala
+	classes/window/overview.vala
 	classes/window/presentation.vala
 	classes/window/presenter.vala
 	interfaces/renderer/caching.vala
