@@ -1,0 +1,304 @@
+.TH  pdfpc "1" "May 2012" 
+
+.SH NAME
+pdfpc \- pdf presentater console with multi-monitor support
+
+.SH SYNOPSIS
+.B pdfpc
+[options] PDF-file
+
+.SH DESCRIPTION
+.PP
+pdfpc is a GTK based presentation viewer application which uses Keynote
+like multi-monitor output to provide meta information to the speaker
+during the presentation.
+It is able to show a normal presentation window on one screen, while
+showing a more sophisticated overview on the other one providing
+information like a picture of the next slide, as well as the left over
+time till the end of the presentation.
+The input files processed by pdfpc are PDF documents, which can be
+created using nearly any of today\[aq]s presentation software.
+.PP
+To run pdfppc, simply type
+.RS
+.PP
+pdfpc file.pdf
+.RE
+.PP
+By default the presenter view appears in the primary monitor and the
+presentation view in the second monitor (provided you have two
+monitors).
+If you want to swith displays, start with the -s option (see below).
+
+.SH OPTIONS
+.TP
+.BI "\-d, \-\-duration"
+Duration in minutes of the presentation used for timer display. If not given or
+if a value of 0 is specified, the clock just measures the time in the
+presentation.
+.TP
+.BI "\-l, \-\-last-minutes"=N
+Time in minutes, from which on the timer changes its color. (Default 5 minutes)
+.TP
+.BI "\-u, \-\-current-size"=N
+Percentage of the presenter screen to be used for the current slide.  (Default 60)
+.TP
+.BI "\-s, \-\-switch-screens"
+Switch the presentation and the presenter screen.
+.TP
+.BI "\-c, \-\-disable-cache"
+Disable caching and pre-rendering of slides to save memory at the cost of speed.
+.TP
+.BI "\-z, \-\-disable-compression"
+Disable the compression of slide images to trade memory consumption for speed.
+(Avg.  factor 30)
+.TP
+.BI "\-b, \-\-black-on-end"
+Add an additional black slide at the end of the presentation
+.TP
+.BI "\-S, \-\-single-screen"
+Force to use only one screen
+.TP
+.BI "\-h, \-\-help"
+Shows the help
+
+.SH KEYBINDINGS
+During the presentation following key strokes and mouse clicks are supported:
+.TP
+.B Right cursor key / Page down / Return / Space / Left mouse button
+Go forward one slide
+.TP
+.B Shift + Right cursor key / Page down / Return / Space / Left mouse button
+Go forward 10 slides
+.TP
+.B Down cursor key
+Go forward one user slide (see section about overlays below)
+.TP
+.B Left cursor key / Page up / Right mouse button
+Go back one slide
+.TP
+.B Shift + Left cursor key / Page up / Right mouse button
+Go back 10 slides
+.TP
+.B Up cursor key
+Go back one "user slide" (see section about overlays below)
+.TP
+.B Home
+Go to the first slide
+.TP
+.B End
+Go to the last slide
+.TP
+.B Tab
+Toggle overview mode
+.TP
+.B g
+Input a slide number to jump to
+.TP
+.B Escape / q
+Exit pdfpc
+.TP
+.B b
+Turn off the presentation view (i.e.  fill it with a black color)
+.TP
+.B n
+Edit note for current slide
+.TP
+.B f
+Freeze the current presentation display (the presenter display is still
+fully active)
+.TP
+.B o
+Toggle the overlay flag for one particular slide (see Overlays
+below)
+.TP
+.B p
+Pause timer
+.TP
+.B r
+Reset presentation (reset timer and go back to first slide)
+.TP
+.B e
+Define end slide
+
+.SH FEATURES
+
+.SS Caching / Prerendering
+
+To allow fast changes between the different slides of the presentation the pdf
+pages are prerendered to memory.  The progress bar on the bottom of the
+presenter screen indicates how many percent of the slides have been
+pre-rendered already.  During the initial rendering phase this will slow-down
+slide changes, as most cpu power is used for the rendering process in the
+background.  After the cache is fully primed however the changing of slides
+should be much faster, as with normal pdf viewers.
+
+As the prerendering takes a lot of memory it can be disabled using the
+\-\-disable-cache switch at the cost of speed.
+.SS Cache compression
+
+The prerendered and cached slides can be compressed in memory to save up some
+memory.  Without compression a set of about 100 pdf pages can easily grow up to
+about 1.5gb size.  Netbooks with only 1gb of memory would swap themselves to
+death if prerendering is enabled in such a situation.  The compression is
+enabled by default as it does not harm rendering speed in a noticeable way on
+most systems.  It does however slows down prerendering by about a factor of 2.
+If you have got enough memory and want to ensure the fastest possible
+prerendering you can disable slide compression by using the \-z switch. But be
+warned using the uncompressed prerendering storage will use about 30 times the
+memory the new compressed storage utilizes (aka the 1.5gb become about 50mb)
+
+
+.SS Timer
+If a duration is given (-d option), the timer will show a countdown with the
+given parameters.  If no duration is specified (or if a value of 0 is given to
+the -d option), the timer will show how much time has been spent.  The duration
+is stored automatically, so you do not need to repeat it for every invocation.
+
+The timer is started if you are navigating away from the first page for the
+first time.  This feature is quite useful as you may want to show the titlepage
+of your presentation while people are still entering the room and the
+presentation hasn\[aq]t really begun yet.  If you want to start over you can
+use the r key which will make the presenter reset the timer.
+
+If a duration is given, at the moment the timer reaches the defined
+last-minutes value it will change color to indicate your talk is nearing its
+end.  As soon as the timer reaches the zero mark (00:00:00) it will turn red
+and count further down showing a negative time, to provide information on how
+many minutes you are overtime.
+
+.SS Notes
+
+Textual notes can be displayed for each slide.  While in the presentation,
+pressing n will allow you to take notes for the screen.  To go out of editing
+mode, press the Escape key.  Note that while editing a note the keybindings
+stop working, i.e.  you are not able to change slides.
+
+The notes are stored in the given file in a plain text format, easy to edit
+also from outside the program.  See the section about the pdfpc format below.
+
+.SS Overview mode
+
+Pressing tab you can enter the overview mode, where miniatures for the slides
+are shown.  You can select one slide to jump to with the mouse or with the
+arrow keys.  You can also define overlays and the end slide (see next sections)
+in this mode.
+
+.SS Overlays
+
+Many slide preparation systems allow for overlays, i.e.  sets of slides that
+are logically grouped together as a single, changing slide.  Examples include
+enumerations where the single items are displayed one after another or rough
+"animations", where parts of a picture change from slide to slide.  Pdf
+Presenter Console includes facilities for dealing with such overlays.
+
+In this description, we will differentiation between slides (i.e.  pages in the
+pdf document) and "user slides", that are the logical slides.  The standard
+forward movement command (page down, enter, etc.) moves through one slide at a
+time, as expected.  That means that every step in the overlay is traversed.
+The backward movement command works differently depending if the current and
+previous slides are part of an overlay:
+
+.IP \[bu] 2
+If the current slide is part of an overlay we just jump to the previous slide.
+That means that we are in the middle of an overlay we can jump forward and
+backward through the single steps of it
+.IP \[bu] 2
+If the current slide is not part of an overlay (or if it is the first one), but
+the previous slides are, we jump to the previous user slide.  This means that
+when going back in the presentation you do not have to go through every step of
+the overlay, Pdf Presenter Console just shows the first slide of the each
+overlay.  As you normally only go back in a presentation when looking for a
+concrete slide, this is more convenient.
+.PP
+
+The up and down cursor keys work on a user slide basis.
+You can use them to skip the rest of an overlay or to jump to the
+previous user slide, ignoring the state of the current slide.
+
+When going through an overlay, two additional previews may be activated
+in the presenter view, just below the main view, showing the next and
+the previous slide in an overlay.
+
+Pdf Presenter Console tries to find these overlays automatically by looking
+into the page labels in the pdf file.  For LaTeX this works correctly at least
+with the beamer class and also modifying the page numbers manually (compiling
+with pdflatex).  If your preferred slide-producing method does not work
+correctly with this detection, you can supply this information using the o key
+for each slide that is part of an overlay (except the first one!).  The page
+numbering is also adapted.  This information is automatically stored.
+
+.SS End slide
+.PP
+Some people like to have some additional, backup slides after the last
+slide in the actual presentation.
+Things like bibliographic references or slides referring to specialized
+questions are typical examples.
+Pdf Presenter Console lets you define which is the last slide in the
+actual presentation vie the \[aq]e\[aq] key.
+This just changes the progress display in the presenter screen, as to
+have a better overview of how many slides are left.
+.SS pdfpc Files
+.PP
+The notes and other additional information are stored in a file with the
+extension "pdfpc".
+When invoking Pdf Presenter Console with a non pdfpc file, it
+automatically checks if there exists such a file and in this case loads
+the additional information.
+This means that you normally do not have to deal with this kind of files
+explicitly.
+.PP
+There are however cases where you may want to edit the files manually.
+The most typical case is if you add or remove some slides after you have
+edited notes or defined overlays.
+It may be quicker to edit the pdfpc file than to re-enter the whole
+information.
+Future versions may include external tools for dealing with this case
+automatically.
+.PP
+The files are plain-text files that should be fairly self-explanatory.
+A couple of things to note - The slide numbers of the notes refer to
+user slides - The [notes] sections must be the last one in the file -
+For the programmers out there: slide indexes start at 1
+
+.SH MOTIVATION
+
+pdfpc is a fork of pdf-presenter-console, from Jakob Westhoff. He explains his
+motivation for starting it in the first place:
+
+.IP
+The idea to create pdf-presenter-console came up during the IPC 2009 where I saw
+a lot of people running around with their MacBooks using Keynote to present
+their slides.  I always liked the presenter console of Keynote.  Therefore I
+began to research if any solution like this existed for my Linux system.  I came
+across the Sun presenter console for Open-Office Impress, which seemed to do
+exactly what I wanted.  Unfortunately I stopped using Impress for creating
+presentations in favor to Latex Beamer quite some time ago.  Therefore this
+Open-Office plugin was no solution to my problem.  I wanted something flexible
+which would be able to use simple PDF documents as input.  I found some projects
+which were started having the same intentions than I did.  Unfortunately these
+projects did either never reach the implementation phase or they were
+implemented but I did not get them to work properly.
+
+All this brought me to the decision to create a simple presenter console on my
+own.  At this point the Pdf Presenter Console was born.
+.PP
+
+pdfpc extends pdf-presenter-console by adding new features.
+
+.SH BUGS
+
+There may be a small memory leak in the program. I am trying to solve it. It
+should not be too important for up to some hundreds of slides.
+
+Other bugs can be reported at 
+.I https://github.com/davvil/pdfpc/issues
+
+.SH CONTACT
+.PP
+Comments and suggestion are welcome. Write an email to 
+.I davvil@gmail.com
+
+.SH SEE ALSO
+pdfpc is a fork of pdf-presenter console, available at
+.I http://westhoffswelt.de/projects/pdf_presenter_console.html
