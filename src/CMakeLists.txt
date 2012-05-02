@@ -112,6 +112,12 @@ DESTINATION
 	bin
 )
 
+install(FILES
+        pdfpc.1
+DESTINATION
+        share/man/man1
+)
+
 # The tests need a library version of all the pdf_presenter_stuff
 add_library(pdf_presenter_console_test_library 
 	SHARED
