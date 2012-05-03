@@ -29,7 +29,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * An overview of all the slides in the form of a table
      */
-    public class Overview: Gtk.Table {
+    public class Overview: Gtk.EventBox {
+        /**
+         * The underlying table
+         */
+        private Gtk.Table table;
+        private Gtk.ScrolledWindow scrolledWindow;
+
         /**
          * Each slide is represented via a derived class of Gtk.Button (see
          * below). We keep references here (as well as implicitely in the
@@ -113,6 +119,29 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
+
+            this.scrolledWindow = new ScrolledWindow(null, null);
+            this.scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+            this.table = new Gtk.Table(0, 0, false);
+            var tableViewport = new Gtk.Viewport(null, null);
+            tableViewport.add(this.table);
+            this.scrolledWindow.add(tableViewport);
+            //this.scrolledWindow.add_with_viewport(this.table);
+
+            this.add(this.scrolledWindow);
+
+            this.table.show();
+            tableViewport.show();
+            this.scrolledWindow.show();
+
+            Color black;
+            Color.parse("black", out black);
+            //this.table.modify_bg(StateType.NORMAL, black);
+            //this.table.modify_bg(StateType.ACTIVE, black);
+            tableViewport.modify_bg(StateType.NORMAL, black);
+            this.modify_bg(StateType.NORMAL, black);
+            this.scrolledWindow.set_shadow_type(Gtk.ShadowType.NONE);
+
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
@@ -195,13 +224,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected void fill_structure() {
             if (!this.structure_done) {
                 this.dimension = (int)Math.ceil(Math.sqrt(this.n_slides));
-                base.resize(this.dimension, this.dimension);
+                this.table.resize(this.dimension, this.dimension);
                 int currentButton = 0;
                 for (int r = 0; currentButton < this.n_slides && r < this.dimension; ++r) {
                     for (int c = 0; currentButton < this.n_slides && c < this.dimension; ++c) {
                         var newButton = new OverviewButton(currentButton, this, this.presentation_controller);
                         newButton.show();
-                        base.attach_defaults(newButton, c, c+1, r, r+1);
+                        this.table.attach_defaults(newButton, c, c+1, r, r+1);
                         this.button += newButton;
                         ++currentButton;
                     }
@@ -272,7 +301,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected void invalidate() {
             for (int b = 0; b < button.length; ++b)
-                this.remove(button[b]);
+                this.table.remove(button[b]);
             button.resize(0);
             this.structure_done = false;
             this.next_undone_preview = 0;
