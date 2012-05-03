@@ -310,6 +310,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.build_layout();
         }
 
+        public override void show() {
+            base.show();
+            this.overview.setMaxWidth(this.slideViews.allocation.width);
+        }
+
         protected void build_layout() {
             this.slideViews = new HBox(false, 4);
 

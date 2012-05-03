@@ -70,6 +70,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public static uint current_size = 60;
 
         /**
+         * Minimum width for the overview miniatures
+         */
+        public static int min_overview_width = 150;
+
+        /**
          * Time the talk starts at, to calculate and display a countdown to
          * this time.
          */

@@ -29,12 +29,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * An overview of all the slides in the form of a table
      */
-    public class Overview: Gtk.EventBox {
+    public class Overview: Gtk.ScrolledWindow {
         /**
          * The underlying table
          */
         private Gtk.Table table;
-        private Gtk.ScrolledWindow scrolledWindow;
 
         /**
          * Each slide is represented via a derived class of Gtk.Button (see
@@ -57,7 +56,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * The dimension of the table (square)
          */
-        protected int dimension = 0;
+        protected int xdimension = 0;
     
         /**
          * The height and width allocated for each button. Needed for scaling
@@ -115,32 +114,39 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected Presenter presenter;
 
+        double aspectRatio;
+
+        int maxXDimension;
+
         /**
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
 
-            this.scrolledWindow = new ScrolledWindow(null, null);
-            this.scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+            this.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
             this.table = new Gtk.Table(0, 0, false);
             var tableViewport = new Gtk.Viewport(null, null);
             tableViewport.add(this.table);
-            this.scrolledWindow.add(tableViewport);
-            //this.scrolledWindow.add_with_viewport(this.table);
-
-            this.add(this.scrolledWindow);
+            this.add(tableViewport);
 
             this.table.show();
             tableViewport.show();
-            this.scrolledWindow.show();
 
             Color black;
+            Color white;
             Color.parse("black", out black);
+            Color.parse("white", out white);
             //this.table.modify_bg(StateType.NORMAL, black);
             //this.table.modify_bg(StateType.ACTIVE, black);
             tableViewport.modify_bg(StateType.NORMAL, black);
-            this.modify_bg(StateType.NORMAL, black);
-            this.scrolledWindow.set_shadow_type(Gtk.ShadowType.NONE);
+            //this.modify_bg(StateType.NORMAL, black);
+            Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.get_vscrollbar();
+            //this.scrolledWindow.set_shadow_type(Gtk.ShadowType.NONE);
+            vscrollbar.modify_bg(StateType.NORMAL, white);
+            vscrollbar.modify_bg(StateType.ACTIVE, black);
+            vscrollbar.modify_bg(StateType.PRELIGHT, white);
+            //this.scrolledWindow.get_vscrollbar().modify_fg(StateType.NORMAL, black);
+            
 
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
@@ -148,6 +154,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.key_press_event.connect( this.on_key_press );
+
+            this.aspectRatio = this.metadata.get_page_width() / this.metadata.get_page_height();
+        }
+
+        public void setMaxWidth(int width) {
+            this.maxXDimension = (int)Math.floor((width - 20) / Options.min_overview_width);;
         }
 
         /**
@@ -158,13 +170,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             bool handled = false;
             switch ( key.keyval ) {
                 case 0xff53: /* Cursor right */
-                    if ( this.currently_selected % this.dimension != this.dimension-1 &&
+                    if ( this.currently_selected % this.xdimension != this.xdimension-1 &&
                          this.currently_selected < this.n_slides - 1 )
                         this.set_current_button( this.currently_selected + 1 );
                     handled = true;
                     break;
                 case 0xff51: /* Cursor left */
-                    if ( this.currently_selected % this.dimension != 0 )
+                    if ( this.currently_selected % this.xdimension != 0 )
                         this.set_current_button( this.currently_selected - 1 );
                     handled = true;
                     break;
@@ -179,13 +191,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     handled = true;
                     break;
                 case 0xff52: /* Cursor up */
-                    if ( this.currently_selected >= this.dimension )
-                        this.set_current_button( this.currently_selected - this.dimension );
+                    if ( this.currently_selected >= this.xdimension )
+                        this.set_current_button( this.currently_selected - this.xdimension );
                     handled = true;
                     break;
                 case 0xff54: /* Cursor down */
-                    if ( this.currently_selected <= this.n_slides - 1 - this.dimension )
-                        this.set_current_button( this.currently_selected + this.dimension );
+                    if ( this.currently_selected <= this.n_slides - 1 - this.xdimension )
+                        this.set_current_button( this.currently_selected + this.xdimension );
                     handled = true;
                     break;
                 case 0xff50: /* Home */
@@ -223,17 +235,26 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected void fill_structure() {
             if (!this.structure_done) {
-                this.dimension = (int)Math.ceil(Math.sqrt(this.n_slides));
-                this.table.resize(this.dimension, this.dimension);
+                this.xdimension = (int)Math.ceil(Math.sqrt(this.n_slides));
+                int ydimension;
+                if (this.xdimension > this.maxXDimension) {
+                    this.xdimension = this.maxXDimension;
+                    ydimension = (int)Math.ceil(this.n_slides/this.xdimension);
+                } else {
+                    ydimension = this.xdimension;
+                }
+                this.table.resize(this.xdimension, ydimension);
                 int currentButton = 0;
-                for (int r = 0; currentButton < this.n_slides && r < this.dimension; ++r) {
-                    for (int c = 0; currentButton < this.n_slides && c < this.dimension; ++c) {
-                        var newButton = new OverviewButton(currentButton, this, this.presentation_controller);
+                int r = 0;
+                while (currentButton < this.n_slides) {
+                    for (int c = 0; currentButton < this.n_slides && c < this.xdimension; ++c) {
+                        var newButton = new OverviewButton(currentButton, this.aspectRatio, this, this.presentation_controller);
                         newButton.show();
                         this.table.attach_defaults(newButton, c, c+1, r, r+1);
                         this.button += newButton;
                         ++currentButton;
                     }
+                    ++r;
                 }
                 this.structure_done = true;
             }
@@ -374,7 +395,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Constructor: set the id, the formatting and the clicked action
          */
-        public OverviewButton(int id, Overview overview, PresentationController presentation_controller) {
+        public OverviewButton(int id, double aspectRatio, Overview overview, PresentationController presentation_controller) {
             this.id = id;
 
             if ( this.black == null ) {
@@ -393,6 +414,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.modify_bg(StateType.NORMAL, this.black);
             this.modify_bg(StateType.PRELIGHT, this.black);
             this.modify_bg(StateType.ACTIVE, this.black);
+
+            // Set a minumum size for the button
+            this.set_size_request(Options.min_overview_width, (int)Math.round(Options.min_overview_width/aspectRatio));
 
             this.enter.connect(() => overview.set_current_button(id));
             this.clicked.connect(() => presentation_controller.goto_user_page(this.id + 1));
