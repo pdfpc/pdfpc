@@ -87,8 +87,8 @@ Congratulations you just installed pdfpc on your system.
 How to go on
 ============
 
-Head over to http://davvil.github.com/pdfpc and download the demo presentation.
-Load it into pdfpc to get a feeling of it::
+Download the demo presentation from the downloads section and load it into
+pdfpc to get a feeling of it::
 
     pdfpc pdfpc-demo.pdf
 
