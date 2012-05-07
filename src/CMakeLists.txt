@@ -38,48 +38,7 @@ link_directories(${LIB_PATHS})
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/icon_path.in ${CMAKE_CURRENT_SOURCE_DIR}/icon_path.vala)
 
-set(VALA_SRC
-	classes/cache_status.vala
-	classes/metadata/base.vala
-	classes/metadata/pdf.vala
-	classes/mutex_locks.vala
-	classes/options.vala
-	classes/presentation_controller.vala
-	classes/renderer/base.vala
-	classes/renderer/pdf.vala
-	classes/renderer/cache/base.vala
-	classes/renderer/cache/simple/engine.vala
-	classes/renderer/cache/png/item.vala
-	classes/renderer/cache/png/engine.vala
-	classes/renderer/cache/option_factory.vala
-	classes/scaler.vala
-        classes/metadata/slides_notes.vala
-	classes/timer_label.vala
-	classes/view/base.vala
-	classes/view/default.vala
-	classes/view/pdf.vala
-	classes/view/behaviour/base.vala
-	classes/view/behaviour/pdf_link/implementation.vala
-	classes/view/behaviour/pdf_link/signal_provider.vala
-	classes/window/fullscreen.vala
-	classes/window/overview.vala
-	classes/window/presentation.vala
-	classes/window/presenter.vala
-	interfaces/renderer/caching.vala
-	interfaces/view/prerendering.vala
-	interfaces/view/behaviour/decoratable.vala
-	interfaces/controllable.vala
-	pdf_presenter_console.vala
-        icon_path.vala
-)
-
-# Vala segfaults if its output dirs are not existant. Therefore make sure they
-# are there.
-macro(make_compile_directory directory)
-	if (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${directory}")
-		make_directory("${CMAKE_CURRENT_BINARY_DIR}/${directory}")
-	endif (NOT IS_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${directory}")
-endmacro(make_compile_directory)
+file (GLOB_RECURSE VALA_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.vala)
 
 vala_precompile(VALA_C
 	${VALA_SRC}
@@ -110,12 +69,6 @@ install(TARGETS
 RUNTIME
 DESTINATION
 	bin
-)
-
-install(FILES
-        pdfpc.1
-DESTINATION
-        share/man/man1
 )
 
 # The tests need a library version of all the pdf_presenter_stuff

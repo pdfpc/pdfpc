@@ -11,3 +11,4 @@ ensure_vala_version("0.16.0" MINIMUM)
 
 add_subdirectory(src)
 add_subdirectory(icons)
+add_subdirectory(man)
