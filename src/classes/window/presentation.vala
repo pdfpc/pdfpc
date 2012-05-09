@@ -90,9 +90,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.add_events(EventMask.BUTTON_PRESS_MASK);
+            this.add_events(EventMask.SCROLL_MASK);
 
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
+            this.scroll_event.connect( this.on_scroll );
 
             this.update();
         }
@@ -115,6 +117,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected bool on_button_press( EventButton button ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
+            }
+            return false;
+        }
+
+        /**
+         * Handle mouse scrolling events on the window and, if neccessary send
+         * them to the presentation controller
+         */
+        protected bool on_scroll( Gtk.Widget source, EventScroll scroll ) {
+            if ( this.presentation_controller != null ) {
+                this.presentation_controller.scroll( scroll );
             }
             return false;
         }

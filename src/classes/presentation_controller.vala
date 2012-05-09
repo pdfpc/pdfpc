@@ -272,7 +272,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * Handle mouse clicks to each of the controllables
          */
         public bool button_press( Gdk.EventButton button ) {
-            if ( !ignore_input_events ) {
+            if ( !ignore_input_events && button.type ==
+                    Gdk.EventType.BUTTON_PRESS ) {
+                // Prevent double or triple clicks from triggering additional
+                // click events
                 switch( button.button ) {
                     case 1: /* Left button */
                         this.next_page();
@@ -354,6 +357,23 @@ namespace org.westhoffswelt.pdfpresenter {
         public void set_end_user_slide_overview() {
             int user_selected = this.overview.get_current_button();
             this.metadata.set_end_user_slide(user_selected + 1);
+        }
+
+        /**
+         * Notify each of the controllables of mouse scrolling
+         */
+        public void scroll( Gdk.EventScroll scroll ) {
+            
+            switch( scroll.direction ) {
+                case Gdk.ScrollDirection.UP: /* Scroll up */
+                case Gdk.ScrollDirection.LEFT: /* Scroll left */ 
+                    this.previous_page();
+                break;
+                case Gdk.ScrollDirection.DOWN: /* Scroll down */
+                case Gdk.ScrollDirection.RIGHT: /* Scroll right */ 
+                    this.next_page();
+                break;
+            }
         }
 
         /**
