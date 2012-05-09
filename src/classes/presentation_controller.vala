@@ -83,6 +83,11 @@ namespace org.westhoffswelt.pdfpresenter {
         protected Window.Overview overview;
 
         /**
+         * Disables processing of multiple Keypresses at the same time (debounce)
+         */
+        protected uint last_key_event = 0;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
@@ -120,11 +125,14 @@ namespace org.westhoffswelt.pdfpresenter {
         KeyMappings current_key_mapping = KeyMappings.Normal;
 
         public bool key_press( Gdk.EventKey key ) {
-            switch (current_key_mapping) {
-                case KeyMappings.Normal:
-                    return key_press_normal(key);
-                case KeyMappings.Overview:
-                    return key_press_overview(key);
+            if(key.time != last_key_event) {
+                last_key_event = key.time;
+                switch (current_key_mapping) {
+                    case KeyMappings.Normal:
+                     return key_press_normal(key);
+                   case KeyMappings.Overview:
+                     return key_press_overview(key);
+                }
             }
             return true;
         }
@@ -133,6 +141,7 @@ namespace org.westhoffswelt.pdfpresenter {
             if ( !ignore_input_events ) {
                 switch( key.keyval ) {
                     case 0xff0d: /* Return */
+                    case 0x1008ff17: /* AudioNext */
                     case 0xff53: /* Cursor right */
                     case 0xff56: /* Page down */
                     case 0x020:  /* Space */
@@ -145,6 +154,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.next_user_page();
                     break;
                     case 0xff51: /* Cursor left */
+                    case 0x1008ff16: /* AudioPrev */
                     case 0xff55: /* Page Up */
                         if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
                             this.back10();
