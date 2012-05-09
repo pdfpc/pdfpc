@@ -88,6 +88,11 @@ namespace org.westhoffswelt.pdfpresenter {
         protected uint last_key_event = 0;
 
         /**
+         * Stores the "history" of the slides (jumps only)
+         */
+        private int[] history;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
@@ -205,6 +210,9 @@ namespace org.westhoffswelt.pdfpresenter {
                     break;
                     case 0xff09:
                         this.controllables_show_overview();
+                    break;
+                    case 0xff08:
+                        this.history_back();
                     break;
                 }
                 return true;
@@ -377,17 +385,19 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Register the current slide in the history
+         */
+        void slide2history() {
+            this.history += this.current_slide_number;
+        }
+
+        /**
          * A request to change the page has been issued
          */
         public void page_change_request( int page_number ) {
+            this.slide2history();
             this.current_slide_number = page_number;
-            // Here we could do a binary search
-            for (int u = 0; u < this.metadata.get_user_slide_count(); ++u) {
-                if (page_number <= this.metadata.user_slide_to_real_slide(u)) {
-                    this.current_user_slide_number = u;
-                    break;
-                }
-            }
+            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
             this.controllables_update();
         }
 
@@ -496,6 +506,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the first slide
          */
         public void goto_first() {
+            this.slide2history();
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
             if (!this.frozen)
@@ -507,6 +518,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the last slide
          */
         public void goto_last() {
+            this.slide2history();
             this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             if (!this.frozen)
@@ -545,6 +557,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Goto a slide in user page numbers
          */
         public void goto_user_page(int page_number) {
+            this.slide2history();
+            
             this.controllables_hide_overview();
             int destination = page_number-1;
             int n_user_slides = this.metadata.get_user_slide_count();
@@ -558,6 +572,23 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.faded_to_black = false;
             this.set_ignore_input_events( false );
             this.controllables_update();
+        }
+
+        /**
+         * Go back in history
+         */
+        public void history_back() {
+            int history_length = this.history.length;
+            if (history_length == 0) {
+                this.goto_first();
+            } else {
+                this.current_slide_number = this.history[history_length - 1];
+                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
+                this.history.resize(history_length - 1);
+                if (!this.frozen)
+                    this.faded_to_black = false;
+                this.controllables_update();
+            }
         }
 
         /**

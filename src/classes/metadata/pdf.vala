@@ -375,6 +375,22 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
                 return (int)this.page_count;
         }
 
+        public int real_slide_to_user_slide(int number) {
+            // Here we could do a binary search
+            int user_slide = 0;
+            for (int u = 0; u < this.get_user_slide_count(); ++u) {
+                int real_slide = this.user_slide_to_real_slide(u);
+                if (number == real_slide) {
+                    user_slide = u;
+                    break;
+                } else if (number < real_slide) {
+                    user_slide = u - 1;
+                    break;
+                }
+            }
+            return user_slide;
+        }
+
         /**
          * Return the width of the first page of the loaded pdf document.
          *
