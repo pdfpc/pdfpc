@@ -190,22 +190,26 @@ namespace org.westhoffswelt.pdfpresenter.Metadata {
         }
 
         /**
-         * Save the metadata to disk, if needed (i.e. if the user did something with the notes or the skips)
+         * Save the metadata to disk, if needed (i.e. if the user did something
+         * with the notes or the skips)
          */
         public void save_to_disk() {
             string contents =   format_duration()
                               + format_skips()
                               + format_end_user_slide()
                               + format_notes();
-            if ( contents != "" ) {
-                contents = "[file]\n" + this.pdf_fname + "\n" + contents;
-
-                try {
+            try {
+                if ( contents != "" ) {
+                    contents = "[file]\n" + this.pdf_fname + "\n" + contents;
                     var pdfpc_file = File.new_for_uri(this.pdfpc_url);
                     FileUtils.set_contents(pdfpc_file.get_path(), contents, contents.length-1);
-                } catch (Error e) {
-                    error("%s", e.message);
+                } else { // We do not need to write anything. Delete the file if it exists
+                    var file = File.new_for_uri(this.pdfpc_url);
+                    if (file.query_exists())
+                        file.delete();
                 }
+            } catch (Error e) {
+                error("%s", e.message);
             }
         }
 
