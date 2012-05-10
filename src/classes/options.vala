@@ -81,6 +81,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public static string? start_time = null;
 
         /**
+         * Time the talk should end
+         */
+        public static string? end_time = null;
+
+        /**
          * Add a black slide at the end of the presentation
          */
         public static bool black_on_end = false;

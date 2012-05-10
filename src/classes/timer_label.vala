@@ -29,8 +29,10 @@ namespace org.westhoffswelt.pdfpresenter {
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-    TimerLabel getTimerLabel( int duration, uint last_minutes = 0, time_t start_time = 0 ) {
-        if ( duration > 0 )
+    TimerLabel getTimerLabel( int duration, time_t end_time, uint last_minutes = 0, time_t start_time = 0 ) {
+        if ( end_time > 0 )
+            return new EndTimeTimer( end_time, last_minutes, start_time );
+        else if ( duration > 0 )
             return new CountdownTimer( duration, last_minutes, start_time );
         else
             return new CountupTimer( start_time );
@@ -66,6 +68,14 @@ namespace org.westhoffswelt.pdfpresenter {
         public Color normal_color;
 
         /**
+         * Color used for pre-talk timer rendering
+         *
+         * This property is public and not accesed using a setter to be able to use
+         * Color.parse directly on it.
+         */
+        public Color pretalk_color;
+
+        /**
          * Default constructor taking the initial time as argument, as well as
          * the time to countdown until the talk actually starts.
          *
@@ -77,12 +87,13 @@ namespace org.westhoffswelt.pdfpresenter {
             this.start_time = start_time;
 
             Color.parse( "white", out this.normal_color );
+            Color.parse( "green", out this.pretalk_color );
         }
 
         /**
          * Start the timer
          */
-        public void start() {
+        public virtual void start() {
             if ( this.timeout != 0 && this.time < 0 ) { 
                 // We are in pretalk, with timeout already running.
                 // Jump to talk mode
@@ -96,7 +107,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Stop the timer
          */
-        public void stop() {
+        public virtual void stop() {
             if ( this.timeout != 0 ) {
                 Source.remove( this.timeout );
                 this.timeout = 0;
@@ -129,7 +140,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * In presentation mode the time will be reset to the initial
          * presentation time.
          */
-        public void reset() {
+        public virtual void reset() {
             this.stop();
             this.time = this.calculate_countdown();
             if ( this.time < 0 )
@@ -152,7 +163,7 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Update the timer on every timeout step (every second)
          */
-        protected bool on_timeout() {
+        protected virtual bool on_timeout() {
             ++this.time;
             this.format_time();
             return true;
@@ -240,7 +251,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 timeInSecs = -this.time;
                 this.modify_fg( 
                     StateType.NORMAL, 
-                    this.normal_color
+                    this.pretalk_color
                 );
             } else {
                 if ( this.time < this.duration ) {
@@ -277,14 +288,46 @@ namespace org.westhoffswelt.pdfpresenter {
         }
     }
 
+    public class EndTimeTimer : CountdownTimer {
+
+        protected time_t end_time;        
+        protected Time end_time_object;
+
+        public EndTimeTimer( time_t end_time, uint last_minutes, time_t start_time = 0 ) {
+            base(1000, last_minutes, start_time);
+            this.end_time = end_time;
+            this.end_time_object = Time.local(end_time);
+        }
+
+        public override void start() {
+            time_t now = Time.local( time_t() ).mktime();
+            this.duration = (int)(this.end_time - now);
+            base.start();
+        }
+
+        public override void stop() {
+            base.stop();
+            this.set_text(this.end_time_object.format("Until %H:%M"));
+        }
+
+        public override void reset() {
+            base.reset();
+            if ( this.timeout == 0 )
+                this.set_text(this.end_time_object.format("Until %H:%M"));
+        }
+
+        public override bool on_timeout() {
+            if (this.time == -1) { // We will switch from pre-talk to in-talk
+                time_t now = Time.local( time_t() ).mktime();
+                this.duration = (int)(this.end_time - now);
+            }
+            return base.on_timeout();
+        }
+    }
+
     public class CountupTimer : TimerLabel {
         public CountupTimer( time_t start_time = 0 ) {
             base(start_time);
-
-            this.modify_fg( 
-                StateType.NORMAL, 
-                this.normal_color
-            );
         }
 
         /**
@@ -304,8 +347,16 @@ namespace org.westhoffswelt.pdfpresenter {
             {
                 prefix = "-";
                 timeInSecs = -this.time;
+                this.modify_fg( 
+                               StateType.NORMAL, 
+                               this.pretalk_color
+                              );
             } else {
                 timeInSecs = this.time;
+                this.modify_fg( 
+                               StateType.NORMAL, 
+                               this.normal_color
+                              );
             }
             this.show_time(timeInSecs, prefix);
         }
