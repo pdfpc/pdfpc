@@ -395,7 +395,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * A request to change the page has been issued
          */
         public void page_change_request( int page_number ) {
-            this.slide2history();
+            if (page_number != this.current_slide_number)
+                this.slide2history();
             this.current_slide_number = page_number;
             this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
             this.controllables_update();
@@ -506,7 +507,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the first slide
          */
         public void goto_first() {
-            this.slide2history();
+            if (this.current_slide_number != 0)
+                this.slide2history();
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
             if (!this.frozen)
@@ -518,7 +520,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the last slide
          */
         public void goto_last() {
-            this.slide2history();
+            if (this.current_user_slide_number != this.metadata.get_end_user_slide() - 1)
+                this.slide2history();
             this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
             if (!this.frozen)
@@ -557,7 +560,8 @@ namespace org.westhoffswelt.pdfpresenter {
          * Goto a slide in user page numbers
          */
         public void goto_user_page(int page_number) {
-            this.slide2history();
+            if (this.current_user_slide_number != page_number - 1)
+                this.slide2history();
             
             this.controllables_hide_overview();
             int destination = page_number-1;
