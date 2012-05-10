@@ -69,7 +69,8 @@ namespace org.westhoffswelt.pdfpresenter {
         /**
          * Ignore input events. Useful e.g. for editing notes.
          */
-        protected bool ignore_input_events = false;
+        protected bool ignore_keyboard_events = false;
+        protected bool ignore_mouse_events = false;
 
         /**
          * The metadata of the presentation
@@ -143,7 +144,7 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         protected bool key_press_normal( Gdk.EventKey key ) {
-            if ( !ignore_input_events ) {
+            if ( !ignore_keyboard_events ) {
                 switch( key.keyval ) {
                     case 0xff0d: /* Return */
                     case 0x1008ff17: /* AudioNext */
@@ -280,21 +281,51 @@ namespace org.westhoffswelt.pdfpresenter {
          * Handle mouse clicks to each of the controllables
          */
         public bool button_press( Gdk.EventButton button ) {
-            if ( !ignore_input_events && button.type ==
+            if ( !ignore_mouse_events && button.type ==
                     Gdk.EventType.BUTTON_PRESS ) {
                 // Prevent double or triple clicks from triggering additional
                 // click events
                 switch( button.button ) {
                     case 1: /* Left button */
-                        this.next_page();
+                        if ( (button.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                            this.jump10();
+                        else
+                            this.next_page();
                     break;
                     case 3: /* Right button */
-                        this.previous_page();
+                        if ( (button.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                            this.back10();
+                        else
+                            this.previous_page();
                     break;
                 }
                 return true;
             } else {
                 return false;
+            }
+        }
+
+        /**
+         * Notify each of the controllables of mouse scrolling
+         */
+        public void scroll( Gdk.EventScroll scroll ) {
+            if ( !this.ignore_mouse_events ) {
+                switch( scroll.direction ) {
+                    case Gdk.ScrollDirection.UP: /* Scroll up */
+                    case Gdk.ScrollDirection.LEFT: /* Scroll left */ 
+                        if ( (scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                            this.back10();
+                        else
+                            this.previous_page();
+                    break;
+                    case Gdk.ScrollDirection.DOWN: /* Scroll down */
+                    case Gdk.ScrollDirection.RIGHT: /* Scroll right */ 
+                        if ( (scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                            this.jump10();
+                        else
+                            this.next_page();
+                    break;
+                }
             }
         }
         
@@ -368,23 +399,6 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Notify each of the controllables of mouse scrolling
-         */
-        public void scroll( Gdk.EventScroll scroll ) {
-            
-            switch( scroll.direction ) {
-                case Gdk.ScrollDirection.UP: /* Scroll up */
-                case Gdk.ScrollDirection.LEFT: /* Scroll left */ 
-                    this.previous_page();
-                break;
-                case Gdk.ScrollDirection.DOWN: /* Scroll down */
-                case Gdk.ScrollDirection.RIGHT: /* Scroll right */ 
-                    this.next_page();
-                break;
-            }
-        }
-
-        /**
          * Register the current slide in the history
          */
         void slide2history() {
@@ -406,7 +420,12 @@ namespace org.westhoffswelt.pdfpresenter {
          * Set the state of ignote_input_events
          */
         public void set_ignore_input_events( bool v ) {
-            ignore_input_events = v;
+            this.ignore_keyboard_events = v;
+            this.ignore_mouse_events = v;
+        }
+
+        public void set_ignore_mouse_events( bool v ) {
+            this.ignore_mouse_events = v;
         }
 
         /**
@@ -614,12 +633,14 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         protected void controllables_show_overview() {
+            this.set_ignore_mouse_events(true);
             this.current_key_mapping = this.KeyMappings.Overview;
             foreach( Controllable c in this.controllables )
                 c.show_overview();
         }
 
         protected void controllables_hide_overview() {
+            this.set_ignore_mouse_events(false);
             this.current_key_mapping = this.KeyMappings.Normal;
             // It may happen that in overview mode, the number of (user) slides
             // has changed due to overlay changes. We may need to correct our
