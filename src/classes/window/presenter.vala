@@ -599,7 +599,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         private time_t parseStartTime( string start_time ) 
         {
             var tm = Time.local( time_t() );
-            tm.strptime( start_time, "%H:%M:%S" );
+            tm.strptime( start_time + ":00", "%H:%M:%S" );
             return tm.mktime();
         }
 
