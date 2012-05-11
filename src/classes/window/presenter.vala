@@ -157,7 +157,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view = View.Pdf.from_metadata( 
                 metadata,
                 current_allocated_width,
-                bottom_position,
+                (int)Math.floor(0.8*bottom_position),
                 Options.black_on_end,
                 this.presentation_controller,
                 out current_scale_rect
@@ -165,6 +165,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             // The next slide is right to the current one and takes up the
             // remaining width
+            Requisition cv_requisition;
+            this.current_view.size_request(out cv_requisition);
+            current_allocated_width = cv_requisition.width;
             Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_metadata( 
@@ -178,16 +181,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.strict_next_view = View.Pdf.from_metadata(
                 metadata,
-                (int)Math.floor(0.2*current_allocated_width),
-                bottom_position,
+                (int)Math.floor(0.5*current_allocated_width),
+                (int)Math.floor(0.2*bottom_position) - 2,
                 true,
                 this.presentation_controller,
                 out next_scale_rect
             );
             this.strict_prev_view = View.Pdf.from_metadata(
                 metadata,
-                (int)Math.floor(0.2*current_allocated_width),
-                bottom_position,
+                (int)Math.floor(0.5*current_allocated_width),
+                (int)Math.floor(0.2*bottom_position) - 2,
                 true,
                 this.presentation_controller,
                 out next_scale_rect
