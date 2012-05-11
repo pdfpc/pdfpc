@@ -343,7 +343,7 @@ void org_westhoffswelt_pdfpresenter_application_run (orgwesthoffsweltpdfpresente
 	orgwesthoffsweltpdfpresenterWindowPresenter* _tmp40_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = stdout;
-	fprintf (_tmp0_, "Pdf-Presenter-Console Version 2.0 Copyright 2009-2011 Jakob Westhoff\n");
+	fprintf (_tmp0_, "%s", "pdfpc v3.0\n" "(C) 2012 David Vilar\n" "(C) 2009-2011 Jakob Westhoff\n\n");
 	gdk_threads_init ();
 	gtk_init (&args_length1, &args);
 	org_westhoffswelt_pdfpresenter_mutex_locks_init ();
