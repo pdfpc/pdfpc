@@ -132,7 +132,9 @@ namespace org.westhoffswelt.pdfpresenter {
          * initializes the Gtk system.
          */
         public void run( string[] args ) {
-            stdout.printf( "Pdf-Presenter-Console Version 2.0 Copyright 2009-2011 Jakob Westhoff\n" );
+            stdout.printf( "pdfpc v3.0\n"
+                           + "(C) 2012 David Vilar\n"
+                           + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
             Gdk.threads_init();
             Gtk.init( ref args );
