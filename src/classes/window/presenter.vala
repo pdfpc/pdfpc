@@ -348,7 +348,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             var nextViewWithNotes = new VBox(false, 0);
             nextViewWithNotes.pack_start( this.next_view, false, false, 0 );
-            nextViewWithNotes.pack_start( this.notes_view, true, true, 5 );
+            var notes_sw = new ScrolledWindow(null, null);
+            notes_sw.add( this.notes_view );
+            notes_sw.set_policy( PolicyType.AUTOMATIC, PolicyType.AUTOMATIC );
+            nextViewWithNotes.pack_start( notes_sw, true, true, 5 );
             this.slideViews.add(nextViewWithNotes);
 
             var bottomRow = new HBox(true, 0);
