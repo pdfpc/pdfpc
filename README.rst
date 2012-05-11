@@ -1,6 +1,6 @@
-=====================
-Pdf Presenter Console
-=====================
+=====
+pdfpc
+=====
 
 About
 =====
@@ -20,7 +20,7 @@ at http://davvil.github.com/pdfpc/
 Requirements
 ============
 
-In order to compile and run the Pdf Presenter Console the following
+In order to compile and run pdfpc the following
 requirements need to be met:
 
 - CMake Version >=2.6
@@ -38,11 +38,11 @@ You can download the latest stable release of pdfpc in the download section of
 github (https://github.com/davvil/pdfpc/downloads). Uncompress the tarball (we
 use v3.0 as an example here)::
 
-    tar xvf pdfpc-v3.0.tgz
+    tar xvf pdfpc-3.0.tgz
 
 Change to the extracted directory::
 
-    cd pdfpc-v3.0
+    cd pdfpc-3.0
 
 Compile and install::
 
