@@ -5,10 +5,10 @@ Pdf Presenter Console
 About
 =====
 
-pdfpc is a GTK based presentation viewer application which uses Keynote like
-multi-monitor output to provide meta information to the speaker during the
-presentation. It is able to show a normal presentation window on one screen,
-while showing a more sophisticated overview on the other one providing
+pdfpc is a GTK based presentation viewer application for GNU/Linux which uses
+Keynote like multi-monitor output to provide meta information to the speaker
+during the presentation. It is able to show a normal presentation window on one
+screen, while showing a more sophisticated overview on the other one providing
 information like a picture of the next slide, as well as the left over time
 till the end of the presentation. The input files processed by pdfpc are PDF
 documents, which can be created using nearly any of today's presentation
@@ -23,7 +23,6 @@ Requirements
 In order to compile and run the Pdf Presenter Console the following
 requirements need to be met:
 
-- Vala Compiler Version >=0.16.0
 - CMake Version >=2.6
 - Gtk+ 2.x
 - libPoppler with glib bindings
@@ -32,9 +31,50 @@ requirements need to be met:
 Compile and install
 ===================
 
-Currently pdfpc is only available through github. The master branch should be
-mostly stable.  If the git executable is available on your system it can be
-retrieved using the following command::
+Compiling from source tarballs
+------------------------------
+
+You can download the latest stable release of pdfpc in the download section of
+github (https://github.com/davvil/pdfpc/downloads). Uncompress the tarball (we
+use v3.0 as an example here)::
+
+    tar xvf pdfpc-v3.0.tgz
+
+Change to the extracted directory::
+
+    cd pdfpc-v3.0
+
+Compile and install::
+
+    cmake .
+    make
+    sudo make install
+
+If there are no errors in the process, you just installed pdfpc on your system.
+Congratulations! If there were errors, they are probably due to missing
+dependencies. Please check that you have all the necessary libraries (in some
+distributions you may have to install *-devel* packages).
+
+Note: You may alter the final installation prefix in the cmake call. By default
+the pdfpc files will be installed under */usr/local/*. If you want to change
+that, for example to be installed under */usr/* you may specify another
+installation prefix as follows::
+
+    cmake -DCMAKE_INSTALL_PREFIX="/usr" ../
+
+Compiling from github
+---------------------
+
+If you want the bleeding-edge version of pdfpc, you should checkout the git
+repository. The *master* branch should be fairly stable and safe to use,
+unstable development happens in the *devel* branch.
+
+When installing from git you will need two additional dependencies:
+
+- git
+- Vala Compiler Version >=0.16.0
+
+The pdfpc source can be retrieved from github::
 
     git clone git://github.com/davvil/pdfpc.git
 
@@ -46,7 +86,8 @@ retrieve all needed submodules::
     git submodule update
 
 You are now set to compile and install pdfpc.  Start by creating a build
-directory::
+directory (this is optional but it keeps the directories clean, in case you
+want to do some changes)::
 
     mkdir build
     cd build
@@ -58,19 +99,13 @@ CMake::
 
 If you have put your build directory elsewhere on your system adapt the path
 above accordingly. You need to provide CMake with the pdfpc directory as
-created by git.
+created by git. As pointer out before, you may alter the installation directory
+via the *-DCMAKE_INSTALL_PREFIX* command line argument. 
 
-You may alter the final installation prefix at this time. By default the
-pdfpc executable will be installed under */usr/local/bin*. If
-you want to change that, for example to be */usr/bin* you may specify another
-installation prefix as follows::
-
-    cmake -DCMAKE_INSTALL_PREFIX="/usr" ../
-
-If all requirements are met CMake will tell you that it created all the
-necessary build files for you. If any of the requirements were not met you
-will be informed of it to provide the necessary files or install the
-appropriate packages.
+If all requirements are met, CMake will tell you that it created all the
+necessary build files for you. If any of the requirements were not met you will
+be informed of it to provide the necessary files or install the appropriate
+packages.
 
 The next step is to compile and install pdfpc using GNU Make or any other make
 derivative you may have installed. Simply issue the following command to start

@@ -28,13 +28,13 @@ Version 3.0
 - Support for mouse wheel (thanks to mikerofone) and bluetooth headset controls
   (thanks to NerdyProjects)
 
-- Freezing of presentation view
-
-- Black out presentation view
+- Freezing and blacking out of presentation view
 
 - Presenter view starts on primary screen
 
 - Definition of "end slide"
+
+- Navigable history of jumps
 
 ===============================
 Pdf Presenter Console Changelog
