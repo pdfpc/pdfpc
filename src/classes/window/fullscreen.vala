@@ -68,19 +68,26 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 int current_screen = screen.get_monitor_at_point(pointerx, pointery);
                 screen.get_monitor_geometry( current_screen, out this.screen_geometry );
             }
-                
-            // Move to the correct monitor
-            // This movement is done here and after mapping, to minimize flickering
-            // with window managers, which correctly handle the movement command,
-            // before the window is mapped.
-            this.move( this.screen_geometry.x, this.screen_geometry.y );
-            //this.fullscreen();
 
-            // As certain window-managers like Xfwm4 ignore movement request
-            // before the window is initially moved and set up we need to
-            // listen to this event.
-            this.size_allocate.connect( this.on_size_allocate );
-            this.configure_event.connect( this.on_configure );
+            if ( !Options.windowed ) {
+                // Move to the correct monitor
+                // This movement is done here and after mapping, to minimize flickering
+                // with window managers, which correctly handle the movement command,
+                // before the window is mapped.
+                this.move( this.screen_geometry.x, this.screen_geometry.y );
+                //this.fullscreen();
+
+                // As certain window-managers like Xfwm4 ignore movement request
+                // before the window is initially moved and set up we need to
+                // listen to this event.
+                this.size_allocate.connect( this.on_size_allocate );
+                this.configure_event.connect( this.on_configure );
+            }
+            else {
+                this.screen_geometry.width /= 2;
+                this.screen_geometry.height /= 2;
+                this.resizable = false;
+            }
 
             this.add_events(EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect( this.on_mouse_move );
