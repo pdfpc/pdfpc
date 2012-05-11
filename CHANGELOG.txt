@@ -1,3 +1,41 @@
+===============
+pdfpc Changelog
+===============
+
+Version 3.0
+===========
+
+*Released: May 2012*
+
+- Renamed to pdfpc (forked from Pdf Presenter Console)
+
+- Support for new poppler version
+
+- Support for (textual) notes
+
+- Support for overlays
+
+- Overview mode
+
+- Jump to slides by inputting the slide number
+
+- Movement in 10-slide blocks allowed using shift
+
+- Two additional timer modes: countup and end time of presentation
+
+- Pause timer (useful for rehearsal talks)
+
+- Support for mouse wheel (thanks to mikerofone) and bluetooth headset controls
+  (thanks to NerdyProjects)
+
+- Freezing of presentation view
+
+- Black out presentation view
+
+- Presenter view starts on primary screen
+
+- Definition of "end slide"
+
 ===============================
 Pdf Presenter Console Changelog
 ===============================
