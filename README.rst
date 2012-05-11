@@ -60,7 +60,7 @@ the pdfpc files will be installed under */usr/local/*. If you want to change
 that, for example to be installed under */usr/* you may specify another
 installation prefix as follows::
 
-    cmake -DCMAKE_INSTALL_PREFIX="/usr" ../
+    cmake -DCMAKE_INSTALL_PREFIX="/usr" .
 
 Compiling from github
 ---------------------
