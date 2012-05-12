@@ -633,10 +633,12 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         protected void controllables_show_overview() {
-            this.set_ignore_mouse_events(true);
-            this.current_key_mapping = this.KeyMappings.Overview;
-            foreach( Controllable c in this.controllables )
-                c.show_overview();
+            if (this.overview != null) {
+                this.set_ignore_mouse_events(true);
+                this.current_key_mapping = this.KeyMappings.Overview;
+                foreach( Controllable c in this.controllables )
+                    c.show_overview();
+            }
         }
 
         protected void controllables_hide_overview() {
