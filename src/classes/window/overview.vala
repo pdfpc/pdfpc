@@ -364,7 +364,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             button[this.currently_selected].unset_current();
             button[b].set_current();
             this.currently_selected = b;
-            this.presenter.custom_slide_count(this.currently_selected+1, (int)this.n_slides);
+            this.presenter.custom_slide_count(this.currently_selected + 1);
         }
 
         /**

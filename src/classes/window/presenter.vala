@@ -429,12 +429,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected void update_slide_count() {
             this.custom_slide_count(
-                    this.presentation_controller.get_current_user_slide_number() + 1, 
-                    this.presentation_controller.get_end_user_slide()
+                    this.presentation_controller.get_current_user_slide_number() + 1
             );
         }
 
-        public void custom_slide_count(int current, int total) {
+        public void custom_slide_count(int current) {
+            int total = this.presentation_controller.get_end_user_slide();
             this.slide_progress.set_text( "%d/%u".printf(current, total) );
         }
 
