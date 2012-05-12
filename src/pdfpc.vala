@@ -138,6 +138,10 @@ namespace org.westhoffswelt.pdfpresenter {
             Gdk.threads_init();
             Gtk.init( ref args );
 
+            // Needed to show the images in the overview
+            var default_settings = Gtk.Settings.get_default();
+            default_settings.set("gtk_button_images", true);
+
             // Initialize the application wide mutex objects
             MutexLocks.init();
 
