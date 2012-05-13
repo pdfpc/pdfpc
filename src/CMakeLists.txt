@@ -6,6 +6,9 @@ pkg_check_modules(POPPLER REQUIRED poppler-glib)
 pkg_check_modules(GTK REQUIRED gtk+-2.0)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
 pkg_check_modules(RSVG REQUIRED librsvg-2.0)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
+pkg_check_modules(GSTINTERFACES REQUIRED gstreamer-interfaces-0.10)
+pkg_check_modules(GDKX11 REQUIRED gdk-x11-2.0)
 
 set(CFLAGS
 	${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
@@ -15,6 +18,9 @@ set(CFLAGS
 	${GTK_CFLAGS} ${GTK_CFLAGS_OTHER}
 	${GTHREAD_CFLAGS} ${GTHREAD_CFLAGS_OTHER}
         ${RSVG_CFLAGS} ${RSVG_CFLAGS_OTHER}
+        ${GSTREAMER_CFLAGS} ${GSTREAMER_CFLAGS_OTHER}
+        ${GSTINTERFACES_CFLAGS} ${GSTINTERFACES_CFLAGS_OTHER}
+        ${GDKX11_CFLAGS} ${GDKX11_CFLAGS_OTHER}
 )
 add_definitions(${CFLAGS})
 
@@ -26,6 +32,9 @@ set(LIBS
 	${GTK_LIBRARIES}
 	${GTHREAD_LIBRARIES}
         ${RSVG_LIBRARIES}
+        ${GSTREAMER_LIBRARIES}
+        ${GSTINTERFACES_LIBRARIES}
+        ${GDKX11_LIBRARIES}
 )
 link_libraries(${LIBS})
 
@@ -37,6 +46,9 @@ set(LIB_PATHS
 	${GTK_LIBRARY_DIRS}
 	${GTHREAD_LIBRARY_DIRS}
         ${RSVG_LIBRARY_DIRS}
+        ${GSTREAMER_LIBRARIES}
+        ${GSTINTERFACES_LIBRARIES}
+        ${GDKX11_LIBRARY_DIRS}
 )
 link_directories(${LIB_PATHS})
 
@@ -53,6 +65,9 @@ PACKAGES
 	gtk+-2.0
 	posix
         librsvg-2.0
+        gstreamer-0.10
+        gstreamer-interfaces-0.10
+        gdk-x11-2.0
 OPTIONS 
 	--thread
 	--debug

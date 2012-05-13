@@ -131,6 +131,7 @@ namespace pdfpc.View.Behaviour {
          */
         protected void on_clicked_external_command( Gdk.Rectangle link_rect, Poppler.Rectangle area, uint source_page_number, string command, string? arguments ) {
             //@TODO: Implement
+            new Movie(command, arguments, area, this.presentation_controller);
             stdout.printf("External command: %s\n", command);
             stdout.printf(" Area: %f %f %f %f\n", area.x1, area.y1, area.x2, area.y2);
             if (arguments != null) stdout.printf(" with arguments %s\n", arguments);
