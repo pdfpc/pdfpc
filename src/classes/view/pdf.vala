@@ -80,5 +80,30 @@ namespace pdfpc {
         public new Renderer.Pdf get_renderer() {
             return this.renderer as Renderer.Pdf;
         }
+
+        /**
+         * Convert an arbitrary Poppler.Rectangle struct into a Gdk.Rectangle
+         * struct taking into account the measurement differences between pdf
+         * space and screen space.
+         */
+        public Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle( Poppler.Rectangle poppler_rectangle ) {
+            Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
+
+            Gtk.Requisition requisition;
+            this.size_request( out requisition );
+
+            // We need the page dimensions for coordinate conversion between
+            // pdf coordinates and screen coordinates
+            var metadata = this.get_renderer().get_metadata() as Metadata.Pdf;
+            gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / metadata.get_page_width() ) * requisition.width );
+            gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / metadata.get_page_width() ) * requisition.width );
+
+            // Gdk has its coordinate origin in the upper left, while Poppler
+            // has its origin in the lower left.
+            gdk_rectangle.y = (int)Math.ceil( ( ( metadata.get_page_height() - poppler_rectangle.y2 ) / metadata.get_page_height() ) * requisition.height );
+            gdk_rectangle.height = (int)Math.floor( ( ( poppler_rectangle.y2 - poppler_rectangle.y1 ) / metadata.get_page_height() ) * requisition.height );
+
+            return gdk_rectangle;
+        }
     }
 }

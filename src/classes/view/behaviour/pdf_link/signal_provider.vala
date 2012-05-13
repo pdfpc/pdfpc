@@ -147,7 +147,7 @@ namespace pdfpc.View.Behaviour {
 
                             // Fire the correct signal for this
                             this.clicked_internal_link( 
-                                this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                                this.target.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
                                 this.target.get_current_slide_number(),
                                 /* We use zero based indexing. Pdf links use one based indexing */ 
                                 destination.page_num - 1
@@ -160,38 +160,14 @@ namespace pdfpc.View.Behaviour {
                     unowned Poppler.ActionLaunch* action = (Poppler.ActionLaunch*)mapping.action;
                     // Fire the appropriate signal
                     this.clicked_external_command( 
-                        this.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                        this.target.convert_poppler_rectangle_to_gdk_rectangle( mapping.area ),
+                        mapping.area,
                         this.target.get_current_slide_number(),
                         action.file_name,
                         action.params
                     );
                 break;
             }
-        }
-
-        /**
-         * Convert an arbitrary Poppler.Rectangle struct into a Gdk.Rectangle
-         * struct taking into account the measurement differences between pdf
-         * space and screen space.
-         */
-        protected Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle( Poppler.Rectangle poppler_rectangle ) {
-            Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
-
-            Gtk.Requisition requisition;
-            this.target.size_request( out requisition );
-
-            // We need the page dimensions for coordinate conversion between
-            // pdf coordinates and screen coordinates
-            var metadata = this.target.get_renderer().get_metadata() as Metadata.Pdf;
-            gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / metadata.get_page_width() ) * requisition.width );
-            gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / metadata.get_page_height() ) * requisition.width );
-
-            // Gdk has its coordinate origin in the upper left, while Poppler
-            // has its origin in the lower left.
-            gdk_rectangle.y = (int)Math.ceil( ( ( metadata.get_page_height() - poppler_rectangle.y2 ) / metadata.get_page_height() ) * requisition.height );
-            gdk_rectangle.height = (int)Math.floor( ( ( poppler_rectangle.y2 - poppler_rectangle.y1 ) / metadata.get_page_height() ) * requisition.height );
-
-            return gdk_rectangle;
         }
 
         /**
@@ -234,7 +210,7 @@ namespace pdfpc.View.Behaviour {
                 // We may have left a link
                 if ( this.active_mapping != null ) {
                     this.link_mouse_leave( 
-                        this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                        this.target.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                         this.active_mapping
                     );
                     this.active_mapping = null;
@@ -252,7 +228,7 @@ namespace pdfpc.View.Behaviour {
                 // We just entered a new link
                 this.active_mapping = link_mapping.copy();
                 this.link_mouse_enter( 
-                    this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                    this.target.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                     this.active_mapping
                 );
                 return false;
@@ -260,12 +236,12 @@ namespace pdfpc.View.Behaviour {
 
             // We "jumped" from one link to another. Therefore enter and leave signals are needed.
             this.link_mouse_leave( 
-                this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                this.target.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                 this.active_mapping
             );
             this.active_mapping = link_mapping.copy();
             this.link_mouse_enter( 
-                this.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
+                this.target.convert_poppler_rectangle_to_gdk_rectangle( this.active_mapping.area ),
                 this.active_mapping
             );
             return false;
@@ -296,7 +272,7 @@ namespace pdfpc.View.Behaviour {
                 this.precalculated_mapping_rectangles = new Gdk.Rectangle[this.page_link_mappings.length()];
                 int i=0;
                 foreach( var mapping in this.page_link_mappings ) {
-                    this.precalculated_mapping_rectangles[i++] = this.convert_poppler_rectangle_to_gdk_rectangle( 
+                    this.precalculated_mapping_rectangles[i++] = this.target.convert_poppler_rectangle_to_gdk_rectangle( 
                         mapping.area
                     );
                 }
