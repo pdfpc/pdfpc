@@ -173,6 +173,7 @@ namespace pdfpc.Window {
                 current_allocated_width,
                 (int)Math.floor(0.8*bottom_position),
                 Options.black_on_end,
+                true,
                 this.presentation_controller,
                 out current_scale_rect
             );
@@ -189,6 +190,7 @@ namespace pdfpc.Window {
                 next_allocated_width,
                 (int)Math.floor(0.7*bottom_position),
                 true,
+                false,
                 this.presentation_controller,
                 out next_scale_rect
             );
@@ -198,6 +200,7 @@ namespace pdfpc.Window {
                 (int)Math.floor(0.5*current_allocated_width),
                 (int)Math.floor(0.19*bottom_position) - 2,
                 true,
+                false,
                 this.presentation_controller,
                 out next_scale_rect
             );
@@ -206,6 +209,7 @@ namespace pdfpc.Window {
                 (int)Math.floor(0.5*current_allocated_width),
                 (int)Math.floor(0.19*bottom_position) - 2,
                 true,
+                false,
                 this.presentation_controller,
                 out next_scale_rect
             );

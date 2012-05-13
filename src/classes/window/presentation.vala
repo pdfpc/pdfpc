@@ -69,6 +69,7 @@ namespace pdfpc.Window {
                 this.screen_geometry.width, 
                 this.screen_geometry.height,
                 Options.black_on_end,
+                true,
                 this.presentation_controller,
                 out scale_rect
             );
