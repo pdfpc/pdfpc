@@ -840,5 +840,17 @@ namespace pdfpc {
             tm.strptime( t + ":00", "%H:%M:%S" );
             return tm.mktime();
         }
+        
+        /**
+         * XID for videos
+         */
+        public ulong video_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect) {
+            Controllable c = this.controllables.nth_data(n);
+            if (c == null) {
+                rect = Gdk.Rectangle();
+                return 0;
+            }
+            return c.video_pos(area, out rect);
+        }
     }
 }

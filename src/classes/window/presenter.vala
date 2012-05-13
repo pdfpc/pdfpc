@@ -630,5 +630,10 @@ namespace pdfpc.Window {
             this.prerender_progress.hide();
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
+        
+        public ulong video_pos(Poppler.Rectangle area, out Gdk.Rectangle rect) {
+            rect = ((View.Pdf)this.current_view).convert_poppler_rectangle_to_gdk_rectangle(area);
+            return (ulong)Gdk.x11_drawable_get_xid(this.current_view.get_window());
+        }
     }
 }

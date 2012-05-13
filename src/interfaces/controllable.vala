@@ -61,5 +61,10 @@ namespace pdfpc {
          * Hide the overview
          */
         public abstract void hide_overview();
+        
+        /**
+         *
+         */
+        public abstract ulong video_pos(Poppler.Rectangle area, out Gdk.Rectangle rect);
     }
 }
