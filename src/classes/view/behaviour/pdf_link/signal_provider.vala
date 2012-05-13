@@ -42,7 +42,7 @@ namespace pdfpc.View.Behaviour {
          * Be careful while handling these, as requested code to be execute may
          * be malicious.
          */
-        public signal void clicked_external_command( Gdk.Rectangle link_rect, uint source_page_number, string command, string arguments );
+        public signal void clicked_external_command( Gdk.Rectangle link_rect, Poppler.Rectangle area, uint source_page_number, string command, string arguments );
 
         /**
          * Emitted whenever the mouse entered a pdf link
