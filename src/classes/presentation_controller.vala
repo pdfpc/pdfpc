@@ -365,6 +365,13 @@ namespace pdfpc {
         }
         
         /**
+         * Get the PDF URL
+         */
+        public string? get_pdf_url() {
+            return this.metadata.pdf_url;
+        }
+        
+        /**
          * Get the current (real) slide number
          */
         public int get_current_slide_number() {

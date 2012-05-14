@@ -6,7 +6,7 @@ namespace pdfpc {
     
     public class Movie: GLib.Object {
         
-        protected Pipeline pipeline;
+        protected dynamic Element pipeline;
         protected PresentationController controller;
         
         public Movie(string file, string? arguments, Poppler.Rectangle area,
@@ -18,12 +18,10 @@ namespace pdfpc {
         }
         
         protected void establish_pipeline(string file, Poppler.Rectangle area) {
-            this.pipeline = new Pipeline("mypipeline");
-            var src = ElementFactory.make("videotestsrc", "source");
+            var bin = new Bin("bin");
             var tee = ElementFactory.make("tee", "tee");
-            this.pipeline.add_many(src, tee);
-            src.link(tee);
-            
+            bin.add_many(tee);
+            bin.add_pad(new GhostPad("sink", tee.get_pad("sink")));
             Gdk.Rectangle rect;
             int n = 0;
             ulong xid;
@@ -33,7 +31,7 @@ namespace pdfpc {
                     break;
                 var sink = ElementFactory.make("xvimagesink", @"sink$n");
                 var queue = ElementFactory.make("queue", @"queue$n");
-                this.pipeline.add_many(queue,sink);
+                bin.add_many(queue,sink);
                 tee.link(queue);
                 queue.link(sink);
                 var xoverlay = sink as XOverlay;
@@ -41,10 +39,32 @@ namespace pdfpc {
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
                 n++;
             }
+            
+            // This will likely have problems in Windows, where paths and urls have different separators.
+            string uri;
+            if (Path.is_absolute(file))
+                uri = "file://" + file;
+            else
+                uri = Path.build_filename(Path.get_dirname(this.controller.get_pdf_url()), file);
+            this.pipeline = ElementFactory.make("playbin2", "playbin");
+            this.pipeline.uri = uri;
+            this.pipeline.video_sink = bin;
+            var bus = this.pipeline.get_bus();
+            bus.add_watch(on_message);
         }
         
         public void play() {
             this.pipeline.set_state(State.PLAYING);
+        }
+        
+        private bool on_message(Gst.Bus bus, Message message) {
+            if (message.type == MessageType.ERROR) {
+                GLib.Error err;
+                string debug;
+                message.parse_error(out err, out debug);
+                stdout.printf("Error %s\n", err.message);
+            }
+            return true;
         }
     }
 }

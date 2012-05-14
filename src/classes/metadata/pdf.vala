@@ -29,7 +29,7 @@ namespace pdfpc.Metadata {
     public class Pdf: Base
     {
         protected string? pdf_fname = null;
-        protected string? pdf_url = null;
+        public string? pdf_url = null;
         protected string? pdfpc_url = null;
 
         /**
