@@ -185,6 +185,7 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.goto_last();
                     break;
                     case 0x062: /* b */
+                    case 0x02e: /* . or Logitech Wireless Presenter black screen button */
                         this.fade_to_black();
                     break;
                     case 0x06e: /* n */
@@ -241,6 +242,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     handled = true;
                 break;
                 case 0x062: /* b */
+                case 0x02e: /* . or Logitech Wireless Presenter black screen button */
                     this.fade_to_black();
                     handled = true;
                 break;
