@@ -9,6 +9,7 @@ pkg_check_modules(RSVG REQUIRED librsvg-2.0)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
 pkg_check_modules(GSTINTERFACES REQUIRED gstreamer-interfaces-0.10)
 pkg_check_modules(GDKX11 REQUIRED gdk-x11-2.0)
+pkg_check_modules(GEE REQUIRED gee-1.0)
 
 set(CFLAGS
 	${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
@@ -21,6 +22,7 @@ set(CFLAGS
         ${GSTREAMER_CFLAGS} ${GSTREAMER_CFLAGS_OTHER}
         ${GSTINTERFACES_CFLAGS} ${GSTINTERFACES_CFLAGS_OTHER}
         ${GDKX11_CFLAGS} ${GDKX11_CFLAGS_OTHER}
+        ${GEE_CFLAGS} ${GEE_CFLAGS_OTHER}
 )
 add_definitions(${CFLAGS})
 
@@ -35,6 +37,7 @@ set(LIBS
         ${GSTREAMER_LIBRARIES}
         ${GSTINTERFACES_LIBRARIES}
         ${GDKX11_LIBRARIES}
+        ${GEE_LIBRARIES}
 )
 link_libraries(${LIBS})
 
@@ -46,9 +49,10 @@ set(LIB_PATHS
 	${GTK_LIBRARY_DIRS}
 	${GTHREAD_LIBRARY_DIRS}
         ${RSVG_LIBRARY_DIRS}
-        ${GSTREAMER_LIBRARIES}
-        ${GSTINTERFACES_LIBRARIES}
+        ${GSTREAMER_LIBRARY_DIRS}
+        ${GSTINTERFACES_LIBRARY_DIRS}
         ${GDKX11_LIBRARY_DIRS}
+        ${GEE_LIBRARY_DIRS}
 )
 link_directories(${LIB_PATHS})
 
@@ -68,6 +72,7 @@ PACKAGES
         gstreamer-0.10
         gstreamer-interfaces-0.10
         gdk-x11-2.0
+        gee-1.0
 OPTIONS 
 	--thread
 	--debug
