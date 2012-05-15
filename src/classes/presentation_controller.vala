@@ -48,6 +48,10 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected bool frozen = false;
 
+        /**
+         * Stores if the clock is paused
+         */
+        protected bool paused = false;
 
         /**
          * A flag signaling if we allow for a black slide at the end. Tis is
@@ -170,10 +174,14 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff52: /* Cursor up */
                         this.previous_user_page();
                     break;
-                    case 0xff1b: /* Escape */
+                    case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
                     case 0x071:  /* q */
-                        this.metadata.save_to_disk();
-                        Gtk.main_quit();
+			if (!this.paused) {
+	                    this.metadata.save_to_disk();
+        	            Gtk.main_quit();
+			} else {
+			    this.toggle_pause();
+			}	
                     break;
                     case 0x072: /* r */
                         this.controllables_reset();
@@ -203,7 +211,8 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x073: /* s */
                         this.start();
                     break;
-                    case 0x070: /* p */
+                    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
+		    case 0x070: /* p */
                     case 0xff13: /* pause */
                         this.toggle_pause();
                     break;
@@ -735,6 +744,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Pause the timer
          */
         protected void toggle_pause() {
+	    this.paused = !this.paused;
             foreach( Controllable c in this.controllables )
                 c.toggle_pause();
         }
