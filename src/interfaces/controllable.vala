@@ -65,6 +65,6 @@ namespace pdfpc {
         /**
          *
          */
-        public abstract ulong video_pos(Poppler.Rectangle area, out Gdk.Rectangle rect);
+        public abstract View.Pdf? get_main_view();
     }
 }

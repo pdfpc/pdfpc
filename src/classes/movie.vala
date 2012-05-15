@@ -13,7 +13,8 @@ namespace pdfpc {
          */
         
         protected PresentationController controller;
-        private Gee.HashMap<string, Movie> movies;
+        protected Gee.HashMap<string, Movie> movies;
+        protected bool connected = false;
         
         public MovieManager(PresentationController controller) {
             base();
@@ -22,6 +23,16 @@ namespace pdfpc {
         }
         
         public bool click(string file, string? argument, uint page_number, Poppler.Rectangle area) {
+            if (!this.connected) {
+                stdout.printf("Not connected\n");
+                // Hook up notifications.  We have to wait until the views are created.
+                var view = this.controller.main_view;
+                if (view != null){
+                    stdout.printf("Connecting\n");
+                    view.leaving_slide.connect(this.on_leaving_slide);
+                    this.connected = true;
+                }
+            }
             string key = @"$(area.x1):$(area.x2):$(area.y1):$(area.y2)";
             Movie? movie = movies.get(key);
             if (movie == null) {
@@ -30,6 +41,12 @@ namespace pdfpc {
             }
             movie.toggle_play();
             return true;
+        }
+        
+        public void on_leaving_slide( View.Base source, int from, int to ) {
+            foreach (var movie in this.movies.values)
+                movie.stop();
+            this.movies.clear(); // Is this enough to trigger garbage collection?
         }
     }
     
@@ -91,6 +108,10 @@ namespace pdfpc {
                 this.pipeline.seek_simple(Format.TIME, SeekFlags.FLUSH, 0);
             }
             this.pipeline.set_state(State.PLAYING);
+        }
+        
+        public void stop() {
+            this.pipeline.set_state(State.NULL);
         }
         
         public void toggle_play() {

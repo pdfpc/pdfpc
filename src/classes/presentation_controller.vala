@@ -149,6 +149,11 @@ namespace pdfpc {
         protected HashMap<KeyDef, KeyAction> keyBindings;
         protected HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
 
+        /*
+         * "Main" view of current slide
+         */
+        public View.Pdf main_view = null;
+
         /**
          * Instantiate a new controller
          */
@@ -498,6 +503,8 @@ namespace pdfpc {
 
             //controllable.set_controller( this );
             this.controllables.append( controllable );
+            if (this.main_view == null)
+                this.main_view = controllable.get_main_view();
             
             return true;
         }
@@ -863,7 +870,13 @@ namespace pdfpc {
                 rect = Gdk.Rectangle();
                 return 0;
             }
-            return c.video_pos(area, out rect);
+            View.Pdf view = c.get_main_view();
+            if (view == null) {
+                rect = Gdk.Rectangle();
+                return 0;
+            }
+            rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
+            return (ulong)Gdk.x11_drawable_get_xid(view.get_window());
         }
     }
 }

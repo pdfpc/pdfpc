@@ -52,7 +52,6 @@ namespace pdfpc.Window {
             } );
 
             this.presentation_controller = presentation_controller;
-            this.presentation_controller.register_controllable( this );
 
             Color black;
             Color.parse( "black", out black );
@@ -97,6 +96,8 @@ namespace pdfpc.Window {
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
             this.scroll_event.connect( this.on_scroll );
+
+            this.presentation_controller.register_controllable( this );
         }
 
         /**
@@ -203,9 +204,8 @@ namespace pdfpc.Window {
             }
         }
         
-        public ulong video_pos(Poppler.Rectangle area, out Gdk.Rectangle rect) {
-            rect = ((View.Pdf)this.view).convert_poppler_rectangle_to_gdk_rectangle(area);
-            return (ulong)Gdk.x11_drawable_get_xid(this.view.get_window());
+        public View.Pdf? get_main_view() {
+            return this.view as View.Pdf;
         }
     }
 }

@@ -145,7 +145,6 @@ namespace pdfpc.Window {
             } );
 
             this.presentation_controller = presentation_controller;
-            this.presentation_controller.register_controllable( this );
             
             this.metadata = metadata;
 
@@ -308,6 +307,7 @@ namespace pdfpc.Window {
             this.overview = new Overview( this.metadata, this.presentation_controller, this );
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
             this.presentation_controller.set_overview(this.overview);
+            this.presentation_controller.register_controllable( this );
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
@@ -631,9 +631,8 @@ namespace pdfpc.Window {
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
         
-        public ulong video_pos(Poppler.Rectangle area, out Gdk.Rectangle rect) {
-            rect = ((View.Pdf)this.current_view).convert_poppler_rectangle_to_gdk_rectangle(area);
-            return (ulong)Gdk.x11_drawable_get_xid(this.current_view.get_window());
+        public View.Pdf? get_main_view() {
+            return this.current_view as View.Pdf;
         }
     }
 }
