@@ -37,11 +37,11 @@ namespace pdfpc {
             string key = @"$(area.x1):$(area.x2):$(area.y1):$(area.y2)";
             Movie? movie = movies.get(key);
             if (movie == null) {
-                movie = new Movie(file, argument, area, this.controller);
+                movie = new ControlledMovie(file, argument, area, this.controller);
                 movies.set(key, movie);
                 movie.play();
             } else
-                movie.control.on_button_press();
+                movie.on_button_press();
             return true;
         }
         
@@ -55,24 +55,18 @@ namespace pdfpc {
     public class Movie: GLib.Object {
         
         public dynamic Element pipeline;
-        protected PresentationController controller;
-        protected bool eos;
-        public MovieControl control;
-        protected uint refresh_timeout;
+        protected bool eos = false;
         
         public Movie(string file, string? arguments, Poppler.Rectangle area,
                      PresentationController controller) {
             base();
-            this.controller = controller;
-            this.eos = false;
-            var overlay = this.establish_pipeline(file, area);
-            this.control = new MovieControl(controller.main_view, area, overlay, this);
+            this.establish_pipeline(file, area, controller);
         }
         
-        protected Element establish_pipeline(string file, Poppler.Rectangle area) {
+        protected void establish_pipeline(string file, Poppler.Rectangle area,
+                                          PresentationController controller) {
             var bin = new Bin("bin");
             var tee = ElementFactory.make("tee", "tee");
-            dynamic Element overlay = null;
             bin.add_many(tee);
             bin.add_pad(new GhostPad("sink", tee.get_pad("sink")));
             Gdk.Rectangle rect;
@@ -86,19 +80,9 @@ namespace pdfpc {
                 var queue = ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
                 tee.link(queue);
-                if (n == 0) {
-                    var adaptor1 = ElementFactory.make("ffmpegcolorspace", "adaptor1");
-                    var adaptor2 = ElementFactory.make("ffmpegcolorspace", "adaptor2");
-                    overlay = ElementFactory.make("cairooverlay", "overlay");
-                    var freeze = ElementFactory.make("imagefreeze", "freeze");
-                    bin.add_many(adaptor1, adaptor2, overlay, freeze);
-                    queue.link(adaptor1);
-                    adaptor1.link(overlay);
-                    overlay.link(adaptor2);
-                    adaptor2.link(sink);
-                } else {
-                    queue.link(sink);
-                }
+                var ad_element = this.link_additional(n, queue, bin);
+                ad_element.link(sink);
+                
                 var xoverlay = sink as XOverlay;
                 xoverlay.set_xwindow_id(xid);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
@@ -110,7 +94,7 @@ namespace pdfpc {
             if (GLib.Path.is_absolute(file))
                 uri = "file://" + file;
             else
-                uri = GLib.Path.build_filename(GLib.Path.get_dirname(this.controller.get_pdf_url()), file);
+                uri = GLib.Path.build_filename(GLib.Path.get_dirname(controller.get_pdf_url()), file);
             this.pipeline = ElementFactory.make("playbin2", "playbin");
             this.pipeline.uri = uri;
             this.pipeline.video_sink = bin;
@@ -118,12 +102,13 @@ namespace pdfpc {
             bus.add_signal_watch();
             bus.message["error"] += this.on_message;
             bus.message["eos"] += this.on_eos;
-            
-            return overlay;
         }
         
-        public void play() {
-            Source.remove(this.refresh_timeout);
+        protected virtual Element link_additional(int n, Element source, Bin bin) {
+            return source;
+        }
+        
+        public virtual void play() {
             if (this.eos) {
                 this.eos = false;
                 this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, 0);
@@ -131,52 +116,47 @@ namespace pdfpc {
             this.pipeline.set_state(State.PLAYING);
         }
         
-        public void pause() {
-            int64 curr_time;
-            var tformat = Gst.Format.TIME;
+        public virtual void pause() {
             this.pipeline.set_state(State.PAUSED);
-            this.pipeline.query_position(ref tformat, out curr_time);
-
-            this.refresh_timeout = Timeout.add(50, () => {
-                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, curr_time);
-                return true;
-            } );
         }
         
-        public void stop() {
+        public virtual void stop() {
             this.pipeline.set_state(State.NULL);
         }
         
-        public void toggle_play() {
+        public virtual void toggle_play() {
             State state;
             ClockTime time = util_get_timestamp();
             this.pipeline.get_state(out state, null, time);
-            if (state == State.PLAYING) {
+            if (state == State.PLAYING)
                 this.pause();
-            }
             else
                 this.play();
         }
         
-        private void on_message(Gst.Bus bus, Message message) {
+        public virtual void on_message(Gst.Bus bus, Message message) {
             GLib.Error err;
             string debug;
             message.parse_error(out err, out debug);
             stdout.printf("Error %s\n", err.message);
         }
         
-        private void on_eos(Gst.Bus bus, Message message) {
+        public virtual void on_eos(Gst.Bus bus, Message message) {
             stdout.printf("EOS\n");
             // Can't seek to beginning w/o updating output, so mark to seek later
             this.eos = true;
             this.pause();
         }
+        
+        public virtual void on_button_press() {
+            this.toggle_play();
+        }
     }
     
-    public class MovieControl: GLib.Object {
+    
+    public class ControlledMovie: Movie {
         
         protected Gdk.Rectangle rect;
-        protected unowned Movie movie;
         protected double scalex;
         protected double scaley;
         protected int vheight;
@@ -189,17 +169,35 @@ namespace pdfpc {
         protected Cairo.Rectangle seek_bar =
                     Cairo.Rectangle() { x=-2.75, y=0.5, width=6.75, height=1.0 };
         protected bool in_seek_bar = false;
+        protected uint refresh_timeout;
         protected bool mouse_drag = false;
         
-        public MovieControl(View.Pdf view, Poppler.Rectangle area, dynamic Element overlay, Movie movie) {
-            this.rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
-            this.movie = movie;
+        public ControlledMovie(string file, string? arguments, Poppler.Rectangle area,
+                     PresentationController controller) {
+            base(file, arguments, area, controller);
+            this.rect = controller.main_view.convert_poppler_rectangle_to_gdk_rectangle(area);
+            controller.main_view.motion_notify_event.connect(this.on_motion);
+            //view.button_press_event.connect(this.on_button_press); Trapped by SignalProvider...
+            controller.main_view.button_release_event.connect(this.on_button_release);
+        }
+        
+        protected override Element link_additional(int n, Element source, Bin bin) {
+            if (n != 0)
+                return source;
+            
+            var adaptor1 = ElementFactory.make("ffmpegcolorspace", "adaptor1");
+            var adaptor2 = ElementFactory.make("ffmpegcolorspace", "adaptor2");
+            dynamic Element overlay = ElementFactory.make("cairooverlay", "overlay");
+            var freeze = ElementFactory.make("imagefreeze", "freeze");
+            bin.add_many(adaptor1, adaptor2, overlay, freeze);
+            source.link(adaptor1);
+            adaptor1.link(overlay);
+            overlay.link(adaptor2);
+            
             overlay.draw.connect(this.on_draw);
             overlay.caps_changed.connect(this.on_prepare);
             
-            view.motion_notify_event.connect(this.on_motion);
-            //view.button_press_event.connect(this.on_button_press); Trapped by SignalProvider...
-            view.button_release_event.connect(this.on_button_release);
+            return adaptor2;
         }
         
         public void on_prepare(Element overlay, Caps caps){
@@ -274,17 +272,17 @@ namespace pdfpc {
                 seek_fraction = (x - seek_bar.x) / seek_bar.width;
                 if (seek_fraction < 0) seek_fraction = 0;
                 if (seek_fraction > 1) seek_fraction = 1;
-                this.movie.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH,
-                                                (int64)(seek_fraction * this.duration));
+                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH,
+                                          (int64)(seek_fraction * this.duration));
             }
             return false;
         }
         
-        public void on_button_press() {
+        public override void on_button_press() {
             // This event is acutally grabbed elsewhere, so we don't get the details.  Instead,
             // decide what to do based on the last-reported mouse location.
             if (!this.in_seek_bar)
-                this.movie.toggle_play();
+                this.toggle_play();
             else {
                 this.mouse_drag = true;
             }
@@ -297,5 +295,23 @@ namespace pdfpc {
             this.mouse_drag = false;
             return false;
         }
+        
+        public override void play() {
+            Source.remove(this.refresh_timeout);
+            base.play();
+        }
+        
+        public override void pause() {
+            int64 curr_time;
+            var tformat = Gst.Format.TIME;
+            base.pause();
+            this.pipeline.query_position(ref tformat, out curr_time);
+
+            this.refresh_timeout = Timeout.add(50, () => {
+                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, curr_time);
+                return true;
+            } );
+        }
+
     }
 }
