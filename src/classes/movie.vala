@@ -169,8 +169,9 @@ namespace pdfpc {
         protected Cairo.Rectangle seek_bar =
                     Cairo.Rectangle() { x=-2.75, y=0.5, width=6.75, height=1.0 };
         protected bool in_seek_bar = false;
-        protected uint refresh_timeout;
+        protected uint refresh_timeout = 0;
         protected bool mouse_drag = false;
+        protected bool drag_was_playing;
         
         public ControlledMovie(string file, string? arguments, Poppler.Rectangle area,
                      PresentationController controller) {
@@ -265,16 +266,20 @@ namespace pdfpc {
                                 y > seek_bar.y && y < seek_bar.y + seek_bar.height);
         }
         
+        public int64 mouse_seek(double x, double y) {
+            double seek_fraction = (x - seek_bar.x) / seek_bar.width;
+            if (seek_fraction < 0) seek_fraction = 0;
+            if (seek_fraction > 1) seek_fraction = 1;
+            var seek_time = (int64)(seek_fraction * this.duration);
+            this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, seek_time);
+            return seek_time;
+        }
+        
         public bool on_motion(Gdk.EventMotion event) {
-            double x, y, seek_fraction;
+            double x, y;
             this.set_mouse_in(event.x, event.y, out x, out y);
-            if (this.mouse_drag) {
-                seek_fraction = (x - seek_bar.x) / seek_bar.width;
-                if (seek_fraction < 0) seek_fraction = 0;
-                if (seek_fraction > 1) seek_fraction = 1;
-                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH,
-                                          (int64)(seek_fraction * this.duration));
-            }
+            if (this.mouse_drag)
+                this.mouse_seek(x, y);
             return false;
         }
         
@@ -285,32 +290,64 @@ namespace pdfpc {
                 this.toggle_play();
             else {
                 this.mouse_drag = true;
+                this.drag_was_playing = (this.pipeline.current_state == State.PLAYING);
+                this.pause();
+                this.stop_refresh();
             }
         }
         
         public bool on_button_release(Gdk.EventButton event) {
-/*            double x, y;
+            double x, y;
             this.set_mouse_in(event.x, event.y, out x, out y);
-            stdout.printf("%s: %f%%\n", this.mouse_drag ? "Was dragging" : "Wasn't draggin", (x - seek_bar.x) / seek_bar.width * 100);*/
+            if (this.mouse_drag) {
+                var seek_time = this.mouse_seek(x, y);
+                if (this.drag_was_playing || this.eos) {
+                    this.eos = false;
+                    this.play();
+                } else
+                    // Otherwise, time resets to 0 (don't know why).
+                    this.start_refresh_time(seek_time);
+            }
             this.mouse_drag = false;
             return false;
         }
         
-        public override void play() {
-            Source.remove(this.refresh_timeout);
-            base.play();
-        }
-        
-        public override void pause() {
+        public void start_refresh() {
+            if (this.refresh_timeout != 0)
+                return;
             int64 curr_time;
             var tformat = Gst.Format.TIME;
-            base.pause();
             this.pipeline.query_position(ref tformat, out curr_time);
-
+            this.start_refresh_time(curr_time);
+        }
+        
+        public void start_refresh_time(int64 curr_time) {
+            if (this.eos)
+                // Seeking to the very end won't refresh the output.
+                curr_time -= 1;
+            if (this.refresh_timeout != 0)
+                Source.remove(this.refresh_timeout);
             this.refresh_timeout = Timeout.add(50, () => {
                 this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, curr_time);
                 return true;
             } );
+        }
+        
+        public void stop_refresh() {
+            if (this.refresh_timeout == 0)
+                return;
+            Source.remove(this.refresh_timeout);
+            this.refresh_timeout = 0;
+        }
+
+        public override void play() {
+            this.stop_refresh();
+            base.play();
+        }
+        
+        public override void pause() {
+            base.pause();
+            this.start_refresh();
         }
 
     }
