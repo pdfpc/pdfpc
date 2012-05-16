@@ -1,4 +1,5 @@
 using Gst;
+using Cairo;
 
 using pdfpc;
 
@@ -38,8 +39,9 @@ namespace pdfpc {
             if (movie == null) {
                 movie = new Movie(file, argument, area, this.controller);
                 movies.set(key, movie);
-            }
-            movie.toggle_play();
+                movie.play();
+            } else
+                movie.control.on_button_press();
             return true;
         }
         
@@ -52,21 +54,25 @@ namespace pdfpc {
     
     public class Movie: GLib.Object {
         
-        protected dynamic Element pipeline;
+        public dynamic Element pipeline;
         protected PresentationController controller;
         protected bool eos;
+        public MovieControl control;
+        protected uint refresh_timeout;
         
         public Movie(string file, string? arguments, Poppler.Rectangle area,
                      PresentationController controller) {
             base();
             this.controller = controller;
             this.eos = false;
-            this.establish_pipeline(file, area);
+            var overlay = this.establish_pipeline(file, area);
+            this.control = new MovieControl(controller.main_view, area, overlay, this);
         }
         
-        protected void establish_pipeline(string file, Poppler.Rectangle area) {
+        protected Element establish_pipeline(string file, Poppler.Rectangle area) {
             var bin = new Bin("bin");
             var tee = ElementFactory.make("tee", "tee");
+            dynamic Element overlay = null;
             bin.add_many(tee);
             bin.add_pad(new GhostPad("sink", tee.get_pad("sink")));
             Gdk.Rectangle rect;
@@ -80,7 +86,19 @@ namespace pdfpc {
                 var queue = ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
                 tee.link(queue);
-                queue.link(sink);
+                if (n == 0) {
+                    var adaptor1 = ElementFactory.make("ffmpegcolorspace", "adaptor1");
+                    var adaptor2 = ElementFactory.make("ffmpegcolorspace", "adaptor2");
+                    overlay = ElementFactory.make("cairooverlay", "overlay");
+                    var freeze = ElementFactory.make("imagefreeze", "freeze");
+                    bin.add_many(adaptor1, adaptor2, overlay, freeze);
+                    queue.link(adaptor1);
+                    adaptor1.link(overlay);
+                    overlay.link(adaptor2);
+                    adaptor2.link(sink);
+                } else {
+                    queue.link(sink);
+                }
                 var xoverlay = sink as XOverlay;
                 xoverlay.set_xwindow_id(xid);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
@@ -89,10 +107,10 @@ namespace pdfpc {
             
             // This will likely have problems in Windows, where paths and urls have different separators.
             string uri;
-            if (Path.is_absolute(file))
+            if (GLib.Path.is_absolute(file))
                 uri = "file://" + file;
             else
-                uri = Path.build_filename(Path.get_dirname(this.controller.get_pdf_url()), file);
+                uri = GLib.Path.build_filename(GLib.Path.get_dirname(this.controller.get_pdf_url()), file);
             this.pipeline = ElementFactory.make("playbin2", "playbin");
             this.pipeline.uri = uri;
             this.pipeline.video_sink = bin;
@@ -100,14 +118,29 @@ namespace pdfpc {
             bus.add_signal_watch();
             bus.message["error"] += this.on_message;
             bus.message["eos"] += this.on_eos;
+            
+            return overlay;
         }
         
         public void play() {
+            Source.remove(this.refresh_timeout);
             if (this.eos) {
                 this.eos = false;
-                this.pipeline.seek_simple(Format.TIME, SeekFlags.FLUSH, 0);
+                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, 0);
             }
             this.pipeline.set_state(State.PLAYING);
+        }
+        
+        public void pause() {
+            int64 curr_time;
+            var tformat = Gst.Format.TIME;
+            this.pipeline.set_state(State.PAUSED);
+            this.pipeline.query_position(ref tformat, out curr_time);
+
+            this.refresh_timeout = Timeout.add(50, () => {
+                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, curr_time);
+                return true;
+            } );
         }
         
         public void stop() {
@@ -118,8 +151,9 @@ namespace pdfpc {
             State state;
             ClockTime time = util_get_timestamp();
             this.pipeline.get_state(out state, null, time);
-            if (state == State.PLAYING)
-                this.pipeline.set_state(State.PAUSED);
+            if (state == State.PLAYING) {
+                this.pause();
+            }
             else
                 this.play();
         }
@@ -135,7 +169,133 @@ namespace pdfpc {
             stdout.printf("EOS\n");
             // Can't seek to beginning w/o updating output, so mark to seek later
             this.eos = true;
-            this.pipeline.set_state(State.PAUSED);
+            this.pause();
+        }
+    }
+    
+    public class MovieControl: GLib.Object {
+        
+        protected Gdk.Rectangle rect;
+        protected unowned Movie movie;
+        protected double scalex;
+        protected double scaley;
+        protected int vheight;
+        protected int64 duration;
+        protected double button_scale = 0.075;
+        protected double button_padding = 0.25;
+        protected Cairo.Rectangle play_button =
+                    Cairo.Rectangle() { x=-4.0, y=0.5, width=1.0, height=1.0 };
+        protected bool in_play_button = false;
+        protected Cairo.Rectangle seek_bar =
+                    Cairo.Rectangle() { x=-2.75, y=0.5, width=6.75, height=1.0 };
+        protected bool in_seek_bar = false;
+        protected bool mouse_drag = false;
+        
+        public MovieControl(View.Pdf view, Poppler.Rectangle area, dynamic Element overlay, Movie movie) {
+            this.rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
+            this.movie = movie;
+            overlay.draw.connect(this.on_draw);
+            overlay.caps_changed.connect(this.on_prepare);
+            
+            view.motion_notify_event.connect(this.on_motion);
+            //view.button_press_event.connect(this.on_button_press); Trapped by SignalProvider...
+            view.button_release_event.connect(this.on_button_release);
+        }
+        
+        public void on_prepare(Element overlay, Caps caps){
+            int width = -1, height = -1;
+            VideoFormat format = VideoFormat.UNKNOWN;
+            Gst.video_format_parse_caps(caps, ref format, ref width, ref height);
+            stdout.printf("%ix%i\n", width, height);
+            scalex = 1.0*width;
+            scaley = 1.0*height * rect.width/rect.height;
+            vheight = height;
+            
+            var tformat = Gst.Format.TIME;
+            overlay.query_duration(ref tformat, out duration);
+            stdout.printf("%f s\n", 1.0*duration / SECOND);
+        }
+        
+        public void on_draw(Element overlay, Context cr, uint64 timestamp, uint64 duration) {
+            // Transform to work from bottom middle, with play button size = 1
+            cr.translate(this.scalex/2.0, this.vheight);
+            cr.scale(this.scalex * this.button_scale, -this.scaley * this.button_scale);
+            
+            double width = this.play_button.width + this.seek_bar.width + 3 * this.button_padding;
+            cr.rectangle(-width/2, this.play_button.y - this.button_padding,
+                         width, this.play_button.height + 2 * this.button_padding);
+            cr.set_source_rgba(0.0, 0.0, 0.0, 0.5);
+            cr.fill();
+            
+            cr.save();
+            cr.translate(this.play_button.x, this.play_button.y);
+            this.draw_play_button(overlay, cr);
+            cr.restore();
+            
+            cr.save();
+            cr.translate(this.seek_bar.x, this.seek_bar.y);
+            this.draw_seek_bar(overlay, cr, timestamp);
+            cr.restore();
+        }
+        
+        private void draw_play_button(Element overlay, Context cr) {
+            cr.rectangle(0,0,1,1);
+            var alpha = this.in_play_button ? 1.0 : 0.8;
+            if (overlay.current_state == State.PLAYING)
+                cr.set_source_rgba(1,0,0,alpha);
+            else
+                cr.set_source_rgba(0,1,0,alpha);
+            cr.fill();
+        }
+        
+        private void draw_seek_bar(Element overlay, Context cr, uint64 timestamp) {
+            double fraction = 1.0*timestamp / this.duration;
+            cr.rectangle(0, 0, fraction * this.seek_bar.width, 0.5);
+            if (this.in_seek_bar)
+                cr.set_source_rgba(1,1,1,1.0);
+            else
+                cr.set_source_rgba(1,1,1,0.8);
+            cr.fill();
+        }
+        
+        private void set_mouse_in(double mx, double my, out double x, out double y) {
+            x = ((mx-rect.x)/rect.width - 0.5) / this.button_scale;
+            y = (rect.y + rect.height - my) / rect.width / this.button_scale;
+            this.in_play_button = (x > play_button.x && x < play_button.x + play_button.width &&
+                                   y > play_button.y && y < play_button.y + play_button.height);
+            this.in_seek_bar = (x > seek_bar.x && x < seek_bar.x + seek_bar.width &&
+                                y > seek_bar.y && y < seek_bar.y + seek_bar.height);
+        }
+        
+        public bool on_motion(Gdk.EventMotion event) {
+            double x, y, seek_fraction;
+            this.set_mouse_in(event.x, event.y, out x, out y);
+            if (this.mouse_drag) {
+                seek_fraction = (x - seek_bar.x) / seek_bar.width;
+                if (seek_fraction < 0) seek_fraction = 0;
+                if (seek_fraction > 1) seek_fraction = 1;
+                this.movie.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH,
+                                                (int64)(seek_fraction * this.duration));
+            }
+            return false;
+        }
+        
+        public void on_button_press() {
+            // This event is acutally grabbed elsewhere, so we don't get the details.  Instead,
+            // decide what to do based on the last-reported mouse location.
+            if (!this.in_seek_bar)
+                this.movie.toggle_play();
+            else {
+                this.mouse_drag = true;
+            }
+        }
+        
+        public bool on_button_release(Gdk.EventButton event) {
+/*            double x, y;
+            this.set_mouse_in(event.x, event.y, out x, out y);
+            stdout.printf("%s: %f%%\n", this.mouse_drag ? "Was dragging" : "Wasn't draggin", (x - seek_bar.x) / seek_bar.width * 100);*/
+            this.mouse_drag = false;
+            return false;
         }
     }
 }

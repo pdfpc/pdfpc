@@ -86,6 +86,7 @@ namespace pdfpc.View.Behaviour {
             this.target = view;
 
             view.add_events( Gdk.EventMask.BUTTON_PRESS_MASK );
+            view.add_events( Gdk.EventMask.BUTTON_RELEASE_MASK );
             view.add_events( Gdk.EventMask.POINTER_MOTION_MASK );
 
             view.button_press_event.connect( this.on_button_press );

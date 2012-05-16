@@ -8,6 +8,7 @@ pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
 pkg_check_modules(RSVG REQUIRED librsvg-2.0)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
 pkg_check_modules(GSTINTERFACES REQUIRED gstreamer-interfaces-0.10)
+pkg_check_modules(GSTVIDEO REQUIRED gstreamer-video-0.10)
 pkg_check_modules(GDKX11 REQUIRED gdk-x11-2.0)
 pkg_check_modules(GEE REQUIRED gee-1.0)
 
@@ -21,6 +22,7 @@ set(CFLAGS
         ${RSVG_CFLAGS} ${RSVG_CFLAGS_OTHER}
         ${GSTREAMER_CFLAGS} ${GSTREAMER_CFLAGS_OTHER}
         ${GSTINTERFACES_CFLAGS} ${GSTINTERFACES_CFLAGS_OTHER}
+        ${GSTVIDEO_CFLAGS} ${GSTVIDEO_CFLAGS_OTHER}
         ${GDKX11_CFLAGS} ${GDKX11_CFLAGS_OTHER}
         ${GEE_CFLAGS} ${GEE_CFLAGS_OTHER}
 )
@@ -36,6 +38,7 @@ set(LIBS
         ${RSVG_LIBRARIES}
         ${GSTREAMER_LIBRARIES}
         ${GSTINTERFACES_LIBRARIES}
+        ${GSTVIDEO_LIBRARIES}
         ${GDKX11_LIBRARIES}
         ${GEE_LIBRARIES}
 )
@@ -51,6 +54,7 @@ set(LIB_PATHS
         ${RSVG_LIBRARY_DIRS}
         ${GSTREAMER_LIBRARY_DIRS}
         ${GSTINTERFACES_LIBRARY_DIRS}
+        ${GSTVIDEO_LIBRARY_DIRS}
         ${GDKX11_LIBRARY_DIRS}
         ${GEE_LIBRARY_DIRS}
 )
@@ -71,6 +75,7 @@ PACKAGES
         librsvg-2.0
         gstreamer-0.10
         gstreamer-interfaces-0.10
+	gstreamer-video-0.10
         gdk-x11-2.0
         gee-1.0
 OPTIONS 
