@@ -161,13 +161,8 @@ namespace pdfpc {
         protected double scaley;
         protected int vheight;
         protected int64 duration;
-        protected double button_scale = 0.075;
-        protected double button_padding = 0.25;
-        protected Cairo.Rectangle play_button =
-                    Cairo.Rectangle() { x=-4.0, y=0.5, width=1.0, height=1.0 };
-        protected bool in_play_button = false;
-        protected Cairo.Rectangle seek_bar =
-                    Cairo.Rectangle() { x=-2.75, y=0.5, width=6.75, height=1.0 };
+        protected double seek_bar_height = 20;
+        protected double seek_bar_padding = 2;
         protected bool in_seek_bar = false;
         protected uint refresh_timeout = 0;
         protected bool mouse_drag = false;
@@ -206,8 +201,8 @@ namespace pdfpc {
             VideoFormat format = VideoFormat.UNKNOWN;
             Gst.video_format_parse_caps(caps, ref format, ref width, ref height);
             stdout.printf("%ix%i\n", width, height);
-            scalex = 1.0*width;
-            scaley = 1.0*height * rect.width/rect.height;
+            scalex = 1.0*width / rect.width;
+            scaley = 1.0*height / rect.height;
             vheight = height;
             
             var tformat = Gst.Format.TIME;
@@ -216,58 +211,78 @@ namespace pdfpc {
         }
         
         public void on_draw(Element overlay, Context cr, uint64 timestamp, uint64 duration) {
-            // Transform to work from bottom middle, with play button size = 1
-            cr.translate(this.scalex/2.0, this.vheight);
-            cr.scale(this.scalex * this.button_scale, -this.scaley * this.button_scale);
+            // Transform to work from bottom left, in screen coordinates
+            cr.translate(0, this.vheight);
+            cr.scale(this.scalex, -this.scaley);
             
-            double width = this.play_button.width + this.seek_bar.width + 3 * this.button_padding;
-            cr.rectangle(-width/2, this.play_button.y - this.button_padding,
-                         width, this.play_button.height + 2 * this.button_padding);
-            cr.set_source_rgba(0.0, 0.0, 0.0, 0.5);
-            cr.fill();
-            
-            cr.save();
-            cr.translate(this.play_button.x, this.play_button.y);
-            this.draw_play_button(overlay, cr);
-            cr.restore();
-            
-            cr.save();
-            cr.translate(this.seek_bar.x, this.seek_bar.y);
-            this.draw_seek_bar(overlay, cr, timestamp);
-            cr.restore();
+            this.draw_seek_bar(cr, timestamp);
         }
         
-        private void draw_play_button(Element overlay, Context cr) {
-            cr.rectangle(0,0,1,1);
-            var alpha = this.in_play_button ? 1.0 : 0.8;
-            if (overlay.current_state == State.PLAYING)
-                cr.set_source_rgba(1,0,0,alpha);
-            else
-                cr.set_source_rgba(0,1,0,alpha);
-            cr.fill();
-        }
-        
-        private void draw_seek_bar(Element overlay, Context cr, uint64 timestamp) {
+        private void draw_seek_bar(Context cr, uint64 timestamp) {
             double fraction = 1.0*timestamp / this.duration;
-            cr.rectangle(0, 0, fraction * this.seek_bar.width, 0.5);
-            if (this.in_seek_bar)
-                cr.set_source_rgba(1,1,1,1.0);
-            else
+            if (this.in_seek_bar || this.mouse_drag) {
+                var bar_end = fraction * (rect.width - 2*this.seek_bar_padding);
+                cr.rectangle(0, 0, rect.width, this.seek_bar_height);
+                cr.set_source_rgba(0,0,0,0.8);
+                cr.fill();
+                cr.rectangle(this.seek_bar_padding, this.seek_bar_padding,
+                            bar_end, this.seek_bar_height-4);
                 cr.set_source_rgba(1,1,1,0.8);
-            cr.fill();
+                cr.fill();
+                
+                var time_in_sec = (int)(timestamp / SECOND);
+                var timestring = "%i:%02i".printf(time_in_sec/60, time_in_sec%60);
+                var dur_in_sec = (int)(this.duration / SECOND);
+                var durstring = "%i:%02i".printf(dur_in_sec/60, dur_in_sec%60);
+                TextExtents te;
+                FontOptions fo = new FontOptions();
+                fo.set_antialias(Antialias.GRAY);
+                cr.set_font_options(fo);
+                cr.select_font_face("sans", FontSlant.NORMAL, FontWeight.NORMAL);
+                cr.set_font_size(this.seek_bar_height - 2*seek_bar_padding);
+                
+                cr.text_extents(durstring, out te);
+                if ((bar_end + te.width + 4*this.seek_bar_padding) < rect.width) {
+                    cr.move_to(rect.width - te.width - 2*this.seek_bar_padding,
+                               this.seek_bar_height/2 - te.height/2);
+                    cr.set_source_rgba(0.8,0.8,0.8,1);
+                    cr.save();
+                    cr.scale(1, -1);
+                    cr.show_text(durstring);
+                    cr.restore();
+                }
+                
+                cr.text_extents(timestring, out te);
+                if (bar_end > te.width) {
+                    cr.move_to(bar_end - te.width, this.seek_bar_height/2 - te.height/2);
+                    cr.set_source_rgba(0,0,0,1);
+                } else {
+                    cr.move_to(bar_end + 2*this.seek_bar_padding, this.seek_bar_height/2 - te.height/2);
+                    cr.set_source_rgba(0.8,0.8,0.8,1);
+                }
+                cr.save();
+                cr.scale(1,-1);
+                cr.show_text(timestring);
+                cr.restore();
+                
+            } else {
+                cr.rectangle(0, 0, rect.width, 4);
+                cr.set_source_rgba(0,0,0,0.8);
+                cr.fill();
+                cr.rectangle(1, 1, fraction * (rect.width - 2), 2);
+                cr.set_source_rgba(1,1,1,0.8);
+                cr.fill();
+            }
         }
         
         private void set_mouse_in(double mx, double my, out double x, out double y) {
-            x = ((mx-rect.x)/rect.width - 0.5) / this.button_scale;
-            y = (rect.y + rect.height - my) / rect.width / this.button_scale;
-            this.in_play_button = (x > play_button.x && x < play_button.x + play_button.width &&
-                                   y > play_button.y && y < play_button.y + play_button.height);
-            this.in_seek_bar = (x > seek_bar.x && x < seek_bar.x + seek_bar.width &&
-                                y > seek_bar.y && y < seek_bar.y + seek_bar.height);
+            x = mx - rect.x;
+            y = rect.y + rect.height - my;
+            this.in_seek_bar = (x > 0 && x < rect.width && y > 0 && y < seek_bar_height);
         }
         
         public int64 mouse_seek(double x, double y) {
-            double seek_fraction = (x - seek_bar.x) / seek_bar.width;
+            double seek_fraction = (x - this.seek_bar_padding) / (rect.width - 2*this.seek_bar_padding);
             if (seek_fraction < 0) seek_fraction = 0;
             if (seek_fraction > 1) seek_fraction = 1;
             var seek_time = (int64)(seek_fraction * this.duration);
