@@ -199,13 +199,27 @@ namespace org.westhoffswelt.pdfpresenter {
                         this.previous_user_page();
                     break;
                     case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
-                    case 0x071:  /* q */
-			if (!this.timer.is_paused()) {
+                        bool exit_some_state = false;
+                        if (this.faded_to_black) {
+                            this.fade_to_black();
+                            exit_some_state = true;
+                        }
+                        if (this.frozen) {
+                            this.toggle_freeze();
+                            exit_some_state = true;
+                        }
+                        if (this.timer.is_paused()) {
+			    this.toggle_pause();
+                            exit_some_state = true;
+                        }
+			if (!exit_some_state) {
 	                    this.metadata.save_to_disk();
         	            Gtk.main_quit();
-			} else {
-			    this.toggle_pause();
 			}	
+                    break;
+                    case 0x071:  /* q */
+                        this.metadata.save_to_disk();
+                        Gtk.main_quit();
                     break;
                     case 0x072: /* r */
                         this.controllables_reset();
@@ -235,10 +249,13 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x073: /* s */
                         this.start();
                     break;
-                    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
 		    case 0x070: /* p */
                     case 0xff13: /* pause */
                         this.toggle_pause();
+                    break;
+                    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
+                        if (!this.timer.is_paused())
+                            this.toggle_pause();
                     break;
                     case 0x065: /* e */
                         this.set_end_user_slide();
