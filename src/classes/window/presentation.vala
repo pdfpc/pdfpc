@@ -178,18 +178,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Pause the timer. We don't do anything
-         */
-        public void toggle_pause() {
-        }
-
-        /**
-         * Reset the timer. We don't do anything
-         */
-        public void reset_timer() {
-        }
-
-        /**
          * Show an overview. We don't do anything (yet?)
          */
         public void show_overview() {

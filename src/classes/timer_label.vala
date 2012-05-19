@@ -131,6 +131,13 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
+         * Returns if the timer is paused
+         */
+        public bool is_paused() {
+            return (this.time > 0 && this.timeout == 0);
+        }
+
+        /**
          * Reset the timer to its initial value
          *
          * Furthermore the stop state will be restored
