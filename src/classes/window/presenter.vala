@@ -56,14 +56,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected View.Base strict_prev_view;
 
         /**
-         * Countdown until the presentation ends
+         * Timer for the presenation
          */
-        protected TimerLabel timer;
-
-        /**
-         * Is the timer paused
-         */
-        protected bool timer_paused;
+        protected TimerLabel? timer;
 
         /**
          * Slide progress label ( eg. "23/42" )
@@ -218,30 +213,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 (int)Math.floor( bottom_height * 0.8 * 0.75 ) * Pango.SCALE
             );
 
-            // Calculate the countdown to display until the presentation has to
-            // start
-            time_t start_time = 0;
-            if ( Options.start_time != null ) 
-            {
-                start_time = this.parseTime( 
-                    Options.start_time 
-                );
-            }
-            // The same again for end_time
-            // 
-            time_t end_time = 0;
-            if ( Options.end_time != null ) 
-            {
-                end_time = this.parseTime( 
-                    Options.end_time 
-                );
-                Options.duration = 0;
-                this.metadata.set_duration(0);
-            }
-
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
-            this.timer = getTimerLabel( (int)this.metadata.get_duration() * 60, end_time, Options.last_minutes, start_time );
+            this.timer = this.presentation_controller.getTimer();
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
 
@@ -297,7 +271,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slide_count = metadata.get_slide_count();
 
             this.update();
-            this.reset_timer();
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
@@ -471,8 +444,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
             this.update_slide_count();
             this.update_note();
-            if (!this.timer_paused)
-                this.timer.start();
+            if (this.timer.is_paused())
+                this.pause_icon.show();
+            else
+                this.pause_icon.hide();
             if (this.presentation_controller.is_faded_to_black())
                 this.blank_icon.show();
             else
@@ -501,8 +476,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             this.update_note();
             this.blank_icon.hide();
-            if (!this.timer_paused)
-                this.timer.start();
         }
 
         /**
@@ -609,36 +582,5 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.prerender_progress.hide();
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
-    
-        /**
-         * Parse the given time string to a Time object
-         */
-        private time_t parseTime( string t ) 
-        {
-            var tm = Time.local( time_t() );
-            tm.strptime( t + ":00", "%H:%M:%S" );
-            return tm.mktime();
-        }
-
-        /**
-         * Pause the presentation
-         */
-        public void toggle_pause() {
-            this.timer_paused = this.timer.pause();
-            if ( this.timer_paused )
-                this.pause_icon.show();
-            else
-                this.pause_icon.hide();
-        }
-
-        /**
-         * Pause the presentation
-         */
-        public void reset_timer() {
-            this.timer.reset();
-            this.timer_paused = false;
-            this.pause_icon.hide();
-        }
     }
-
 }

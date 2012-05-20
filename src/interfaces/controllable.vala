@@ -53,16 +53,6 @@ namespace org.westhoffswelt.pdfpresenter {
         public abstract void ask_goto_page();
 
         /**
-         * Pause the timer
-         */
-        public abstract void toggle_pause();
-
-        /**
-         * Reset the timer
-         */
-        public abstract void reset_timer();
-
-        /**
          * Show an overview of all slides
          */
         public abstract void show_overview();
