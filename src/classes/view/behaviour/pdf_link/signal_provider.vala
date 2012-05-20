@@ -312,13 +312,13 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
             this.precalculated_mapping_rectangles = null;
 
             // Free the mapping memory
-            MutexLocks.poppler.lock();
 #if !VALA_0_16
+            MutexLocks.poppler.lock();
             Poppler.Page.free_link_mapping(  
                 this.page_link_mappings
             );
-#endif
             MutexLocks.poppler.unlock();
+#endif
         }
     }
 }
