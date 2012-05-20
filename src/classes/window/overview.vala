@@ -114,8 +114,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
             this.slides = new ListStore(1, typeof(Pixbuf));
             this.slides_view = new IconView.with_model(this.slides);
-            this.slides_view.pixbuf_column = 0;
             this.slides_view.selection_mode = SelectionMode.SINGLE;
+            var renderer = new CellRendererHighlight();
+            this.slides_view.pack_start(renderer, true);
+            this.slides_view.add_attribute(renderer, "pixbuf", 0);
+            this.slides_view.set_item_padding(0);
             this.add(this.slides_view);
             this.slides_view.show();
 
@@ -339,6 +342,26 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // If there's no selection, reset the old one
             this.set_current_slide(this.current_slide);
         }
+    }
 
+    /*
+     * Render a pixbuf that is slightly shaded, unless it is the selected one.
+     */
+    public class CellRendererHighlight: CellRendererPixbuf {
+        
+        public override void render(Gdk.Window window, Widget widget,
+                                    Rectangle background_area, Rectangle cell_area,
+                                    Rectangle expose_area, CellRendererState flags) {
+            base.render(window, widget, background_area, cell_area, expose_area, flags);
+            if (flags != CellRendererState.SELECTED) {
+                var cr = Gdk.cairo_create(window);
+                Gdk.cairo_rectangle(cr, expose_area);
+                cr.clip();
+                
+                Gdk.cairo_rectangle(cr, cell_area);
+                cr.set_source_rgba(0,0,0,0.2);
+                cr.fill();
+            }
+        }
     }
 }
