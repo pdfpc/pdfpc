@@ -330,13 +330,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             bool handled = false;
             var currently_selected = this.get_current_slide();
             switch ( key.keyval ) {
-                //case 0xff51: /* Cursor left */
+                case 0xff51: /* Cursor left */
                 case 0xff55: /* Page Up */
                     if ( currently_selected > 0)
                         this.set_current_slide( currently_selected - 1 );
                     handled = true;
                     break;
-                //case 0xff53: /* Cursor right */
+                case 0xff53: /* Cursor right */
                 case 0xff56: /* Page down */
                     if ( currently_selected < this.n_slides - 1 )
                         this.set_current_slide( currently_selected + 1 );
