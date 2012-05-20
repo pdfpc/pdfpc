@@ -7,7 +7,7 @@ include(ValaVersion)
 
 find_package(Vala)
 
-ensure_vala_version("0.16.0" MINIMUM)
+ensure_vala_version("0.11.0" MINIMUM)
 
 add_subdirectory(src)
 add_subdirectory(icons)

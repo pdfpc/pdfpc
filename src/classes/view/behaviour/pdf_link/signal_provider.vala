@@ -68,8 +68,11 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
         /**
          * Poppler.LinkMappings of the current page
          */
-        //protected unowned GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
+#if VALA_0_16
         protected GLib.List<Poppler.LinkMapping> page_link_mappings = null;
+#else
+        protected unowned GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
+#endif
 
         /**
          * Precalculated Gdk.Rectangles for every link mapping
@@ -132,9 +135,12 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
                             MutexLocks.poppler.lock();
                             var metadata = this.target.get_renderer().get_metadata() as Metadata.Pdf;
                             var document = metadata.get_document();
-                            //unowned Poppler.Dest destination;
-                            //destination = document.find_dest(
-                            Poppler.Dest destination = document.find_dest( 
+#if VALA_0_16
+                            Poppler.Dest destination;
+#else
+                            unowned Poppler.Dest destination;
+#endif
+                            destination = document.find_dest( 
                                 action.dest.named_dest
                             );
                             MutexLocks.poppler.unlock();
@@ -307,9 +313,11 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
 
             // Free the mapping memory
             MutexLocks.poppler.lock();
-            //Poppler.Page.free_link_mapping(  
-            //    this.page_link_mappings
-            //);
+#if !VALA_0_16
+            Poppler.Page.free_link_mapping(  
+                this.page_link_mappings
+            );
+#endif
             MutexLocks.poppler.unlock();
         }
     }
