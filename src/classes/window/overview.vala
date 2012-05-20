@@ -165,23 +165,28 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 var row_spacing = this.slides_view.get_row_spacing();
                 var col_spacing = this.slides_view.get_column_spacing();
                 
-                int cols = 0;
-                int height = this.max_height + 1;
-                do {
-                    cols += 1;
-                    this.target_width = (this.max_width - 2*cols*padding
-                                         - (cols-1)*col_spacing - 2*margin) / cols;
-                    if (this.target_width < Options.min_overview_width) {
-                        this.target_width = Options.min_overview_width;
-                        // Reset icon_width, but take into account scrollbar
-                        break;
-                    }
-                    int rows = (int)Math.ceil((float)this.n_slides / cols);
-                    this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
-                    height = rows * this.target_height + 2*rows*padding
-                             + (rows-1)*row_spacing + 2*margin;
-                } while (height > this.max_height);
+                var eff_max_width = this.max_width - 2 * margin + col_spacing;
+                var eff_max_height = this.max_height - 2 * margin + row_spacing;
+                int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
+                int widthx, widthy, min_width, rows;
                 
+                this.target_width = 0;
+                while (cols > 0) {
+                    widthx = eff_max_width / cols - 2*padding - col_spacing;
+                    rows = (int)Math.ceil((float)this.n_slides / cols);
+                    widthy = (int)Math.floor((eff_max_height / rows - 2*padding - row_spacing)
+                                             * this.aspect_ratio);  // floor so that later round
+                                                                    // doesn't increase height
+                    if (widthy < Options.min_overview_width)
+                        break;
+                    
+                    min_width = widthx < widthy ? widthx : widthy;
+                    this.target_width = min_width > this.target_width ? min_width : this.target_width;
+                    cols -= 1;
+                }
+                if (this.target_width < Options.min_overview_width)
+                    this.target_width = Options.min_overview_width;
+                this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
                 //this.slides_view.set_item_width(icon_width);
 
                 var iter = TreeIter();
