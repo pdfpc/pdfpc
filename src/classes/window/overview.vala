@@ -187,11 +187,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 if (this.target_width < Options.min_overview_width)
                     this.target_width = Options.min_overview_width;
                 this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
-                //this.slides_view.set_item_width(icon_width);
 
+                var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
+                pixbuf.fill(0x7f7f7fff);
                 var iter = TreeIter();
-                for (int i=0; i<this.n_slides; i++)
+                for (int i=0; i<this.n_slides; i++) {
                     this.slides.append(out iter);
+                    this.slides.set_value(iter, 0, pixbuf);
+                }
                 this.structure_done = true;
             }
             GLib.Idle.add(this.fill_previews);
