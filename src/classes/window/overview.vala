@@ -101,6 +101,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected int max_width;
         protected int max_height;
 
+        /*
+         * The currently selected slide.
+         */
+        protected int current_slide = 0;
+
         /**
          * Constructor
          */
@@ -135,6 +140,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.slides_view.key_press_event.connect( this.on_key_press );
+            this.slides_view.selection_changed.connect( this.on_selection_changed );
 
             this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
@@ -284,22 +290,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Set the current highlighted button (and deselect the previous one)
          */
         public void set_current_button(int b) {
-            this.slides_view.select_path(new TreePath.from_indices(b));
-            this.slides_view.set_cursor(new TreePath.from_indices(b), null, false);
-            this.presenter.custom_slide_count(b + 1);
+            var path = new TreePath.from_indices(b);
+            this.slides_view.select_path(path);
+            this.slides_view.set_cursor(path, null, false);
         }
 
         /**
          * Which is the current highlighted button/slide?
          */
         public int get_current_button() {
-            var ltp = this.slides_view.get_selected_items();
-            if (ltp != null) {
-                var tp = ltp.data;
-                if (tp.get_indices() != null)
-                    return tp.get_indices()[0];  // Seg fault if we save tp.get_indices locally
-            }
-            return 0;
+            return this.current_slide;
         }
 
         /**
@@ -330,5 +330,24 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     
             return handled;
         }
+
+        /*
+         * When the section changes, we need to update the current slide number.
+         * Also, make sure we don't end up with no selection.
+         */
+        public void on_selection_changed(Gtk.Widget source) {
+            var ltp = this.slides_view.get_selected_items();
+            if (ltp != null) {
+                var tp = ltp.data;
+                if (tp.get_indices() != null) {  // Seg fault if we save tp.get_indices locally
+                    this.current_slide =  tp.get_indices()[0];
+                    this.presenter.custom_slide_count(this.current_slide + 1);
+                    return;
+                }
+            }
+            // If there's no selection, reset the old one
+            this.set_current_button(this.current_slide);
+        }
+
     }
 }
