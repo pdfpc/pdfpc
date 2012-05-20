@@ -328,7 +328,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public override void show() {
             base.show();
-            this.overview.setMaxWidth(this.slideViews.allocation.width);
+            this.overview.set_available_space(this.allocation.width,
+                                              (int)Math.floor(this.allocation.height * 0.9));
         }
 
         protected void build_layout() {

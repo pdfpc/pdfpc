@@ -30,17 +30,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
      * An overview of all the slides in the form of a table
      */
     public class Overview: Gtk.ScrolledWindow {
-        /**
-         * The underlying table
-         */
-        //private Gtk.Table table;
 
-        /**
-         * Each slide is represented via a derived class of Gtk.Button (see
-         * below). We keep references here (as well as implicitely in the
-         * Gtk.Table to more convenient referencing.
+        /*
+         * The store of all the slides.
          */
-        //private OverviewButton[] button;
+        protected ListStore slides;
+        /*
+         * The view of the above.
+         */
+        protected IconView slides_view;
 
         /**
          * We will need the metadata mainly for converting from user slides to
@@ -54,34 +52,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected int n_slides = 0;
 
         /**
-         * The dimension of the table (square)
-         */
-        protected int xdimension = 0;
-    
-        /**
-         * The height and width allocated for each button. Needed for scaling
-         * the images.
-         */
-        protected int buttonWidth;
-        protected int buttonHeight;
-
-        /**
-         * The height and width of the pixmaps provided by the cache
-         */
-        protected int pixmapWidth;
-        protected int pixmapHeight;
-
-        /**
          * The target height and width of the scaled images, a bit smaller than
          * the button dimensions to allow some margin
          */
-        protected int targetWidth;
-        protected int targetHeight;
-
-        /**
-         * Currently selected button/user slide
-         */
-        //protected int currently_selected = 0;
+        protected int target_width;
+        protected int target_height;
 
         /**
          * Are we displayed?
@@ -114,12 +89,17 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected Presenter presenter;
 
-        double aspectRatio;
+        /*
+         * The aspect ratio of the first slide.  We assume all slides share the
+         * same aspect ratio.
+         */
+        protected double aspect_ratio;
 
-        int maxXDimension;
-
-        protected ListStore slides;
-        protected IconView slides_view;
+        /*
+         * The maximal size of the slides_view.
+         */
+        protected int max_width;
+        protected int max_height;
 
         /**
          * Constructor
@@ -156,11 +136,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.add_events(EventMask.KEY_PRESS_MASK);
             this.slides_view.key_press_event.connect( this.on_key_press );
 
-            this.aspectRatio = this.metadata.get_page_width() / this.metadata.get_page_height();
+            this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
 
-        public void setMaxWidth(int width) {
-            this.maxXDimension = (int)Math.floor((width - 20) / Options.min_overview_width);;
+        public void set_available_space(int width, int height) {
+            this.max_width = width;
+            this.max_height = height;
         }
 
         /**
@@ -174,67 +155,46 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Fill the widget with buttons.
-         *
-         * Note: gtk uses a "lazy" policy for creating widgets. What this means
-         * for us is that we will not know the final size of the buttons in
-         * this function, and thus the miniatures must be built in a separate
-         * function.
+         * Figure out the sizes for the icons, and create entries in slides
+         * for all the slides.
          */
         protected void fill_structure() {
             if (!this.structure_done) {
-                /*this.xdimension = (int)Math.ceil(Math.sqrt(this.n_slides));
-                int ydimension;
-                if (this.xdimension > this.maxXDimension) {
-                    this.xdimension = this.maxXDimension;
-                    ydimension = (int)Math.ceil(this.n_slides/this.xdimension);
-                } else {
-                    ydimension = this.xdimension;
-                }
-                this.table.resize(this.xdimension, ydimension);
-                int currentButton = 0;
-                int r = 0;
-                while (currentButton < this.n_slides) {
-                    for (int c = 0; currentButton < this.n_slides && c < this.xdimension; ++c) {
-                        var newButton = new OverviewButton(currentButton, this.aspectRatio, this, this.presentation_controller);
-                        newButton.show();
-                        this.table.attach_defaults(newButton, c, c+1, r, r+1);
-                        this.button += newButton;
-                        ++currentButton;
+                var margin = this.slides_view.get_margin();
+                var padding = this.slides_view.get_item_padding()+1; // Additional mystery pixel
+                var row_spacing = this.slides_view.get_row_spacing();
+                var col_spacing = this.slides_view.get_column_spacing();
+                
+                int cols = 0;
+                int height = this.max_height + 1;
+                do {
+                    cols += 1;
+                    this.target_width = (this.max_width - 2*cols*padding
+                                         - (cols-1)*col_spacing - 2*margin) / cols;
+                    if (this.target_width < Options.min_overview_width) {
+                        this.target_width = Options.min_overview_width;
+                        // Reset icon_width, but take into account scrollbar
+                        break;
                     }
-                    ++r;
-                }*/
+                    int rows = (int)Math.ceil((float)this.n_slides / cols);
+                    this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
+                    height = rows * this.target_height + 2*rows*padding
+                             + (rows-1)*row_spacing + 2*margin;
+                } while (height > this.max_height);
+                
+                //this.slides_view.set_item_width(icon_width);
+
                 var iter = TreeIter();
                 for (int i=0; i<this.n_slides; i++)
                     this.slides.append(out iter);
                 this.structure_done = true;
             }
-            GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
-        }
-
-        /**
-         * This function will be called when idle, i.e. the buttons will
-         * already have been created and we can know their size. Then it queues
-         * the preview building.
-         */
-        public bool idle_get_button_size_and_queue_fill_previews() {
-            if (this.cache != null) {
-                //this.buttonWidth = this.button[0].allocation.width;
-                //this.buttonHeight = this.button[0].allocation.height;
-                this.cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
-                Scaler scaler = new Scaler(pixmapWidth, pixmapHeight);
-                Rectangle rect = scaler.scale_to(400,400);//this.buttonWidth-10, this.buttonHeight-10);
-                this.targetWidth = rect.width;
-                this.targetHeight = rect.height;
-
-                GLib.Idle.add(this.fill_previews);
-            }
-            return false;
+            GLib.Idle.add(this.fill_previews);
         }
 
         /**
          * Fill the previews (only if we have a cache and we are displayed).
-         * The size of the buttons should be known already
+         * The size of the icons should be known already
          *
          * This is done in a progressive way (one slide at a time) instead of
          * all the slides in one go to provide some progress feedback to the
@@ -247,9 +207,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // should be the same for all
 
             //var thisButton = button[this.next_undone_preview];
-            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, this.pixmapWidth, this.pixmapHeight);
-            Gdk.pixbuf_get_from_drawable(pixbuf, this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview)), null, 0, 0, 0, 0, this.pixmapWidth, this.pixmapHeight);
-            var pixbuf_scaled = pixbuf.scale_simple(this.targetWidth, this.targetHeight, Gdk.InterpType.BILINEAR);
+            int pixmap_width, pixmap_height;
+            this.cache.retrieve(0).get_size(out pixmap_width, out pixmap_height);
+            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmap_width, pixmap_height);
+            Gdk.pixbuf_get_from_drawable(pixbuf,
+                this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview)),
+                null, 0, 0, 0, 0, pixmap_width, pixmap_height);
+            var pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
+                                                    Gdk.InterpType.BILINEAR);
             //thisButton.set_label("");
             //thisButton.set_image(image);
             var iter = TreeIter();
@@ -276,7 +241,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void set_cache(Renderer.Cache.Base cache) {
             this.cache = cache;
             if (this.shown)
-                GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
+                GLib.Idle.add(this.fill_previews);
         }
         
         /**
