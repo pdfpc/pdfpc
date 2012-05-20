@@ -255,7 +255,7 @@ namespace org.westhoffswelt.pdfpresenter {
                     break;
                     case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
                         if (!this.timer.is_paused())
-                            this.toggle_pause();
+                            this.toggle_freeze();
                     break;
                     case 0x065: /* e */
                         this.set_end_user_slide();
