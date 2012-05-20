@@ -29,7 +29,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * An overview of all the slides in the form of a table
      */
-    public class Overview: Gtk.ScrolledWindow {
+    public class Overview: Gtk.Alignment {
 
         /*
          * The store of all the slides.
@@ -39,6 +39,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * The view of the above.
          */
         protected IconView slides_view;
+
+        /*
+         * The ScrolledWindow containing slides_view.
+         */
+        protected ScrolledWindow sw;
 
         /**
          * We will need the metadata mainly for converting from user slides to
@@ -110,8 +115,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
+            this.set(0.5f, 0.5f, 0, 0);
 
-            this.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            this.sw = new ScrolledWindow(null, null);
+            this.sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
             this.slides = new ListStore(1, typeof(Pixbuf));
             this.slides_view = new IconView.with_model(this.slides);
             this.slides_view.selection_mode = SelectionMode.SINGLE;
@@ -119,15 +126,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slides_view.pack_start(renderer, true);
             this.slides_view.add_attribute(renderer, "pixbuf", 0);
             this.slides_view.set_item_padding(0);
-            this.add(this.slides_view);
-            this.slides_view.show();
+            this.sw.add(this.slides_view);
+            this.add(this.sw);
+            this.sw.show_all();
 
             Color black;
             Color white;
             Color.parse("black", out black);
             Color.parse("white", out white);
             this.slides_view.modify_base(StateType.NORMAL, black);
-            Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.get_vscrollbar();
+            Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.sw.get_vscrollbar();
             vscrollbar.modify_bg(StateType.NORMAL, white);
             vscrollbar.modify_bg(StateType.ACTIVE, black);
             vscrollbar.modify_bg(StateType.PRELIGHT, white);
@@ -136,7 +144,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
 
-            this.add_events(EventMask.KEY_PRESS_MASK);
+            //this.add_events(EventMask.KEY_PRESS_MASK);
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
 
@@ -173,6 +181,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 var eff_max_height = this.max_height - 2 * margin + row_spacing;
                 int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
                 int widthx, widthy, min_width, rows;
+                int tr = 0, tc = 0;
                 
                 this.target_width = 0;
                 while (cols > 0) {
@@ -185,12 +194,28 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                         break;
                     
                     min_width = widthx < widthy ? widthx : widthy;
-                    this.target_width = min_width > this.target_width ? min_width : this.target_width;
+                    if (min_width >= this.target_width) {
+                        this.target_width = min_width;
+                        tr = rows;
+                        tc = cols;
+                    }
                     cols -= 1;
                 }
                 if (this.target_width < Options.min_overview_width)
                     this.target_width = Options.min_overview_width;
                 this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
+                if (tr > 0) {
+                    this.sw.set_size_request(tc * (this.target_width + 2*padding + col_spacing)
+                                             + 2*margin - col_spacing,
+                                            tr * (this.target_height + 2*padding + row_spacing)
+                                             + 2*margin - row_spacing);
+                    // Even though there's enough room, the scrollbar appears, which costs
+                    // enough width that there's not enough room.  So shut it off manually.
+                    this.sw.set_policy(PolicyType.NEVER, PolicyType.NEVER);
+                } else {
+                    this.sw.set_size_request(this.max_width, this.max_height);
+                    this.sw.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+                }
 
                 var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
                 pixbuf.fill(0x7f7f7fff);
