@@ -109,7 +109,33 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /*
          * The currently selected slide.
          */
-        protected int current_slide = 0;
+        private int _current_slide = 0;
+        public int current_slide {
+            get { return _current_slide; }
+            set { var path = new TreePath.from_indices(value);
+                  this.slides_view.select_path(path);
+                  // _current_slide set in on_selection_changed, below
+                  this.slides_view.set_cursor(path, null, false);
+                }
+        }
+
+        /*
+         * When the section changes, we need to update the current slide number.
+         * Also, make sure we don't end up with no selection.
+         */
+        public void on_selection_changed(Gtk.Widget source) {
+            var ltp = this.slides_view.get_selected_items();
+            if (ltp != null) {
+                var tp = ltp.data;
+                if (tp.get_indices() != null) {  // Seg fault if we save tp.get_indices locally
+                    this._current_slide = tp.get_indices()[0];
+                    this.presenter.custom_slide_count(this._current_slide + 1);
+                    return;
+                }
+            }
+            // If there's no selection, reset the old one
+            this.current_slide = this._current_slide;
+        }
 
         /**
          * Constructor
@@ -283,14 +309,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         public void set_n_slides(int n) {
             if ( n != this.n_slides ) {
-                var currently_selected = this.get_current_slide();
+                var currently_selected = this.current_slide;
                 this.invalidate();
                 this.n_slides = n;
                 if ( this.shown ) {
                     this.fill_structure();
                     if ( currently_selected >= this.n_slides )
                         currently_selected = this.n_slides - 1;
-                    this.set_current_slide(currently_selected);
+                    this.current_slide = currently_selected;
                 }
             }
         }
@@ -306,66 +332,31 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Set the current highlighted button (and deselect the previous one)
-         */
-        public void set_current_slide(int b) {
-            var path = new TreePath.from_indices(b);
-            this.slides_view.select_path(path);
-            this.slides_view.set_cursor(path, null, false);
-        }
-
-        /**
-         * Which is the current highlighted button/slide?
-         */
-        public int get_current_slide() {
-            return this.current_slide;
-        }
-
-        /**
          * We handle some "navigation" key presses ourselves. Others are left to
          * the standard IconView controls, the rest are passed back to the
          * PresentationController.
          */
         public bool on_key_press(Gtk.Widget source, EventKey key) {
             bool handled = false;
-            var currently_selected = this.get_current_slide();
             switch ( key.keyval ) {
                 case 0xff51: /* Cursor left */
                 case 0xff55: /* Page Up */
-                    if ( currently_selected > 0)
-                        this.set_current_slide( currently_selected - 1 );
+                    if ( this.current_slide > 0)
+                        this.current_slide -= 1;
                     handled = true;
                     break;
                 case 0xff53: /* Cursor right */
                 case 0xff56: /* Page down */
-                    if ( currently_selected < this.n_slides - 1 )
-                        this.set_current_slide( currently_selected + 1 );
+                    if ( this.current_slide < this.n_slides - 1 )
+                        this.current_slide += 1;
                     handled = true;
                     break;
                 case 0xff0d: /* Return */
-                    this.presentation_controller.goto_user_page(currently_selected + 1);
+                    this.presentation_controller.goto_user_page(this.current_slide + 1);
                     break;
             }
                     
             return handled;
-        }
-
-        /*
-         * When the section changes, we need to update the current slide number.
-         * Also, make sure we don't end up with no selection.
-         */
-        public void on_selection_changed(Gtk.Widget source) {
-            var ltp = this.slides_view.get_selected_items();
-            if (ltp != null) {
-                var tp = ltp.data;
-                if (tp.get_indices() != null) {  // Seg fault if we save tp.get_indices locally
-                    this.current_slide = tp.get_indices()[0];
-                    this.presenter.custom_slide_count(this.current_slide + 1);
-                    return;
-                }
-            }
-            // If there's no selection, reset the old one
-            this.set_current_slide(this.current_slide);
         }
     }
 

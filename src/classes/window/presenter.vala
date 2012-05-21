@@ -575,7 +575,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void show_overview() {
             this.slideViews.hide();
             this.overview.show();
-            this.overview.set_current_slide(this.presentation_controller.get_current_user_slide_number());
+            this.overview.current_slide = this.presentation_controller.get_current_user_slide_number();
         }
 
         public void hide_overview() {

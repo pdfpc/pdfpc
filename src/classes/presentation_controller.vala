@@ -396,7 +396,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Set the last slide as defined by the user
          */
         public void set_end_user_slide_overview() {
-            int user_selected = this.overview.get_current_slide();
+            int user_selected = this.overview.current_slide;
             this.metadata.set_end_user_slide(user_selected + 1);
         }
 
@@ -717,7 +717,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Toggle skip for current slide in overview mode
          */
         protected void toggle_skip_overview() {
-            int user_selected = this.overview.get_current_slide();
+            int user_selected = this.overview.current_slide;
             int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
             this.metadata.toggle_skip( slide_number, user_selected );
             this.overview.set_n_slides( this.get_user_n_slides() );
