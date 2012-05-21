@@ -171,6 +171,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.presenter = presenter;
 
             this.slides_view.motion_notify_event.connect( this.presenter.on_mouse_move );
+            this.slides_view.motion_notify_event.connect( this.on_mouse_move );
+            this.slides_view.button_release_event.connect( this.on_mouse_release );
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
 
@@ -357,6 +359,28 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
                     
             return handled;
+        }
+
+        /*
+         * Update the selection when the mouse moves over a new slides.
+         */
+        public bool on_mouse_move(Gtk.Widget source, EventMotion event) {
+            TreePath path;
+            path = this.slides_view.get_path_at_pos((int)event.x, (int)event.y);
+            if (path != null && path.get_indices()[0] != this.current_slide)
+                this.current_slide = path.get_indices()[0];
+            return false;
+        }
+
+        /*
+         * Go to selected slide when the mouse button is released.  On a simple
+         * click, the button_press event will have set the current slide.  On
+         * a drag, the current slide will have been updated by the motion.
+         */
+        public bool on_mouse_release(EventButton event) {
+            if (event.button == 1)
+                this.presentation_controller.goto_user_page(this.current_slide + 1);
+            return false;
         }
     }
 
