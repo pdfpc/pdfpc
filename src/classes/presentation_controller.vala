@@ -719,8 +719,8 @@ namespace org.westhoffswelt.pdfpresenter {
         protected void toggle_skip_overview() {
             int user_selected = this.overview.current_slide;
             int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
-            this.metadata.toggle_skip( slide_number, user_selected );
-            this.overview.set_n_slides( this.get_user_n_slides() );
+            if (this.metadata.toggle_skip( slide_number, user_selected ) != 0)
+                this.overview.remove_current( this.get_user_n_slides() );
         }
 
         /**

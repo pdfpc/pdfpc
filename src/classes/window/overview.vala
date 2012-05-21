@@ -56,6 +56,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected int n_slides = 0;
 
+        protected int last_structure_n_slides = 0;
+
         /**
          * The target height and width of the scaled images, a bit smaller than
          * the button dimensions to allow some margin
@@ -186,6 +188,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slides_view.grab_focus();
         }
 
+        /*
+         * Hide the widget and recalculate the structure, if needed.
+         */
+        public override void hide() {
+            base.hide();
+            if (this.n_slides != this.last_structure_n_slides)
+                this.fill_structure();
+        }
+
         /**
          * Figure out the sizes for the icons, and create entries in slides
          * for all the slides.
@@ -238,6 +249,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.sw.set_size_request(this.max_width, this.max_height);
                 this.sw.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
             }
+            this.last_structure_n_slides = this.n_slides;
 
             this.slides.clear();
             var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
@@ -310,6 +322,20 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     currently_selected = this.n_slides - 1;
                 this.current_slide = currently_selected;
             }
+        }
+
+        /**
+         * Remove the current slide from the overview, and set the total number
+         * of slides to the new value.  Perpare to regenerate the structure the
+         * next time the overview is hidden.
+         */
+        public void remove_current(int newn) {
+            this.n_slides = newn;
+            var iter = TreeIter();
+            this.slides.get_iter_from_string(out iter, @"$(this.current_slide)");
+            this.slides.remove(iter);
+            if (this.current_slide >= this.n_slides)
+                this.current_slide = this.n_slides - 1;
         }
 
         /**
