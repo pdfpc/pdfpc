@@ -64,17 +64,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected int target_height;
 
         /**
-         * Are we displayed?
+         * We render the previews one at a time in idle times.
          */
-        protected bool shown = false;
-
-        /**
-         * Because gtk only allocates sizes on demand, the building of the
-         * buttons and the scaling of the preview must be done separately. Here
-         * we keep track of what we have already done.
-         */
-        protected bool structure_done = false;
         protected int next_undone_preview = 0;
+        protected uint idle_id = 0;
 
         /**
          * The cache we get the images from. It is a reference because the user
@@ -103,8 +96,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /*
          * The maximal size of the slides_view.
          */
-        protected int max_width;
-        protected int max_height;
+        protected int max_width = -1;
+        protected int max_height = -1;
 
         /*
          * The currently selected slide.
@@ -182,15 +175,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void set_available_space(int width, int height) {
             this.max_width = width;
             this.max_height = height;
+            this.fill_structure();
         }
 
         /**
-         * Show the widget + build the structure if needed
+         * Show the widget and get keyboard focus.
          */
         public override void show() {
             base.show();
-            this.shown = true;
-            this.fill_structure();
             this.slides_view.grab_focus();
         }
 
@@ -199,62 +191,64 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * for all the slides.
          */
         protected void fill_structure() {
-            if (!this.structure_done) {
-                var margin = this.slides_view.get_margin();
-                var padding = this.slides_view.get_item_padding()+1; // Additional mystery pixel
-                var row_spacing = this.slides_view.get_row_spacing();
-                var col_spacing = this.slides_view.get_column_spacing();
+            if (this.max_width == -1)
+                return;
+            
+            var margin = this.slides_view.get_margin();
+            var padding = this.slides_view.get_item_padding()+1; // Additional mystery pixel
+            var row_spacing = this.slides_view.get_row_spacing();
+            var col_spacing = this.slides_view.get_column_spacing();
+            
+            var eff_max_width = this.max_width - 2 * margin + col_spacing;
+            var eff_max_height = this.max_height - 2 * margin + row_spacing;
+            int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
+            int widthx, widthy, min_width, rows;
+            int tr = 0, tc = 0;
+            
+            this.target_width = 0;
+            while (cols > 0) {
+                widthx = eff_max_width / cols - 2*padding - col_spacing;
+                rows = (int)Math.ceil((float)this.n_slides / cols);
+                widthy = (int)Math.floor((eff_max_height / rows - 2*padding - row_spacing)
+                                         * this.aspect_ratio);  // floor so that later round
+                                                                // doesn't increase height
+                if (widthy < Options.min_overview_width)
+                    break;
                 
-                var eff_max_width = this.max_width - 2 * margin + col_spacing;
-                var eff_max_height = this.max_height - 2 * margin + row_spacing;
-                int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
-                int widthx, widthy, min_width, rows;
-                int tr = 0, tc = 0;
-                
-                this.target_width = 0;
-                while (cols > 0) {
-                    widthx = eff_max_width / cols - 2*padding - col_spacing;
-                    rows = (int)Math.ceil((float)this.n_slides / cols);
-                    widthy = (int)Math.floor((eff_max_height / rows - 2*padding - row_spacing)
-                                             * this.aspect_ratio);  // floor so that later round
-                                                                    // doesn't increase height
-                    if (widthy < Options.min_overview_width)
-                        break;
-                    
-                    min_width = widthx < widthy ? widthx : widthy;
-                    if (min_width >= this.target_width) {
-                        this.target_width = min_width;
-                        tr = rows;
-                        tc = cols;
-                    }
-                    cols -= 1;
+                min_width = widthx < widthy ? widthx : widthy;
+                if (min_width >= this.target_width) {
+                    this.target_width = min_width;
+                    tr = rows;
+                    tc = cols;
                 }
-                if (this.target_width < Options.min_overview_width)
-                    this.target_width = Options.min_overview_width;
-                this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
-                if (tr > 0) {
-                    this.sw.set_size_request(tc * (this.target_width + 2*padding + col_spacing)
-                                             + 2*margin - col_spacing,
-                                            tr * (this.target_height + 2*padding + row_spacing)
-                                             + 2*margin - row_spacing);
-                    // Even though there's enough room, the scrollbar appears, which costs
-                    // enough width that there's not enough room.  So shut it off manually.
-                    this.sw.set_policy(PolicyType.NEVER, PolicyType.NEVER);
-                } else {
-                    this.sw.set_size_request(this.max_width, this.max_height);
-                    this.sw.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
-                }
-
-                var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
-                pixbuf.fill(0x7f7f7fff);
-                var iter = TreeIter();
-                for (int i=0; i<this.n_slides; i++) {
-                    this.slides.append(out iter);
-                    this.slides.set_value(iter, 0, pixbuf);
-                }
-                this.structure_done = true;
+                cols -= 1;
             }
-            GLib.Idle.add(this.fill_previews);
+            if (this.target_width < Options.min_overview_width)
+                this.target_width = Options.min_overview_width;
+            this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
+            if (tr > 0) {
+                this.sw.set_size_request(tc * (this.target_width + 2*padding + col_spacing)
+                                         + 2*margin - col_spacing,
+                                        tr * (this.target_height + 2*padding + row_spacing)
+                                         + 2*margin - row_spacing);
+                // Even though there's enough room, the scrollbar appears, which costs
+                // enough width that there's not enough room.  So shut it off manually.
+                this.sw.set_policy(PolicyType.NEVER, PolicyType.NEVER);
+            } else {
+                this.sw.set_size_request(this.max_width, this.max_height);
+                this.sw.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+            }
+
+            this.slides.clear();
+            var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
+            pixbuf.fill(0x7f7f7fff);
+            var iter = TreeIter();
+            for (int i=0; i<this.n_slides; i++) {
+                this.slides.append(out iter);
+                this.slides.set_value(iter, 0, pixbuf);
+            }
+
+            this.fill_previews();
         }
 
         /**
@@ -265,8 +259,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * all the slides in one go to provide some progress feedback to the
          * user.
          */
-        protected bool fill_previews() {
-            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides)
+        protected void fill_previews() {
+            if (this.idle_id != 0)
+                Source.remove(idle_id);
+            this.next_undone_preview = 0;
+            this.idle_id = GLib.Idle.add(this._fill_previews);
+        }
+        
+        protected bool _fill_previews() {
+            if (this.cache == null || this.next_undone_preview >= this.n_slides)
                 return false;
 
             // We get the dimensions from the first button and first slide,
@@ -288,21 +289,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         /**
-         * Hides the widget
-         */
-        public override void hide() {
-            base.hide();
-            this.shown = false;
-        }
-
-        /**
          * Gives the cache to retrieve the images from. The caching process
          * itself should already be finished.
          */
         public void set_cache(Renderer.Cache.Base cache) {
             this.cache = cache;
-            if (this.shown)
-                GLib.Idle.add(this.fill_previews);
+            this.fill_previews();
         }
         
         /**
@@ -312,25 +304,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         public void set_n_slides(int n) {
             if ( n != this.n_slides ) {
                 var currently_selected = this.current_slide;
-                this.invalidate();
                 this.n_slides = n;
-                if ( this.shown ) {
-                    this.fill_structure();
-                    if ( currently_selected >= this.n_slides )
-                        currently_selected = this.n_slides - 1;
-                    this.current_slide = currently_selected;
-                }
+                this.fill_structure();
+                if ( currently_selected >= this.n_slides )
+                    currently_selected = this.n_slides - 1;
+                this.current_slide = currently_selected;
             }
-        }
-
-        /**
-         * Invalidates the current structure, e.g. because the number of (user)
-         * slides changed.
-         */
-        protected void invalidate() {
-            this.slides.clear();
-            this.structure_done = false;
-            this.next_undone_preview = 0;
         }
 
         /**
