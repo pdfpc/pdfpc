@@ -144,7 +144,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
 
-            //this.add_events(EventMask.KEY_PRESS_MASK);
+            this.slides_view.motion_notify_event.connect( this.presenter.on_mouse_move );
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
 

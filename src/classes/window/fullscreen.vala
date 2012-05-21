@@ -132,7 +132,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Called every time the mouse cursor is moved
          */
-        protected bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
+        public bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
             // Restore the mouse cursor to its default value
             this.window.set_cursor( null );
 
