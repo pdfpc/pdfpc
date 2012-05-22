@@ -80,7 +80,7 @@ namespace pdfpc {
                 var queue = ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
                 tee.link(queue);
-                var ad_element = this.link_additional(n, queue, bin);
+                var ad_element = this.link_additional(n, queue, bin, rect);
                 ad_element.link(sink);
                 
                 var xoverlay = sink as XOverlay;
@@ -104,7 +104,8 @@ namespace pdfpc {
             bus.message["eos"] += this.on_eos;
         }
         
-        protected virtual Element link_additional(int n, Element source, Bin bin) {
+        protected virtual Element link_additional(int n, Element source, Bin bin,
+                                                  Gdk.Rectangle rect) {
             return source;
         }
         
@@ -171,24 +172,33 @@ namespace pdfpc {
         public ControlledMovie(string file, string? arguments, Poppler.Rectangle area,
                      PresentationController controller) {
             base(file, arguments, area, controller);
-            this.rect = controller.main_view.convert_poppler_rectangle_to_gdk_rectangle(area);
             controller.main_view.motion_notify_event.connect(this.on_motion);
             //view.button_press_event.connect(this.on_button_press); Trapped by SignalProvider...
             controller.main_view.button_release_event.connect(this.on_button_release);
         }
         
-        protected override Element link_additional(int n, Element source, Bin bin) {
+        protected override Element link_additional(int n, Element source, Bin bin,
+                                                   Gdk.Rectangle rect) {
             if (n != 0)
                 return source;
             
+            this.rect = rect;
+            
+            var scale = ElementFactory.make("videoscale", "scale");
+            var rate = ElementFactory.make("videorate", "rate");
             var adaptor1 = ElementFactory.make("ffmpegcolorspace", "adaptor1");
             var adaptor2 = ElementFactory.make("ffmpegcolorspace", "adaptor2");
             dynamic Element overlay = ElementFactory.make("cairooverlay", "overlay");
-            var freeze = ElementFactory.make("imagefreeze", "freeze");
-            bin.add_many(adaptor1, adaptor2, overlay, freeze);
-            source.link(adaptor1);
-            adaptor1.link(overlay);
-            overlay.link(adaptor2);
+            var caps = Caps.from_string(
+                "video/x-raw-rgb," + // Same as cairooverlay; hope to minimize transformations
+                "framerate=[25/1,2147483647/1]," + // At least 25 fps
+                @"width=$(rect.width),height=$(rect.height)"
+            );
+            dynamic Element filter = ElementFactory.make("capsfilter", "filter");
+            filter.caps = caps;
+            bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
+            if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
+                stdout.printf("Trouble in linksville\n");
             
             overlay.draw.connect(this.on_draw);
             overlay.caps_changed.connect(this.on_prepare);
