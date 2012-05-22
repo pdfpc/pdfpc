@@ -136,10 +136,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
-            this.set(0.5f, 0.5f, 0, 0);
 
             this.sw = new ScrolledWindow(null, null);
-            this.sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
             this.slides = new ListStore(1, typeof(Pixbuf));
             this.slides_view = new IconView.with_model(this.slides);
             this.slides_view.selection_mode = SelectionMode.SINGLE;
@@ -205,7 +203,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if (this.max_width == -1)
                 return;
             
-            var margin = this.slides_view.get_margin() + 1; // Avoid jitter w/ moving highlight
+            var margin = this.slides_view.get_margin();
             var padding = this.slides_view.get_item_padding() + 1; // Additional mystery pixel
             var row_spacing = this.slides_view.get_row_spacing();
             var col_spacing = this.slides_view.get_column_spacing();
@@ -214,7 +212,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             var eff_max_height = this.max_height - 2 * margin + row_spacing;
             int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
             int widthx, widthy, min_width, rows;
-            int tr = 0, tc = 0;
+            int tc = 0;
             
             this.target_width = 0;
             while (cols > 0) {
@@ -229,26 +227,24 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 min_width = widthx < widthy ? widthx : widthy;
                 if (min_width >= this.target_width) {
                     this.target_width = min_width;
-                    tr = rows;
                     tc = cols;
                 }
                 cols -= 1;
             }
-            if (this.target_width < Options.min_overview_width)
+            if (this.target_width < Options.min_overview_width) {
                 this.target_width = Options.min_overview_width;
-            this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
-            if (tr > 0) {
-                this.sw.set_size_request(tc * (this.target_width + 2*padding + col_spacing)
-                                         + 2*margin - col_spacing,
-                                        tr * (this.target_height + 2*padding + row_spacing)
-                                         + 2*margin - row_spacing);
-                // Even though there's enough room, the scrollbar appears, which costs
-                // enough width that there's not enough room.  So shut it off manually.
-                this.sw.set_policy(PolicyType.NEVER, PolicyType.NEVER);
+                this.slides_view.columns = (eff_max_width - 20) // Guess for scrollbar width
+                    / (Options.min_overview_width + 2 * padding + col_spacing);
+                this.set(0.5f,0.5f,0,1);  // Expand the ScrolledWindow to full height
+                this.sw.set_policy(PolicyType.NEVER, PolicyType.ALWAYS);
             } else {
-                this.sw.set_size_request(this.max_width, this.max_height);
-                this.sw.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+                this.slides_view.columns = tc;
+                this.set(0.5f,0.5f,0,0);  // Don't expand the ScrolledWindow
+                // Never show vertical scrollbar, or else ScrolledWindow will be as short
+                // as possible.
+                this.sw.set_policy(PolicyType.NEVER, PolicyType.NEVER);
             }
+            this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
             this.last_structure_n_slides = this.n_slides;
 
             this.slides.clear();
