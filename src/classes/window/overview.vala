@@ -205,8 +205,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if (this.max_width == -1)
                 return;
             
-            var margin = this.slides_view.get_margin();
-            var padding = this.slides_view.get_item_padding()+1; // Additional mystery pixel
+            var margin = this.slides_view.get_margin() + 1; // Avoid jitter w/ moving highlight
+            var padding = this.slides_view.get_item_padding() + 1; // Additional mystery pixel
             var row_spacing = this.slides_view.get_row_spacing();
             var col_spacing = this.slides_view.get_column_spacing();
             
