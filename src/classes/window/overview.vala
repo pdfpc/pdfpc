@@ -214,6 +214,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             int widthx, widthy, min_width, rows;
             int tc = 0;
             
+            // Search for the layout with the widest icons.  We do this by considering
+            // layouts with different numbers of columns, and figuring the maximum
+            // width for the icon so that all the icons fit both horizontally and
+            // vertically.  We start with the largest number of columns that fit the
+            // icons at the minimum allowed width, and we decrease the number of columns
+            // until we cannot fit the icons vertically at the minimal allowed size.
+            // Note that there may be NO solution, in which case target_width == 0.
             this.target_width = 0;
             while (cols > 0) {
                 widthx = eff_max_width / cols - 2*padding - col_spacing;
@@ -225,10 +232,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                     break;
                 
                 min_width = widthx < widthy ? widthx : widthy;
-                if (min_width >= this.target_width) {
-                    this.target_width = min_width;
-                    tc = cols;
-                }
+                if (min_width >= this.target_width) {  // If two layouts give the same width
+                    this.target_width = min_width;     // (which happens when they're limited
+                    tc = cols;                         // by height), prefer the one with fewer
+                }                                      // columns for a more filled block.
                 cols -= 1;
             }
             if (this.target_width < Options.min_overview_width) {
