@@ -102,6 +102,9 @@ namespace org.westhoffswelt.pdfpresenter {
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
+            this.metadata = metadata;
+            this.black_on_end = allow_black_on_end;
+
             this.controllables = new List<Controllable>();
 
             // Calculate the countdown to display until the presentation has to
@@ -127,10 +130,7 @@ namespace org.westhoffswelt.pdfpresenter {
                                         end_time, Options.last_minutes, start_time );
             this.timer.reset();
 
-            this.metadata = metadata;
-
             this.n_slides = (int)metadata.get_slide_count();
-            this.black_on_end = allow_black_on_end;
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
