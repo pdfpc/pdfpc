@@ -48,7 +48,6 @@ namespace org.westhoffswelt.pdfpresenter {
          */
         protected bool frozen = false;
 
-
         /**
          * A flag signaling if we allow for a black slide at the end. Tis is
          * useful for the next view and (for some presenters) also for the main
@@ -94,15 +93,44 @@ namespace org.westhoffswelt.pdfpresenter {
         private int[] history;
 
         /**
+         * Timer for the presentation. It should only be displayed on one view.
+         * We hope the controllables behave accordingly.
+         */
+        protected TimerLabel timer;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
+            this.metadata = metadata;
+            this.black_on_end = allow_black_on_end;
+
             this.controllables = new List<Controllable>();
 
-            this.metadata = metadata;
+            // Calculate the countdown to display until the presentation has to
+            // start
+            time_t start_time = 0;
+            if ( Options.start_time != null ) 
+            {
+                start_time = this.parseTime( 
+                    Options.start_time 
+                );
+            }
+            // The same again for end_time
+            time_t end_time = 0;
+            if ( Options.end_time != null ) 
+            {
+                end_time = this.parseTime( 
+                    Options.end_time 
+                );
+                Options.duration = 0;
+                this.metadata.set_duration(0);
+            }
+            this.timer = getTimerLabel( (int)this.metadata.get_duration() * 60,
+                                        end_time, Options.last_minutes, start_time );
+            this.timer.reset();
 
             this.n_slides = (int)metadata.get_slide_count();
-            this.black_on_end = allow_black_on_end;
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
@@ -170,7 +198,25 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0xff52: /* Cursor up */
                         this.previous_user_page();
                     break;
-                    case 0xff1b: /* Escape */
+                    case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
+                        bool exit_some_state = false;
+                        if (this.faded_to_black) {
+                            this.fade_to_black();
+                            exit_some_state = true;
+                        }
+                        if (this.frozen) {
+                            this.toggle_freeze();
+                            exit_some_state = true;
+                        }
+                        if (this.timer.is_paused()) {
+			    this.toggle_pause();
+                            exit_some_state = true;
+                        }
+			if (!exit_some_state) {
+	                    this.metadata.save_to_disk();
+        	            Gtk.main_quit();
+			}	
+                    break;
                     case 0x071:  /* q */
                         this.metadata.save_to_disk();
                         Gtk.main_quit();
@@ -203,9 +249,13 @@ namespace org.westhoffswelt.pdfpresenter {
                     case 0x073: /* s */
                         this.start();
                     break;
-                    case 0x070: /* p */
+		    case 0x070: /* p */
                     case 0xff13: /* pause */
                         this.toggle_pause();
+                    break;
+                    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
+                        if (!this.frozen)
+                            this.toggle_freeze();
                     break;
                     case 0x065: /* e */
                         this.set_end_user_slide();
@@ -415,6 +465,7 @@ namespace org.westhoffswelt.pdfpresenter {
                 this.slide2history();
             this.current_slide_number = page_number;
             this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            this.timer.start();
             this.controllables_update();
         }
 
@@ -428,6 +479,13 @@ namespace org.westhoffswelt.pdfpresenter {
 
         public void set_ignore_mouse_events( bool v ) {
             this.ignore_mouse_events = v;
+        }
+
+        /**
+         * Get the timer
+         */
+        public TimerLabel getTimer() {
+            return this.timer;
         }
 
         /**
@@ -452,6 +510,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the next slide
          */
         public void next_page() {
+            this.timer.start();
             if ( this.current_slide_number < this.n_slides - 1 ) {
                 ++this.current_slide_number;
                 if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1))
@@ -468,6 +527,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the next user slide
          */
         public void next_user_page() {
+            this.timer.start();
             bool needs_update; // Did we change anything?
             if ( this.current_user_slide_number < this.metadata.get_user_slide_count()-1 ) {
                 ++this.current_user_slide_number;
@@ -495,6 +555,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the previous slide
          */
         public void previous_page() {
+            this.timer.start();
             if ( this.current_slide_number > 0) {
                 if (this.current_slide_number != this.metadata.user_slide_to_real_slide(this.current_user_slide_number)) {
                     --this.current_slide_number;
@@ -512,6 +573,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the previous user slide
          */
         public void previous_user_page() {
+            this.timer.start();
             if ( this.current_user_slide_number > 0 ) {
                 --this.current_user_slide_number;
                 this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
@@ -528,6 +590,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the first slide
          */
         public void goto_first() {
+            this.timer.start();
             if (this.current_slide_number != 0)
                 this.slide2history();
             this.current_slide_number = 0;
@@ -541,6 +604,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Go to the last slide
          */
         public void goto_last() {
+            this.timer.start();
             if (this.current_user_slide_number != this.metadata.get_end_user_slide() - 1)
                 this.slide2history();
             this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
@@ -554,6 +618,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Jump 10 (user) slides forward
          */
         public void jump10() {
+            this.timer.start();
             this.current_user_slide_number += 10;
             int max_user_slide = this.metadata.get_user_slide_count();
             if ( this.current_user_slide_number >= max_user_slide )
@@ -568,6 +633,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Jump 10 (user) slides backward
          */
         public void back10() {
+            this.timer.start();
             this.current_user_slide_number -= 10;
             if ( this.current_user_slide_number < 0 )
                 this.current_user_slide_number = 0;
@@ -581,6 +647,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Goto a slide in user page numbers
          */
         public void goto_user_page(int page_number) {
+            this.timer.start();
             if (this.current_user_slide_number != page_number - 1)
                 this.slide2history();
             
@@ -727,7 +794,7 @@ namespace org.westhoffswelt.pdfpresenter {
          * Start the presentation (-> timer)
          */
         protected void start() {
-            // The update implicitely starts the timer
+            this.timer.start();
             this.controllables_update();
         }
         
@@ -735,16 +802,26 @@ namespace org.westhoffswelt.pdfpresenter {
          * Pause the timer
          */
         protected void toggle_pause() {
-            foreach( Controllable c in this.controllables )
-                c.toggle_pause();
+            this.timer.pause();
+            this.controllables_update();
         }
 
         /**
          * Reset the timer
          */
         protected void reset_timer() {
-            foreach( Controllable c in this.controllables )
-                c.reset_timer();
+            this.timer.reset();
+            this.controllables_update();
+        }
+    
+        /**
+         * Parse the given time string to a Time object
+         */
+        private time_t parseTime( string t ) 
+        {
+            var tm = Time.local( time_t() );
+            tm.strptime( t + ":00", "%H:%M:%S" );
+            return tm.mktime();
         }
     }
 }
