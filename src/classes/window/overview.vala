@@ -217,9 +217,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Note that there may be NO solution, in which case target_width == 0.
             this.target_width = 0;
             while (cols > 0) {
-                widthx = eff_max_width / cols - 2*padding - col_spacing;
+                widthx = eff_max_width / cols - 2*padding - 2*col_spacing;
                 rows = (int)Math.ceil((float)this.n_slides / cols);
-                widthy = (int)Math.floor((eff_max_height / rows - 2*padding - row_spacing)
+                widthy = (int)Math.floor((eff_max_height / rows - 2*padding - 2*row_spacing)
                                          * this.aspect_ratio);  // floor so that later round
                                                                 // doesn't increase height
                 if (widthy < Options.min_overview_width)
