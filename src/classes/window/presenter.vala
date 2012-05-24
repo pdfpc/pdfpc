@@ -365,7 +365,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.add( fullLayout );
 
             this.overview = new Overview( this.metadata, this.presentation_controller, this );
-            this.centered_overview = new Alignment(0.5f, 0.5f, 0, 1);
+            this.centered_overview = new Alignment(0.5f, 0.5f, 0, 0);
             this.centered_overview.add(this.overview);
             //this.centered_overview.no_show_all = true;
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );

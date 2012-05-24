@@ -195,13 +195,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             if (this.max_width == -1)
                 return;
             
+            this.slides_view.set_margin(0);
+
             var margin = this.slides_view.get_margin();
             var padding = this.slides_view.get_item_padding() + 1; // Additional mystery pixel
             var row_spacing = this.slides_view.get_row_spacing();
             var col_spacing = this.slides_view.get_column_spacing();
-            
-            var eff_max_width = this.max_width - 2 * margin + col_spacing - 25; // -20 for the scroll bar
-            var eff_max_height = this.max_height - 2 * margin + row_spacing;
+
+            var eff_max_width = this.max_width - 2 * margin;
+            var eff_max_height = this.max_height - 2 * margin;
             int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
             int widthx, widthy, min_width, rows;
             int tc = 0;
@@ -239,6 +241,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
             this.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
             this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
+            rows = (int)Math.ceil((float)this.n_slides / this.slides_view.columns);
+            int full_height = rows*(this.target_height + 2*padding + 2*row_spacing) + 2*margin;
+            if (full_height > this.max_height)
+                full_height = this.max_height;
+            this.set_size_request(-1, full_height);
+
             this.last_structure_n_slides = this.n_slides;
 
             this.slides.clear();
