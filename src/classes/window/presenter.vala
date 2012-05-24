@@ -95,6 +95,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected HBox slideViews = null;
         
         protected Overview overview = null;
+        protected Alignment centered_overview = null;
+        protected bool overview_added = false;
 
         /**
          * Number of slides inside the presentation
@@ -160,9 +162,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             // The next slide is right to the current one and takes up the
             // remaining width
-            Requisition cv_requisition;
-            this.current_view.size_request(out cv_requisition);
-            current_allocated_width = cv_requisition.width;
+            //Requisition cv_requisition;
+            //this.current_view.size_request(out cv_requisition);
+            //current_allocated_width = cv_requisition.width;
             Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_metadata( 
@@ -270,8 +272,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
 
-            this.update();
-
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
                 ((Renderer.Caching)this.current_view.get_renderer()).set_cache( 
@@ -312,17 +312,25 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
+            var center_current_view = new Alignment(0.5f, 0.5f, 0, 0);
+            center_current_view.add(this.current_view);
+
             var current_view_and_stricts = new VBox(false, 2);
-            current_view_and_stricts.pack_start(this.current_view, false, false, 2);
+            current_view_and_stricts.pack_start(center_current_view, false, false, 2);
             current_view_and_stricts.pack_start(strict_views, false, false, 2);
 
-            //var center_current_view = new Alignment(0, (float)0.5, 0, 0);
-            //center_current_view.add(this.current_view);
+
             this.slideViews.add( current_view_and_stricts );
 
             var nextViewWithNotes = new VBox(false, 0);
-            nextViewWithNotes.pack_start( this.next_view, false, false, 0 );
+            var center_next_view = new Alignment(0.5f, 0.5f, 0, 0);
+            center_next_view.add(this.next_view);
+            nextViewWithNotes.pack_start( center_next_view, false, false, 0 );
             var notes_sw = new ScrolledWindow(null, null);
+            Scrollbar notes_scrollbar = (Gtk.Scrollbar) notes_sw.get_vscrollbar();
+            notes_scrollbar.modify_bg(StateType.NORMAL, white);
+            notes_scrollbar.modify_bg(StateType.ACTIVE, black);
+            notes_scrollbar.modify_bg(StateType.PRELIGHT, white);
             notes_sw.add( this.notes_view );
             notes_sw.set_policy( PolicyType.AUTOMATIC, PolicyType.AUTOMATIC );
             nextViewWithNotes.pack_start( notes_sw, true, true, 5 );
@@ -357,9 +365,11 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.add( fullLayout );
 
             this.overview = new Overview( this.metadata, this.presentation_controller, this );
-            this.overview.no_show_all = true;
+            this.centered_overview = new Alignment(0.5f, 0.5f, 0, 1);
+            this.centered_overview.add(this.overview);
+            //this.centered_overview.no_show_all = true;
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
-            this.fullLayout.pack_start( this.overview, true, true, 0 );
+            //this.fullLayout.pack_start( this.overview, true, true, 0 );
             this.presentation_controller.set_overview(this.overview);
         }
 
@@ -421,7 +431,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public void update() {
             if (this.overview != null) {
-                this.overview.hide();
+                this.centered_overview.hide();
                 this.slideViews.show();
             }
             int current_slide_number = this.presentation_controller.get_current_slide_number();
@@ -547,12 +557,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public void show_overview() {
             this.slideViews.hide();
-            this.overview.show();
+            if (!overview_added) {
+                this.fullLayout.pack_start( this.centered_overview, true, true, 0 );
+                overview_added = true;
+            }
+            this.centered_overview.show();
             this.overview.current_slide = this.presentation_controller.get_current_user_slide_number();
         }
 
         public void hide_overview() {
-            this.overview.hide();
+            this.centered_overview.hide();
             this.slideViews.show();
         }
 

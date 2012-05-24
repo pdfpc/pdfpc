@@ -61,7 +61,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
            // As we are using our own kind of double buffer and blit in a one
            // time action, we do not need gtk to double buffer as well.
-           this.set_double_buffered( true );
+           this.set_double_buffered( false );
 
            this.current_slide_number = 0;
 

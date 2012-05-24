@@ -29,7 +29,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
     /**
      * An overview of all the slides in the form of a table
      */
-    public class Overview: Gtk.Alignment {
+    public class Overview: Gtk.ScrolledWindow {
 
         /*
          * The store of all the slides.
@@ -39,11 +39,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * The view of the above.
          */
         protected IconView slides_view;
-
-        /*
-         * The ScrolledWindow containing slides_view.
-         */
-        protected ScrolledWindow sw;
 
         /**
          * We will need the metadata mainly for converting from user slides to
@@ -136,8 +131,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
-
-            this.sw = new ScrolledWindow(null, null);
             this.slides = new ListStore(1, typeof(Pixbuf));
             this.slides_view = new IconView.with_model(this.slides);
             this.slides_view.selection_mode = SelectionMode.SINGLE;
@@ -145,16 +138,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slides_view.pack_start(renderer, true);
             this.slides_view.add_attribute(renderer, "pixbuf", 0);
             this.slides_view.set_item_padding(0);
-            this.sw.add(this.slides_view);
-            this.add(this.sw);
-            this.sw.show_all();
+            this.add(this.slides_view);
+            this.show_all();
 
             Color black;
             Color white;
             Color.parse("black", out black);
             Color.parse("white", out white);
             this.slides_view.modify_base(StateType.NORMAL, black);
-            Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.sw.get_vscrollbar();
+            Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.get_vscrollbar();
             vscrollbar.modify_bg(StateType.NORMAL, white);
             vscrollbar.modify_bg(StateType.ACTIVE, black);
             vscrollbar.modify_bg(StateType.PRELIGHT, white);
@@ -242,15 +234,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 this.target_width = Options.min_overview_width;
                 this.slides_view.columns = (eff_max_width - 20) // Guess for scrollbar width
                     / (Options.min_overview_width + 2 * padding + col_spacing);
-                this.set(0.5f,0.5f,0,1);  // Expand the ScrolledWindow to full height
-                this.sw.set_policy(PolicyType.NEVER, PolicyType.ALWAYS);
             } else {
                 this.slides_view.columns = tc;
-                this.set(0.5f,0.5f,0,0);  // Don't expand the ScrolledWindow
-                // Never show vertical scrollbar, or else ScrolledWindow will be as short
-                // as possible.
-                this.sw.set_policy(PolicyType.NEVER, PolicyType.NEVER);
             }
+            this.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
             this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
             this.last_structure_n_slides = this.n_slides;
 

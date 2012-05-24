@@ -186,10 +186,12 @@ namespace org.westhoffswelt.pdfpresenter {
             // been created at this point.
             if ( this.presentation_window != null ) {
                 this.presentation_window.show_all();
+                this.presentation_window.update();
             }
             
             if ( this.presenter_window != null ) {
                 this.presenter_window.show_all();
+                this.presenter_window.update();
             }
 
             

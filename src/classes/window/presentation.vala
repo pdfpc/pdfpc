@@ -95,8 +95,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
             this.scroll_event.connect( this.on_scroll );
-
-            this.update();
         }
 
         /**
