@@ -74,12 +74,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // with window managers, which correctly handle the movement command,
             // before the window is mapped.
             this.move( this.screen_geometry.x, this.screen_geometry.y );
-            this.fullscreen();
+            //this.fullscreen();
 
             // As certain window-managers like Xfwm4 ignore movement request
             // before the window is initially moved and set up we need to
             // listen to this event.
             this.size_allocate.connect( this.on_size_allocate );
+            this.configure_event.connect( this.on_configure );
 
             this.add_events(EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect( this.on_mouse_move );
@@ -87,6 +88,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Start the 5 seconds timeout after which the mouse curosr is
             // hidden
             this.restart_hide_cursor_timer();
+        }
+
+        // We got to fullscreen once we have moved
+        protected bool on_configure( Gdk.EventConfigure e) {
+            this.fullscreen();
+            return false;
         }
 
         /**
@@ -116,14 +123,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 // Certain window manager (eg. Xfce4) do not allow window movement
                 // while the window is maximized. Therefore it is ensured the
                 // window is not in this state.
-                this.unfullscreen();
-                this.unmaximize();
+                //this.unfullscreen();
+                //this.unmaximize();
 
                 // The first movement might not have worked as expected, because of
                 // the before mentioned maximized window problem. Therefore it is
                 // done again
                 this.move( this.screen_geometry.x, this.screen_geometry.y );
-                this.resize( this.screen_geometry.width, this.screen_geometry.height );
+                //this.resize( this.screen_geometry.width, this.screen_geometry.height );
 
                 this.fullscreen();
             }
