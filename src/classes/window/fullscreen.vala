@@ -93,6 +93,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         // We got to fullscreen once we have moved
         protected bool on_configure( Gdk.EventConfigure e) {
             this.fullscreen();
+            this.configure_event.disconnect(this.on_configure);
             return false;
         }
 
