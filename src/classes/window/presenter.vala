@@ -88,15 +88,32 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected TextView notes_view;
 
         /**
-         * Layout to position all the elements inside the window
+         * The views of the slides + notes
+         */
+        protected HBox slideViews = null;
+
+        /**
+         * The overview of slides
+         */
+        protected Overview overview = null;
+
+        /**
+         * The container that shows the overview. This is the one that has to
+         * be shown or hidden
+         */
+        protected Alignment centered_overview = null;
+
+        /**
+         * There may be problems in some configurations if adding the overview
+         * from the beginning, therefore we delay it until it is first shown.
+         */
+        protected bool overview_added = false;
+
+        /**
+         * We will also need to store the layout where we have to add the
+         * overview (see the comment above)
          */
         protected VBox fullLayout = null;
-
-        protected HBox slideViews = null;
-        
-        protected Overview overview = null;
-        protected Alignment centered_overview = null;
-        protected bool overview_added = false;
 
         /**
          * Number of slides inside the presentation
@@ -272,6 +289,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
 
+            this.overview = new Overview( this.metadata, this.presentation_controller, this );
+            this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
+            this.presentation_controller.set_overview(this.overview);
+
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
                 ((Renderer.Caching)this.current_view.get_renderer()).set_cache( 
@@ -359,18 +380,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             //var fullLayout = new VBox(false, 0);
             this.fullLayout = new VBox(false, 0);
-            fullLayout.pack_start( this.slideViews, true, true, 0 );
-            fullLayout.pack_end( bottomRow, false, false, 0 );
+            this.fullLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
+            this.fullLayout.pack_start( this.slideViews, true, true, 0 );
+            this.fullLayout.pack_end( bottomRow, false, false, 0 );
             
             this.add( fullLayout );
 
-            this.overview = new Overview( this.metadata, this.presentation_controller, this );
             this.centered_overview = new Alignment(0.5f, 0.5f, 0, 0);
             this.centered_overview.add(this.overview);
-            //this.centered_overview.no_show_all = true;
-            this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
-            //this.fullLayout.pack_start( this.overview, true, true, 0 );
-            this.presentation_controller.set_overview(this.overview);
         }
 
         /**

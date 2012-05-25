@@ -59,6 +59,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.modify_bg( StateType.NORMAL, black );
 
             var fixedLayout = new Fixed();
+            fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
             this.add( fixedLayout );
             
             Rectangle scale_rect;
