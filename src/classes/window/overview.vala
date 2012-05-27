@@ -160,6 +160,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.slides_view.button_release_event.connect( this.on_mouse_release );
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
+            this.parent_set.connect( this.on_parent_set );
 
             this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
@@ -170,19 +171,31 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.fill_structure();
         }
 
-        /**
-         * Show the widget and get keyboard focus.
+        /*
+         * Due to a change, the Overview is no longer shown or hidden; instead, its
+         * parent is.  So we need to connect to its parent's show and hide signals.
+         * But we can't do that until the parent has been set.  Thus this signal
+         * handler.  Note that if the Overview is reparented, it will still be
+         * connected to signals from its old parent.  So don't do that.
          */
-        public override void show() {
-            base.show();
+        public void on_parent_set(Widget? old_parent) {
+            if (this.parent != null) {
+                this.parent.show.connect( this.on_show );
+                this.parent.hide.connect( this.on_hide );
+            }
+        }
+
+        /**
+         * Get keyboard focus.
+         */
+        public void on_show() {
             this.slides_view.grab_focus();
         }
 
         /*
-         * Hide the widget and recalculate the structure, if needed.
+         * Recalculate the structure, if needed.
          */
-        public override void hide() {
-            base.hide();
+        public void on_hide() {
             if (this.n_slides != this.last_structure_n_slides)
                 this.fill_structure();
         }
