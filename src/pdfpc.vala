@@ -72,7 +72,7 @@ namespace org.westhoffswelt.pdfpresenter {
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
             { "black-on-end", 'b', 0, 0, ref Options.black_on_end, "Add an additional black slide at the end of the presentation", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
-            { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode", null},
+            { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { null }
         };
 
@@ -157,7 +157,7 @@ namespace org.westhoffswelt.pdfpresenter {
 
 
             var screen = Gdk.Screen.get_default();
-            if ( !Options.single_screen && screen.get_n_monitors() > 1 ) {
+            if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
                 int presenter_monitor, presentation_monitor;
                 if ( Options.display_switch != true )
                     presenter_monitor    = screen.get_primary_monitor();
@@ -168,23 +168,18 @@ namespace org.westhoffswelt.pdfpresenter {
                     this.create_presentation_window( metadata, presentation_monitor );
                 this.presenter_window = 
                     this.create_presenter_window( metadata, presenter_monitor );
-            }
-            else {
-                stdout.printf( "Using only one screen\n" );
-                if ( Options.windowed ) {
-                    this.presenter_window =
-                        this.create_presenter_window( metadata, -1 );
-                    this.presentation_window =
-                        this.create_presentation_window( metadata, -1 );
-                }
-                else {
+            } else if (Options.windowed && !Options.single_screen) {
+                this.presenter_window =
+                    this.create_presenter_window( metadata, -1 );
+                this.presentation_window =
+                    this.create_presentation_window( metadata, -1 );
+            } else {
                     if ( !Options.display_switch)
                         this.presenter_window =
                             this.create_presenter_window( metadata, -1 );
                     else
                         this.presentation_window =
                             this.create_presentation_window( metadata, -1 );
-                }
             }
 
             // The windows are always displayed at last to be sure all caches have
