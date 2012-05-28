@@ -23,7 +23,7 @@
 using GLib;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * View spezialized to work with Pdf renderers.
      *

@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
+namespace pdfpc.Renderer.Cache {
     /**
      * PNG picture data stored by the PNG cache engine.
      */

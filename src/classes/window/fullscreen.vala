@@ -23,7 +23,7 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * Window extension implementing all the needed functionality, to be
      * displayed fullscreen.

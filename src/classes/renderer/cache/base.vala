@@ -23,7 +23,7 @@
 using GLib;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Base Cache store interface which needs to be implemented by every
      * working cache.

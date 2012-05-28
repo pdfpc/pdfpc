@@ -24,9 +24,9 @@ using GLib;
 using Gdk;
 using Cairo;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
+namespace pdfpc.Renderer.Cache {
     /**
      * Cache store which holds all given items in memory as compressed png
      * images

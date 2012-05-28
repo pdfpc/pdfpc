@@ -23,9 +23,9 @@
 using Gtk;
 using Gdk;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * An overview of all the slides in the form of a table
      */

@@ -24,7 +24,7 @@ using Gtk;
 using Gdk;
 using Cairo;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Interface for showing the fill status of all registered pdf image caches
      */

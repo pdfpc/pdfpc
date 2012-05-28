@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Class for providing storage for the notes associate with a presentation
      */

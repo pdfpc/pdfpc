@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Every window or object which wants to be controlled by the
      * PresentationController needs to implement this interface.

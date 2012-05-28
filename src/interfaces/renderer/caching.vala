@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace org.westhoffswelt.pdfpresenter.Renderer {
+namespace pdfpc.Renderer {
     /**
      * Every renderer may decide to implement the Caching interface to improve
      * rendering speed.

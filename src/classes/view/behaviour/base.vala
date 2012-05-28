@@ -22,9 +22,9 @@
 
 using GLib;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.View {
+namespace pdfpc.View {
     /**
      * Abstract base every View Behaviour implementation has to extend.
      *

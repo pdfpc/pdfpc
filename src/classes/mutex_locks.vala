@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Static property container holding all mutex locks, which are needed
      * throughout the application.

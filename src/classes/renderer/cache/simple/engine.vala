@@ -23,9 +23,9 @@
 using GLib;
 using Gdk;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Renderer.Cache {
+namespace pdfpc.Renderer.Cache {
     /**
      * Cache store which simply holds all given items in memory.
      */

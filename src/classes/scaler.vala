@@ -23,7 +23,7 @@
 using GLib;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Scaling calculator which is able to calculate different scaling
      * scenarios while maintaining the correct aspect ratio.

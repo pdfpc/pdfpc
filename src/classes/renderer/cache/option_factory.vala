@@ -22,9 +22,9 @@
 
 using GLib;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Renderer {
+namespace pdfpc.Renderer {
     /**
      * Creates cache engines based on the global commandline options
      */

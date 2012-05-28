@@ -22,7 +22,7 @@
 
 using Gtk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Pdf Presenter Console main application class
      *

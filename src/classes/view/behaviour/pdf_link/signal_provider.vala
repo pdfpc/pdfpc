@@ -22,9 +22,9 @@
 
 using GLib;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
+namespace pdfpc.View.Behaviour {
     /**
      * Access provider to all signals related to PDF links.
      */

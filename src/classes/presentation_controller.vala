@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Controller handling all the triggered events/signals
      */

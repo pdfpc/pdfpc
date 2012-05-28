@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Static property container holding the application wide option
      * information and their default values.

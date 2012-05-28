@@ -23,9 +23,9 @@
 using Gtk;
 using Gdk;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * Window showing the currently active and next slide.
      *

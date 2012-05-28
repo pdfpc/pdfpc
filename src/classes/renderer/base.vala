@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Renderer base class needed to be extended by every slide renderer.
      */

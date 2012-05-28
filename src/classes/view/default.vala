@@ -24,7 +24,7 @@ using GLib;
 using Cairo;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Basic view class which is usable with any renderer.
      */

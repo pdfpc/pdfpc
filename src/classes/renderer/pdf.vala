@@ -24,7 +24,7 @@ using GLib;
 using Gdk;
 using Cairo;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Pdf slide renderer
      */

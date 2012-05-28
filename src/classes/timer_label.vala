@@ -23,7 +23,7 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
 
     /**
       * Factory function for creating TimerLabels, depending if a duration was

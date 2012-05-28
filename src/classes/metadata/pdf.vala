@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.Metadata {
+namespace pdfpc.Metadata {
     /**
      * Metadata for Pdf files
      */
