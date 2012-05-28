@@ -38,6 +38,11 @@ namespace org.westhoffswelt.pdfpresenter {
         public static bool single_screen = false;
         
         /**
+         * Commandline option to run in windowed mode
+         */
+        public static bool windowed = false;
+        
+        /**
          * Commandline option which allows the complete disabling of slide caching
          */
         public static bool disable_caching = false;
