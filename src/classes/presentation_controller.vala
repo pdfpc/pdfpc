@@ -21,6 +21,7 @@
  */
 
 using GLib;
+using Gee;
 
 namespace pdfpc {
     /**
@@ -63,7 +64,7 @@ namespace pdfpc {
         /**
          * Controllables which are registered with this presentation controller.
          */
-        protected List<Controllable> controllables;
+        protected GLib.List<Controllable> controllables;
 
         /**
          * Ignore input events. Useful e.g. for editing notes.
@@ -99,13 +100,30 @@ namespace pdfpc {
         protected TimerLabel timer;
 
         /**
+         * The key bindings as a map from keycodes to actions
+         *
+         * Vala doesn't allow for delegates as the values in a HashMap (yet?). See
+         * http://stackoverflow.com/questions/6145635/gee-hashmap-containing-methods-as-values
+         * for this solution.
+         */
+        protected class KeyAction {
+            public delegate void KeyActionDelegate();
+            public KeyActionDelegate d;
+            public KeyAction(KeyActionDelegate d) {
+                this.d = d;
+            }
+        }
+        protected HashMap<uint, KeyAction> keyBindings;
+        protected HashMap<string, KeyAction> actionNames;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
             this.metadata = metadata;
             this.black_on_end = allow_black_on_end;
 
-            this.controllables = new List<Controllable>();
+            this.controllables = new GLib.List<Controllable>();
 
             // Calculate the countdown to display until the presentation has to
             // start
@@ -134,10 +152,52 @@ namespace pdfpc {
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
+            
+            this.keyBindings = new HashMap<uint, KeyAction>();
+            this.fillActionNames();
         }
 
         public void set_overview(Window.Overview o) {
             this.overview = o;
+        }
+
+        protected void fillActionNames() {
+            this.actionNames = new HashMap<string, KeyAction>();
+            this.actionNames.set("next", new KeyAction(this.next_page));
+            this.actionNames.set("next10", new KeyAction(this.jump10));
+            this.actionNames.set("nextOverlay", new KeyAction(this.next_user_page));
+            this.actionNames.set("prev", new KeyAction(this.previous_page));
+            this.actionNames.set("prev10", new KeyAction(this.back10));
+            this.actionNames.set("prevOverlay", new KeyAction(this.previous_user_page));
+
+            this.actionNames.set("goto", new KeyAction(this.controllables_ask_goto_page));
+            this.actionNames.set("gotoFirst", new KeyAction(this.goto_first));
+            this.actionNames.set("gotoLast", new KeyAction(this.goto_last));
+            this.actionNames.set("overview", new KeyAction(this.controllables_show_overview));
+            this.actionNames.set("histBack", new KeyAction(this.history_back));
+
+            this.actionNames.set("start", new KeyAction(this.start));
+            this.actionNames.set("pause", new KeyAction(this.toggle_pause));
+            this.actionNames.set("resetTimer", new KeyAction(this.reset_timer));
+            this.actionNames.set("reset", new KeyAction(this.controllables_reset));
+
+            this.actionNames.set("blank", new KeyAction(this.fade_to_black));
+            this.actionNames.set("freeze", new KeyAction(this.toggle_freeze));
+            this.actionNames.set("freezeOn", new KeyAction(() => {if (!this.frozen) this.toggle_freeze();}));
+
+            this.actionNames.set("overlay", new KeyAction(this.toggle_skip));
+            this.actionNames.set("note", new KeyAction(this.controllables_edit_note));
+            this.actionNames.set("endSlide", new KeyAction(this.set_end_user_slide));
+
+            this.actionNames.set("exitState", new KeyAction(this.exit_state));
+            this.actionNames.set("quit", new KeyAction(this.quit));
+        }
+
+        /**
+         * Bind the (user-defined) keys
+         */
+        public void bind(uint keycode, string function) {
+            this.keyBindings[keycode] = this.actionNames[function];
         }
 
         /**
@@ -173,100 +233,103 @@ namespace pdfpc {
 
         protected bool key_press_normal( Gdk.EventKey key ) {
             if ( !ignore_keyboard_events ) {
-                switch( key.keyval ) {
-                    case 0xff0d: /* Return */
-                    case 0x1008ff17: /* AudioNext */
-                    case 0xff53: /* Cursor right */
-                    case 0xff56: /* Page down */
-                    case 0x020:  /* Space */
-                        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.jump10();
-                        else
-                            this.next_page();
-                    break;
-                    case 0xff54: /* Cursor down */
-                        this.next_user_page();
-                    break;
-                    case 0xff51: /* Cursor left */
-                    case 0x1008ff16: /* AudioPrev */
-                    case 0xff55: /* Page Up */
-                        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.back10();
-                        else
-                            this.previous_page();
-                    break;
-                    case 0xff52: /* Cursor up */
-                        this.previous_user_page();
-                    break;
-                    case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
-                        bool exit_some_state = false;
-                        if (this.faded_to_black) {
-                            this.fade_to_black();
-                            exit_some_state = true;
-                        }
-                        if (this.frozen) {
-                            this.toggle_freeze();
-                            exit_some_state = true;
-                        }
-                        if (this.timer.is_paused()) {
-			    this.toggle_pause();
-                            exit_some_state = true;
-                        }
-			if (!exit_some_state) {
-	                    this.metadata.save_to_disk();
-        	            Gtk.main_quit();
-			}	
-                    break;
-                    case 0x071:  /* q */
-                        this.metadata.save_to_disk();
-                        Gtk.main_quit();
-                    break;
-                    case 0x072: /* r */
-                        this.controllables_reset();
-                    break;
-                    case 0xff50: /* Home */
-                        this.goto_first();
-                    break;
-                    case 0xff57: /* End */
-                        this.goto_last();
-                    break;
-                    case 0x062: /* b */
-                    case 0x02e: /* . or Logitech Wireless Presenter black screen button */
-                        this.fade_to_black();
-                    break;
-                    case 0x06e: /* n */
-                        this.controllables_edit_note();
-                    break;
-                    case 0x067: /* g */
-                        this.controllables_ask_goto_page();
-                    break;
-                    case 0x066: /* f */
-                        this.toggle_freeze();
-                    break;
-                    case 0x06f: /* o */
-                        this.toggle_skip();
-                    break;
-                    case 0x073: /* s */
-                        this.start();
-                    break;
-		    case 0x070: /* p */
-                    case 0xff13: /* pause */
-                        this.toggle_pause();
-                    break;
-                    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
-                        if (!this.frozen)
-                            this.toggle_freeze();
-                    break;
-                    case 0x065: /* e */
-                        this.set_end_user_slide();
-                    break;
-                    case 0xff09:
-                        this.controllables_show_overview();
-                    break;
-                    case 0xff08:
-                        this.history_back();
-                    break;
-                }
+                var keyAction = this.keyBindings.get(key.keyval);
+                if (keyAction != null)
+                    keyAction.d();
+                //switch( key.keyval ) {
+                //    case 0xff0d: /* Return */
+                //    case 0x1008ff17: /* AudioNext */
+                //    case 0xff53: /* Cursor right */
+                //    case 0xff56: /* Page down */
+                //    case 0x020:  /* Space */
+                //        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                //            this.jump10();
+                //        else
+                //            this.next_page();
+                //    break;
+                //    case 0xff54: /* Cursor down */
+                //        this.next_user_page();
+                //    break;
+                //    case 0xff51: /* Cursor left */
+                //    case 0x1008ff16: /* AudioPrev */
+                //    case 0xff55: /* Page Up */
+                //        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+                //            this.back10();
+                //        else
+                //            this.previous_page();
+                //    break;
+                //    case 0xff52: /* Cursor up */
+                //        this.previous_user_page();
+                //    break;
+                //    case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
+                //        bool exit_some_state = false;
+                //        if (this.faded_to_black) {
+                //            this.fade_to_black();
+                //            exit_some_state = true;
+                //        }
+                //        if (this.frozen) {
+                //            this.toggle_freeze();
+                //            exit_some_state = true;
+                //        }
+                //        if (this.timer.is_paused()) {
+		//	    this.toggle_pause();
+                //            exit_some_state = true;
+                //        }
+		//	if (!exit_some_state) {
+	        //            this.metadata.save_to_disk();
+        	//            Gtk.main_quit();
+		//	}	
+                //    break;
+                //    case 0x071:  /* q */
+                //        this.metadata.save_to_disk();
+                //        Gtk.main_quit();
+                //    break;
+                //    case 0x072: /* r */
+                //        this.controllables_reset();
+                //    break;
+                //    case 0xff50: /* Home */
+                //        this.goto_first();
+                //    break;
+                //    case 0xff57: /* End */
+                //        this.goto_last();
+                //    break;
+                //    case 0x062: /* b */
+                //    case 0x02e: /* . or Logitech Wireless Presenter black screen button */
+                //        this.fade_to_black();
+                //    break;
+                //    case 0x06e: /* n */
+                //        this.controllables_edit_note();
+                //    break;
+                //    case 0x067: /* g */
+                //        this.controllables_ask_goto_page();
+                //    break;
+                //    case 0x066: /* f */
+                //        this.toggle_freeze();
+                //    break;
+                //    case 0x06f: /* o */
+                //        this.toggle_skip();
+                //    break;
+                //    case 0x073: /* s */
+                //        this.start();
+                //    break;
+		//    case 0x070: /* p */
+                //    case 0xff13: /* pause */
+                //        this.toggle_pause();
+                //    break;
+                //    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
+                //        if (!this.frozen)
+                //            this.toggle_freeze();
+                //    break;
+                //    case 0x065: /* e */
+                //        this.set_end_user_slide();
+                //    break;
+                //    case 0xff09:
+                //        this.controllables_show_overview();
+                //    break;
+                //    case 0xff08:
+                //        this.history_back();
+                //    break;
+                //}
                 return true;
             } else {
                 return false;
@@ -811,9 +874,25 @@ namespace pdfpc {
          */
         protected void reset_timer() {
             this.timer.reset();
-            this.controllables_update();
         }
-    
+
+        protected void exit_state() {
+            if (this.faded_to_black) {
+                this.fade_to_black();
+            }
+            if (this.frozen) {
+                this.toggle_freeze();
+            }
+            if (this.timer.is_paused()) {
+                this.toggle_pause();
+            }
+        }
+
+        protected void quit() {
+            this.metadata.save_to_disk();
+            Gtk.main_quit();              
+        }
+
         /**
          * Parse the given time string to a Time object
          */

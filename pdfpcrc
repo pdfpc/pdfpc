@@ -1,0 +1,32 @@
+bind Next      next
+bind Return    next
+bind Right     next
+bind Space     next
+bind Down      nextOverlay
+
+bind Left      prev
+bind Prior     prev
+bind Up        prevOverlay
+
+bind Home      gotoFirst
+bind End       gotoLast
+bind g         goto
+
+bind Escape    quit
+bind q         quit
+
+bind s         start
+bind p         pause
+bind r         resetTimer
+bind R         reset
+
+bind b         blank
+bind period    blank
+bind f         freeze
+
+bind n         note
+bind o         overlay
+
+bind e         endSlide
+bind Tab       overview
+bind BackSpace histBack
