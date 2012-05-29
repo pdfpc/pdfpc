@@ -194,6 +194,8 @@ namespace pdfpc {
                 this.presenter_window.update();
             }
 
+            ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
+            configFileReader.readConfig("/home/david/.pdfpcrc");
             
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
