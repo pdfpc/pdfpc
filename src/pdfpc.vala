@@ -195,7 +195,8 @@ namespace pdfpc {
             }
 
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
-            configFileReader.readConfig("/home/david/.pdfpcrc");
+            configFileReader.readConfig(etc_path + "/pdfpcrc");
+            configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
             
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based

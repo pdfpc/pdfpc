@@ -9,6 +9,14 @@ find_package(Vala)
 
 ensure_vala_version("0.11.0" MINIMUM)
 
+set(SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/etc" CACHE FILEPATH "sysconfdir")
+
 add_subdirectory(src)
 add_subdirectory(icons)
 add_subdirectory(man)
+
+install(FILES
+    pdfpcrc
+DESTINATION
+    ${SYSCONFDIR}
+)   
