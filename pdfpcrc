@@ -1,12 +1,20 @@
 bind Next      next
 bind Return    next
 bind Right     next
-bind Space     next
+bind space     next
 bind Down      nextOverlay
+bind S+Next    next10
+bind S+Return  next10
+bind S+Right   next10
+bind S+space   next10
+bind S+Down    next10
 
 bind Left      prev
 bind Prior     prev
 bind Up        prevOverlay
+bind S+Left    prev10
+bind S+Prior   prev10
+bind S+Up      prev10
 
 bind Home      gotoFirst
 bind End       gotoLast

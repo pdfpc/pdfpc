@@ -67,6 +67,11 @@ namespace pdfpc {
         protected GLib.List<Controllable> controllables;
 
         /**
+         * Key modifiers that we support
+         */
+        public uint accepted_key_mods { get; set; }
+
+        /**
          * Ignore input events. Useful e.g. for editing notes.
          */
         protected bool ignore_keyboard_events = false;
@@ -113,7 +118,22 @@ namespace pdfpc {
                 this.d = d;
             }
         }
-        protected HashMap<uint, KeyAction> keyBindings;
+        /**
+         * HashMaps do not support complex structures as indexing (per value,
+         * it seems to use pointers). Not really happy with this solution, but
+         * it works for the time being. We index the keybindings by keyval in a
+         * MultiMap and then go sequentially looking for the modmap. As the
+         * number of modifiers is small, this doesn't take long.
+         */
+        protected class KeyActionWithMod {
+            public KeyAction.KeyActionDelegate d;
+            public uint modMask {set;get;}
+            public KeyActionWithMod(uint m, KeyAction ka) {
+                this.modMask = m;
+                this.d = ka.d;
+            }
+        }
+        protected HashMultiMap<uint, KeyActionWithMod> keyBindings;
         protected HashMap<string, KeyAction> actionNames;
 
         /**
@@ -153,7 +173,7 @@ namespace pdfpc {
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
             
-            this.keyBindings = new HashMap<uint, KeyAction>();
+            this.keyBindings = new HashMultiMap<uint, KeyActionWithMod>();
             this.fillActionNames();
         }
 
@@ -196,8 +216,11 @@ namespace pdfpc {
         /**
          * Bind the (user-defined) keys
          */
-        public void bind(uint keycode, string function) {
-            this.keyBindings[keycode] = this.actionNames[function];
+        public void bind(uint keycode, uint modMask, string function) {
+            if (this.actionNames.contains(function))
+                this.keyBindings.set(keycode, new KeyActionWithMod(modMask, this.actionNames[function]));
+            else
+                stderr.printf("Warning: Unknown function %s\n", function);
         }
 
         /**
@@ -233,9 +256,15 @@ namespace pdfpc {
 
         protected bool key_press_normal( Gdk.EventKey key ) {
             if ( !ignore_keyboard_events ) {
-                var keyAction = this.keyBindings.get(key.keyval);
-                if (keyAction != null)
-                    keyAction.d();
+                var allKeyActions = this.keyBindings.get(key.keyval).to_array();
+                uint modMask = key.state & this.accepted_key_mods;
+                int i;
+                for (i = 0; i < allKeyActions.length; ++i) {
+                    if (allKeyActions[i].modMask == modMask)
+                        break;
+                }
+                if (i < allKeyActions.length)
+                    allKeyActions[i].d();
                 //switch( key.keyval ) {
                 //    case 0xff0d: /* Return */
                 //    case 0x1008ff17: /* AudioNext */

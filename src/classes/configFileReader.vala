@@ -26,6 +26,11 @@ namespace pdfpc {
 
         public ConfigFileReader(PresentationController controller) {
             this.presentation_controller = controller;
+            uint supportedModifiers = Gdk.ModifierType.SHIFT_MASK 
+                                      | Gdk.ModifierType.CONTROL_MASK
+                                      | Gdk.ModifierType.META_MASK
+                                    ;
+            this.presentation_controller.accepted_key_mods = supportedModifiers;
         }
 
         public void readConfig(string fname) {
@@ -40,8 +45,40 @@ namespace pdfpc {
                     if (fields.length == 0 || fields[0][0] == '#')
                         continue;
                     if (fields[0] == "bind") {
-                        uint keycode = Gdk.keyval_from_name(fields[1]);
-                        this.presentation_controller.bind(keycode, fields[2]);
+                        string[] keyFields = fields[1].split("+");
+                        uint modMask = 0;
+                        uint keycode = 0;
+                        if (keyFields.length == 1) {
+                            keycode = Gdk.keyval_from_name(fields[1]);
+                        } else if (keyFields.length == 2) {
+                            string modString = keyFields[0];
+                            for (int m = 0; m < modString.length; ++m) {
+                                switch (modString[m]) {
+                                    case 'S':
+                                        modMask |= Gdk.ModifierType.SHIFT_MASK;
+                                        break;
+                                    case 'C':
+                                        modMask |= Gdk.ModifierType.CONTROL_MASK;
+                                        break;
+                                    case 'A':
+                                    case 'M':
+                                        modMask |= Gdk.ModifierType.META_MASK;
+                                        break;
+                                    default:
+                                        stderr.printf("Warning: Ignoring unknown modifier '%c'\n", modString[m]);
+                                        break;
+                                }
+                            }
+                            keycode = Gdk.keyval_from_name(keyFields[1]);
+                        } else {
+                            stderr.printf("Malformed key specification: %s\n", fields[1]);
+                            continue;
+                        }
+                        if (keycode == 0x0) {
+                            stderr.printf("Warning: Unknown key: %s\n", fields[1]);
+                        } else {
+                            this.presentation_controller.bind(keycode, modMask, fields[2]);
+                        }
                     }
                 }
             } catch (Error e) {
