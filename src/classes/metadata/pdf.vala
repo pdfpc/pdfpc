@@ -494,5 +494,36 @@ namespace pdfpc.Metadata {
 
             return document;
         }
+
+        private int mapping_page_num = -1;
+        private GLib.List<ActionMapping> action_mapping;
+        public weak PresentationController controller = null;
+        public unowned GLib.List<ActionMapping> get_action_mapping( int page_num ) {
+            if (page_num != this.mapping_page_num) {
+                foreach (var mapping in this.action_mapping)
+                    mapping.deactivate();
+                this.action_mapping = null; //.Is this really the correct way to clear a list?
+#if VALA_0_16
+                GLib.List<Poppler.LinkMapping> link_mappings;
+#else
+                unowned GLib.List<unowned Poppler.LinkMapping> link_mappings;
+#endif
+                link_mappings = this.get_document().get_page(page_num).get_link_mapping();
+                foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
+                    var action = ControlledMovie.new_if_handled(mapping, this.controller, this.document);
+                    if (action == null)
+                        action = LinkAction.new_if_handled(mapping, this.controller, this.document);
+                    this.action_mapping.append(action);
+                }
+                this.mapping_page_num = page_num;
+                // Free the mapping memory
+#if !VALA_0_16
+                //MutexLocks.poppler.lock(); Already in lock
+                Poppler.Page.free_link_mapping(link_mappings);
+                //MutexLocks.poppler.unlock();
+#endif
+            }
+            return this.action_mapping;
+        }
     }
 }

@@ -5,66 +5,28 @@ using pdfpc;
 
 namespace pdfpc {
     
-    public class MovieManager: GLib.Object {
-        /**
-         * The movie manager should be informed of any clicks on movies. It will
-         * create, start, and stop them as appropriate.  It will also watch for
-         * page changes and stop movies as appropriate.  There is no guarantee
-         * that movie objects will persist past page changes.
-         */
-        
-        protected PresentationController controller;
-        protected Gee.HashMap<string, Movie> movies;
-        protected bool connected = false;
-        
-        public MovieManager(PresentationController controller) {
-            base();
-            this.controller = controller;
-            this.movies = new Gee.HashMap<string, Movie>();
-        }
-        
-        public bool click(string file, string? argument, uint page_number, Poppler.Rectangle area) {
-            if (!this.connected) {
-                stdout.printf("Not connected\n");
-                // Hook up notifications.  We have to wait until the views are created.
-                var view = this.controller.main_view;
-                if (view != null){
-                    stdout.printf("Connecting\n");
-                    view.leaving_slide.connect(this.on_leaving_slide);
-                    this.connected = true;
-                }
-            }
-            string key = @"$(area.x1):$(area.x2):$(area.y1):$(area.y2)";
-            Movie? movie = movies.get(key);
-            if (movie == null) {
-                movie = new ControlledMovie(file, argument, area, this.controller);
-                movies.set(key, movie);
-                movie.play();
-            } else
-                movie.on_button_press();
-            return true;
-        }
-        
-        public void on_leaving_slide( View.Base source, int from, int to ) {
-            foreach (var movie in this.movies.values)
-                movie.stop();
-            this.movies.clear(); // Is this enough to trigger garbage collection?
-        }
-    }
-    
-    public class Movie: GLib.Object {
+    public class Movie: ActionMapping {
         
         public dynamic Element pipeline;
         protected bool eos = false;
         
-        public Movie(string file, string? arguments, Poppler.Rectangle area,
-                     PresentationController controller) {
-            base();
-            this.establish_pipeline(file, area, controller);
+        public Movie(Poppler.LinkMapping mapping,
+                PresentationController controller, Poppler.Document document) {
+        //this = null;
+            base(mapping, controller, document);
+            var file = ((Poppler.ActionLaunch*)this.action).file_name;
+            this.establish_pipeline(file);
         }
         
-        protected void establish_pipeline(string file, Poppler.Rectangle area,
-                                          PresentationController controller) {
+        public static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
+                PresentationController controller, Poppler.Document document) {
+            if (mapping.action.type == Poppler.ActionType.LAUNCH)
+                // Need better test...
+                return new Movie(mapping, controller, document) as ActionMapping;
+            return null;
+        }
+        
+        protected void establish_pipeline(string file) {
             var bin = new Bin("bin");
             var tee = ElementFactory.make("tee", "tee");
             bin.add_many(tee);
@@ -73,7 +35,7 @@ namespace pdfpc {
             int n = 0;
             ulong xid;
             while (true) {
-                xid = controller.video_pos(n, area, out rect);
+                xid = this.controller.video_pos(n, this.area, out rect);
                 if (xid == 0)
                     break;
                 var sink = ElementFactory.make("xvimagesink", @"sink$n");
@@ -149,8 +111,13 @@ namespace pdfpc {
             this.pause();
         }
         
-        public virtual void on_button_press() {
+        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
             this.toggle_play();
+            return true;
+        }
+        
+        public override void deactivate() {
+            this.stop();
         }
     }
     
@@ -169,12 +136,19 @@ namespace pdfpc {
         protected bool mouse_drag = false;
         protected bool drag_was_playing;
         
-        public ControlledMovie(string file, string? arguments, Poppler.Rectangle area,
-                     PresentationController controller) {
-            base(file, arguments, area, controller);
+        public ControlledMovie(Poppler.LinkMapping mapping,
+                PresentationController controller, Poppler.Document document) {
+            base(mapping, controller, document);
             controller.main_view.motion_notify_event.connect(this.on_motion);
-            //view.button_press_event.connect(this.on_button_press); Trapped by SignalProvider...
             controller.main_view.button_release_event.connect(this.on_button_release);
+        }
+        
+        public new static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
+                PresentationController controller, Poppler.Document document) {
+            if (mapping.action.type == Poppler.ActionType.LAUNCH)
+                // Need better test...
+                return new ControlledMovie(mapping, controller, document) as ActionMapping;
+            return null;
         }
         
         protected override Element link_additional(int n, Element source, Bin bin,
@@ -308,17 +282,24 @@ namespace pdfpc {
             return false;
         }
         
-        public override void on_button_press() {
-            // This event is acutally grabbed elsewhere, so we don't get the details.  Instead,
-            // decide what to do based on the last-reported mouse location.
+        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+            if (widget != this.controller.main_view) {
+                this.toggle_play();
+                return true;
+            }
+            
+            double x, y;
+            this.set_mouse_in(event.x, event.y, out x, out y);
             if (!this.in_seek_bar)
                 this.toggle_play();
             else {
                 this.mouse_drag = true;
                 this.drag_was_playing = (this.pipeline.current_state == State.PLAYING);
                 this.pause();
+                this.mouse_seek(x, y);
                 this.stop_refresh();
             }
+            return true;
         }
         
         public bool on_button_release(Gdk.EventButton event) {

@@ -43,7 +43,7 @@ namespace pdfpc {
             if ( clickable_links )
                 // Enable the PDFLink Behaviour by default on PDF Views
                 this.associate_behaviour( 
-                    new View.Behaviour.PdfLink.Implementation( presentation_controller )
+                    new View.Behaviour.PdfLink()
                 );
         }
 
