@@ -11,22 +11,41 @@ namespace pdfpc {
         protected bool eos = false;
         
         public Movie(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
-        //this = null;
+                PresentationController controller, Poppler.Document document, string file) {
             base(mapping, controller, document);
-            var file = ((Poppler.ActionLaunch*)this.action).file_name;
             GLib.Idle.add( () => { this.establish_pipeline(file); return false; } );
         }
         
         public static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            if (mapping.action.type == Poppler.ActionType.LAUNCH)
-                // Need better test...
-                return new Movie(mapping, controller, document) as ActionMapping;
+            string uri;
+            if (Movie.parse_mapping(mapping, controller, out uri))
+                return new Movie(mapping, controller, document, uri) as ActionMapping;
             return null;
         }
         
-        protected void establish_pipeline(string file) {
+        public static bool parse_mapping(Poppler.LinkMapping mapping, PresentationController controller, out string uri) {
+            if (mapping.action.type == Poppler.ActionType.LAUNCH) {
+                var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
+                stdout.printf(@"File name: $file\n");
+                var uriRE = new Regex("^[a-z]*://");
+                if (uriRE.match(file)) {
+                    uri = file;
+                } else if (GLib.Path.is_absolute(file)) {
+                    uri = "file://" + file;
+                } else {
+                    var dirname = GLib.Path.get_dirname(controller.get_pdf_url());
+                    uri = GLib.Path.build_filename(dirname, file);
+                }
+                bool uncertain;
+                var ctype = GLib.ContentType.guess(uri, null, out uncertain);
+                if (ctype.split("/", 2)[0] == "video")
+                    return true;
+            }
+            return false;
+        }
+        
+        protected void establish_pipeline(string uri) {
             var bin = new Bin("bin");
             var tee = ElementFactory.make("tee", "tee");
             bin.add_many(tee);
@@ -51,12 +70,6 @@ namespace pdfpc {
                 n++;
             }
             
-            // This will likely have problems in Windows, where paths and urls have different separators.
-            string uri;
-            if (GLib.Path.is_absolute(file))
-                uri = "file://" + file;
-            else
-                uri = GLib.Path.build_filename(GLib.Path.get_dirname(controller.get_pdf_url()), file);
             this.pipeline = ElementFactory.make("playbin2", "playbin");
             this.pipeline.uri = uri;
             this.pipeline.video_sink = bin;
@@ -137,17 +150,17 @@ namespace pdfpc {
         protected bool drag_was_playing;
         
         public ControlledMovie(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
-            base(mapping, controller, document);
+                PresentationController controller, Poppler.Document document, string file) {
+            base(mapping, controller, document, file);
             controller.main_view.motion_notify_event.connect(this.on_motion);
             controller.main_view.button_release_event.connect(this.on_button_release);
         }
         
         public new static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            if (mapping.action.type == Poppler.ActionType.LAUNCH)
-                // Need better test...
-                return new ControlledMovie(mapping, controller, document) as ActionMapping;
+            string file;
+            if (Movie.parse_mapping(mapping, controller, out file))
+                return new ControlledMovie(mapping, controller, document, file) as ActionMapping;
             return null;
         }
         
