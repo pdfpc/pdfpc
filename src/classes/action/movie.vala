@@ -11,10 +11,10 @@ namespace pdfpc {
         protected bool eos = false;
         protected bool loop;
         
-        public Movie(Poppler.LinkMapping mapping,
+        public Movie(Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
                 string file, bool autostart, bool loop) {
-            base(mapping, controller, document);
+            base(area, controller, document);
             this.loop = loop;
             GLib.Idle.add( () => {
                 this.establish_pipeline(file);
@@ -24,16 +24,20 @@ namespace pdfpc {
             } );
         }
         
-        public static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
+        public Movie.blank() {
+            base.blank();
+        }
+        
+        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             string uri;
             bool autostart, loop;
-            if (Movie.parse_mapping(mapping, controller, out uri, out autostart, out loop))
-                return new Movie(mapping, controller, document, uri, autostart, loop) as ActionMapping;
+            if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop))
+                return new Movie(mapping.area, controller, document, uri, autostart, loop) as ActionMapping;
             return null;
         }
         
-        public static bool parse_mapping(Poppler.LinkMapping mapping, PresentationController controller, out string uri, out bool autostart, out bool loop) {
+        public static bool parse_link_mapping(Poppler.LinkMapping mapping, PresentationController controller, out string uri, out bool autostart, out bool loop) {
             if (mapping.action.type == Poppler.ActionType.LAUNCH) {
                 var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
                 var splitfile = file.split("?", 2);
@@ -170,19 +174,23 @@ namespace pdfpc {
         protected bool mouse_drag = false;
         protected bool drag_was_playing;
         
-        public ControlledMovie(Poppler.LinkMapping mapping,
+        public ControlledMovie(Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop) {
-            base(mapping, controller, document, file, autostart, loop);
+            base(area, controller, document, file, autostart, loop);
             controller.main_view.motion_notify_event.connect(this.on_motion);
             controller.main_view.button_release_event.connect(this.on_button_release);
         }
         
-        public new static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
+        public ControlledMovie.blank() {
+            base.blank();
+        }
+        
+        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             string uri;
             bool autostart, loop;
-            if (Movie.parse_mapping(mapping, controller, out uri, out autostart, out loop))
-                return new ControlledMovie(mapping, controller, document, uri, autostart, loop) as ActionMapping;
+            if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop))
+                return new ControlledMovie(mapping.area, controller, document, uri, autostart, loop) as ActionMapping;
             return null;
         }
         

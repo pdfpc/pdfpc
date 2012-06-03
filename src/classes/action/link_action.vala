@@ -6,12 +6,19 @@ namespace pdfpc {
     
     public class LinkAction: ActionMapping {
         
+        public Poppler.Action action;
+        
         public LinkAction(Poppler.LinkMapping mapping, PresentationController controller,
                 Poppler.Document document) {
-            base(mapping, controller, document);
+            base(mapping.area, controller, document);
+            this.action = mapping.action.copy();
         }
         
-        public static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
+        public LinkAction.blank() {
+            base.blank();
+        }
+        
+        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             return new LinkAction(mapping, controller, document) as ActionMapping;
         }

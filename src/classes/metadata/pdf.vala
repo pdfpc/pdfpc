@@ -497,12 +497,14 @@ namespace pdfpc.Metadata {
 
         private int mapping_page_num = -1;
         private GLib.List<ActionMapping> action_mapping;
+        private ActionMapping[] blanks = {new ControlledMovie.blank(), new LinkAction.blank()};
         public weak PresentationController controller = null;
         public unowned GLib.List<ActionMapping> get_action_mapping( int page_num ) {
             if (page_num != this.mapping_page_num) {
                 foreach (var mapping in this.action_mapping)
                     mapping.deactivate();
                 this.action_mapping = null; //.Is this really the correct way to clear a list?
+
 #if VALA_0_16
                 GLib.List<Poppler.LinkMapping> link_mappings;
 #else
@@ -510,18 +512,40 @@ namespace pdfpc.Metadata {
 #endif
                 link_mappings = this.get_document().get_page(page_num).get_link_mapping();
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
-                    var action = ControlledMovie.new_if_handled(mapping, this.controller, this.document);
-                    if (action == null)
-                        action = LinkAction.new_if_handled(mapping, this.controller, this.document);
-                    this.action_mapping.append(action);
+                    foreach (var blank in blanks) {
+                        var action = blank.new_from_link_mapping(mapping, this.controller, this.document);
+                        if (action != null) {
+                            this.action_mapping.append(action);
+                            break;
+                        }
+                    }
                 }
-                this.mapping_page_num = page_num;
-                // Free the mapping memory
+                // Free the mapping memory; already in lock
 #if !VALA_0_16
-                //MutexLocks.poppler.lock(); Already in lock
                 Poppler.Page.free_link_mapping(link_mappings);
-                //MutexLocks.poppler.unlock();
 #endif
+
+#if VALA_0_16
+                GLib.List<Poppler.AnnotMapping> annot_mappings;
+#else
+                unowned GLib.List<Poppler.AnnotMapping> annot_mappings;
+#endif
+                annot_mappings = this.get_document().get_page(page_num).get_annot_mapping();
+                foreach (unowned Poppler.AnnotMapping mapping in annot_mappings) {
+                    foreach (var blank in blanks) {
+                        var action = blank.new_from_annot_mapping(mapping, this.controller, this.document);
+                        if (action != null) {
+                            this.action_mapping.append(action);
+                            break;
+                        }
+                    }
+                }
+                // Free the mapping memory; already in lock
+#if !VALA_0_16
+                Poppler.Page.free_annot_mapping(annot_mappings);
+#endif
+
+                this.mapping_page_num = page_num;
             }
             return this.action_mapping;
         }
