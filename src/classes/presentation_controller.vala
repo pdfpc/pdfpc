@@ -118,6 +118,16 @@ namespace pdfpc {
                 this.d = d;
             }
         }
+        protected class KeyDef {
+            public uint keycode { get; set; }
+            public uint modMask { get; set; }
+
+            public KeyDef(uint k, uint m) {
+                this.keycode = k;
+                this.modMask = m;
+            }
+        }
+    
         /**
          * HashMaps do not support complex structures as indexing (per value,
          * it seems to use pointers). Not really happy with this solution, but
@@ -133,7 +143,7 @@ namespace pdfpc {
                 this.d = ka.d;
             }
         }
-        protected HashMultiMap<uint, KeyActionWithMod> keyBindings;
+        protected HashMap<KeyDef, KeyAction> keyBindings;
         protected HashMap<string, KeyAction> actionNames;
 
         /**
@@ -173,7 +183,19 @@ namespace pdfpc {
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
             
-            this.keyBindings = new HashMultiMap<uint, KeyActionWithMod>();
+            // The standard hash function for classes is to use the pointer, so we have to provide our own
+            this.keyBindings = new HashMap<KeyDef, KeyAction>(
+                   (_a) => {
+                        KeyDef a = (KeyDef)_a;
+                        var uintHashFunc = Functions.get_hash_func_for(Type.from_name("uint"));
+                        return uintHashFunc(a.keycode | a.modMask); // | is probable the best combinator, but for this small application it should suffice
+                    }
+                 , (_a, _b) => {
+                        KeyDef a = (KeyDef) _a;
+                        KeyDef b = (KeyDef) _b;
+                         return a.keycode == b.keycode && a.modMask == b.modMask;
+                    }
+            );
             this.fillActionNames();
         }
 
@@ -217,9 +239,9 @@ namespace pdfpc {
          * Bind the (user-defined) keys
          */
         public void bind(uint keycode, uint modMask, string function) {
-            if (this.actionNames.contains(function))
-                this.keyBindings.set(keycode, new KeyActionWithMod(modMask, this.actionNames[function]));
-            else
+            if (this.actionNames.contains(function)) {
+                this.keyBindings.set(new KeyDef(keycode, modMask), this.actionNames[function]);
+            } else
                 stderr.printf("Warning: Unknown function %s\n", function);
         }
 
@@ -256,109 +278,9 @@ namespace pdfpc {
 
         protected bool key_press_normal( Gdk.EventKey key ) {
             if ( !ignore_keyboard_events ) {
-                var allKeyActions = this.keyBindings.get(key.keyval).to_array();
-                uint modMask = key.state & this.accepted_key_mods;
-                int i;
-                for (i = 0; i < allKeyActions.length; ++i) {
-                    if (allKeyActions[i].modMask == modMask)
-                        break;
-                }
-                if (i < allKeyActions.length)
-                    allKeyActions[i].d();
-                //switch( key.keyval ) {
-                //    case 0xff0d: /* Return */
-                //    case 0x1008ff17: /* AudioNext */
-                //    case 0xff53: /* Cursor right */
-                //    case 0xff56: /* Page down */
-                //    case 0x020:  /* Space */
-                //        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                //            this.jump10();
-                //        else
-                //            this.next_page();
-                //    break;
-                //    case 0xff54: /* Cursor down */
-                //        this.next_user_page();
-                //    break;
-                //    case 0xff51: /* Cursor left */
-                //    case 0x1008ff16: /* AudioPrev */
-                //    case 0xff55: /* Page Up */
-                //        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                //            this.back10();
-                //        else
-                //            this.previous_page();
-                //    break;
-                //    case 0xff52: /* Cursor up */
-                //        this.previous_user_page();
-                //    break;
-                //    case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
-                //        bool exit_some_state = false;
-                //        if (this.faded_to_black) {
-                //            this.fade_to_black();
-                //            exit_some_state = true;
-                //        }
-                //        if (this.frozen) {
-                //            this.toggle_freeze();
-                //            exit_some_state = true;
-                //        }
-                //        if (this.timer.is_paused()) {
-		//	    this.toggle_pause();
-                //            exit_some_state = true;
-                //        }
-		//	if (!exit_some_state) {
-	        //            this.metadata.save_to_disk();
-        	//            Gtk.main_quit();
-		//	}	
-                //    break;
-                //    case 0x071:  /* q */
-                //        this.metadata.save_to_disk();
-                //        Gtk.main_quit();
-                //    break;
-                //    case 0x072: /* r */
-                //        this.controllables_reset();
-                //    break;
-                //    case 0xff50: /* Home */
-                //        this.goto_first();
-                //    break;
-                //    case 0xff57: /* End */
-                //        this.goto_last();
-                //    break;
-                //    case 0x062: /* b */
-                //    case 0x02e: /* . or Logitech Wireless Presenter black screen button */
-                //        this.fade_to_black();
-                //    break;
-                //    case 0x06e: /* n */
-                //        this.controllables_edit_note();
-                //    break;
-                //    case 0x067: /* g */
-                //        this.controllables_ask_goto_page();
-                //    break;
-                //    case 0x066: /* f */
-                //        this.toggle_freeze();
-                //    break;
-                //    case 0x06f: /* o */
-                //        this.toggle_skip();
-                //    break;
-                //    case 0x073: /* s */
-                //        this.start();
-                //    break;
-		//    case 0x070: /* p */
-                //    case 0xff13: /* pause */
-                //        this.toggle_pause();
-                //    break;
-                //    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
-                //        if (!this.frozen)
-                //            this.toggle_freeze();
-                //    break;
-                //    case 0x065: /* e */
-                //        this.set_end_user_slide();
-                //    break;
-                //    case 0xff09:
-                //        this.controllables_show_overview();
-                //    break;
-                //    case 0xff08:
-                //        this.history_back();
-                //    break;
-                //}
+                var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
+                if (action != null)
+                    action.d();
                 return true;
             } else {
                 return false;
