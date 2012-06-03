@@ -9,24 +9,42 @@ namespace pdfpc {
         
         public dynamic Element pipeline;
         protected bool eos = false;
+        protected bool loop;
         
         public Movie(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document, string file) {
+                PresentationController controller, Poppler.Document document,
+                string file, bool autostart, bool loop) {
             base(mapping, controller, document);
-            GLib.Idle.add( () => { this.establish_pipeline(file); return false; } );
+            this.loop = loop;
+            GLib.Idle.add( () => {
+                this.establish_pipeline(file);
+                if (autostart)
+                    this.play();
+                return false;
+            } );
         }
         
         public static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             string uri;
-            if (Movie.parse_mapping(mapping, controller, out uri))
-                return new Movie(mapping, controller, document, uri) as ActionMapping;
+            bool autostart, loop;
+            if (Movie.parse_mapping(mapping, controller, out uri, out autostart, out loop))
+                return new Movie(mapping, controller, document, uri, autostart, loop) as ActionMapping;
             return null;
         }
         
-        public static bool parse_mapping(Poppler.LinkMapping mapping, PresentationController controller, out string uri) {
+        public static bool parse_mapping(Poppler.LinkMapping mapping, PresentationController controller, out string uri, out bool autostart, out bool loop) {
             if (mapping.action.type == Poppler.ActionType.LAUNCH) {
                 var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
+                var splitfile = file.split("?", 2);
+                file = splitfile[0];
+                var querystring = "";
+                if (splitfile.length == 2)
+                    querystring = splitfile[1];
+                var queryarray = querystring.split("&");
+                autostart = "autostart" in queryarray;
+                loop = "loop" in queryarray;
+                
                 stdout.printf(@"File name: $file\n");
                 var uriRE = new Regex("^[a-z]*://");
                 if (uriRE.match(file)) {
@@ -118,10 +136,13 @@ namespace pdfpc {
         }
         
         public virtual void on_eos(Gst.Bus bus, Message message) {
-            stdout.printf("EOS\n");
-            // Can't seek to beginning w/o updating output, so mark to seek later
-            this.eos = true;
-            this.pause();
+            if (this.loop) {
+                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, 0);
+            } else {
+                // Can't seek to beginning w/o updating output, so mark to seek later
+                this.eos = true;
+                this.pause();
+            }
         }
         
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
@@ -150,17 +171,18 @@ namespace pdfpc {
         protected bool drag_was_playing;
         
         public ControlledMovie(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document, string file) {
-            base(mapping, controller, document, file);
+                PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop) {
+            base(mapping, controller, document, file, autostart, loop);
             controller.main_view.motion_notify_event.connect(this.on_motion);
             controller.main_view.button_release_event.connect(this.on_button_release);
         }
         
         public new static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            string file;
-            if (Movie.parse_mapping(mapping, controller, out file))
-                return new ControlledMovie(mapping, controller, document, file) as ActionMapping;
+            string uri;
+            bool autostart, loop;
+            if (Movie.parse_mapping(mapping, controller, out uri, out autostart, out loop))
+                return new ControlledMovie(mapping, controller, document, uri, autostart, loop) as ActionMapping;
             return null;
         }
         
