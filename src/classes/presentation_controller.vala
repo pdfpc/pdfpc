@@ -119,6 +119,7 @@ namespace pdfpc {
                 this.d = d;
             }
         }
+        protected HashMap<string, KeyAction> actionNames;
         protected class KeyDef {
             public uint keycode { get; set; }
             public uint modMask { get; set; }
@@ -127,25 +128,21 @@ namespace pdfpc {
                 this.keycode = k;
                 this.modMask = m;
             }
-        }
-    
-        /**
-         * HashMaps do not support complex structures as indexing (per value,
-         * it seems to use pointers). Not really happy with this solution, but
-         * it works for the time being. We index the keybindings by keyval in a
-         * MultiMap and then go sequentially looking for the modmap. As the
-         * number of modifiers is small, this doesn't take long.
-         */
-        protected class KeyActionWithMod {
-            public KeyAction.KeyActionDelegate d;
-            public uint modMask {set;get;}
-            public KeyActionWithMod(uint m, KeyAction ka) {
-                this.modMask = m;
-                this.d = ka.d;
+
+            public static uint hash(void *_a) {
+                KeyDef a = (KeyDef)_a;
+                var uintHashFunc = Functions.get_hash_func_for(Type.from_name("uint"));
+                return uintHashFunc(a.keycode | a.modMask); // | is probable the best combinator, but for this small application it should suffice
+            }
+            
+            public static bool equal(void *_a, void *_b) {
+                KeyDef a = (KeyDef) _a;
+                KeyDef b = (KeyDef) _b;
+                return a.keycode == b.keycode && a.modMask == b.modMask;
             }
         }
         protected HashMap<KeyDef, KeyAction> keyBindings;
-        protected HashMap<string, KeyAction> actionNames;
+        protected HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
 
         /**
          * Instantiate a new controller
@@ -185,18 +182,8 @@ namespace pdfpc {
             this.current_user_slide_number = 0;
             
             // The standard hash function for classes is to use the pointer, so we have to provide our own
-            this.keyBindings = new HashMap<KeyDef, KeyAction>(
-                   (_a) => {
-                        KeyDef a = (KeyDef)_a;
-                        var uintHashFunc = Functions.get_hash_func_for(Type.from_name("uint"));
-                        return uintHashFunc(a.keycode | a.modMask); // | is probable the best combinator, but for this small application it should suffice
-                    }
-                 , (_a, _b) => {
-                        KeyDef a = (KeyDef) _a;
-                        KeyDef b = (KeyDef) _b;
-                         return a.keycode == b.keycode && a.modMask == b.modMask;
-                    }
-            );
+            this.keyBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
+            this.mouseBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
             this.fillActionNames();
         }
 
@@ -261,37 +248,39 @@ namespace pdfpc {
         }
 
         /**
+         * Bind the (user-defined) keys
+         */
+        public void bindMouse(uint button, uint modMask, string function) {
+            if (this.actionNames.contains(function)) {
+                this.mouseBindings.set(new KeyDef(button, modMask), this.actionNames[function]);
+            } else
+                stderr.printf("Warning: Unknown function %s\n", function);
+        }
+
+        /**
+         * Unbind a mouse button
+         */
+        public void unbindMouse(uint keycode, uint modMask) {
+            this.mouseBindings.unset(new KeyDef(keycode, modMask));
+        }
+
+        /**
+         * Unbind all keybindings
+         */
+        public void unbindAllMouse() {
+            this.mouseBindings.clear();
+        }
+
+        /**
          * Handle keypresses to each of the controllables
          *
          * This seperate handling is needed because keypresses from any of the
          * window have implications on the behaviour of both of them. Therefore
          * this controller is needed to take care of the needed actions.
-         *
-         * There are no Vala bindings for gdk/gdkkeysyms.h
-         * https://bugzilla.gnome.org/show_bug.cgi?id=551184
-         *
          */
-        enum KeyMappings {
-            Normal,
-            Overview
-        }
-
-        KeyMappings current_key_mapping = KeyMappings.Normal;
-
         public bool key_press( Gdk.EventKey key ) {
             if (key.time != last_key_event && !ignore_keyboard_events ) {
                 last_key_event = key.time;
-                var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
-                if (action != null)
-                    action.d();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        protected bool key_press_normal( Gdk.EventKey key ) {
-            if ( !ignore_keyboard_events ) {
                 var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
                 if (action != null)
                     action.d();
@@ -309,20 +298,9 @@ namespace pdfpc {
                     Gdk.EventType.BUTTON_PRESS ) {
                 // Prevent double or triple clicks from triggering additional
                 // click events
-                switch( button.button ) {
-                    case 1: /* Left button */
-                        if ( (button.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.jump10();
-                        else
-                            this.next_page();
-                    break;
-                    case 3: /* Right button */
-                        if ( (button.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.back10();
-                        else
-                            this.previous_page();
-                    break;
-                }
+                var action = this.mouseBindings.get(new KeyDef(button.button,button.state & this.accepted_key_mods));
+                if (action != null)
+                    action.d();
                 return true;
             } else {
                 return false;
@@ -691,7 +669,6 @@ namespace pdfpc {
         protected void controllables_show_overview() {
             if (this.overview != null) {
                 this.set_ignore_mouse_events(true);
-                this.current_key_mapping = this.KeyMappings.Overview;
                 foreach( Controllable c in this.controllables )
                     c.show_overview();
                 this.overview_shown = true;
@@ -700,7 +677,6 @@ namespace pdfpc {
 
         protected void controllables_hide_overview() {
             this.set_ignore_mouse_events(false);
-            this.current_key_mapping = this.KeyMappings.Normal;
             // It may happen that in overview mode, the number of (user) slides
             // has changed due to overlay changes. We may need to correct our
             // position

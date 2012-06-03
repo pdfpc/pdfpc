@@ -33,14 +33,15 @@ namespace pdfpc {
             this.presentation_controller.accepted_key_mods = supportedModifiers;
         }
 
-        private void readKeyDef(string keyName, out uint keycode, out uint modMask) {
-            string[] keyFields = keyName.split("+");
+        delegate uint binding2uint(string a);
+        private void readBindDef(string name, binding2uint conversor, out uint code, out uint modMask) {
+            string[] fields = name.split("+");
             modMask = 0x0;
-            keycode = 0x0;
-            if (keyFields.length == 1) {
-                keycode = Gdk.keyval_from_name(keyName);
-            } else if (keyFields.length == 2) {
-                string modString = keyFields[0];
+            code = 0x0;
+            if (fields.length == 1) {
+                code = conversor(name);
+            } else if (fields.length == 2) {
+                string modString = fields[0];
                 for (int m = 0; m < modString.length; ++m) {
                     switch (modString[m]) {
                         case 'S':
@@ -58,7 +59,7 @@ namespace pdfpc {
                             break;
                     }
                 }
-                keycode = Gdk.keyval_from_name(keyFields[1]);
+                code = conversor(fields[1]);
             }
         }
 
@@ -69,7 +70,7 @@ namespace pdfpc {
             }
             uint modMask = 0;
             uint keycode = 0;
-            readKeyDef(fields[1], out keycode, out modMask);
+            readBindDef(fields[1], Gdk.keyval_from_name, out keycode, out modMask);
             if (keycode == 0x0) {
                 stderr.printf("Warning: Unknown key: %s\n", fields[1]);
             } else {
@@ -84,11 +85,41 @@ namespace pdfpc {
             }
             uint modMask = 0;
             uint keycode = 0;
-            readKeyDef(fields[1], out keycode, out modMask);
+            readBindDef(fields[1], Gdk.keyval_from_name, out keycode, out modMask);
             if (keycode == 0x0) {
                 stderr.printf("Warning: Unknown key: %s\n", fields[1]);
             } else {
                 this.presentation_controller.unbind(keycode, modMask);
+            }
+        }
+
+        private void bindMouse(string wholeLine, string[] fields) {
+            if (fields.length != 3) {
+                stderr.printf("Bad mouse specification: %s\n", wholeLine);
+                return;
+            }
+            uint modMask = 0;
+            uint button = 0;
+            readBindDef(fields[1], (x) => { return (uint)int.parse(x); }, out button, out modMask);
+            if (button == 0x0) {
+                stderr.printf("Warning: Unknown button: %s\n", fields[1]);
+            } else {
+                this.presentation_controller.bindMouse(button, modMask, fields[2]);
+            }
+        }
+
+        private void unbindMouse(string wholeLine, string[] fields) {
+            if (fields.length != 2) {
+                stderr.printf("Bad unmouse specification: %s\n", wholeLine);
+                return;
+            }
+            uint modMask = 0;
+            uint button = 0;
+            readBindDef(fields[1], (x) => { return (uint)int.parse(x); }, out button, out modMask);
+            if (button == 0x0) {
+                stderr.printf("Warning: Unknown button: %s\n", fields[1]);
+            } else {
+                this.presentation_controller.unbindMouse(button, modMask);
             }
         }
 
@@ -107,13 +138,22 @@ namespace pdfpc {
                         continue;
                     switch(fields[0]) {
                         case "bind":
-                            bindKey(uncommentedLine, fields);
+                            this.bindKey(uncommentedLine, fields);
                             break;
                         case "unbind":
-                            unbindKey(uncommentedLine, fields);
+                            this.unbindKey(uncommentedLine, fields);
                             break;
                         case "unbind_all":
                             this.presentation_controller.unbindAll();
+                            break;
+                        case "mouse":
+                            this.bindMouse(uncommentedLine, fields);
+                            break;
+                        case "unmouse":
+                            this.unbindMouse(uncommentedLine, fields);
+                            break;
+                        case "unmouse_all":
+                            this.presentation_controller.unbindAllMouse();
                             break;
                         case "switch-screens":
                             Options.display_switch = !Options.display_switch;
