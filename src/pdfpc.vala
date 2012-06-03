@@ -155,6 +155,9 @@ namespace pdfpc {
             this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
 
+            ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
+            configFileReader.readConfig(etc_path + "/pdfpcrc");
+            configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
 
             var screen = Gdk.Screen.get_default();
             if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
@@ -194,10 +197,6 @@ namespace pdfpc {
                 this.presenter_window.update();
             }
 
-            ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
-            configFileReader.readConfig(etc_path + "/pdfpcrc");
-            configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
-            
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
             Gdk.threads_enter();
