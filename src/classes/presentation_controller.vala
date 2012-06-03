@@ -857,9 +857,11 @@ namespace pdfpc {
         }
         
         /**
-         * XID for videos
+         * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
+         * controllable's main view.  Also, return the XID for the view's window,
+         * useful for overlays.
          */
-        public ulong video_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect) {
+        public ulong overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect) {
             Controllable c = this.controllables.nth_data(n);
             if (c == null) {
                 rect = Gdk.Rectangle();

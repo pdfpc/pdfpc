@@ -15,7 +15,7 @@ namespace pdfpc {
         //this = null;
             base(mapping, controller, document);
             var file = ((Poppler.ActionLaunch*)this.action).file_name;
-            this.establish_pipeline(file);
+            GLib.Idle.add( () => { this.establish_pipeline(file); return false; } );
         }
         
         public static ActionMapping? new_if_handled(Poppler.LinkMapping mapping,
@@ -35,7 +35,7 @@ namespace pdfpc {
             int n = 0;
             ulong xid;
             while (true) {
-                xid = this.controller.video_pos(n, this.area, out rect);
+                xid = this.controller.overlay_pos(n, this.area, out rect);
                 if (xid == 0)
                     break;
                 var sink = ElementFactory.make("xvimagesink", @"sink$n");
