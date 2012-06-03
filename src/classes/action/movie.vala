@@ -296,7 +296,10 @@ namespace pdfpc {
         }
         
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
-            if (widget != this.controller.main_view) {
+            State state;
+            ClockTime time = util_get_timestamp();
+            this.pipeline.get_state(out state, null, time);
+            if (state == State.NULL || widget != this.controller.main_view) {
                 this.toggle_play();
                 return true;
             }
