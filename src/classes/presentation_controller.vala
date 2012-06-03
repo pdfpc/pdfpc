@@ -224,6 +224,16 @@ namespace pdfpc {
         }
 
         /**
+         * Gets an array wit all function names
+         *
+         * It would be more legant yo use the keys property of actionNames, but
+         * we would need an instance for doing this...
+         */
+        public static string[] getActionNames() {
+            return {"aaa", "bbb"};
+        }
+
+        /**
          * Bind the (user-defined) keys
          */
         public void bind(uint keycode, uint modMask, string function) {

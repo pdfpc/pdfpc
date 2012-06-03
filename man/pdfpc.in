@@ -72,7 +72,7 @@ Force to use only one screen
 Shows the help
 
 .SH KEYBINDINGS
-During the presentation following key strokes and mouse clicks are supported:
+These are the default keybindings for pdfpc:
 .TP
 .B Right cursor key / Page down / Return / Space / Left mouse button
 Go forward one slide
@@ -81,7 +81,9 @@ Go forward one slide
 Go forward 10 slides
 .TP
 .B Down cursor key
-Go forward one user slide (see section about overlays below)
+Go forward one user slide (see
+.B Overlays
+below)
 .TP
 .B Left cursor key / Page up / Right mouse button / Mouse wheel up or left
 Go back one slide
@@ -90,7 +92,9 @@ Go back one slide
 Go back 10 slides
 .TP
 .B Up cursor key
-Go back one "user slide" (see section about overlays below)
+Go back one "user slide" (see
+.B Overlays
+below)
 .TP
 .B Home
 Go to the first slide
@@ -101,8 +105,8 @@ Go to the last slide
 .B Backspace
 Go back in history. Note that history is defined by "jump" commands, not by normal slide movement.
 .TP
-.B Tab
-Toggle overview mode
+.B Tab / Middle mouse button
+Overview mode
 .TP
 .B g
 Input a slide number to jump to
@@ -132,6 +136,10 @@ Reset presentation (reset timer and go back to first slide)
 .TP
 .B e
 Define end slide
+.P
+See
+.B CONFIG FILE
+below if you want to customize the keybindings.
 
 .SH FEATURES
 
@@ -272,6 +280,34 @@ The files are plain-text files that should be fairly self-explanatory.
 A couple of things to note - The slide numbers of the notes refer to
 user slides - The [notes] sections must be the last one in the file -
 For the programmers out there: slide indexes start at 1
+
+.SH CONFIG FILE
+
+The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
+Additionally, $HOME/.pdfpcrc is also read, if present. Following commands are
+aceepted
+.TP
+.B bind
+Bind a key to a function
+.TP
+.B unbind
+Unbinds the given key
+.TP
+.B unbind_all
+Unbinds all the keybindings
+.TP
+.B mouse
+Binds a mouse button to a function
+.TP
+.B unmouse
+Unbinds a mouse button
+.TP
+.B unmouse_all
+Unbinds all the mouse bindings
+.TP
+.B switch-screens
+Switches screens, in the same way as the command line parameter with the same
+name.
 
 .SH BUGS
 

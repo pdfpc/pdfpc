@@ -72,6 +72,7 @@ namespace pdfpc {
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
             { "black-on-end", 'b', 0, 0, ref Options.black_on_end, "Add an additional black slide at the end of the presentation", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
+            { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { null }
         };
@@ -143,6 +144,11 @@ namespace pdfpc {
             MutexLocks.init();
 
             this.parse_command_line_options( args );
+
+            if (Options.list_actions) {
+                stdout.printf("%s\n", PresentationController.getActionNames()[0]);
+                return;
+            }
 
             stdout.printf( "Initializing rendering...\n" );
 

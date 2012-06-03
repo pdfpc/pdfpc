@@ -94,5 +94,10 @@ namespace pdfpc {
          * Add a black slide at the end of the presentation
          */
         public static bool black_on_end = false;
+
+        /**
+         * Show the actions supported in the config file(s)
+         */
+        public static bool list_actions = false;
     }
 }
