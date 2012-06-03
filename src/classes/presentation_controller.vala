@@ -247,6 +247,20 @@ namespace pdfpc {
         }
 
         /**
+         * Unbind a key
+         */
+        public void unbind(uint keycode, uint modMask) {
+            this.keyBindings.unset(new KeyDef(keycode, modMask));
+        }
+
+        /**
+         * Unbind all keybindings
+         */
+        public void unbindAll() {
+            this.keyBindings.clear();
+        }
+
+        /**
          * Handle keypresses to each of the controllables
          *
          * This seperate handling is needed because keypresses from any of the
