@@ -87,6 +87,7 @@ namespace pdfpc {
          * skips
          */
         protected Window.Overview overview;
+        public bool overview_shown = false;
 
         /**
          * Disables processing of multiple Keypresses at the same time (debounce)
@@ -215,7 +216,7 @@ namespace pdfpc {
             this.actionNames.set("goto", new KeyAction(this.controllables_ask_goto_page));
             this.actionNames.set("gotoFirst", new KeyAction(this.goto_first));
             this.actionNames.set("gotoLast", new KeyAction(this.goto_last));
-            this.actionNames.set("overview", new KeyAction(this.controllables_show_overview));
+            this.actionNames.set("overview", new KeyAction(this.toggle_overview));
             this.actionNames.set("histBack", new KeyAction(this.history_back));
 
             this.actionNames.set("start", new KeyAction(this.start));
@@ -264,16 +265,15 @@ namespace pdfpc {
         KeyMappings current_key_mapping = KeyMappings.Normal;
 
         public bool key_press( Gdk.EventKey key ) {
-            if(key.time != last_key_event) {
+            if (key.time != last_key_event && !ignore_keyboard_events ) {
                 last_key_event = key.time;
-                switch (current_key_mapping) {
-                    case KeyMappings.Normal:
-                     return key_press_normal(key);
-                   case KeyMappings.Overview:
-                     return key_press_overview(key);
-                }
+                var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
+                if (action != null)
+                    action.d();
+                return true;
+            } else {
+                return false;
             }
-            return true;
         }
 
         protected bool key_press_normal( Gdk.EventKey key ) {
@@ -285,62 +285,6 @@ namespace pdfpc {
             } else {
                 return false;
             }
-        }
-
-        /**
-         * Handle key presses when in overview mode
-         *
-         * This is a subset of the keybindings above
-         */
-        protected bool key_press_overview( Gdk.EventKey key ) {
-            bool handled = false;
-            switch( key.keyval ) {
-                case 0xff1b: /* Escape */
-                case 0x071:  /* q */
-                    this.metadata.save_to_disk();
-                    Gtk.main_quit();
-                    handled = true;
-                break;
-                case 0x072: /* r */
-                    this.controllables_reset();
-                    handled = true;
-                break;
-                case 0x062: /* b */
-                case 0x02e: /* . or Logitech Wireless Presenter black screen button */
-                    this.fade_to_black();
-                    handled = true;
-                break;
-                case 0x067: /* g */
-                    this.controllables_ask_goto_page();
-                    handled = true;
-                break;
-                case 0x066: /* f */
-                    this.toggle_freeze();
-                    handled = true;
-                break;
-                case 0x06f: /* o */
-                    this.toggle_skip_overview();
-                    handled = true;
-                break;
-                case 0x073: /* s */
-                    this.start();
-                    handled = true;
-                break;
-                case 0x070: /* p */
-                case 0xff13: /* pause */
-                    this.toggle_pause();
-                    handled = true;
-                break;
-                case 0x065: /* e */
-                    this.set_end_user_slide_overview();
-                    handled = true;
-                break;
-                case 0xff09:
-                    this.controllables_hide_overview();
-                    handled = true;
-                break;
-            }
-            return handled;
         }
 
         /**
@@ -524,6 +468,8 @@ namespace pdfpc {
          * Go to the next slide
          */
         public void next_page() {
+            if (overview_shown)
+                return;
             this.timer.start();
             if ( this.current_slide_number < this.n_slides - 1 ) {
                 ++this.current_slide_number;
@@ -632,6 +578,8 @@ namespace pdfpc {
          * Jump 10 (user) slides forward
          */
         public void jump10() {
+            if (this.overview_shown)
+                return;
             this.timer.start();
             this.current_user_slide_number += 10;
             int max_user_slide = this.metadata.get_user_slide_count();
@@ -647,6 +595,8 @@ namespace pdfpc {
          * Jump 10 (user) slides backward
          */
         public void back10() {
+            if (this.overview_shown)
+                return;
             this.timer.start();
             this.current_user_slide_number -= 10;
             if ( this.current_user_slide_number < 0 )
@@ -684,6 +634,8 @@ namespace pdfpc {
          * Go back in history
          */
         public void history_back() {
+            if (this.overview_shown)
+                return;
             int history_length = this.history.length;
             if (history_length == 0) {
                 this.goto_first();
@@ -715,12 +667,20 @@ namespace pdfpc {
             this.reset_timer();
         }
 
+        protected void toggle_overview() {
+            if (this.overview_shown)
+                this.controllables_hide_overview();
+            else
+                this.controllables_show_overview();
+        }
+
         protected void controllables_show_overview() {
             if (this.overview != null) {
                 this.set_ignore_mouse_events(true);
                 this.current_key_mapping = this.KeyMappings.Overview;
                 foreach( Controllable c in this.controllables )
                     c.show_overview();
+                this.overview_shown = true;
             }
         }
 
@@ -732,6 +692,9 @@ namespace pdfpc {
             // position
             if (this.current_user_slide_number >= this.get_user_n_slides())
                 this.goto_last();
+            this.overview_shown = false;
+            foreach( Controllable c in this.controllables )
+                c.hide_overview();
             this.controllables_update();
         }
 
@@ -754,6 +717,8 @@ namespace pdfpc {
          * Edit note for current slide.
          */
         protected void controllables_edit_note() {
+            if (this.overview_shown)
+                return;
             foreach( Controllable c in this.controllables ) {
                 c.edit_note();
             }
@@ -763,6 +728,8 @@ namespace pdfpc {
          * Ask for the page to jump to
          */
         protected void controllables_ask_goto_page() {
+            if (this.overview_shown)
+                return;
             foreach( Controllable c in this.controllables ) {
                 c.ask_goto_page();
             }
@@ -789,19 +756,16 @@ namespace pdfpc {
          * Toggle skip for current slide
          */
         protected void toggle_skip() {
-            this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
-            this.overview.set_n_slides(this.get_user_n_slides());
-            this.controllables_update();
-        }
-
-        /**
-         * Toggle skip for current slide in overview mode
-         */
-        protected void toggle_skip_overview() {
-            int user_selected = this.overview.current_slide;
-            int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
-            if (this.metadata.toggle_skip( slide_number, user_selected ) != 0)
-                this.overview.remove_current( this.get_user_n_slides() );
+            if (overview_shown) {
+                int user_selected = this.overview.current_slide;
+                int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
+                if (this.metadata.toggle_skip( slide_number, user_selected ) != 0)
+                    this.overview.remove_current( this.get_user_n_slides() );
+            } else {
+                this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
+                this.overview.set_n_slides(this.get_user_n_slides());
+                this.controllables_update();
+            }
         }
 
         /**
