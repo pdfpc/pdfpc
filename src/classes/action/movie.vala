@@ -10,14 +10,16 @@ namespace pdfpc {
         public dynamic Element pipeline;
         protected bool eos = false;
         protected bool loop;
+        protected string temp;
         
         public Movie(Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string file, bool autostart, bool loop) {
+                string uri, bool autostart, bool loop, bool temp=false) {
             base(area, controller, document);
             this.loop = loop;
+            this.temp = temp ? uri.substring(7) : "";
             GLib.Idle.add( () => {
-                this.establish_pipeline(file);
+                this.establish_pipeline(uri);
                 if (autostart)
                     this.play();
                 return false;
@@ -61,9 +63,55 @@ namespace pdfpc {
                 }
                 bool uncertain;
                 var ctype = GLib.ContentType.guess(uri, null, out uncertain);
-                if (ctype.split("/", 2)[0] == "video")
+                if ("video" in ctype)
                     return true;
             }
+            return false;
+        }
+        
+        public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
+                PresentationController controller, Poppler.Document document) {
+            string uri;
+            bool autostart, loop, temp;
+            if (Movie.parse_annot_mapping(mapping, controller, out uri, out autostart, out loop, out temp))
+                return new Movie(mapping.area, controller, document, uri, autostart, loop, temp) as ActionMapping;
+            return null;
+        }
+        
+        public static bool parse_annot_mapping(Poppler.AnnotMapping mapping, PresentationController controller, out string uri, out bool autostart, out bool loop, out bool temp) {
+            var annot = mapping.annot;
+            if (annot.get_annot_type() == Poppler.AnnotType.FILE_ATTACHMENT) {
+                var attach = ((Poppler.AnnotFileAttachment)annot).get_attachment();
+                if (!("video" in attach.description))
+                    return false;
+                
+                string tmp_fn;
+                int fh;
+                try {
+                    fh = FileUtils.open_tmp(null, out tmp_fn);
+                } catch (FileError e) {
+                    warning("Could not create temp file: %s", e.message);
+                    return false;
+                }
+                FileUtils.close(fh);
+                try {
+                    attach.save(tmp_fn);
+                } catch (Error e) {
+                    warning("Could not save temp file: %s", e.message);
+                    return false;
+                }
+                stdout.printf(@"Temp file $tmp_fn\n");
+                uri = "file://" + tmp_fn;
+                autostart = false;
+                loop = false;
+                temp = true;
+                return true;
+                //g_free(&attach);
+            }
+            /*if (mapping.annot.get_annot_type() == Poppler.AnnotType.SCREEN) {
+                stdout.printf("Parsing annot mapping -- Screen\n");
+                stdout.printf(@"$(annot.get_contents())\n");
+            }*/
             return false;
         }
         
@@ -156,6 +204,9 @@ namespace pdfpc {
         
         public override void deactivate() {
             this.stop();
+            if (this.temp != "")
+                if (FileUtils.unlink(this.temp) != 0)
+                    warning("Problem deleting temp file %s", this.temp);
         }
     }
     
@@ -175,8 +226,8 @@ namespace pdfpc {
         protected bool drag_was_playing;
         
         public ControlledMovie(Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop) {
-            base(area, controller, document, file, autostart, loop);
+                PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop, bool temp=false) {
+            base(area, controller, document, file, autostart, loop, temp);
             controller.main_view.motion_notify_event.connect(this.on_motion);
             controller.main_view.button_release_event.connect(this.on_button_release);
         }
@@ -191,6 +242,15 @@ namespace pdfpc {
             bool autostart, loop;
             if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop))
                 return new ControlledMovie(mapping.area, controller, document, uri, autostart, loop) as ActionMapping;
+            return null;
+        }
+        
+        public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
+                PresentationController controller, Poppler.Document document) {
+            string uri;
+            bool autostart, loop, temp;
+            if (Movie.parse_annot_mapping(mapping, controller, out uri, out autostart, out loop, out temp))
+                return new ControlledMovie(mapping.area, controller, document, uri, autostart, loop, temp) as ActionMapping;
             return null;
         }
         
