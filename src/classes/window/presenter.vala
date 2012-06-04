@@ -260,22 +260,34 @@ namespace pdfpc.Window {
             this.prerender_progress.modify_fg( StateType.PRELIGHT, this.black );
             this.prerender_progress.no_show_all = true;
 
+            int icon_height = bottom_height - 10;
             try {
-                int icon_height = bottom_height - 10;
-
                 var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", (int)Math.floor(1.06*icon_height), icon_height);
                 this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
                 this.blank_icon.no_show_all = true;
+            } catch (Error e) {
+                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "blank.svg", e.message);
+                this.blank_icon = new Gtk.Image.from_icon_name("image-missing",
+                                                                Gtk.IconSize.LARGE_TOOLBAR);
 
+            }
+            try {
                 var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", icon_height, icon_height);
                 this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
                 this.frozen_icon.no_show_all = true;
+            } catch (Error e) {
+                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "snow.svg", e.message);
+                this.frozen_icon = new Gtk.Image.from_icon_name("image-missing",
+                                                                Gtk.IconSize.LARGE_TOOLBAR);
 
+            }
+            try {
                 var pause_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "pause.svg", icon_height, icon_height);
                 this.pause_icon = new Gtk.Image.from_pixbuf(pause_pixbuf);
                 this.pause_icon.no_show_all = true;
             } catch (Error e) {
-                error("%s", e.message);
+                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "pause.svg", e.message);
+                this.pause_icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
             }
 
             this.add_events(EventMask.KEY_PRESS_MASK);
