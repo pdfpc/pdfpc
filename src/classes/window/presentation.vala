@@ -48,7 +48,7 @@ namespace pdfpc.Window {
             base( screen_num );
 
             this.destroy.connect( (source) => {
-                Gtk.main_quit();
+                presentation_controller.quit();
             } );
 
             this.presentation_controller = presentation_controller;

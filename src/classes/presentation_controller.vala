@@ -193,6 +193,11 @@ namespace pdfpc {
             this.fillActionNames();
         }
 
+        public void quit() {
+            this.metadata.quit();
+            Gtk.main_quit();
+        }
+
         public void set_overview(Window.Overview o) {
             this.overview = o;
         }
@@ -839,11 +844,6 @@ namespace pdfpc {
             if (this.timer.is_paused()) {
                 this.toggle_pause();
             }
-        }
-
-        protected void quit() {
-            this.metadata.save_to_disk();
-            Gtk.main_quit();              
         }
 
         /**

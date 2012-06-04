@@ -189,6 +189,13 @@ namespace pdfpc.Metadata {
             } 
         }
 
+        /*
+         * Called on quit
+         */
+        public void quit() {
+            this.save_to_disk();
+        }
+
         /**
          * Save the metadata to disk, if needed (i.e. if the user did something
          * with the notes or the skips)
