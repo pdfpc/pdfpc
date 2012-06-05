@@ -8,19 +8,21 @@ namespace pdfpc {
         
         public Poppler.Action action;
         
-        public LinkAction(Poppler.LinkMapping mapping, PresentationController controller,
-                Poppler.Document document) {
-            base(mapping.area, controller, document);
-            this.action = mapping.action.copy();
+        public LinkAction() {
+            base();
         }
         
-        public LinkAction.blank() {
-            base.blank();
+        public new void init(Poppler.LinkMapping mapping, PresentationController controller,
+                Poppler.Document document) {
+            base.init(mapping.area, controller, document);
+            this.action = mapping.action.copy();
         }
         
         public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            return new LinkAction(mapping, controller, document) as ActionMapping;
+            var new_obj = new LinkAction();
+            new_obj.init(mapping, controller, document);
+            return new_obj as ActionMapping;
         }
         
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {

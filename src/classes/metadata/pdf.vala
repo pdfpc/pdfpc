@@ -506,7 +506,7 @@ namespace pdfpc.Metadata {
 
         private int mapping_page_num = -1;
         private GLib.List<ActionMapping> action_mapping;
-        private ActionMapping[] blanks = {new ControlledMovie.blank(), new LinkAction.blank()};
+        private ActionMapping[] blanks = {new ControlledMovie(), new LinkAction()};
         public weak PresentationController controller = null;
         public unowned GLib.List<ActionMapping> get_action_mapping( int page_num ) {
             if (page_num != this.mapping_page_num) {

@@ -12,30 +12,35 @@ namespace pdfpc {
         protected bool loop;
         protected string temp;
         
-        public Movie(Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, bool temp=false) {
-            base(area, controller, document);
-            this.loop = loop;
-            this.temp = temp ? uri.substring(7) : "";
-            GLib.Idle.add( () => {
-                this.establish_pipeline(uri);
-                if (autostart)
-                    this.play();
-                return false;
-            } );
+        public Movie() {
+            base();
         }
         
-        public Movie.blank() {
-            base.blank();
+        public virtual void init_other(ActionMapping other, Poppler.Rectangle area,
+                PresentationController controller, Poppler.Document document,
+                string uri, bool autostart, bool loop, bool temp=false) {
+            other.init(area, controller, document);
+            var movie = other as Movie;
+            movie.loop = loop;
+            movie.temp = temp ? uri.substring(7) : "";
+            GLib.Idle.add( () => {
+                movie.establish_pipeline(uri);
+                if (autostart)
+                    movie.play();
+                return false;
+            } );
         }
         
         public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             string uri;
             bool autostart, loop;
-            if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop))
-                return new Movie(mapping.area, controller, document, uri, autostart, loop) as ActionMapping;
+            var type = Type.from_instance(this);
+            if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop)) {
+                var new_obj = GLib.Object.new(type) as ActionMapping;
+                this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop);
+                return new_obj;
+            }
             return null;
         }
         
@@ -73,8 +78,12 @@ namespace pdfpc {
                 PresentationController controller, Poppler.Document document) {
             string uri;
             bool autostart, loop, temp;
-            if (Movie.parse_annot_mapping(mapping, controller, out uri, out autostart, out loop, out temp))
-                return new Movie(mapping.area, controller, document, uri, autostart, loop, temp) as ActionMapping;
+            var type = Type.from_instance(this);
+            if (Movie.parse_annot_mapping(mapping, controller, out uri, out autostart, out loop, out temp)) {
+                var new_obj = GLib.Object.new(type) as ActionMapping;
+                this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, temp);
+                return new_obj;
+            }
             return null;
         }
         
@@ -225,33 +234,16 @@ namespace pdfpc {
         protected bool mouse_drag = false;
         protected bool drag_was_playing;
         
-        public ControlledMovie(Poppler.Rectangle area,
+        public ControlledMovie() {
+            base();
+        }
+        
+        public override void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop, bool temp=false) {
-            base(area, controller, document, file, autostart, loop, temp);
-            controller.main_view.motion_notify_event.connect(this.on_motion);
-            controller.main_view.button_release_event.connect(this.on_button_release);
-        }
-        
-        public ControlledMovie.blank() {
-            base.blank();
-        }
-        
-        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
-            string uri;
-            bool autostart, loop;
-            if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop))
-                return new ControlledMovie(mapping.area, controller, document, uri, autostart, loop) as ActionMapping;
-            return null;
-        }
-        
-        public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
-                PresentationController controller, Poppler.Document document) {
-            string uri;
-            bool autostart, loop, temp;
-            if (Movie.parse_annot_mapping(mapping, controller, out uri, out autostart, out loop, out temp))
-                return new ControlledMovie(mapping.area, controller, document, uri, autostart, loop, temp) as ActionMapping;
-            return null;
+            base.init_other(other, area, controller, document, file, autostart, loop, temp);
+            var movie = other as ControlledMovie;
+            controller.main_view.motion_notify_event.connect(movie.on_motion);
+            controller.main_view.button_release_event.connect(movie.on_button_release);
         }
         
         protected override Element link_additional(int n, Element source, Bin bin,

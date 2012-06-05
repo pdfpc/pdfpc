@@ -11,15 +11,15 @@ namespace pdfpc {
         protected PresentationController controller;
         protected Poppler.Document document;
         
-        public ActionMapping(Poppler.Rectangle area, PresentationController controller,
+        public ActionMapping() {
+            base();
+        }
+        
+        public virtual void init(Poppler.Rectangle area, PresentationController controller,
                 Poppler.Document document) {
             this.area = area;
             this.controller = controller;
             this.document = document;
-        }
-        
-        public ActionMapping.blank() {
-            //nothing
         }
         
         public virtual ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
