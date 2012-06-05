@@ -33,66 +33,51 @@ namespace pdfpc {
         
         public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
+            if (mapping.action.type != Poppler.ActionType.LAUNCH)
+                return null;
+            
+            var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
+            var splitfile = file.split("?", 2);
+            file = splitfile[0];
+            var querystring = "";
+            if (splitfile.length == 2)
+                querystring = splitfile[1];
+            var queryarray = querystring.split("&");
+            var autostart = "autostart" in queryarray;
+            var loop = "loop" in queryarray;
+            
+            stdout.printf(@"File name: $file\n");
+            var uriRE = new Regex("^[a-z]*://");
             string uri;
-            bool autostart, loop;
-            var type = Type.from_instance(this);
-            if (Movie.parse_link_mapping(mapping, controller, out uri, out autostart, out loop)) {
-                var new_obj = GLib.Object.new(type) as ActionMapping;
-                this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop);
-                return new_obj;
+            if (uriRE.match(file)) {
+                uri = file;
+            } else if (GLib.Path.is_absolute(file)) {
+                uri = "file://" + file;
+            } else {
+                var dirname = GLib.Path.get_dirname(controller.get_pdf_url());
+                uri = GLib.Path.build_filename(dirname, file);
             }
-            return null;
+            bool uncertain;
+            var ctype = GLib.ContentType.guess(uri, null, out uncertain);
+            if (!("video" in ctype))
+                return null;
+            
+            var type = Type.from_instance(this);
+            var new_obj = GLib.Object.new(type) as ActionMapping;
+            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop);
+            return new_obj;
         }
         
-        public static bool parse_link_mapping(Poppler.LinkMapping mapping, PresentationController controller, out string uri, out bool autostart, out bool loop) {
-            if (mapping.action.type == Poppler.ActionType.LAUNCH) {
-                var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
-                var splitfile = file.split("?", 2);
-                file = splitfile[0];
-                var querystring = "";
-                if (splitfile.length == 2)
-                    querystring = splitfile[1];
-                var queryarray = querystring.split("&");
-                autostart = "autostart" in queryarray;
-                loop = "loop" in queryarray;
-                
-                stdout.printf(@"File name: $file\n");
-                var uriRE = new Regex("^[a-z]*://");
-                if (uriRE.match(file)) {
-                    uri = file;
-                } else if (GLib.Path.is_absolute(file)) {
-                    uri = "file://" + file;
-                } else {
-                    var dirname = GLib.Path.get_dirname(controller.get_pdf_url());
-                    uri = GLib.Path.build_filename(dirname, file);
-                }
-                bool uncertain;
-                var ctype = GLib.ContentType.guess(uri, null, out uncertain);
-                if ("video" in ctype)
-                    return true;
-            }
-            return false;
-        }
         
         public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            string uri;
-            bool autostart, loop, temp;
-            var type = Type.from_instance(this);
-            if (Movie.parse_annot_mapping(mapping, controller, out uri, out autostart, out loop, out temp)) {
-                var new_obj = GLib.Object.new(type) as ActionMapping;
-                this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, temp);
-                return new_obj;
-            }
-            return null;
-        }
-        
-        public static bool parse_annot_mapping(Poppler.AnnotMapping mapping, PresentationController controller, out string uri, out bool autostart, out bool loop, out bool temp) {
             var annot = mapping.annot;
-            if (annot.get_annot_type() == Poppler.AnnotType.FILE_ATTACHMENT) {
+            string uri;
+            switch (annot.get_annot_type()) {
+            case Poppler.AnnotType.FILE_ATTACHMENT:
                 var attach = ((Poppler.AnnotFileAttachment)annot).get_attachment();
                 if (!("video" in attach.description))
-                    return false;
+                    return null;
                 
                 string tmp_fn;
                 int fh;
@@ -100,29 +85,28 @@ namespace pdfpc {
                     fh = FileUtils.open_tmp(null, out tmp_fn);
                 } catch (FileError e) {
                     warning("Could not create temp file: %s", e.message);
-                    return false;
+                    return null;
                 }
                 FileUtils.close(fh);
                 try {
                     attach.save(tmp_fn);
                 } catch (Error e) {
                     warning("Could not save temp file: %s", e.message);
-                    return false;
+                    return null;
                 }
                 stdout.printf(@"Temp file $tmp_fn\n");
                 uri = "file://" + tmp_fn;
-                autostart = false;
-                loop = false;
-                temp = true;
-                return true;
-                //g_free(&attach);
+                break;
+            default:
+                return null;
             }
-            /*if (mapping.annot.get_annot_type() == Poppler.AnnotType.SCREEN) {
-                stdout.printf("Parsing annot mapping -- Screen\n");
-                stdout.printf(@"$(annot.get_contents())\n");
-            }*/
-            return false;
+            
+            var type = Type.from_instance(this);
+            var new_obj = GLib.Object.new(type) as ActionMapping;
+            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, true);
+            return new_obj;
         }
+        
         
         protected void establish_pipeline(string uri) {
             var bin = new Bin("bin");
