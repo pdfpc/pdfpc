@@ -203,7 +203,10 @@ namespace pdfpc.Window {
                 observer.monitor_view( prerendering_view );
             }
         }
-        
+
+        /**
+         * The only view is the main view.
+         */
         public View.Pdf? get_main_view() {
             return this.view as View.Pdf;
         }

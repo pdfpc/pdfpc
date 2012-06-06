@@ -630,7 +630,10 @@ namespace pdfpc.Window {
             this.prerender_progress.hide();
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
-        
+
+        /**
+         * Only handle links and annotations on the current_view
+         */
         public View.Pdf? get_main_view() {
             return this.current_view as View.Pdf;
         }

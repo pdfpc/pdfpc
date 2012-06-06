@@ -193,6 +193,9 @@ namespace pdfpc {
             this.fillActionNames();
         }
 
+        /*
+         * Inform metadata of quit, and then quit.
+         */
         public void quit() {
             this.metadata.quit();
             Gtk.main_quit();

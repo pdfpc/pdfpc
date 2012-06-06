@@ -189,7 +189,7 @@ namespace pdfpc.Metadata {
             } 
         }
 
-        /*
+        /**
          * Called on quit
          */
         public void quit() {
@@ -504,10 +504,21 @@ namespace pdfpc.Metadata {
             return document;
         }
 
+        /**
+         * Variables used to keep track of the action mappings for the current
+         * page.
+         */
         private int mapping_page_num = -1;
         private GLib.List<ActionMapping> action_mapping;
         private ActionMapping[] blanks = {new ControlledMovie(), new LinkAction()};
         public weak PresentationController controller = null;
+
+        /**
+         * Return the action mappings (link and annotation mappings) for the
+         * specified page.  If that page is different from the previous one,
+         * destroy the existing action mappings and create new mappings for
+         * the new page.
+         */
         public unowned GLib.List<ActionMapping> get_action_mapping( int page_num ) {
             if (page_num != this.mapping_page_num) {
                 foreach (var mapping in this.action_mapping)

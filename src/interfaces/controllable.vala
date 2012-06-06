@@ -63,7 +63,7 @@ namespace pdfpc {
         public abstract void hide_overview();
         
         /**
-         *
+         * Return the view on which links and annotations should be handled.
          */
         public abstract View.Pdf? get_main_view();
     }
