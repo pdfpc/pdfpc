@@ -138,6 +138,7 @@ namespace pdfpc {
 
             Gdk.threads_init();
             Gtk.init( ref args );
+            Gst.init( ref args );
 
             string pdfFilename = this.parse_command_line_options( args );
             if (Options.list_actions) {
