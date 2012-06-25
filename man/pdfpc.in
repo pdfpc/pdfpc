@@ -40,11 +40,11 @@ presentation.
 .BI "\-e, \-\-end-time"=T
 End time of the presentation. (Format: HH:MM (24h))
 .TP
-.BI "\-t, \-\-start-time"=T
-Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
-.TP
 .BI "\-l, \-\-last-minutes"=N
 Time in minutes, from which on the timer changes its color. (Default 5 minutes)
+.TP
+.BI "\-t, \-\-start-time"=T
+Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 .TP
 .BI "\-u, \-\-current-size"=N
 Percentage of the presenter screen to be used for the current slide.  (Default 60)
@@ -67,6 +67,9 @@ Add an additional black slide at the end of the presentation
 .TP
 .BI "\-S, \-\-single-screen"
 Force to use only one screen
+.TP
+.BI "\-L, \-\-list-actions"
+List actions supported in the config file(s)
 .TP
 .BI "\-h, \-\-help"
 Shows the help
@@ -167,7 +170,6 @@ If you have got enough memory and want to ensure the fastest possible
 prerendering you can disable slide compression by using the \-z switch. But be
 warned using the uncompressed prerendering storage will use about 30 times the
 memory the new compressed storage utilizes (aka the 1.5gb become about 50mb)
-
 
 .SS Timer
 If a duration is given (-d option), the timer will show a countdown with the
@@ -277,9 +279,14 @@ Future versions may include external tools for dealing with this case
 automatically.
 .PP
 The files are plain-text files that should be fairly self-explanatory.
-A couple of things to note - The slide numbers of the notes refer to
-user slides - The [notes] sections must be the last one in the file -
+A couple of things to note:
+.IP \[bu] 2
+The slide numbers of the notes refer to user slides
+.IP \[bu] 2
+The [notes] sections must be the last one in the file
+.IP \[bu] 2
 For the programmers out there: slide indexes start at 1
+.PP
 
 .SH CONFIG FILE
 
@@ -287,19 +294,19 @@ The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
 Additionally, $HOME/.pdfpcrc is also read, if present. Following commands are
 aceepted
 .TP
-.B bind
+.B bind <key> <func>
 Bind a key to a function
 .TP
-.B unbind
+.B unbind <key>
 Unbinds the given key
 .TP
 .B unbind_all
 Unbinds all the keybindings
 .TP
-.B mouse
+.B mouse <button> <func>
 Binds a mouse button to a function
 .TP
-.B unmouse
+.B unmouse <button>
 Unbinds a mouse button
 .TP
 .B unmouse_all
@@ -308,6 +315,8 @@ Unbinds all the mouse bindings
 .B switch-screens
 Switches screens, in the same way as the command line parameter with the same
 name.
+.P
+A list of all possible functions can be obtained via the -L command line option.
 
 .SH BUGS
 
