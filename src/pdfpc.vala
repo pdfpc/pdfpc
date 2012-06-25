@@ -97,11 +97,6 @@ namespace pdfpc {
                 stderr.printf( "%s", context.get_help( true, null ) );
                 Posix.exit( 1 );
             }
-
-            if ( args.length != 2 ) {
-                stderr.printf( "%s", context.get_help( true, null ) );
-                Posix.exit( 1 );
-            }
         }
 
         /**
@@ -137,18 +132,28 @@ namespace pdfpc {
                            + "(C) 2012 David Vilar\n"
                            + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
+            this.parse_command_line_options( args );
+            if (Options.list_actions) {
+				stdout.printf("Config file commands accepted by pdfpc:\n");
+				string[] actions = PresentationController.getActionDescriptions();
+				for (int i = 0; i < actions.length; i+=2) {
+					string tabAlignment = "\t";
+					if (actions[i].length < 8)
+						tabAlignment += "\t";
+					stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+				}
+                return;
+            }
+            if ( args.length != 2 ) {
+                stderr.printf( "Error: No pdf file given\n");
+                Posix.exit( 1 );
+            }
+
             Gdk.threads_init();
             Gtk.init( ref args );
 
             // Initialize the application wide mutex objects
             MutexLocks.init();
-
-            this.parse_command_line_options( args );
-
-            if (Options.list_actions) {
-                stdout.printf("%s\n", PresentationController.getActionNames()[0]);
-                return;
-            }
 
             stdout.printf( "Initializing rendering...\n" );
 

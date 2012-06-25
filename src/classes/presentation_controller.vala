@@ -229,8 +229,31 @@ namespace pdfpc {
          * It would be more legant yo use the keys property of actionNames, but
          * we would need an instance for doing this...
          */
-        public static string[] getActionNames() {
-            return {"aaa", "bbb"};
+        public static string[] getActionDescriptions() {
+            return {"next", "Go to next slide",
+					"next10", "Jump 10 slides forward",
+					"nextOverlay", "Jump forward outside of current overlay",
+					"prev", "Go to previous slide",
+					"prev10", "Jump 10 slides back",
+					"prevOverlay", "Jump back outside of current overlay",
+					"goto", "Ask for a page to jump to",
+					"gotoFirst", "Jump to first slide",
+					"gotoLast", "Jump to last slide",
+					"overview", "Show the overview mode",
+					"histBack", "Go back in history",
+					"start", "Start the timer",
+					"pause", "Pause the timer",
+					"resetTimer", "Reset the timer",
+					"reset", "Reset the presentation",
+					"blank", "Blank presentation screen",
+					"freeze", "Toggle freeze presentation screen",
+					"freezeOn", "Freeze presentation screen if unfrozen",
+					"overlay", "Mark current slide as overlay slide",
+					"note", "Edit note for current slide",
+					"endSlide", "Set current slide as end slide",
+					"exitState", "Exit \"special\" state (pause, freeze, blank)",
+					"quit", "Exit pdfpc"
+			};
         }
 
         /**
