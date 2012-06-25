@@ -316,7 +316,22 @@ Unbinds all the mouse bindings
 Switches screens, in the same way as the command line parameter with the same
 name.
 .P
-A list of all possible functions can be obtained via the -L command line option.
+Key names can be obtained with the help of the xev utility. Note that
+names are case sensitive. Modifiers can be specified in the form
+<mod>+<key> where <mod> is one of S (for shift), C (for control) and
+A/M (for Alt/Meta). E.g.
+.TP
+bind S+Next    next10
+.P
+A list of all possible functions can be obtained
+via the -L command line option.
+
+Under
+.I https://github.com/davvil/pdfpc/downloads
+you can find some configuration files for commonly used devices
+(wireles presenters, bluetooth headesets, ...). If your device is not
+yet supported and you generated a working config file, please
+contribute it (see contact information below).
 
 .SH BUGS
 
