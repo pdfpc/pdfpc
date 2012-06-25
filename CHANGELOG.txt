@@ -2,6 +2,20 @@
 pdfpc Changelog
 ===============
 
+Version 3.1
+===========
+
+*Released: June 2012*
+
+- Revamped overview mode, with better keyboard navigation support and better visual
+  appearance (thanks to rschroll)
+
+- Support for configuration files. Now all keybindings are configurable
+
+- Improved layout management (thanks to rschroll)
+
+- (Hopefully) Improved handling of fullscreen modes
+
 Version 3.0
 ===========
 
