@@ -72,6 +72,7 @@ namespace pdfpc {
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
             { "black-on-end", 'b', 0, 0, ref Options.black_on_end, "Add an additional black slide at the end of the presentation", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
+            { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { null }
         };
@@ -93,11 +94,6 @@ namespace pdfpc {
             }
             catch( OptionError e ) {
                 stderr.printf( "\n%s\n\n", e.message );
-                stderr.printf( "%s", context.get_help( true, null ) );
-                Posix.exit( 1 );
-            }
-
-            if ( args.length != 2 ) {
                 stderr.printf( "%s", context.get_help( true, null ) );
                 Posix.exit( 1 );
             }
@@ -136,13 +132,28 @@ namespace pdfpc {
                            + "(C) 2012 David Vilar\n"
                            + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
+            this.parse_command_line_options( args );
+            if (Options.list_actions) {
+				stdout.printf("Config file commands accepted by pdfpc:\n");
+				string[] actions = PresentationController.getActionDescriptions();
+				for (int i = 0; i < actions.length; i+=2) {
+					string tabAlignment = "\t";
+					if (actions[i].length < 8)
+						tabAlignment += "\t";
+					stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+				}
+                return;
+            }
+            if ( args.length != 2 ) {
+                stderr.printf( "Error: No pdf file given\n");
+                Posix.exit( 1 );
+            }
+
             Gdk.threads_init();
             Gtk.init( ref args );
 
             // Initialize the application wide mutex objects
             MutexLocks.init();
-
-            this.parse_command_line_options( args );
 
             stdout.printf( "Initializing rendering...\n" );
 
@@ -155,6 +166,9 @@ namespace pdfpc {
             this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
 
+            ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
+            configFileReader.readConfig(etc_path + "/pdfpcrc");
+            configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
 
             var screen = Gdk.Screen.get_default();
             if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
@@ -194,7 +208,6 @@ namespace pdfpc {
                 this.presenter_window.update();
             }
 
-            
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
             Gdk.threads_enter();

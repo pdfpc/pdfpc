@@ -21,6 +21,7 @@
  */
 
 using GLib;
+using Gee;
 
 namespace pdfpc {
     /**
@@ -63,7 +64,12 @@ namespace pdfpc {
         /**
          * Controllables which are registered with this presentation controller.
          */
-        protected List<Controllable> controllables;
+        protected GLib.List<Controllable> controllables;
+
+        /**
+         * Key modifiers that we support
+         */
+        public uint accepted_key_mods { get; set; }
 
         /**
          * Ignore input events. Useful e.g. for editing notes.
@@ -81,6 +87,7 @@ namespace pdfpc {
          * skips
          */
         protected Window.Overview overview;
+        public bool overview_shown = false;
 
         /**
          * Disables processing of multiple Keypresses at the same time (debounce)
@@ -99,13 +106,52 @@ namespace pdfpc {
         protected TimerLabel timer;
 
         /**
+         * The key bindings as a map from keycodes to actions
+         *
+         * Vala doesn't allow for delegates as the values in a HashMap (yet?). See
+         * http://stackoverflow.com/questions/6145635/gee-hashmap-containing-methods-as-values
+         * for this solution.
+         */
+        protected class KeyAction {
+            public delegate void KeyActionDelegate();
+            public KeyActionDelegate d;
+            public KeyAction(KeyActionDelegate d) {
+                this.d = d;
+            }
+        }
+        protected HashMap<string, KeyAction> actionNames;
+        protected class KeyDef {
+            public uint keycode { get; set; }
+            public uint modMask { get; set; }
+
+            public KeyDef(uint k, uint m) {
+                this.keycode = k;
+                this.modMask = m;
+            }
+
+            public static uint hash(void *_a) {
+                KeyDef a = (KeyDef)_a;
+                var uintHashFunc = Functions.get_hash_func_for(Type.from_name("uint"));
+                return uintHashFunc(a.keycode | a.modMask); // | is probable the best combinator, but for this small application it should suffice
+            }
+            
+            public static bool equal(void *_a, void *_b) {
+                KeyDef a = (KeyDef) _a;
+                KeyDef b = (KeyDef) _b;
+                return a.keycode == b.keycode && a.modMask == b.modMask;
+            }
+        }
+        protected HashMap<KeyDef, KeyAction> keyBindings;
+        protected HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
             this.metadata = metadata;
             this.black_on_end = allow_black_on_end;
 
-            this.controllables = new List<Controllable>();
+            this.controllables = new GLib.List<Controllable>();
 
             // Calculate the countdown to display until the presentation has to
             // start
@@ -134,10 +180,128 @@ namespace pdfpc {
             
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
+            
+            // The standard hash function for classes is to use the pointer, so we have to provide our own
+            this.keyBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
+            this.mouseBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
+            this.fillActionNames();
         }
 
         public void set_overview(Window.Overview o) {
             this.overview = o;
+        }
+
+        protected void fillActionNames() {
+            this.actionNames = new HashMap<string, KeyAction>();
+            this.actionNames.set("next", new KeyAction(this.next_page));
+            this.actionNames.set("next10", new KeyAction(this.jump10));
+            this.actionNames.set("nextOverlay", new KeyAction(this.next_user_page));
+            this.actionNames.set("prev", new KeyAction(this.previous_page));
+            this.actionNames.set("prev10", new KeyAction(this.back10));
+            this.actionNames.set("prevOverlay", new KeyAction(this.previous_user_page));
+
+            this.actionNames.set("goto", new KeyAction(this.controllables_ask_goto_page));
+            this.actionNames.set("gotoFirst", new KeyAction(this.goto_first));
+            this.actionNames.set("gotoLast", new KeyAction(this.goto_last));
+            this.actionNames.set("overview", new KeyAction(this.toggle_overview));
+            this.actionNames.set("histBack", new KeyAction(this.history_back));
+
+            this.actionNames.set("start", new KeyAction(this.start));
+            this.actionNames.set("pause", new KeyAction(this.toggle_pause));
+            this.actionNames.set("resetTimer", new KeyAction(this.reset_timer));
+            this.actionNames.set("reset", new KeyAction(this.controllables_reset));
+
+            this.actionNames.set("blank", new KeyAction(this.fade_to_black));
+            this.actionNames.set("freeze", new KeyAction(this.toggle_freeze));
+            this.actionNames.set("freezeOn", new KeyAction(() => {if (!this.frozen) this.toggle_freeze();}));
+
+            this.actionNames.set("overlay", new KeyAction(this.toggle_skip));
+            this.actionNames.set("note", new KeyAction(this.controllables_edit_note));
+            this.actionNames.set("endSlide", new KeyAction(this.set_end_user_slide));
+
+            this.actionNames.set("exitState", new KeyAction(this.exit_state));
+            this.actionNames.set("quit", new KeyAction(this.quit));
+        }
+
+        /**
+         * Gets an array wit all function names
+         *
+         * It would be more legant yo use the keys property of actionNames, but
+         * we would need an instance for doing this...
+         */
+        public static string[] getActionDescriptions() {
+            return {"next", "Go to next slide",
+					"next10", "Jump 10 slides forward",
+					"nextOverlay", "Jump forward outside of current overlay",
+					"prev", "Go to previous slide",
+					"prev10", "Jump 10 slides back",
+					"prevOverlay", "Jump back outside of current overlay",
+					"goto", "Ask for a page to jump to",
+					"gotoFirst", "Jump to first slide",
+					"gotoLast", "Jump to last slide",
+					"overview", "Show the overview mode",
+					"histBack", "Go back in history",
+					"start", "Start the timer",
+					"pause", "Pause the timer",
+					"resetTimer", "Reset the timer",
+					"reset", "Reset the presentation",
+					"blank", "Blank presentation screen",
+					"freeze", "Toggle freeze presentation screen",
+					"freezeOn", "Freeze presentation screen if unfrozen",
+					"overlay", "Mark current slide as overlay slide",
+					"note", "Edit note for current slide",
+					"endSlide", "Set current slide as end slide",
+					"exitState", "Exit \"special\" state (pause, freeze, blank)",
+					"quit", "Exit pdfpc"
+			};
+        }
+
+        /**
+         * Bind the (user-defined) keys
+         */
+        public void bind(uint keycode, uint modMask, string function) {
+            if (this.actionNames.contains(function)) {
+                this.keyBindings.set(new KeyDef(keycode, modMask), this.actionNames[function]);
+            } else
+                stderr.printf("Warning: Unknown function %s\n", function);
+        }
+
+        /**
+         * Unbind a key
+         */
+        public void unbind(uint keycode, uint modMask) {
+            this.keyBindings.unset(new KeyDef(keycode, modMask));
+        }
+
+        /**
+         * Unbind all keybindings
+         */
+        public void unbindAll() {
+            this.keyBindings.clear();
+        }
+
+        /**
+         * Bind the (user-defined) keys
+         */
+        public void bindMouse(uint button, uint modMask, string function) {
+            if (this.actionNames.contains(function)) {
+                this.mouseBindings.set(new KeyDef(button, modMask), this.actionNames[function]);
+            } else
+                stderr.printf("Warning: Unknown function %s\n", function);
+        }
+
+        /**
+         * Unbind a mouse button
+         */
+        public void unbindMouse(uint keycode, uint modMask) {
+            this.mouseBindings.unset(new KeyDef(keycode, modMask));
+        }
+
+        /**
+         * Unbind all keybindings
+         */
+        public void unbindAllMouse() {
+            this.mouseBindings.clear();
         }
 
         /**
@@ -146,187 +310,17 @@ namespace pdfpc {
          * This seperate handling is needed because keypresses from any of the
          * window have implications on the behaviour of both of them. Therefore
          * this controller is needed to take care of the needed actions.
-         *
-         * There are no Vala bindings for gdk/gdkkeysyms.h
-         * https://bugzilla.gnome.org/show_bug.cgi?id=551184
-         *
          */
-        enum KeyMappings {
-            Normal,
-            Overview
-        }
-
-        KeyMappings current_key_mapping = KeyMappings.Normal;
-
         public bool key_press( Gdk.EventKey key ) {
-            if(key.time != last_key_event) {
+            if (key.time != last_key_event && !ignore_keyboard_events ) {
                 last_key_event = key.time;
-                switch (current_key_mapping) {
-                    case KeyMappings.Normal:
-                     return key_press_normal(key);
-                   case KeyMappings.Overview:
-                     return key_press_overview(key);
-                }
-            }
-            return true;
-        }
-
-        protected bool key_press_normal( Gdk.EventKey key ) {
-            if ( !ignore_keyboard_events ) {
-                switch( key.keyval ) {
-                    case 0xff0d: /* Return */
-                    case 0x1008ff17: /* AudioNext */
-                    case 0xff53: /* Cursor right */
-                    case 0xff56: /* Page down */
-                    case 0x020:  /* Space */
-                        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.jump10();
-                        else
-                            this.next_page();
-                    break;
-                    case 0xff54: /* Cursor down */
-                        this.next_user_page();
-                    break;
-                    case 0xff51: /* Cursor left */
-                    case 0x1008ff16: /* AudioPrev */
-                    case 0xff55: /* Page Up */
-                        if ( (key.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.back10();
-                        else
-                            this.previous_page();
-                    break;
-                    case 0xff52: /* Cursor up */
-                        this.previous_user_page();
-                    break;
-                    case 0xff1b: /* Escape or Logitec Wireless Presenter start presentation button OFF */
-                        bool exit_some_state = false;
-                        if (this.faded_to_black) {
-                            this.fade_to_black();
-                            exit_some_state = true;
-                        }
-                        if (this.frozen) {
-                            this.toggle_freeze();
-                            exit_some_state = true;
-                        }
-                        if (this.timer.is_paused()) {
-			    this.toggle_pause();
-                            exit_some_state = true;
-                        }
-			if (!exit_some_state) {
-	                    this.metadata.save_to_disk();
-        	            Gtk.main_quit();
-			}	
-                    break;
-                    case 0x071:  /* q */
-                        this.metadata.save_to_disk();
-                        Gtk.main_quit();
-                    break;
-                    case 0x072: /* r */
-                        this.controllables_reset();
-                    break;
-                    case 0xff50: /* Home */
-                        this.goto_first();
-                    break;
-                    case 0xff57: /* End */
-                        this.goto_last();
-                    break;
-                    case 0x062: /* b */
-                    case 0x02e: /* . or Logitech Wireless Presenter black screen button */
-                        this.fade_to_black();
-                    break;
-                    case 0x06e: /* n */
-                        this.controllables_edit_note();
-                    break;
-                    case 0x067: /* g */
-                        this.controllables_ask_goto_page();
-                    break;
-                    case 0x066: /* f */
-                        this.toggle_freeze();
-                    break;
-                    case 0x06f: /* o */
-                        this.toggle_skip();
-                    break;
-                    case 0x073: /* s */
-                        this.start();
-                    break;
-		    case 0x070: /* p */
-                    case 0xff13: /* pause */
-                        this.toggle_pause();
-                    break;
-                    case 0xffc2: /* F5 or Logitec Wireless Presenter start presentation button ON */
-                        if (!this.frozen)
-                            this.toggle_freeze();
-                    break;
-                    case 0x065: /* e */
-                        this.set_end_user_slide();
-                    break;
-                    case 0xff09:
-                        this.controllables_show_overview();
-                    break;
-                    case 0xff08:
-                        this.history_back();
-                    break;
-                }
+                var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
+                if (action != null)
+                    action.d();
                 return true;
             } else {
                 return false;
             }
-        }
-
-        /**
-         * Handle key presses when in overview mode
-         *
-         * This is a subset of the keybindings above
-         */
-        protected bool key_press_overview( Gdk.EventKey key ) {
-            bool handled = false;
-            switch( key.keyval ) {
-                case 0xff1b: /* Escape */
-                case 0x071:  /* q */
-                    this.metadata.save_to_disk();
-                    Gtk.main_quit();
-                    handled = true;
-                break;
-                case 0x072: /* r */
-                    this.controllables_reset();
-                    handled = true;
-                break;
-                case 0x062: /* b */
-                case 0x02e: /* . or Logitech Wireless Presenter black screen button */
-                    this.fade_to_black();
-                    handled = true;
-                break;
-                case 0x067: /* g */
-                    this.controllables_ask_goto_page();
-                    handled = true;
-                break;
-                case 0x066: /* f */
-                    this.toggle_freeze();
-                    handled = true;
-                break;
-                case 0x06f: /* o */
-                    this.toggle_skip_overview();
-                    handled = true;
-                break;
-                case 0x073: /* s */
-                    this.start();
-                    handled = true;
-                break;
-                case 0x070: /* p */
-                case 0xff13: /* pause */
-                    this.toggle_pause();
-                    handled = true;
-                break;
-                case 0x065: /* e */
-                    this.set_end_user_slide_overview();
-                    handled = true;
-                break;
-                case 0xff09:
-                    this.controllables_hide_overview();
-                    handled = true;
-                break;
-            }
-            return handled;
         }
 
         /**
@@ -337,20 +331,9 @@ namespace pdfpc {
                     Gdk.EventType.BUTTON_PRESS ) {
                 // Prevent double or triple clicks from triggering additional
                 // click events
-                switch( button.button ) {
-                    case 1: /* Left button */
-                        if ( (button.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.jump10();
-                        else
-                            this.next_page();
-                    break;
-                    case 3: /* Right button */
-                        if ( (button.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
-                            this.back10();
-                        else
-                            this.previous_page();
-                    break;
-                }
+                var action = this.mouseBindings.get(new KeyDef(button.button,button.state & this.accepted_key_mods));
+                if (action != null)
+                    action.d();
                 return true;
             } else {
                 return false;
@@ -510,6 +493,8 @@ namespace pdfpc {
          * Go to the next slide
          */
         public void next_page() {
+            if (overview_shown)
+                return;
             this.timer.start();
             if ( this.current_slide_number < this.n_slides - 1 ) {
                 ++this.current_slide_number;
@@ -618,6 +603,8 @@ namespace pdfpc {
          * Jump 10 (user) slides forward
          */
         public void jump10() {
+            if (this.overview_shown)
+                return;
             this.timer.start();
             this.current_user_slide_number += 10;
             int max_user_slide = this.metadata.get_user_slide_count();
@@ -633,6 +620,8 @@ namespace pdfpc {
          * Jump 10 (user) slides backward
          */
         public void back10() {
+            if (this.overview_shown)
+                return;
             this.timer.start();
             this.current_user_slide_number -= 10;
             if ( this.current_user_slide_number < 0 )
@@ -670,6 +659,8 @@ namespace pdfpc {
          * Go back in history
          */
         public void history_back() {
+            if (this.overview_shown)
+                return;
             int history_length = this.history.length;
             if (history_length == 0) {
                 this.goto_first();
@@ -701,23 +692,32 @@ namespace pdfpc {
             this.reset_timer();
         }
 
+        protected void toggle_overview() {
+            if (this.overview_shown)
+                this.controllables_hide_overview();
+            else
+                this.controllables_show_overview();
+        }
+
         protected void controllables_show_overview() {
             if (this.overview != null) {
                 this.set_ignore_mouse_events(true);
-                this.current_key_mapping = this.KeyMappings.Overview;
                 foreach( Controllable c in this.controllables )
                     c.show_overview();
+                this.overview_shown = true;
             }
         }
 
         protected void controllables_hide_overview() {
             this.set_ignore_mouse_events(false);
-            this.current_key_mapping = this.KeyMappings.Normal;
             // It may happen that in overview mode, the number of (user) slides
             // has changed due to overlay changes. We may need to correct our
             // position
             if (this.current_user_slide_number >= this.get_user_n_slides())
                 this.goto_last();
+            this.overview_shown = false;
+            foreach( Controllable c in this.controllables )
+                c.hide_overview();
             this.controllables_update();
         }
 
@@ -740,6 +740,8 @@ namespace pdfpc {
          * Edit note for current slide.
          */
         protected void controllables_edit_note() {
+            if (this.overview_shown)
+                return;
             foreach( Controllable c in this.controllables ) {
                 c.edit_note();
             }
@@ -749,6 +751,8 @@ namespace pdfpc {
          * Ask for the page to jump to
          */
         protected void controllables_ask_goto_page() {
+            if (this.overview_shown)
+                return;
             foreach( Controllable c in this.controllables ) {
                 c.ask_goto_page();
             }
@@ -775,19 +779,16 @@ namespace pdfpc {
          * Toggle skip for current slide
          */
         protected void toggle_skip() {
-            this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
-            this.overview.set_n_slides(this.get_user_n_slides());
-            this.controllables_update();
-        }
-
-        /**
-         * Toggle skip for current slide in overview mode
-         */
-        protected void toggle_skip_overview() {
-            int user_selected = this.overview.current_slide;
-            int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
-            if (this.metadata.toggle_skip( slide_number, user_selected ) != 0)
-                this.overview.remove_current( this.get_user_n_slides() );
+            if (overview_shown) {
+                int user_selected = this.overview.current_slide;
+                int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
+                if (this.metadata.toggle_skip( slide_number, user_selected ) != 0)
+                    this.overview.remove_current( this.get_user_n_slides() );
+            } else {
+                this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
+                this.overview.set_n_slides(this.get_user_n_slides());
+                this.controllables_update();
+            }
         }
 
         /**
@@ -811,9 +812,25 @@ namespace pdfpc {
          */
         protected void reset_timer() {
             this.timer.reset();
-            this.controllables_update();
         }
-    
+
+        protected void exit_state() {
+            if (this.faded_to_black) {
+                this.fade_to_black();
+            }
+            if (this.frozen) {
+                this.toggle_freeze();
+            }
+            if (this.timer.is_paused()) {
+                this.toggle_pause();
+            }
+        }
+
+        protected void quit() {
+            this.metadata.save_to_disk();
+            Gtk.main_quit();              
+        }
+
         /**
          * Parse the given time string to a Time object
          */

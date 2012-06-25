@@ -1,0 +1,4 @@
+# Config file for bluetooth headsets with previous/next buttons
+
+bind XF86AudioNext next
+bind XF86AudioPrev prev

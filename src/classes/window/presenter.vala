@@ -459,10 +459,10 @@ namespace pdfpc.Window {
         }
 
         public void update() {
-            if (this.overview != null) {
-                this.centered_overview.hide();
-                this.slideViews.show();
-            }
+            //if (this.overview != null) {
+            //    this.centered_overview.hide();
+            //    this.slideViews.show();
+            //}
             int current_slide_number = this.presentation_controller.get_current_slide_number();
             int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
             try {

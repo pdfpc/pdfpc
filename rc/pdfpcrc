@@ -1,0 +1,55 @@
+#### Keybindings
+
+# Forward movement
+bind Next      next
+bind Return    next
+bind Right     next
+bind space     next
+bind Down      nextOverlay
+bind S+Next    next10
+bind S+Return  next10
+bind S+Right   next10
+bind S+space   next10
+bind S+Down    next10
+
+# Back movement
+bind Left      prev
+bind Prior     prev
+bind Up        prevOverlay
+bind S+Left    prev10
+bind S+Prior   prev10
+bind S+Up      prev10
+
+# "Jumps"
+bind Home      gotoFirst
+bind End       gotoLast
+bind g         goto
+bind Tab       overview
+bind BackSpace histBack
+
+# Exit
+bind Escape    quit
+bind q         quit
+
+# Timer related
+bind s         start
+bind p         pause
+bind r         resetTimer
+bind R         reset
+
+# Change state
+bind b         blank
+bind period    blank
+bind f         freeze
+
+# Presentation properties
+bind n         note
+bind o         overlay
+bind e         endSlide
+
+#### Mouse bindings
+mouse 1        next
+mouse S+1      next10
+mouse 2        overview
+mouse 3        prev
+mouse S+3      prev10
