@@ -3,5 +3,4 @@
 build/
 src/paths.vala
 c-src/paths.c
-src/paths.vala
 man/pdfpc.1
