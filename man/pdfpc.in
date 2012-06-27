@@ -327,7 +327,7 @@ A list of all possible functions can be obtained
 via the -L command line option.
 
 Under
-.I https://github.com/davvil/pdfpc/downloads
+.I http://davvil.github.com/pdfpc#configs 
 you can find some configuration files for commonly used devices
 (wireles presenters, bluetooth headesets, ...). If your device is not
 yet supported and you generated a working config file, please
