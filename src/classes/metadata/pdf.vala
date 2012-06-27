@@ -1,7 +1,7 @@
 /**
  * Pdf metadata information
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter.Metadata {
+namespace pdfpc.Metadata {
     /**
      * Metadata for Pdf files
      */

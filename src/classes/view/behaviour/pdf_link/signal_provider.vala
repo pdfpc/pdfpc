@@ -1,7 +1,7 @@
 /**
  * Signal Provider for all pdf link related events
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -22,9 +22,9 @@
 
 using GLib;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
+namespace pdfpc.View.Behaviour {
     /**
      * Access provider to all signals related to PDF links.
      */
@@ -68,8 +68,11 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
         /**
          * Poppler.LinkMappings of the current page
          */
-        //protected unowned GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
+#if VALA_0_16
         protected GLib.List<Poppler.LinkMapping> page_link_mappings = null;
+#else
+        protected unowned GLib.List<unowned Poppler.LinkMapping> page_link_mappings = null;
+#endif
 
         /**
          * Precalculated Gdk.Rectangles for every link mapping
@@ -132,9 +135,12 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
                             MutexLocks.poppler.lock();
                             var metadata = this.target.get_renderer().get_metadata() as Metadata.Pdf;
                             var document = metadata.get_document();
-                            //unowned Poppler.Dest destination;
-                            //destination = document.find_dest(
-                            Poppler.Dest destination = document.find_dest( 
+#if VALA_0_16
+                            Poppler.Dest destination;
+#else
+                            unowned Poppler.Dest destination;
+#endif
+                            destination = document.find_dest( 
                                 action.dest.named_dest
                             );
                             MutexLocks.poppler.unlock();
@@ -306,11 +312,13 @@ namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
             this.precalculated_mapping_rectangles = null;
 
             // Free the mapping memory
+#if !VALA_0_16
             MutexLocks.poppler.lock();
-            //Poppler.Page.free_link_mapping(  
-            //    this.page_link_mappings
-            //);
+            Poppler.Page.free_link_mapping(  
+                this.page_link_mappings
+            );
             MutexLocks.poppler.unlock();
+#endif
         }
     }
 }

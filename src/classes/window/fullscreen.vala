@@ -1,7 +1,7 @@
 /**
  * Fullscreen Window
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -23,7 +23,7 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * Window extension implementing all the needed functionality, to be
      * displayed fullscreen.
@@ -68,18 +68,26 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 int current_screen = screen.get_monitor_at_point(pointerx, pointery);
                 screen.get_monitor_geometry( current_screen, out this.screen_geometry );
             }
-                
-            // Move to the correct monitor
-            // This movement is done here and after mapping, to minimize flickering
-            // with window managers, which correctly handle the movement command,
-            // before the window is mapped.
-            this.move( this.screen_geometry.x, this.screen_geometry.y );
-            this.fullscreen();
 
-            // As certain window-managers like Xfwm4 ignore movement request
-            // before the window is initially moved and set up we need to
-            // listen to this event.
-            this.size_allocate.connect( this.on_size_allocate );
+            if ( !Options.windowed ) {
+                // Move to the correct monitor
+                // This movement is done here and after mapping, to minimize flickering
+                // with window managers, which correctly handle the movement command,
+                // before the window is mapped.
+                this.move( this.screen_geometry.x, this.screen_geometry.y );
+                //this.fullscreen();
+
+                // As certain window-managers like Xfwm4 ignore movement request
+                // before the window is initially moved and set up we need to
+                // listen to this event.
+                this.size_allocate.connect( this.on_size_allocate );
+                this.configure_event.connect( this.on_configure );
+            }
+            else {
+                this.screen_geometry.width /= 2;
+                this.screen_geometry.height /= 2;
+                this.resizable = false;
+            }
 
             this.add_events(EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect( this.on_mouse_move );
@@ -87,6 +95,13 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Start the 5 seconds timeout after which the mouse curosr is
             // hidden
             this.restart_hide_cursor_timer();
+        }
+
+        // We got to fullscreen once we have moved
+        protected bool on_configure( Gdk.EventConfigure e) {
+            this.fullscreen();
+            this.configure_event.disconnect(this.on_configure);
+            return false;
         }
 
         /**
@@ -116,14 +131,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 // Certain window manager (eg. Xfce4) do not allow window movement
                 // while the window is maximized. Therefore it is ensured the
                 // window is not in this state.
-                this.unfullscreen();
-                this.unmaximize();
+                //this.unfullscreen();
+                //this.unmaximize();
 
                 // The first movement might not have worked as expected, because of
                 // the before mentioned maximized window problem. Therefore it is
                 // done again
                 this.move( this.screen_geometry.x, this.screen_geometry.y );
-                this.resize( this.screen_geometry.width, this.screen_geometry.height );
+                //this.resize( this.screen_geometry.width, this.screen_geometry.height );
 
                 this.fullscreen();
             }
@@ -132,7 +147,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         /**
          * Called every time the mouse cursor is moved
          */
-        protected bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
+        public bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
             // Restore the mouse cursor to its default value
             this.window.set_cursor( null );
 

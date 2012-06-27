@@ -1,7 +1,7 @@
 /**
  * Presentater window
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -23,24 +23,22 @@
 using Gtk;
 using Gdk;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * An overview of all the slides in the form of a table
      */
     public class Overview: Gtk.ScrolledWindow {
-        /**
-         * The underlying table
-         */
-        private Gtk.Table table;
 
-        /**
-         * Each slide is represented via a derived class of Gtk.Button (see
-         * below). We keep references here (as well as implicitely in the
-         * Gtk.Table to more convenient referencing.
+        /*
+         * The store of all the slides.
          */
-        private OverviewButton[] button;
+        protected ListStore slides;
+        /*
+         * The view of the above.
+         */
+        protected IconView slides_view;
 
         /**
          * We will need the metadata mainly for converting from user slides to
@@ -53,48 +51,20 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected int n_slides = 0;
 
-        /**
-         * The dimension of the table (square)
-         */
-        protected int xdimension = 0;
-    
-        /**
-         * The height and width allocated for each button. Needed for scaling
-         * the images.
-         */
-        protected int buttonWidth;
-        protected int buttonHeight;
-
-        /**
-         * The height and width of the pixmaps provided by the cache
-         */
-        protected int pixmapWidth;
-        protected int pixmapHeight;
+        protected int last_structure_n_slides = 0;
 
         /**
          * The target height and width of the scaled images, a bit smaller than
          * the button dimensions to allow some margin
          */
-        protected int targetWidth;
-        protected int targetHeight;
+        protected int target_width;
+        protected int target_height;
 
         /**
-         * Currently selected button/user slide
+         * We render the previews one at a time in idle times.
          */
-        protected int currently_selected = 0;
-
-        /**
-         * Are we displayed?
-         */
-        protected bool shown = false;
-
-        /**
-         * Because gtk only allocates sizes on demand, the building of the
-         * buttons and the scaling of the preview must be done separately. Here
-         * we keep track of what we have already done.
-         */
-        protected bool structure_done = false;
         protected int next_undone_preview = 0;
+        protected uint idle_id = 0;
 
         /**
          * The cache we get the images from. It is a reference because the user
@@ -114,179 +84,231 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected Presenter presenter;
 
-        double aspectRatio;
+        /*
+         * The aspect ratio of the first slide.  We assume all slides share the
+         * same aspect ratio.
+         */
+        protected double aspect_ratio;
 
-        int maxXDimension;
+        /*
+         * The maximal size of the slides_view.
+         */
+        protected int max_width = -1;
+        protected int max_height = -1;
+
+        /*
+         * The currently selected slide.
+         */
+        private int _current_slide = 0;
+        public int current_slide {
+            get { return _current_slide; }
+            set { var path = new TreePath.from_indices(value);
+                  this.slides_view.select_path(path);
+                  // _current_slide set in on_selection_changed, below
+                  this.slides_view.set_cursor(path, null, false);
+                }
+        }
+
+        /*
+         * When the section changes, we need to update the current slide number.
+         * Also, make sure we don't end up with no selection.
+         */
+        public void on_selection_changed(Gtk.Widget source) {
+            var ltp = this.slides_view.get_selected_items();
+            if (ltp != null) {
+                var tp = ltp.data;
+                if (tp.get_indices() != null) {  // Seg fault if we save tp.get_indices locally
+                    this._current_slide = tp.get_indices()[0];
+                    this.presenter.custom_slide_count(this._current_slide + 1);
+                    return;
+                }
+            }
+            // If there's no selection, reset the old one
+            this.current_slide = this._current_slide;
+        }
 
         /**
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
-
-            this.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-            this.table = new Gtk.Table(0, 0, false);
-            var tableViewport = new Gtk.Viewport(null, null);
-            tableViewport.add(this.table);
-            this.add(tableViewport);
-
-            this.table.show();
-            tableViewport.show();
+            this.slides = new ListStore(1, typeof(Pixbuf));
+            this.slides_view = new IconView.with_model(this.slides);
+            this.slides_view.selection_mode = SelectionMode.SINGLE;
+            var renderer = new CellRendererHighlight();
+            this.slides_view.pack_start(renderer, true);
+            this.slides_view.add_attribute(renderer, "pixbuf", 0);
+            this.slides_view.set_item_padding(0);
+            this.add(this.slides_view);
+            this.show_all();
 
             Color black;
             Color white;
             Color.parse("black", out black);
             Color.parse("white", out white);
-            //this.table.modify_bg(StateType.NORMAL, black);
-            //this.table.modify_bg(StateType.ACTIVE, black);
-            tableViewport.modify_bg(StateType.NORMAL, black);
-            //this.modify_bg(StateType.NORMAL, black);
+            this.slides_view.modify_base(StateType.NORMAL, black);
             Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.get_vscrollbar();
-            //this.scrolledWindow.set_shadow_type(Gtk.ShadowType.NONE);
             vscrollbar.modify_bg(StateType.NORMAL, white);
             vscrollbar.modify_bg(StateType.ACTIVE, black);
             vscrollbar.modify_bg(StateType.PRELIGHT, white);
-            //this.scrolledWindow.get_vscrollbar().modify_fg(StateType.NORMAL, black);
-            
 
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
 
-            this.add_events(EventMask.KEY_PRESS_MASK);
-            this.key_press_event.connect( this.on_key_press );
+            this.slides_view.motion_notify_event.connect( this.presenter.on_mouse_move );
+            this.slides_view.motion_notify_event.connect( this.on_mouse_move );
+            this.slides_view.button_release_event.connect( this.on_mouse_release );
+            this.slides_view.key_press_event.connect( this.on_key_press );
+            this.slides_view.selection_changed.connect( this.on_selection_changed );
+            this.parent_set.connect( this.on_parent_set );
 
-            this.aspectRatio = this.metadata.get_page_width() / this.metadata.get_page_height();
+            this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
 
-        public void setMaxWidth(int width) {
-            this.maxXDimension = (int)Math.floor((width - 20) / Options.min_overview_width);;
-        }
-
-        /**
-         * We handle the "navigation" key presses ourselves. The rest is left
-         * to the presentation_controller, as in normal mode.
-         */
-        public bool on_key_press(Gtk.Widget source, EventKey key) {
-            bool handled = false;
-            switch ( key.keyval ) {
-                case 0xff53: /* Cursor right */
-                    if ( this.currently_selected % this.xdimension != this.xdimension-1 &&
-                         this.currently_selected < this.n_slides - 1 )
-                        this.set_current_button( this.currently_selected + 1 );
-                    handled = true;
-                    break;
-                case 0xff51: /* Cursor left */
-                    if ( this.currently_selected % this.xdimension != 0 )
-                        this.set_current_button( this.currently_selected - 1 );
-                    handled = true;
-                    break;
-                case 0xff55: /* Page Up */
-                    if ( this.currently_selected > 0)
-                        this.set_current_button( this.currently_selected - 1 );
-                    handled = true;
-                    break;
-                case 0xff56: /* Page down */
-                    if ( this.currently_selected < this.n_slides - 1 )
-                        this.set_current_button( this.currently_selected + 1 );
-                    handled = true;
-                    break;
-                case 0xff52: /* Cursor up */
-                    if ( this.currently_selected >= this.xdimension )
-                        this.set_current_button( this.currently_selected - this.xdimension );
-                    handled = true;
-                    break;
-                case 0xff54: /* Cursor down */
-                    if ( this.currently_selected <= this.n_slides - 1 - this.xdimension )
-                        this.set_current_button( this.currently_selected + this.xdimension );
-                    handled = true;
-                    break;
-                case 0xff50: /* Home */
-                    this.set_current_button( 0 );
-                    handled = true;
-                    break;
-                case 0xff57: /* End */
-                    this.set_current_button( this.n_slides - 1 );
-                    handled = true;
-                    break;
-                case 0xff0d: /* Return */
-                    this.presentation_controller.goto_user_page(this.currently_selected + 1);
-                    break;
-            }
-                    
-            return handled;
-        }
-
-        /**
-         * Show the widget + build the structure if needed
-         */
-        public override void show() {
-            base.show();
-            this.shown = true;
+        public void set_available_space(int width, int height) {
+            this.max_width = width;
+            this.max_height = height;
             this.fill_structure();
         }
 
+        /*
+         * Due to a change, the Overview is no longer shown or hidden; instead, its
+         * parent is.  So we need to connect to its parent's show and hide signals.
+         * But we can't do that until the parent has been set.  Thus this signal
+         * handler.  Note that if the Overview is reparented, it will still be
+         * connected to signals from its old parent.  So don't do that.
+         */
+        public void on_parent_set(Widget? old_parent) {
+            if (this.parent != null) {
+                this.parent.show.connect( this.on_show );
+                this.parent.hide.connect( this.on_hide );
+            }
+        }
+
         /**
-         * Fill the widget with buttons.
-         *
-         * Note: gtk uses a "lazy" policy for creating widgets. What this means
-         * for us is that we will not know the final size of the buttons in
-         * this function, and thus the miniatures must be built in a separate
-         * function.
+         * Get keyboard focus.
+         */
+        public void on_show() {
+            this.slides_view.grab_focus();
+        }
+
+        /*
+         * Recalculate the structure, if needed.
+         */
+        public void on_hide() {
+            if (this.n_slides != this.last_structure_n_slides)
+                this.fill_structure();
+        }
+
+        /**
+         * Figure out the sizes for the icons, and create entries in slides
+         * for all the slides.
          */
         protected void fill_structure() {
-            if (!this.structure_done) {
-                this.xdimension = (int)Math.ceil(Math.sqrt(this.n_slides));
-                int ydimension;
-                if (this.xdimension > this.maxXDimension) {
-                    this.xdimension = this.maxXDimension;
-                    ydimension = (int)Math.ceil(this.n_slides/this.xdimension);
-                } else {
-                    ydimension = this.xdimension;
-                }
-                this.table.resize(this.xdimension, ydimension);
-                int currentButton = 0;
-                int r = 0;
-                while (currentButton < this.n_slides) {
-                    for (int c = 0; currentButton < this.n_slides && c < this.xdimension; ++c) {
-                        var newButton = new OverviewButton(currentButton, this.aspectRatio, this, this.presentation_controller);
-                        newButton.show();
-                        this.table.attach_defaults(newButton, c, c+1, r, r+1);
-                        this.button += newButton;
-                        ++currentButton;
-                    }
-                    ++r;
-                }
-                this.structure_done = true;
+            if (this.max_width == -1)
+                return;
+            
+            this.slides_view.set_margin(0);
+
+            var margin = this.slides_view.get_margin();
+            var padding = this.slides_view.get_item_padding() + 1; // Additional mystery pixel
+            var row_spacing = this.slides_view.get_row_spacing();
+            var col_spacing = this.slides_view.get_column_spacing();
+            
+            var eff_max_width = this.max_width - 2 * margin;
+            var eff_max_height = this.max_height - 2 * margin;
+            int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
+            int widthx, widthy, min_width, rows;
+            int tc = 0;
+            
+            // Search for the layout with the widest icons.  We do this by considering
+            // layouts with different numbers of columns, and figuring the maximum
+            // width for the icon so that all the icons fit both horizontally and
+            // vertically.  We start with the largest number of columns that fit the
+            // icons at the minimum allowed width, and we decrease the number of columns
+            // until we cannot fit the icons vertically at the minimal allowed size.
+            // Note that there may be NO solution, in which case target_width == 0.
+            this.target_width = 0;
+            while (cols > 0) {
+                widthx = eff_max_width / cols - 2*padding - 2*col_spacing;
+                rows = (int)Math.ceil((float)this.n_slides / cols);
+                widthy = (int)Math.floor((eff_max_height / rows - 2*padding - 2*row_spacing)
+                                         * this.aspect_ratio);  // floor so that later round
+                                                                // doesn't increase height
+                if (widthy < Options.min_overview_width)
+                    break;
+                
+                min_width = widthx < widthy ? widthx : widthy;
+                if (min_width >= this.target_width) {  // If two layouts give the same width
+                    this.target_width = min_width;     // (which happens when they're limited
+                    tc = cols;                         // by height), prefer the one with fewer
+                }                                      // columns for a more filled block.
+                cols -= 1;
             }
-            GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
+            if (this.target_width < Options.min_overview_width) {
+                this.target_width = Options.min_overview_width;
+                this.slides_view.columns = (eff_max_width - 20) // Guess for scrollbar width
+                    / (Options.min_overview_width + 2 * padding + col_spacing);
+            } else {
+                this.slides_view.columns = tc;
+            }
+            this.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+            this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
+            rows = (int)Math.ceil((float)this.n_slides / this.slides_view.columns);
+            int full_height = rows*(this.target_height + 2*padding + 2*row_spacing) + 2*margin;
+            if (full_height > this.max_height)
+                full_height = this.max_height;
+            this.set_size_request(-1, full_height);
+
+            this.last_structure_n_slides = this.n_slides;
+
+            this.slides.clear();
+            var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
+            pixbuf.fill(0x7f7f7fff);
+            var iter = TreeIter();
+            for (int i=0; i<this.n_slides; i++) {
+                this.slides.append(out iter);
+                this.slides.set_value(iter, 0, pixbuf);
+            }
+
+            this.fill_previews();
         }
 
         /**
-         * This function will be called when idle, i.e. the buttons will
-         * already have been created and we can know their size. Then it queues
-         * the preview building.
+         * Fill the previews (only if we have a cache and we are displayed).
+         * The size of the icons should be known already
+         *
+         * This is done in a progressive way (one slide at a time) instead of
+         * all the slides in one go to provide some progress feedback to the
+         * user.
          */
-        public bool idle_get_button_size_and_queue_fill_previews() {
-            if (this.cache != null) {
-                this.buttonWidth = this.button[0].allocation.width;
-                this.buttonHeight = this.button[0].allocation.height;
-                this.cache.retrieve(0).get_size(out pixmapWidth, out pixmapHeight);
-                Scaler scaler = new Scaler(pixmapWidth, pixmapHeight);
-                Rectangle rect = scaler.scale_to(this.buttonWidth-10, this.buttonHeight-10);
-                this.targetWidth = rect.width;
-                this.targetHeight = rect.height;
-
-                GLib.Idle.add(this.fill_previews);
-            }
-            return false;
+        protected void fill_previews() {
+            if (this.idle_id != 0)
+                Source.remove(idle_id);
+            this.next_undone_preview = 0;
+            this.idle_id = GLib.Idle.add(this._fill_previews);
         }
+        
+        protected bool _fill_previews() {
+            if (this.cache == null || this.next_undone_preview >= this.n_slides)
+                return false;
 
-        /**
-         * Hides the widget
-         */
-        public override void hide() {
-            base.hide();
-            this.shown = false;
+            // We get the dimensions from the first button and first slide,
+            // should be the same for all
+            int pixmap_width, pixmap_height;
+            this.cache.retrieve(0).get_size(out pixmap_width, out pixmap_height);
+            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmap_width, pixmap_height);
+            Gdk.pixbuf_get_from_drawable(pixbuf,
+                this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview)),
+                null, 0, 0, 0, 0, pixmap_width, pixmap_height);
+            var pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
+                                                    Gdk.InterpType.BILINEAR);
+
+            var iter = TreeIter();
+            this.slides.get_iter_from_string(out iter, @"$(this.next_undone_preview)");
+            this.slides.set_value(iter, 0, pixbuf_scaled);
+
+            return (++this.next_undone_preview < this.n_slides);
         }
 
         /**
@@ -295,8 +317,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         public void set_cache(Renderer.Cache.Base cache) {
             this.cache = cache;
-            if (this.shown)
-                GLib.Idle.add(this.idle_get_button_size_and_queue_fill_previews);
+            this.fill_previews();
         }
         
         /**
@@ -305,137 +326,98 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         public void set_n_slides(int n) {
             if ( n != this.n_slides ) {
-                this.invalidate();
+                var currently_selected = this.current_slide;
                 this.n_slides = n;
-                if ( this.shown ) {
-                    this.fill_structure();
-                    if ( this.currently_selected >= this.n_slides )
-                        this.currently_selected = this.n_slides - 1;
-                    this.set_current_button(this.currently_selected);
-                }
+                this.fill_structure();
+                if ( currently_selected >= this.n_slides )
+                    currently_selected = this.n_slides - 1;
+                this.current_slide = currently_selected;
             }
         }
 
         /**
-         * Invalidates the current structure, e.g. because the number of (user)
-         * slides changed.
+         * Remove the current slide from the overview, and set the total number
+         * of slides to the new value.  Perpare to regenerate the structure the
+         * next time the overview is hidden.
          */
-        protected void invalidate() {
-            for (int b = 0; b < button.length; ++b)
-                this.table.remove(button[b]);
-            button.resize(0);
-            this.structure_done = false;
-            this.next_undone_preview = 0;
+        public void remove_current(int newn) {
+            this.n_slides = newn;
+            var iter = TreeIter();
+            this.slides.get_iter_from_string(out iter, @"$(this.current_slide)");
+            this.slides.remove(iter);
+            if (this.current_slide >= this.n_slides)
+                this.current_slide = this.n_slides - 1;
         }
 
         /**
-         * Fill the previews (only if we have a cache and we are displayed).
-         * The size of the buttons should be known already
-         *
-         * This is done in a progressive way (one slide at a time) instead of
-         * all the slides in one go to provide some progress feedback to the
-         * user.
+         * We handle some "navigation" key presses ourselves. Others are left to
+         * the standard IconView controls, the rest are passed back to the
+         * PresentationController.
          */
-        protected bool fill_previews() {
-            if (this.cache == null || !this.shown || this.next_undone_preview >= this.n_slides)
-                return false;
-            // We get the dimensions from the first button and first slide,
-            // should be the same for all
-
-            var thisButton = button[this.next_undone_preview];
-            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, this.pixmapWidth, this.pixmapHeight);
-            Gdk.pixbuf_get_from_drawable(pixbuf, this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview)), null, 0, 0, 0, 0, this.pixmapWidth, this.pixmapHeight);
-            var image = new Gtk.Image.from_pixbuf(pixbuf.scale_simple(this.targetWidth, this.targetHeight, Gdk.InterpType.BILINEAR));
-            thisButton.set_label("");
-            thisButton.set_image(image);
-
-            ++this.next_undone_preview;
-
-            if (this.next_undone_preview < this.n_slides)
-                return true;
-            else
-                return false;
+        public bool on_key_press(Gtk.Widget source, EventKey key) {
+            bool handled = false;
+            switch ( key.keyval ) {
+                case 0xff51: /* Cursor left */
+                case 0xff55: /* Page Up */
+                    if ( this.current_slide > 0)
+                        this.current_slide -= 1;
+                    handled = true;
+                    break;
+                case 0xff53: /* Cursor right */
+                case 0xff56: /* Page down */
+                    if ( this.current_slide < this.n_slides - 1 )
+                        this.current_slide += 1;
+                    handled = true;
+                    break;
+                case 0xff0d: /* Return */
+                    this.presentation_controller.goto_user_page(this.current_slide + 1);
+                    break;
+            }
+                    
+            return handled;
         }
 
-        /**
-         * Set the current highlighted button (and deselect the previous one)
+        /*
+         * Update the selection when the mouse moves over a new slides.
          */
-        public void set_current_button(int b) {
-            button[this.currently_selected].unset_current();
-            button[b].set_current();
-            this.currently_selected = b;
-            this.presenter.custom_slide_count(this.currently_selected+1, (int)this.n_slides);
+        public bool on_mouse_move(Gtk.Widget source, EventMotion event) {
+            TreePath path;
+            path = this.slides_view.get_path_at_pos((int)event.x, (int)event.y);
+            if (path != null && path.get_indices()[0] != this.current_slide)
+                this.current_slide = path.get_indices()[0];
+            return false;
         }
 
-        /**
-         * Which is the current highlighted button/slide?
+        /*
+         * Go to selected slide when the mouse button is released.  On a simple
+         * click, the button_press event will have set the current slide.  On
+         * a drag, the current slide will have been updated by the motion.
          */
-        public int get_current_button() {
-            return this.currently_selected;
+        public bool on_mouse_release(EventButton event) {
+            if (event.button == 1)
+                this.presentation_controller.goto_user_page(this.current_slide + 1);
+            return false;
         }
     }
 
-    /**
-     * A derived class of Gtk.Button with custom colors and clicked action
+    /*
+     * Render a pixbuf that is slightly shaded, unless it is the selected one.
      */
-    public class OverviewButton : Gtk.Button {
-        /**
-         * Colors and font
-         */
-        protected static Color? black = null;
-        protected static Color? white = null;
-        protected static Color? yellow = null;
-        protected static Pango.FontDescription? font = null;
-
-        /**
-         * Which slide we refer to
-         */
-        protected int id;
-
-        /**
-         * Constructor: set the id, the formatting and the clicked action
-         */
-        public OverviewButton(int id, double aspectRatio, Overview overview, PresentationController presentation_controller) {
-            this.id = id;
-
-            if ( this.black == null ) {
-                Color.parse( "black", out this.black );
-                Color.parse( "white", out this.white );
-                Color.parse( "yellow", out this.yellow );
-                font = Pango.FontDescription.from_string( "Verdana" );
-                font.set_size( 20 * Pango.SCALE );
+    public class CellRendererHighlight: CellRendererPixbuf {
+        
+        public override void render(Gdk.Window window, Widget widget,
+                                    Rectangle background_area, Rectangle cell_area,
+                                    Rectangle expose_area, CellRendererState flags) {
+            base.render(window, widget, background_area, cell_area, expose_area, flags);
+            if (flags != CellRendererState.SELECTED) {
+                var cr = Gdk.cairo_create(window);
+                Gdk.cairo_rectangle(cr, expose_area);
+                cr.clip();
+                
+                Gdk.cairo_rectangle(cr, cell_area);
+                cr.set_source_rgba(0,0,0,0.2);
+                cr.fill();
             }
-
-            this.set_label("%d".printf(this.id + 1));
-            var buttonLabel = this.get_children().nth_data(0);
-            buttonLabel.modify_font(font);
-            buttonLabel.modify_fg(StateType.NORMAL, this.white);
-            buttonLabel.modify_fg(StateType.PRELIGHT, this.white);
-            this.modify_bg(StateType.NORMAL, this.black);
-            this.modify_bg(StateType.PRELIGHT, this.black);
-            this.modify_bg(StateType.ACTIVE, this.black);
-
-            // Set a minumum size for the button
-            this.set_size_request(Options.min_overview_width, (int)Math.round(Options.min_overview_width/aspectRatio));
-
-            this.enter.connect(() => overview.set_current_button(id));
-            this.clicked.connect(() => presentation_controller.goto_user_page(this.id + 1));
-        } 
-
-        /**
-         * Hilight the button
-         */
-        public void set_current() {
-            this.modify_bg(StateType.NORMAL, this.yellow);
-            this.modify_bg(StateType.PRELIGHT, this.yellow);
-        }
-
-        /**
-         * Unselect the button
-         */
-        public void unset_current() {
-            this.modify_bg(StateType.NORMAL, this.black);
-            this.modify_bg(StateType.PRELIGHT, this.black);
         }
     }
 }

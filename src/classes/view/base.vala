@@ -1,7 +1,7 @@
 /**
  * Slide View
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -22,7 +22,7 @@
 
 using GLib;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Base class for every slide view
      */
@@ -61,38 +61,7 @@ namespace org.westhoffswelt.pdfpresenter {
         }
 
         /**
-         * Goto the next slide
-         *
-         * If the end of slides is reached this method is expected to do
-         * nothing.
-         */
-        //public abstract void next();
-
-        /**
-         * Go forward 10 slides
-         *
-         * If the end of slides is reached this method is expected to do
-         * nothing.
-         */
-        //public abstract void jumpN( int n );
-
-        /**
-         * Goto the previous slide
-         *
-         * If the beginning of slides is reached this method is expected to do
-         * nothing.
-         */
-        //public abstract void previous();
-
-        /**
-         * Go back 10 slides
-         *
-         * If the beginning of slides is reached this method does nothing.
-         */
-        //public abstract void backN( int n );
-
-        /**
-         * Goto a specific slide number
+         * Display a specific slide
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */

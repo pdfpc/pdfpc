@@ -1,7 +1,7 @@
 /**
  * Pdf link handling Behaviour
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -22,9 +22,9 @@
 
 using GLib;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.View.Behaviour {
+namespace pdfpc.View.Behaviour {
     /**
      * Behaviour which handles links inside of Pdf based Views
      */

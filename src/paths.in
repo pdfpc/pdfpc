@@ -1,1 +1,2 @@
 const string icon_path = "@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/";
+const string etc_path = "@SYSCONFDIR@";

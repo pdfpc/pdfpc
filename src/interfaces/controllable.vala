@@ -1,7 +1,7 @@
 /**
  * Controllable interface
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Every window or object which wants to be controlled by the
      * PresentationController needs to implement this interface.
@@ -51,16 +51,6 @@ namespace org.westhoffswelt.pdfpresenter {
          * Ask for the page to jump to
          */
         public abstract void ask_goto_page();
-
-        /**
-         * Pause the timer
-         */
-        public abstract void toggle_pause();
-
-        /**
-         * Reset the timer
-         */
-        public abstract void reset_timer();
 
         /**
          * Show an overview of all slides

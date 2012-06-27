@@ -1,7 +1,7 @@
 /**
  * Presentater window
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -23,9 +23,9 @@
 using Gtk;
 using Gdk;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * Window showing the currently active and next slide.
      *
@@ -56,14 +56,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected View.Base strict_prev_view;
 
         /**
-         * Countdown until the presentation ends
+         * Timer for the presenation
          */
-        protected TimerLabel timer;
-
-        /**
-         * Is the timer paused
-         */
-        protected bool timer_paused;
+        protected TimerLabel? timer;
 
         /**
          * Slide progress label ( eg. "23/42" )
@@ -93,13 +88,32 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         protected TextView notes_view;
 
         /**
-         * Layout to position all the elements inside the window
+         * The views of the slides + notes
+         */
+        protected HBox slideViews = null;
+
+        /**
+         * The overview of slides
+         */
+        protected Overview overview = null;
+
+        /**
+         * The container that shows the overview. This is the one that has to
+         * be shown or hidden
+         */
+        protected Alignment centered_overview = null;
+
+        /**
+         * There may be problems in some configurations if adding the overview
+         * from the beginning, therefore we delay it until it is first shown.
+         */
+        protected bool overview_added = false;
+
+        /**
+         * We will also need to store the layout where we have to add the
+         * overview (see the comment above)
          */
         protected VBox fullLayout = null;
-
-        protected HBox slideViews = null;
-        
-        protected Overview overview = null;
 
         /**
          * Number of slides inside the presentation
@@ -157,7 +171,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.current_view = View.Pdf.from_metadata( 
                 metadata,
                 current_allocated_width,
-                bottom_position,
+                (int)Math.floor(0.8*bottom_position),
                 Options.black_on_end,
                 this.presentation_controller,
                 out current_scale_rect
@@ -165,12 +179,15 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             // The next slide is right to the current one and takes up the
             // remaining width
+            //Requisition cv_requisition;
+            //this.current_view.size_request(out cv_requisition);
+            //current_allocated_width = cv_requisition.width;
             Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_metadata( 
                 metadata,
                 next_allocated_width,
-                bottom_position,
+                (int)Math.floor(0.7*bottom_position),
                 true,
                 this.presentation_controller,
                 out next_scale_rect
@@ -178,16 +195,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             this.strict_next_view = View.Pdf.from_metadata(
                 metadata,
-                (int)Math.floor(0.2*current_allocated_width),
-                bottom_position,
+                (int)Math.floor(0.5*current_allocated_width),
+                (int)Math.floor(0.19*bottom_position) - 2,
                 true,
                 this.presentation_controller,
                 out next_scale_rect
             );
             this.strict_prev_view = View.Pdf.from_metadata(
                 metadata,
-                (int)Math.floor(0.2*current_allocated_width),
-                bottom_position,
+                (int)Math.floor(0.5*current_allocated_width),
+                (int)Math.floor(0.19*bottom_position) - 2,
                 true,
                 this.presentation_controller,
                 out next_scale_rect
@@ -215,30 +232,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
                 (int)Math.floor( bottom_height * 0.8 * 0.75 ) * Pango.SCALE
             );
 
-            // Calculate the countdown to display until the presentation has to
-            // start
-            time_t start_time = 0;
-            if ( Options.start_time != null ) 
-            {
-                start_time = this.parseTime( 
-                    Options.start_time 
-                );
-            }
-            // The same again for end_time
-            // 
-            time_t end_time = 0;
-            if ( Options.end_time != null ) 
-            {
-                end_time = this.parseTime( 
-                    Options.end_time 
-                );
-                Options.duration = 0;
-                this.metadata.set_duration(0);
-            }
-
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
-            this.timer = getTimerLabel( (int)this.metadata.get_duration() * 60, end_time, Options.last_minutes, start_time );
+            this.timer = this.presentation_controller.getTimer();
             this.timer.set_justify( Justification.CENTER );
             this.timer.modify_font( font );
 
@@ -264,22 +260,34 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.prerender_progress.modify_fg( StateType.PRELIGHT, this.black );
             this.prerender_progress.no_show_all = true;
 
+            int icon_height = bottom_height - 10;
             try {
-                int icon_height = bottom_height - 10;
-
                 var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", (int)Math.floor(1.06*icon_height), icon_height);
                 this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
                 this.blank_icon.no_show_all = true;
+            } catch (Error e) {
+                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "blank.svg", e.message);
+                this.blank_icon = new Gtk.Image.from_icon_name("image-missing",
+                                                                Gtk.IconSize.LARGE_TOOLBAR);
 
+            }
+            try {
                 var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", icon_height, icon_height);
                 this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
                 this.frozen_icon.no_show_all = true;
+            } catch (Error e) {
+                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "snow.svg", e.message);
+                this.frozen_icon = new Gtk.Image.from_icon_name("image-missing",
+                                                                Gtk.IconSize.LARGE_TOOLBAR);
 
+            }
+            try {
                 var pause_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "pause.svg", icon_height, icon_height);
                 this.pause_icon = new Gtk.Image.from_pixbuf(pause_pixbuf);
                 this.pause_icon.no_show_all = true;
             } catch (Error e) {
-                error("%s", e.message);
+                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "pause.svg", e.message);
+                this.pause_icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
             }
 
             this.add_events(EventMask.KEY_PRESS_MASK);
@@ -293,8 +301,9 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
 
-            this.update();
-            this.reset_timer();
+            this.overview = new Overview( this.metadata, this.presentation_controller, this );
+            this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
+            this.presentation_controller.set_overview(this.overview);
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
@@ -325,7 +334,8 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public override void show() {
             base.show();
-            this.overview.setMaxWidth(this.slideViews.allocation.width);
+            this.overview.set_available_space(this.allocation.width,
+                                              (int)Math.floor(this.allocation.height * 0.9));
         }
 
         protected void build_layout() {
@@ -335,17 +345,28 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
+            var center_current_view = new Alignment(0.5f, 0.5f, 0, 0);
+            center_current_view.add(this.current_view);
+
             var current_view_and_stricts = new VBox(false, 2);
-            current_view_and_stricts.pack_start(this.current_view, false, false, 2);
+            current_view_and_stricts.pack_start(center_current_view, false, false, 2);
             current_view_and_stricts.pack_start(strict_views, false, false, 2);
 
-            //var center_current_view = new Alignment(0, (float)0.5, 0, 0);
-            //center_current_view.add(this.current_view);
+
             this.slideViews.add( current_view_and_stricts );
 
             var nextViewWithNotes = new VBox(false, 0);
-            nextViewWithNotes.pack_start( this.next_view, false, false, 0 );
-            nextViewWithNotes.pack_start( this.notes_view, true, true, 5 );
+            var center_next_view = new Alignment(0.5f, 0.5f, 0, 0);
+            center_next_view.add(this.next_view);
+            nextViewWithNotes.pack_start( center_next_view, false, false, 0 );
+            var notes_sw = new ScrolledWindow(null, null);
+            Scrollbar notes_scrollbar = (Gtk.Scrollbar) notes_sw.get_vscrollbar();
+            notes_scrollbar.modify_bg(StateType.NORMAL, white);
+            notes_scrollbar.modify_bg(StateType.ACTIVE, black);
+            notes_scrollbar.modify_bg(StateType.PRELIGHT, white);
+            notes_sw.add( this.notes_view );
+            notes_sw.set_policy( PolicyType.AUTOMATIC, PolicyType.AUTOMATIC );
+            nextViewWithNotes.pack_start( notes_sw, true, true, 5 );
             this.slideViews.add(nextViewWithNotes);
 
             var bottomRow = new HBox(true, 0);
@@ -371,16 +392,14 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
             //var fullLayout = new VBox(false, 0);
             this.fullLayout = new VBox(false, 0);
-            fullLayout.pack_start( this.slideViews, true, true, 0 );
-            fullLayout.pack_end( bottomRow, false, false, 0 );
+            this.fullLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
+            this.fullLayout.pack_start( this.slideViews, true, true, 0 );
+            this.fullLayout.pack_end( bottomRow, false, false, 0 );
             
             this.add( fullLayout );
 
-            this.overview = new Overview( this.metadata, this.presentation_controller, this );
-            this.overview.no_show_all = true;
-            this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
-            this.fullLayout.pack_start( this.overview, true, true, 0 );
-            this.presentation_controller.set_overview(this.overview);
+            this.centered_overview = new Alignment(0.5f, 0.5f, 0, 0);
+            this.centered_overview.add(this.overview);
         }
 
         /**
@@ -423,12 +442,12 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          */
         protected void update_slide_count() {
             this.custom_slide_count(
-                    this.presentation_controller.get_current_user_slide_number() + 1, 
-                    this.presentation_controller.get_end_user_slide()
+                    this.presentation_controller.get_current_user_slide_number() + 1
             );
         }
 
-        public void custom_slide_count(int current, int total) {
+        public void custom_slide_count(int current) {
+            int total = this.presentation_controller.get_end_user_slide();
             this.slide_progress.set_text( "%d/%u".printf(current, total) );
         }
 
@@ -440,10 +459,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
         }
 
         public void update() {
-            if (this.overview != null) {
-                this.overview.hide();
-                this.slideViews.show();
-            }
+            //if (this.overview != null) {
+            //    this.centered_overview.hide();
+            //    this.slideViews.show();
+            //}
             int current_slide_number = this.presentation_controller.get_current_slide_number();
             int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
             try {
@@ -465,8 +484,10 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             }
             this.update_slide_count();
             this.update_note();
-            if (!this.timer_paused)
-                this.timer.start();
+            if (this.timer.is_paused())
+                this.pause_icon.show();
+            else
+                this.pause_icon.hide();
             if (this.presentation_controller.is_faded_to_black())
                 this.blank_icon.show();
             else
@@ -495,8 +516,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.update_slide_count();
             this.update_note();
             this.blank_icon.hide();
-            if (!this.timer_paused)
-                this.timer.start();
         }
 
         /**
@@ -567,12 +586,16 @@ namespace org.westhoffswelt.pdfpresenter.Window {
 
         public void show_overview() {
             this.slideViews.hide();
-            this.overview.show();
-            this.overview.set_current_button(this.presentation_controller.get_current_user_slide_number());
+            if (!overview_added) {
+                this.fullLayout.pack_start( this.centered_overview, true, true, 0 );
+                overview_added = true;
+            }
+            this.centered_overview.show();
+            this.overview.current_slide = this.presentation_controller.get_current_user_slide_number();
         }
 
         public void hide_overview() {
-            this.overview.hide();
+            this.centered_overview.hide();
             this.slideViews.show();
         }
 
@@ -603,36 +626,5 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.prerender_progress.hide();
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
-    
-        /**
-         * Parse the given time string to a Time object
-         */
-        private time_t parseTime( string t ) 
-        {
-            var tm = Time.local( time_t() );
-            tm.strptime( t + ":00", "%H:%M:%S" );
-            return tm.mktime();
-        }
-
-        /**
-         * Pause the presentation
-         */
-        public void toggle_pause() {
-            this.timer_paused = this.timer.pause();
-            if ( this.timer_paused )
-                this.pause_icon.show();
-            else
-                this.pause_icon.hide();
-        }
-
-        /**
-         * Pause the presentation
-         */
-        public void reset_timer() {
-            this.timer.reset();
-            this.timer_paused = false;
-            this.pause_icon.hide();
-        }
     }
-
 }

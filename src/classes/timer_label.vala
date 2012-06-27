@@ -1,7 +1,7 @@
 /**
  * Timer GTK-Label
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -23,7 +23,7 @@
 using Gtk;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
 
     /**
       * Factory function for creating TimerLabels, depending if a duration was
@@ -128,6 +128,13 @@ namespace org.westhoffswelt.pdfpresenter {
                 }
             }
             return paused;
+        }
+
+        /**
+         * Returns if the timer is paused
+         */
+        public bool is_paused() {
+            return (this.time > 0 && this.timeout == 0);
         }
 
         /**

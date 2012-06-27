@@ -57,10 +57,10 @@ distributions you may have to install *-devel* packages).
 
 Note: You may alter the final installation prefix in the cmake call. By default
 the pdfpc files will be installed under */usr/local/*. If you want to change
-that, for example to be installed under */usr/* you may specify another
-installation prefix as follows::
+that, for example to be installed under */usr/*, with config files under
+*/etc/* you may specify another installation prefix as follows::
 
-    cmake -DCMAKE_INSTALL_PREFIX="/usr" .
+    cmake -DCMAKE_INSTALL_PREFIX="/usr" -DSYSCONFDIR=/etc .
 
 Compiling from github
 ---------------------
@@ -72,7 +72,7 @@ unstable development happens in the *devel* branch.
 When installing from git you will need two additional dependencies:
 
 - git
-- Vala Compiler Version >=0.16.0
+- Vala Compiler Version >=0.11.0
 
 The pdfpc source can be retrieved from github::
 
@@ -99,8 +99,9 @@ CMake::
 
 If you have put your build directory elsewhere on your system adapt the path
 above accordingly. You need to provide CMake with the pdfpc directory as
-created by git. As pointer out before, you may alter the installation directory
-via the *-DCMAKE_INSTALL_PREFIX* command line argument. 
+created by git. As pointed out before, you may alter the installation
+directories via the *-DCMAKE_INSTALL_PREFIX* and *-DSYSCONFDIR* command line
+arguments.
 
 If all requirements are met, CMake will tell you that it created all the
 necessary build files for you. If any of the requirements were not met you will

@@ -1,7 +1,7 @@
 /**
  * Application wide options
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Static property container holding the application wide option
      * information and their default values.
@@ -36,6 +36,11 @@ namespace org.westhoffswelt.pdfpresenter {
          * Commandline option to force using only one screen.
          */
         public static bool single_screen = false;
+        
+        /**
+         * Commandline option to run in windowed mode
+         */
+        public static bool windowed = false;
         
         /**
          * Commandline option which allows the complete disabling of slide caching
@@ -89,5 +94,10 @@ namespace org.westhoffswelt.pdfpresenter {
          * Add a black slide at the end of the presentation
          */
         public static bool black_on_end = false;
+
+        /**
+         * Show the actions supported in the config file(s)
+         */
+        public static bool list_actions = false;
     }
 }

@@ -1,5 +1,7 @@
 .history
 .*.swp
 build/
-src/icon_path.vala
-c-src/icon_path.c
+src/paths.vala
+c-src/paths.c
+src/paths.vala
+man/pdfpc.1

@@ -1,7 +1,7 @@
 /**
  * Scaling calculator
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -23,7 +23,7 @@
 using GLib;
 using Gdk;
 
-namespace org.westhoffswelt.pdfpresenter {
+namespace pdfpc {
     /**
      * Scaling calculator which is able to calculate different scaling
      * scenarios while maintaining the correct aspect ratio.

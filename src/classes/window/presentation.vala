@@ -1,7 +1,7 @@
 /**
  * Presentation window
  *
- * This file is part of pdf-presenter-console.
+ * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * 
@@ -23,9 +23,9 @@
 using Gtk;
 using Gdk;
 
-using org.westhoffswelt.pdfpresenter;
+using pdfpc;
 
-namespace org.westhoffswelt.pdfpresenter.Window {
+namespace pdfpc.Window {
     /**
      * Window showing the currently active slide to be presented on a beamer
      */
@@ -59,6 +59,7 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.modify_bg( StateType.NORMAL, black );
 
             var fixedLayout = new Fixed();
+            fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
             this.add( fixedLayout );
             
             Rectangle scale_rect;
@@ -95,8 +96,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
             this.scroll_event.connect( this.on_scroll );
-
-            this.update();
         }
 
         /**
@@ -175,18 +174,6 @@ namespace org.westhoffswelt.pdfpresenter.Window {
          * Ask for the page to jump to. We don't do anything
          */
         public void ask_goto_page() {
-        }
-
-        /**
-         * Pause the timer. We don't do anything
-         */
-        public void toggle_pause() {
-        }
-
-        /**
-         * Reset the timer. We don't do anything
-         */
-        public void reset_timer() {
         }
 
         /**

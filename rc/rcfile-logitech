@@ -1,0 +1,5 @@
+# Config file for Logitech Wireless Presetners
+
+bind Escape exitState
+bind period blank
+bind F5 freezeOn

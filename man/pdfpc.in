@@ -1,4 +1,4 @@
-.TH  pdfpc "1" "May 2012" 
+.TH  pdfpc "1" "Jun 2012" 
 
 .SH NAME
 pdfpc \- pdf presentater console with multi-monitor support
@@ -40,11 +40,11 @@ presentation.
 .BI "\-e, \-\-end-time"=T
 End time of the presentation. (Format: HH:MM (24h))
 .TP
-.BI "\-t, \-\-start-time"=T
-Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
-.TP
 .BI "\-l, \-\-last-minutes"=N
 Time in minutes, from which on the timer changes its color. (Default 5 minutes)
+.TP
+.BI "\-t, \-\-start-time"=T
+Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 .TP
 .BI "\-u, \-\-current-size"=N
 Percentage of the presenter screen to be used for the current slide.  (Default 60)
@@ -68,11 +68,14 @@ Add an additional black slide at the end of the presentation
 .BI "\-S, \-\-single-screen"
 Force to use only one screen
 .TP
+.BI "\-L, \-\-list-actions"
+List actions supported in the config file(s)
+.TP
 .BI "\-h, \-\-help"
 Shows the help
 
 .SH KEYBINDINGS
-During the presentation following key strokes and mouse clicks are supported:
+These are the default keybindings for pdfpc:
 .TP
 .B Right cursor key / Page down / Return / Space / Left mouse button
 Go forward one slide
@@ -81,7 +84,9 @@ Go forward one slide
 Go forward 10 slides
 .TP
 .B Down cursor key
-Go forward one user slide (see section about overlays below)
+Go forward one user slide (see
+.B Overlays
+below)
 .TP
 .B Left cursor key / Page up / Right mouse button / Mouse wheel up or left
 Go back one slide
@@ -90,7 +95,9 @@ Go back one slide
 Go back 10 slides
 .TP
 .B Up cursor key
-Go back one "user slide" (see section about overlays below)
+Go back one "user slide" (see
+.B Overlays
+below)
 .TP
 .B Home
 Go to the first slide
@@ -101,8 +108,8 @@ Go to the last slide
 .B Backspace
 Go back in history. Note that history is defined by "jump" commands, not by normal slide movement.
 .TP
-.B Tab
-Toggle overview mode
+.B Tab / Middle mouse button
+Overview mode
 .TP
 .B g
 Input a slide number to jump to
@@ -132,6 +139,10 @@ Reset presentation (reset timer and go back to first slide)
 .TP
 .B e
 Define end slide
+.P
+See
+.B CONFIG FILE
+below if you want to customize the keybindings.
 
 .SH FEATURES
 
@@ -159,7 +170,6 @@ If you have got enough memory and want to ensure the fastest possible
 prerendering you can disable slide compression by using the \-z switch. But be
 warned using the uncompressed prerendering storage will use about 30 times the
 memory the new compressed storage utilizes (aka the 1.5gb become about 50mb)
-
 
 .SS Timer
 If a duration is given (-d option), the timer will show a countdown with the
@@ -269,9 +279,59 @@ Future versions may include external tools for dealing with this case
 automatically.
 .PP
 The files are plain-text files that should be fairly self-explanatory.
-A couple of things to note - The slide numbers of the notes refer to
-user slides - The [notes] sections must be the last one in the file -
+A couple of things to note:
+.IP \[bu] 2
+The slide numbers of the notes refer to user slides
+.IP \[bu] 2
+The [notes] sections must be the last one in the file
+.IP \[bu] 2
 For the programmers out there: slide indexes start at 1
+.PP
+
+.SH CONFIG FILE
+
+The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
+Additionally, $HOME/.pdfpcrc is also read, if present. Following commands are
+aceepted
+.TP
+.B bind <key> <func>
+Bind a key to a function
+.TP
+.B unbind <key>
+Unbinds the given key
+.TP
+.B unbind_all
+Unbinds all the keybindings
+.TP
+.B mouse <button> <func>
+Binds a mouse button to a function
+.TP
+.B unmouse <button>
+Unbinds a mouse button
+.TP
+.B unmouse_all
+Unbinds all the mouse bindings
+.TP
+.B switch-screens
+Switches screens, in the same way as the command line parameter with the same
+name.
+.P
+Key names can be obtained with the help of the xev utility. Note that
+names are case sensitive. Modifiers can be specified in the form
+<mod>+<key> where <mod> is one of S (for shift), C (for control) and
+A/M (for Alt/Meta). E.g.
+.TP
+bind S+Next    next10
+.P
+A list of all possible functions can be obtained
+via the -L command line option.
+
+Under
+.I http://davvil.github.com/pdfpc#configs 
+you can find some configuration files for commonly used devices
+(wireles presenters, bluetooth headesets, ...). If your device is not
+yet supported and you generated a working config file, please
+contribute it (see contact information below).
 
 .SH BUGS
 
