@@ -1,6 +1,7 @@
 find_package(PkgConfig)
 pkg_check_modules(GOBJECT REQUIRED gobject-2.0)
 pkg_check_modules(GIO REQUIRED gio-2.0)
+pkg_check_modules(GEE REQUIRED gee-1.0)
 pkg_check_modules(POPPLER REQUIRED poppler-glib)
 pkg_check_modules(GTK REQUIRED gtk+-2.0)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
@@ -9,6 +10,7 @@ pkg_check_modules(RSVG REQUIRED librsvg-2.0)
 set(CFLAGS
 	${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
 	${GIO_CFLAGS} ${GIO_CFLAGS_OTHER}
+        ${GEE_CFLAGS} ${GEE_CFLAGS_OTHER}
 	${POPPLER_CFLAGS} ${POPPLER_CFLAGS_OTHER}
 	${GTK_CFLAGS} ${GTK_CFLAGS_OTHER}
 	${GTHREAD_CFLAGS} ${GTHREAD_CFLAGS_OTHER}
@@ -19,6 +21,7 @@ add_definitions(${CFLAGS})
 set(LIBS
 	${GOBJECT_LIBRARIES}
 	${GIO_LIBRARIES}
+        ${GEE_LIBRARIES}
 	${POPPLER_LIBRARIES}
 	${GTK_LIBRARIES}
 	${GTHREAD_LIBRARIES}
