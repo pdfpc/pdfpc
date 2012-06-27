@@ -5,78 +5,116 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <gdk/gdk.h>
+#include <gee.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <stdio.h>
+#include <gdk/gdk.h>
+#include <gobject/gvaluecollector.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER (org_westhoffswelt_pdfpresenter_presentation_controller_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationController))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
+#define PDFPC_TYPE_PRESENTATION_CONTROLLER (pdfpc_presentation_controller_get_type ())
+#define PDFPC_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationController))
+#define PDFPC_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
+#define PDFPC_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterPresentationController orgwesthoffsweltpdfpresenterPresentationController;
-typedef struct _orgwesthoffsweltpdfpresenterPresentationControllerClass orgwesthoffsweltpdfpresenterPresentationControllerClass;
-typedef struct _orgwesthoffsweltpdfpresenterPresentationControllerPrivate orgwesthoffsweltpdfpresenterPresentationControllerPrivate;
+typedef struct _pdfpcPresentationController pdfpcPresentationController;
+typedef struct _pdfpcPresentationControllerClass pdfpcPresentationControllerClass;
+typedef struct _pdfpcPresentationControllerPrivate pdfpcPresentationControllerPrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE (org_westhoffswelt_pdfpresenter_controllable_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE, orgwesthoffsweltpdfpresenterControllable))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE, orgwesthoffsweltpdfpresenterControllableIface))
+#define PDFPC_TYPE_CONTROLLABLE (pdfpc_controllable_get_type ())
+#define PDFPC_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllable))
+#define PDFPC_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONTROLLABLE))
+#define PDFPC_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllableIface))
 
-typedef struct _orgwesthoffsweltpdfpresenterControllable orgwesthoffsweltpdfpresenterControllable;
-typedef struct _orgwesthoffsweltpdfpresenterControllableIface orgwesthoffsweltpdfpresenterControllableIface;
+typedef struct _pdfpcControllable pdfpcControllable;
+typedef struct _pdfpcControllableIface pdfpcControllableIface;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE (org_westhoffswelt_pdfpresenter_metadata_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
+#define PDFPC_METADATA_TYPE_BASE (pdfpc_metadata_base_get_type ())
+#define PDFPC_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBase))
+#define PDFPC_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
+#define PDFPC_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBase orgwesthoffsweltpdfpresenterMetadataBase;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBaseClass orgwesthoffsweltpdfpresenterMetadataBaseClass;
+typedef struct _pdfpcMetadataBase pdfpcMetadataBase;
+typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF (org_westhoffswelt_pdfpresenter_metadata_pdf_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdf))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfClass))
+#define PDFPC_METADATA_TYPE_PDF (pdfpc_metadata_pdf_get_type ())
+#define PDFPC_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdf))
+#define PDFPC_METADATA_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfClass))
+#define PDFPC_METADATA_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_PDF))
+#define PDFPC_METADATA_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_PDF))
+#define PDFPC_METADATA_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdf orgwesthoffsweltpdfpresenterMetadataPdf;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdfClass orgwesthoffsweltpdfpresenterMetadataPdfClass;
+typedef struct _pdfpcMetadataPdf pdfpcMetadataPdf;
+typedef struct _pdfpcMetadataPdfClass pdfpcMetadataPdfClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_OVERVIEW (org_westhoffswelt_pdfpresenter_window_overview_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_OVERVIEW(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_OVERVIEW, orgwesthoffsweltpdfpresenterWindowOverview))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_OVERVIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_OVERVIEW, orgwesthoffsweltpdfpresenterWindowOverviewClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_OVERVIEW(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_OVERVIEW))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_OVERVIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_OVERVIEW))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_OVERVIEW_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_OVERVIEW, orgwesthoffsweltpdfpresenterWindowOverviewClass))
+#define PDFPC_WINDOW_TYPE_OVERVIEW (pdfpc_window_overview_get_type ())
+#define PDFPC_WINDOW_OVERVIEW(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_OVERVIEW, pdfpcWindowOverview))
+#define PDFPC_WINDOW_OVERVIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_WINDOW_TYPE_OVERVIEW, pdfpcWindowOverviewClass))
+#define PDFPC_WINDOW_IS_OVERVIEW(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_WINDOW_TYPE_OVERVIEW))
+#define PDFPC_WINDOW_IS_OVERVIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_WINDOW_TYPE_OVERVIEW))
+#define PDFPC_WINDOW_OVERVIEW_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_WINDOW_TYPE_OVERVIEW, pdfpcWindowOverviewClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterWindowOverview orgwesthoffsweltpdfpresenterWindowOverview;
-typedef struct _orgwesthoffsweltpdfpresenterWindowOverviewClass orgwesthoffsweltpdfpresenterWindowOverviewClass;
+typedef struct _pdfpcWindowOverview pdfpcWindowOverview;
+typedef struct _pdfpcWindowOverviewClass pdfpcWindowOverviewClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_TYPE_KEY_MAPPINGS (org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_get_type ())
+#define PDFPC_TYPE_TIMER_LABEL (pdfpc_timer_label_get_type ())
+#define PDFPC_TIMER_LABEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_TIMER_LABEL, pdfpcTimerLabel))
+#define PDFPC_TIMER_LABEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_TIMER_LABEL, pdfpcTimerLabelClass))
+#define PDFPC_IS_TIMER_LABEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_TIMER_LABEL))
+#define PDFPC_IS_TIMER_LABEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_TIMER_LABEL))
+#define PDFPC_TIMER_LABEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_TIMER_LABEL, pdfpcTimerLabelClass))
+
+typedef struct _pdfpcTimerLabel pdfpcTimerLabel;
+typedef struct _pdfpcTimerLabelClass pdfpcTimerLabelClass;
+
+#define PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION (pdfpc_presentation_controller_key_action_get_type ())
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, pdfpcPresentationControllerKeyAction))
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, pdfpcPresentationControllerKeyActionClass))
+#define PDFPC_PRESENTATION_CONTROLLER_IS_KEY_ACTION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION))
+#define PDFPC_PRESENTATION_CONTROLLER_IS_KEY_ACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION))
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, pdfpcPresentationControllerKeyActionClass))
+
+typedef struct _pdfpcPresentationControllerKeyAction pdfpcPresentationControllerKeyAction;
+typedef struct _pdfpcPresentationControllerKeyActionClass pdfpcPresentationControllerKeyActionClass;
+
+#define PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF (pdfpc_presentation_controller_key_def_get_type ())
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_DEF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, pdfpcPresentationControllerKeyDef))
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, pdfpcPresentationControllerKeyDefClass))
+#define PDFPC_PRESENTATION_CONTROLLER_IS_KEY_DEF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF))
+#define PDFPC_PRESENTATION_CONTROLLER_IS_KEY_DEF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF))
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, pdfpcPresentationControllerKeyDefClass))
+
+typedef struct _pdfpcPresentationControllerKeyDef pdfpcPresentationControllerKeyDef;
+typedef struct _pdfpcPresentationControllerKeyDefClass pdfpcPresentationControllerKeyDefClass;
 #define __g_list_free__g_object_unref0_0(var) ((var == NULL) ? NULL : (var = (_g_list_free__g_object_unref0_ (var), NULL)))
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
+#define _pdfpc_presentation_controller_key_action_unref0(var) ((var == NULL) ? NULL : (var = (pdfpc_presentation_controller_key_action_unref (var), NULL)))
+#define _pdfpc_presentation_controller_key_def_unref0(var) ((var == NULL) ? NULL : (var = (pdfpc_presentation_controller_key_def_unref (var), NULL)))
+typedef struct _pdfpcPresentationControllerKeyActionPrivate pdfpcPresentationControllerKeyActionPrivate;
+#define _g_free0(var) (var = (g_free (var), NULL))
+typedef struct _pdfpcPresentationControllerParamSpecKeyAction pdfpcPresentationControllerParamSpecKeyAction;
+typedef struct _pdfpcPresentationControllerKeyDefPrivate pdfpcPresentationControllerKeyDefPrivate;
+typedef struct _pdfpcPresentationControllerParamSpecKeyDef pdfpcPresentationControllerParamSpecKeyDef;
 
-struct _orgwesthoffsweltpdfpresenterControllableIface {
+struct _pdfpcControllableIface {
 	GTypeInterface parent_iface;
-	orgwesthoffsweltpdfpresenterPresentationController* (*get_controller) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*update) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*edit_note) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*ask_goto_page) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*toggle_pause) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*reset_timer) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*show_overview) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*hide_overview) (orgwesthoffsweltpdfpresenterControllable* self);
+	pdfpcPresentationController* (*get_controller) (pdfpcControllable* self);
+	void (*update) (pdfpcControllable* self);
+	void (*edit_note) (pdfpcControllable* self);
+	void (*ask_goto_page) (pdfpcControllable* self);
+	void (*show_overview) (pdfpcControllable* self);
+	void (*hide_overview) (pdfpcControllable* self);
 };
 
-struct _orgwesthoffsweltpdfpresenterPresentationController {
+struct _pdfpcPresentationController {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterPresentationControllerPrivate * priv;
+	pdfpcPresentationControllerPrivate * priv;
 	gint current_slide_number;
 	gint current_user_slide_number;
 	gboolean faded_to_black;
@@ -86,130 +124,233 @@ struct _orgwesthoffsweltpdfpresenterPresentationController {
 	GList* controllables;
 	gboolean ignore_keyboard_events;
 	gboolean ignore_mouse_events;
-	orgwesthoffsweltpdfpresenterMetadataPdf* metadata;
-	orgwesthoffsweltpdfpresenterWindowOverview* overview;
+	pdfpcMetadataPdf* metadata;
+	pdfpcWindowOverview* overview;
+	gboolean overview_shown;
 	guint last_key_event;
+	pdfpcTimerLabel* timer;
+	GeeHashMap* actionNames;
+	GeeHashMap* keyBindings;
+	GeeHashMap* mouseBindings;
 };
 
-struct _orgwesthoffsweltpdfpresenterPresentationControllerClass {
+struct _pdfpcPresentationControllerClass {
 	GObjectClass parent_class;
 };
 
-typedef enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Normal,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Overview
-} orgwesthoffsweltpdfpresenterPresentationControllerKeyMappings;
-
-struct _orgwesthoffsweltpdfpresenterPresentationControllerPrivate {
+struct _pdfpcPresentationControllerPrivate {
+	guint _accepted_key_mods;
 	gint* history;
 	gint history_length1;
 	gint _history_size_;
-	orgwesthoffsweltpdfpresenterPresentationControllerKeyMappings current_key_mapping;
+};
+
+typedef void (*pdfpcPresentationControllerKeyActionKeyActionDelegate) (void* user_data);
+struct _pdfpcPresentationControllerKeyAction {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	pdfpcPresentationControllerKeyActionPrivate * priv;
+	pdfpcPresentationControllerKeyActionKeyActionDelegate d;
+	gpointer d_target;
+	GDestroyNotify d_target_destroy_notify;
+};
+
+struct _pdfpcPresentationControllerKeyActionClass {
+	GTypeClass parent_class;
+	void (*finalize) (pdfpcPresentationControllerKeyAction *self);
+};
+
+struct _pdfpcPresentationControllerParamSpecKeyAction {
+	GParamSpec parent_instance;
+};
+
+struct _pdfpcPresentationControllerKeyDef {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	pdfpcPresentationControllerKeyDefPrivate * priv;
+};
+
+struct _pdfpcPresentationControllerKeyDefClass {
+	GTypeClass parent_class;
+	void (*finalize) (pdfpcPresentationControllerKeyDef *self);
+};
+
+struct _pdfpcPresentationControllerKeyDefPrivate {
+	guint _keycode;
+	guint _modMask;
+};
+
+struct _pdfpcPresentationControllerParamSpecKeyDef {
+	GParamSpec parent_instance;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_presentation_controller_parent_class = NULL;
+static gpointer pdfpc_presentation_controller_parent_class = NULL;
+extern gchar* pdfpc_options_start_time;
+extern gchar* pdfpc_options_end_time;
+extern guint pdfpc_options_duration;
+extern guint pdfpc_options_last_minutes;
+static gpointer pdfpc_presentation_controller_key_action_parent_class = NULL;
+static gpointer pdfpc_presentation_controller_key_def_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_presentation_controller_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_controllable_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_metadata_base_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_metadata_pdf_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_window_overview_get_type (void) G_GNUC_CONST;
-static GType org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_get_type (void) G_GNUC_UNUSED;
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerPrivate))
+GType pdfpc_presentation_controller_get_type (void) G_GNUC_CONST;
+GType pdfpc_controllable_get_type (void) G_GNUC_CONST;
+GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_metadata_pdf_get_type (void) G_GNUC_CONST;
+GType pdfpc_window_overview_get_type (void) G_GNUC_CONST;
+GType pdfpc_timer_label_get_type (void) G_GNUC_CONST;
+gpointer pdfpc_presentation_controller_key_action_ref (gpointer instance);
+void pdfpc_presentation_controller_key_action_unref (gpointer instance);
+GParamSpec* pdfpc_presentation_controller_param_spec_key_action (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void pdfpc_presentation_controller_value_set_key_action (GValue* value, gpointer v_object);
+void pdfpc_presentation_controller_value_take_key_action (GValue* value, gpointer v_object);
+gpointer pdfpc_presentation_controller_value_get_key_action (const GValue* value);
+GType pdfpc_presentation_controller_key_action_get_type (void) G_GNUC_CONST;
+gpointer pdfpc_presentation_controller_key_def_ref (gpointer instance);
+void pdfpc_presentation_controller_key_def_unref (gpointer instance);
+GParamSpec* pdfpc_presentation_controller_param_spec_key_def (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void pdfpc_presentation_controller_value_set_key_def (GValue* value, gpointer v_object);
+void pdfpc_presentation_controller_value_take_key_def (GValue* value, gpointer v_object);
+gpointer pdfpc_presentation_controller_value_get_key_def (const GValue* value);
+GType pdfpc_presentation_controller_key_def_get_type (void) G_GNUC_CONST;
+#define PDFPC_PRESENTATION_CONTROLLER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerPrivate))
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_DUMMY_PROPERTY
+	PDFPC_PRESENTATION_CONTROLLER_DUMMY_PROPERTY,
+	PDFPC_PRESENTATION_CONTROLLER_ACCEPTED_KEY_MODS
 };
 static void _g_object_unref0_ (gpointer var);
 static void _g_list_free__g_object_unref0_ (GList* self);
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_presentation_controller_new (orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gboolean allow_black_on_end);
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_presentation_controller_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gboolean allow_black_on_end);
-guint org_westhoffswelt_pdfpresenter_metadata_base_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_overview (orgwesthoffsweltpdfpresenterPresentationController* self, orgwesthoffsweltpdfpresenterWindowOverview* o);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventKey* key);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press_normal (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventKey* key);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press_overview (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventKey* key);
-void org_westhoffswelt_pdfpresenter_presentation_controller_jump10 (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_next_page (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_next_user_page (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_back10 (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_previous_page (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_previous_user_page (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_reset (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_goto_first (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_goto_last (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_fade_to_black (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_edit_note (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_ask_goto_page (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_freeze (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_skip (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_start (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_pause (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_end_user_slide (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_show_overview (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_history_back (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_skip_overview (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_end_user_slide_overview (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_hide_overview (orgwesthoffsweltpdfpresenterPresentationController* self);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_button_press (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventButton* button);
-void org_westhoffswelt_pdfpresenter_presentation_controller_scroll (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventScroll* scroll);
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_current_slide_number (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_current_user_slide_number (orgwesthoffsweltpdfpresenterPresentationController* self);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_previous (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint number);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_next (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_n_slide (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_user_n_slides (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_end_user_slide (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-void org_westhoffswelt_pdfpresenter_metadata_pdf_set_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint slide);
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_window_overview_get_current_button (orgwesthoffsweltpdfpresenterWindowOverview* self);
-static void org_westhoffswelt_pdfpresenter_presentation_controller_slide2history (orgwesthoffsweltpdfpresenterPresentationController* self);
+pdfpcPresentationController* pdfpc_presentation_controller_new (pdfpcMetadataPdf* metadata, gboolean allow_black_on_end);
+pdfpcPresentationController* pdfpc_presentation_controller_construct (GType object_type, pdfpcMetadataPdf* metadata, gboolean allow_black_on_end);
+static time_t pdfpc_presentation_controller_parseTime (pdfpcPresentationController* self, const gchar* t);
+void pdfpc_metadata_pdf_set_duration (pdfpcMetadataPdf* self, guint d);
+pdfpcTimerLabel* pdfpc_getTimerLabel (gint duration, time_t end_time, guint last_minutes, time_t start_time);
+guint pdfpc_metadata_pdf_get_duration (pdfpcMetadataPdf* self);
+void pdfpc_timer_label_reset (pdfpcTimerLabel* self);
+guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self);
+guint pdfpc_presentation_controller_key_def_hash (void* _a);
+static guint _pdfpc_presentation_controller_key_def_hash_ghash_func (gconstpointer key);
+gboolean pdfpc_presentation_controller_key_def_equal (void* _a, void* _b);
+static gboolean _pdfpc_presentation_controller_key_def_equal_gequal_func (gconstpointer a, gconstpointer b);
+void pdfpc_presentation_controller_fillActionNames (pdfpcPresentationController* self);
+void pdfpc_presentation_controller_set_overview (pdfpcPresentationController* self, pdfpcWindowOverview* o);
+void pdfpc_presentation_controller_next_page (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_next_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+pdfpcPresentationControllerKeyAction* pdfpc_presentation_controller_key_action_new (pdfpcPresentationControllerKeyActionKeyActionDelegate d, void* d_target);
+pdfpcPresentationControllerKeyAction* pdfpc_presentation_controller_key_action_construct (GType object_type, pdfpcPresentationControllerKeyActionKeyActionDelegate d, void* d_target);
+void pdfpc_presentation_controller_jump10 (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_jump10_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_next_user_page (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_next_user_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_previous_page (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_previous_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_back10 (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_back10_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_previous_user_page (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_previous_user_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_controllables_ask_goto_page (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_controllables_ask_goto_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_goto_first (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_goto_first_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_goto_last (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_goto_last_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_toggle_overview (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_toggle_overview_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_history_back (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_history_back_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_start (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_start_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_toggle_pause (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_toggle_pause_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_reset_timer (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_reset_timer_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_controllables_reset (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_controllables_reset_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_fade_to_black (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_fade_to_black_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_toggle_freeze (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_toggle_freeze_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+static void __lambda7_ (pdfpcPresentationController* self);
+static void ___lambda7__pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_toggle_skip (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_toggle_skip_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_controllables_edit_note (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_controllables_edit_note_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_set_end_user_slide (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_set_end_user_slide_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_exit_state (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_exit_state_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+void pdfpc_presentation_controller_quit (pdfpcPresentationController* self);
+static void _pdfpc_presentation_controller_quit_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self);
+gchar** pdfpc_presentation_controller_getActionDescriptions (int* result_length1);
+void pdfpc_presentation_controller_bind (pdfpcPresentationController* self, guint keycode, guint modMask, const gchar* function);
+pdfpcPresentationControllerKeyDef* pdfpc_presentation_controller_key_def_new (guint k, guint m);
+pdfpcPresentationControllerKeyDef* pdfpc_presentation_controller_key_def_construct (GType object_type, guint k, guint m);
+void pdfpc_presentation_controller_unbind (pdfpcPresentationController* self, guint keycode, guint modMask);
+void pdfpc_presentation_controller_unbindAll (pdfpcPresentationController* self);
+void pdfpc_presentation_controller_bindMouse (pdfpcPresentationController* self, guint button, guint modMask, const gchar* function);
+void pdfpc_presentation_controller_unbindMouse (pdfpcPresentationController* self, guint keycode, guint modMask);
+void pdfpc_presentation_controller_unbindAllMouse (pdfpcPresentationController* self);
+gboolean pdfpc_presentation_controller_key_press (pdfpcPresentationController* self, GdkEventKey* key);
+guint pdfpc_presentation_controller_get_accepted_key_mods (pdfpcPresentationController* self);
+gboolean pdfpc_presentation_controller_button_press (pdfpcPresentationController* self, GdkEventButton* button);
+void pdfpc_presentation_controller_scroll (pdfpcPresentationController* self, GdkEventScroll* scroll);
+gint pdfpc_presentation_controller_get_current_slide_number (pdfpcPresentationController* self);
+gint pdfpc_presentation_controller_get_current_user_slide_number (pdfpcPresentationController* self);
+gboolean pdfpc_presentation_controller_skip_previous (pdfpcPresentationController* self);
+gint pdfpc_metadata_pdf_user_slide_to_real_slide (pdfpcMetadataPdf* self, gint number);
+gboolean pdfpc_presentation_controller_skip_next (pdfpcPresentationController* self);
+gint pdfpc_metadata_pdf_get_user_slide_count (pdfpcMetadataPdf* self);
+gint pdfpc_presentation_controller_get_n_slide (pdfpcPresentationController* self);
+gint pdfpc_presentation_controller_get_user_n_slides (pdfpcPresentationController* self);
+gint pdfpc_presentation_controller_get_end_user_slide (pdfpcPresentationController* self);
+gint pdfpc_metadata_pdf_get_end_user_slide (pdfpcMetadataPdf* self);
+void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide);
+void pdfpc_presentation_controller_controllables_update (pdfpcPresentationController* self);
+void pdfpc_presentation_controller_set_end_user_slide_overview (pdfpcPresentationController* self);
+gint pdfpc_window_overview_get_current_slide (pdfpcWindowOverview* self);
+static void pdfpc_presentation_controller_slide2history (pdfpcPresentationController* self);
 static void _vala_array_add1 (gint** array, int* length, int* size, gint value);
-void org_westhoffswelt_pdfpresenter_presentation_controller_page_change_request (orgwesthoffsweltpdfpresenterPresentationController* self, gint page_number);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint number);
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_input_events (orgwesthoffsweltpdfpresenterPresentationController* self, gboolean v);
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_mouse_events (orgwesthoffsweltpdfpresenterPresentationController* self, gboolean v);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_register_controllable (orgwesthoffsweltpdfpresenterPresentationController* self, orgwesthoffsweltpdfpresenterControllable* controllable);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_is_faded_to_black (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_goto_user_page (orgwesthoffsweltpdfpresenterPresentationController* self, gint page_number);
-void org_westhoffswelt_pdfpresenter_controllable_update (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_presentation_controller_reset_timer (orgwesthoffsweltpdfpresenterPresentationController* self);
-void org_westhoffswelt_pdfpresenter_controllable_show_overview (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_edit_note (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_ask_goto_page (orgwesthoffsweltpdfpresenterControllable* self);
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_is_frozen (orgwesthoffsweltpdfpresenterPresentationController* self);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint slide_number, gint user_slide_number);
-void org_westhoffswelt_pdfpresenter_window_overview_set_n_slides (orgwesthoffsweltpdfpresenterWindowOverview* self, gint n);
-void org_westhoffswelt_pdfpresenter_controllable_toggle_pause (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_reset_timer (orgwesthoffsweltpdfpresenterControllable* self);
-static void org_westhoffswelt_pdfpresenter_presentation_controller_finalize (GObject* obj);
-
-
-/**
-         * Handle keypresses to each of the controllables
-         *
-         * This seperate handling is needed because keypresses from any of the
-         * window have implications on the behaviour of both of them. Therefore
-         * this controller is needed to take care of the needed actions.
-         *
-         * There are no Vala bindings for gdk/gdkkeysyms.h
-         * https://bugzilla.gnome.org/show_bug.cgi?id=551184
-         *
-         */
-static GType org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id__volatile)) {
-		static const GEnumValue values[] = {{ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Normal, "ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Normal", "normal"}, {ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Overview, "ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Overview", "overview"}, {0, NULL, NULL}};
-		GType org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id;
-		org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id = g_enum_register_static ("orgwesthoffsweltpdfpresenterPresentationControllerKeyMappings", values);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id__volatile, org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id);
-	}
-	return org_westhoffswelt_pdfpresenter_presentation_controller_key_mappings_type_id__volatile;
-}
+void pdfpc_presentation_controller_page_change_request (pdfpcPresentationController* self, gint page_number);
+gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number);
+void pdfpc_timer_label_start (pdfpcTimerLabel* self);
+void pdfpc_presentation_controller_set_ignore_input_events (pdfpcPresentationController* self, gboolean v);
+void pdfpc_presentation_controller_set_ignore_mouse_events (pdfpcPresentationController* self, gboolean v);
+pdfpcTimerLabel* pdfpc_presentation_controller_getTimer (pdfpcPresentationController* self);
+gboolean pdfpc_presentation_controller_register_controllable (pdfpcPresentationController* self, pdfpcControllable* controllable);
+gboolean pdfpc_presentation_controller_is_faded_to_black (pdfpcPresentationController* self);
+void pdfpc_presentation_controller_goto_user_page (pdfpcPresentationController* self, gint page_number);
+void pdfpc_presentation_controller_controllables_hide_overview (pdfpcPresentationController* self);
+void pdfpc_controllable_update (pdfpcControllable* self);
+void pdfpc_presentation_controller_controllables_show_overview (pdfpcPresentationController* self);
+void pdfpc_controllable_show_overview (pdfpcControllable* self);
+void pdfpc_controllable_hide_overview (pdfpcControllable* self);
+void pdfpc_controllable_edit_note (pdfpcControllable* self);
+void pdfpc_controllable_ask_goto_page (pdfpcControllable* self);
+gboolean pdfpc_presentation_controller_is_frozen (pdfpcPresentationController* self);
+gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, gint user_slide_number);
+void pdfpc_window_overview_remove_current (pdfpcWindowOverview* self, gint newn);
+void pdfpc_window_overview_set_n_slides (pdfpcWindowOverview* self, gint n);
+gboolean pdfpc_timer_label_pause (pdfpcTimerLabel* self);
+gboolean pdfpc_timer_label_is_paused (pdfpcTimerLabel* self);
+void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self);
+void pdfpc_presentation_controller_set_accepted_key_mods (pdfpcPresentationController* self, guint value);
+enum  {
+	PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION_DUMMY_PROPERTY
+};
+static void pdfpc_presentation_controller_key_action_finalize (pdfpcPresentationControllerKeyAction* obj);
+#define PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, pdfpcPresentationControllerKeyDefPrivate))
+enum  {
+	PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_DUMMY_PROPERTY
+};
+void pdfpc_presentation_controller_key_def_set_keycode (pdfpcPresentationControllerKeyDef* self, guint value);
+void pdfpc_presentation_controller_key_def_set_modMask (pdfpcPresentationControllerKeyDef* self, guint value);
+guint pdfpc_presentation_controller_key_def_get_keycode (pdfpcPresentationControllerKeyDef* self);
+guint pdfpc_presentation_controller_key_def_get_modMask (pdfpcPresentationControllerKeyDef* self);
+static void pdfpc_presentation_controller_key_def_finalize (pdfpcPresentationControllerKeyDef* obj);
+static void pdfpc_presentation_controller_finalize (GObject* obj);
+static void _vala_pdfpc_presentation_controller_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec);
+static void _vala_pdfpc_presentation_controller_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec);
 
 
 static void _g_object_unref0_ (gpointer var) {
@@ -231,40 +372,106 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_presentation_controller_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gboolean allow_black_on_end) {
-	orgwesthoffsweltpdfpresenterPresentationController * self = NULL;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp1_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
-	guint _tmp3_ = 0U;
-	gboolean _tmp4_;
+static guint _pdfpc_presentation_controller_key_def_hash_ghash_func (gconstpointer key) {
+	guint result;
+	result = pdfpc_presentation_controller_key_def_hash (key);
+	return result;
+}
+
+
+static gboolean _pdfpc_presentation_controller_key_def_equal_gequal_func (gconstpointer a, gconstpointer b) {
+	gboolean result;
+	result = pdfpc_presentation_controller_key_def_equal (a, b);
+	return result;
+}
+
+
+pdfpcPresentationController* pdfpc_presentation_controller_construct (GType object_type, pdfpcMetadataPdf* metadata, gboolean allow_black_on_end) {
+	pdfpcPresentationController * self = NULL;
+	pdfpcMetadataPdf* _tmp0_;
+	pdfpcMetadataPdf* _tmp1_;
+	gboolean _tmp2_;
+	time_t start_time;
+	const gchar* _tmp3_;
+	time_t end_time;
+	const gchar* _tmp6_;
+	pdfpcMetadataPdf* _tmp10_;
+	guint _tmp11_ = 0U;
+	time_t _tmp12_;
+	guint _tmp13_;
+	time_t _tmp14_;
+	pdfpcTimerLabel* _tmp15_ = NULL;
+	pdfpcTimerLabel* _tmp16_;
+	pdfpcMetadataPdf* _tmp17_;
+	guint _tmp18_ = 0U;
+	GeeHashMap* _tmp19_;
+	GeeHashMap* _tmp20_;
 	g_return_val_if_fail (metadata != NULL, NULL);
-	self = (orgwesthoffsweltpdfpresenterPresentationController*) g_object_new (object_type, NULL);
-	__g_list_free__g_object_unref0_0 (self->controllables);
-	self->controllables = NULL;
+	self = (pdfpcPresentationController*) g_object_new (object_type, NULL);
 	_tmp0_ = metadata;
 	_tmp1_ = _g_object_ref0 (_tmp0_);
 	_g_object_unref0 (self->metadata);
 	self->metadata = _tmp1_;
-	_tmp2_ = metadata;
-	_tmp3_ = org_westhoffswelt_pdfpresenter_metadata_base_get_slide_count ((orgwesthoffsweltpdfpresenterMetadataBase*) _tmp2_);
-	self->n_slides = (gint) _tmp3_;
-	_tmp4_ = allow_black_on_end;
-	self->black_on_end = _tmp4_;
+	_tmp2_ = allow_black_on_end;
+	self->black_on_end = _tmp2_;
+	__g_list_free__g_object_unref0_0 (self->controllables);
+	self->controllables = NULL;
+	start_time = (time_t) 0;
+	_tmp3_ = pdfpc_options_start_time;
+	if (_tmp3_ != NULL) {
+		const gchar* _tmp4_;
+		time_t _tmp5_ = 0;
+		_tmp4_ = pdfpc_options_start_time;
+		_tmp5_ = pdfpc_presentation_controller_parseTime (self, _tmp4_);
+		start_time = _tmp5_;
+	}
+	end_time = (time_t) 0;
+	_tmp6_ = pdfpc_options_end_time;
+	if (_tmp6_ != NULL) {
+		const gchar* _tmp7_;
+		time_t _tmp8_ = 0;
+		pdfpcMetadataPdf* _tmp9_;
+		_tmp7_ = pdfpc_options_end_time;
+		_tmp8_ = pdfpc_presentation_controller_parseTime (self, _tmp7_);
+		end_time = _tmp8_;
+		pdfpc_options_duration = (guint) 0;
+		_tmp9_ = self->metadata;
+		pdfpc_metadata_pdf_set_duration (_tmp9_, (guint) 0);
+	}
+	_tmp10_ = self->metadata;
+	_tmp11_ = pdfpc_metadata_pdf_get_duration (_tmp10_);
+	_tmp12_ = end_time;
+	_tmp13_ = pdfpc_options_last_minutes;
+	_tmp14_ = start_time;
+	_tmp15_ = pdfpc_getTimerLabel (((gint) _tmp11_) * 60, _tmp12_, _tmp13_, _tmp14_);
+	_g_object_unref0 (self->timer);
+	self->timer = _tmp15_;
+	_tmp16_ = self->timer;
+	pdfpc_timer_label_reset (_tmp16_);
+	_tmp17_ = metadata;
+	_tmp18_ = pdfpc_metadata_base_get_slide_count ((pdfpcMetadataBase*) _tmp17_);
+	self->n_slides = (gint) _tmp18_;
 	self->current_slide_number = 0;
 	self->current_user_slide_number = 0;
+	_tmp19_ = gee_hash_map_new (PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, (GBoxedCopyFunc) pdfpc_presentation_controller_key_def_ref, pdfpc_presentation_controller_key_def_unref, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, (GBoxedCopyFunc) pdfpc_presentation_controller_key_action_ref, pdfpc_presentation_controller_key_action_unref, _pdfpc_presentation_controller_key_def_hash_ghash_func, _pdfpc_presentation_controller_key_def_equal_gequal_func, NULL);
+	_g_object_unref0 (self->keyBindings);
+	self->keyBindings = _tmp19_;
+	_tmp20_ = gee_hash_map_new (PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, (GBoxedCopyFunc) pdfpc_presentation_controller_key_def_ref, pdfpc_presentation_controller_key_def_unref, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, (GBoxedCopyFunc) pdfpc_presentation_controller_key_action_ref, pdfpc_presentation_controller_key_action_unref, _pdfpc_presentation_controller_key_def_hash_ghash_func, _pdfpc_presentation_controller_key_def_equal_gequal_func, NULL);
+	_g_object_unref0 (self->mouseBindings);
+	self->mouseBindings = _tmp20_;
+	pdfpc_presentation_controller_fillActionNames (self);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_presentation_controller_new (orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gboolean allow_black_on_end) {
-	return org_westhoffswelt_pdfpresenter_presentation_controller_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, metadata, allow_black_on_end);
+pdfpcPresentationController* pdfpc_presentation_controller_new (pdfpcMetadataPdf* metadata, gboolean allow_black_on_end) {
+	return pdfpc_presentation_controller_construct (PDFPC_TYPE_PRESENTATION_CONTROLLER, metadata, allow_black_on_end);
 }
 
 
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_overview (orgwesthoffsweltpdfpresenterPresentationController* self, orgwesthoffsweltpdfpresenterWindowOverview* o) {
-	orgwesthoffsweltpdfpresenterWindowOverview* _tmp0_;
-	orgwesthoffsweltpdfpresenterWindowOverview* _tmp1_;
+void pdfpc_presentation_controller_set_overview (pdfpcPresentationController* self, pdfpcWindowOverview* o) {
+	pdfpcWindowOverview* _tmp0_;
+	pdfpcWindowOverview* _tmp1_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (o != NULL);
 	_tmp0_ = o;
@@ -274,185 +481,702 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_set_overview (orgwes
 }
 
 
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventKey* key) {
-	gboolean result = FALSE;
-	GdkEventKey _tmp0_;
-	guint32 _tmp1_;
-	guint _tmp2_;
-	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (key != NULL, FALSE);
-	_tmp0_ = *key;
-	_tmp1_ = _tmp0_.time;
-	_tmp2_ = self->last_key_event;
-	if (_tmp1_ != ((guint32) _tmp2_)) {
-		GdkEventKey _tmp3_;
-		guint32 _tmp4_;
-		orgwesthoffsweltpdfpresenterPresentationControllerKeyMappings _tmp5_;
-		_tmp3_ = *key;
-		_tmp4_ = _tmp3_.time;
-		self->last_key_event = (guint) _tmp4_;
-		_tmp5_ = self->priv->current_key_mapping;
-		switch (_tmp5_) {
-			case ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Normal:
-			{
-				GdkEventKey _tmp6_;
-				gboolean _tmp7_ = FALSE;
-				_tmp6_ = *key;
-				_tmp7_ = org_westhoffswelt_pdfpresenter_presentation_controller_key_press_normal (self, &_tmp6_);
-				result = _tmp7_;
-				return result;
-			}
-			case ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Overview:
-			{
-				GdkEventKey _tmp8_;
-				gboolean _tmp9_ = FALSE;
-				_tmp8_ = *key;
-				_tmp9_ = org_westhoffswelt_pdfpresenter_presentation_controller_key_press_overview (self, &_tmp8_);
-				result = _tmp9_;
-				return result;
-			}
-			default:
-			break;
-		}
+static void _pdfpc_presentation_controller_next_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_next_page (self);
+}
+
+
+static void _pdfpc_presentation_controller_jump10_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_jump10 (self);
+}
+
+
+static void _pdfpc_presentation_controller_next_user_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_next_user_page (self);
+}
+
+
+static void _pdfpc_presentation_controller_previous_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_previous_page (self);
+}
+
+
+static void _pdfpc_presentation_controller_back10_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_back10 (self);
+}
+
+
+static void _pdfpc_presentation_controller_previous_user_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_previous_user_page (self);
+}
+
+
+static void _pdfpc_presentation_controller_controllables_ask_goto_page_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_controllables_ask_goto_page (self);
+}
+
+
+static void _pdfpc_presentation_controller_goto_first_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_goto_first (self);
+}
+
+
+static void _pdfpc_presentation_controller_goto_last_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_goto_last (self);
+}
+
+
+static void _pdfpc_presentation_controller_toggle_overview_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_toggle_overview (self);
+}
+
+
+static void _pdfpc_presentation_controller_history_back_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_history_back (self);
+}
+
+
+static void _pdfpc_presentation_controller_start_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_start (self);
+}
+
+
+static void _pdfpc_presentation_controller_toggle_pause_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_toggle_pause (self);
+}
+
+
+static void _pdfpc_presentation_controller_reset_timer_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_reset_timer (self);
+}
+
+
+static void _pdfpc_presentation_controller_controllables_reset_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_controllables_reset (self);
+}
+
+
+static void _pdfpc_presentation_controller_fade_to_black_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_fade_to_black (self);
+}
+
+
+static void _pdfpc_presentation_controller_toggle_freeze_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_toggle_freeze (self);
+}
+
+
+static void __lambda7_ (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	_tmp0_ = self->frozen;
+	if (!_tmp0_) {
+		pdfpc_presentation_controller_toggle_freeze (self);
 	}
-	result = TRUE;
+}
+
+
+static void ___lambda7__pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	__lambda7_ (self);
+}
+
+
+static void _pdfpc_presentation_controller_toggle_skip_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_toggle_skip (self);
+}
+
+
+static void _pdfpc_presentation_controller_controllables_edit_note_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_controllables_edit_note (self);
+}
+
+
+static void _pdfpc_presentation_controller_set_end_user_slide_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_set_end_user_slide (self);
+}
+
+
+static void _pdfpc_presentation_controller_exit_state_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_exit_state (self);
+}
+
+
+static void _pdfpc_presentation_controller_quit_pdfpc_presentation_controller_key_action_key_action_delegate (gpointer self) {
+	pdfpc_presentation_controller_quit (self);
+}
+
+
+void pdfpc_presentation_controller_fillActionNames (pdfpcPresentationController* self) {
+	GeeHashMap* _tmp0_;
+	GeeHashMap* _tmp1_;
+	pdfpcPresentationControllerKeyAction* _tmp2_;
+	pdfpcPresentationControllerKeyAction* _tmp3_;
+	GeeHashMap* _tmp4_;
+	pdfpcPresentationControllerKeyAction* _tmp5_;
+	pdfpcPresentationControllerKeyAction* _tmp6_;
+	GeeHashMap* _tmp7_;
+	pdfpcPresentationControllerKeyAction* _tmp8_;
+	pdfpcPresentationControllerKeyAction* _tmp9_;
+	GeeHashMap* _tmp10_;
+	pdfpcPresentationControllerKeyAction* _tmp11_;
+	pdfpcPresentationControllerKeyAction* _tmp12_;
+	GeeHashMap* _tmp13_;
+	pdfpcPresentationControllerKeyAction* _tmp14_;
+	pdfpcPresentationControllerKeyAction* _tmp15_;
+	GeeHashMap* _tmp16_;
+	pdfpcPresentationControllerKeyAction* _tmp17_;
+	pdfpcPresentationControllerKeyAction* _tmp18_;
+	GeeHashMap* _tmp19_;
+	pdfpcPresentationControllerKeyAction* _tmp20_;
+	pdfpcPresentationControllerKeyAction* _tmp21_;
+	GeeHashMap* _tmp22_;
+	pdfpcPresentationControllerKeyAction* _tmp23_;
+	pdfpcPresentationControllerKeyAction* _tmp24_;
+	GeeHashMap* _tmp25_;
+	pdfpcPresentationControllerKeyAction* _tmp26_;
+	pdfpcPresentationControllerKeyAction* _tmp27_;
+	GeeHashMap* _tmp28_;
+	pdfpcPresentationControllerKeyAction* _tmp29_;
+	pdfpcPresentationControllerKeyAction* _tmp30_;
+	GeeHashMap* _tmp31_;
+	pdfpcPresentationControllerKeyAction* _tmp32_;
+	pdfpcPresentationControllerKeyAction* _tmp33_;
+	GeeHashMap* _tmp34_;
+	pdfpcPresentationControllerKeyAction* _tmp35_;
+	pdfpcPresentationControllerKeyAction* _tmp36_;
+	GeeHashMap* _tmp37_;
+	pdfpcPresentationControllerKeyAction* _tmp38_;
+	pdfpcPresentationControllerKeyAction* _tmp39_;
+	GeeHashMap* _tmp40_;
+	pdfpcPresentationControllerKeyAction* _tmp41_;
+	pdfpcPresentationControllerKeyAction* _tmp42_;
+	GeeHashMap* _tmp43_;
+	pdfpcPresentationControllerKeyAction* _tmp44_;
+	pdfpcPresentationControllerKeyAction* _tmp45_;
+	GeeHashMap* _tmp46_;
+	pdfpcPresentationControllerKeyAction* _tmp47_;
+	pdfpcPresentationControllerKeyAction* _tmp48_;
+	GeeHashMap* _tmp49_;
+	pdfpcPresentationControllerKeyAction* _tmp50_;
+	pdfpcPresentationControllerKeyAction* _tmp51_;
+	GeeHashMap* _tmp52_;
+	pdfpcPresentationControllerKeyAction* _tmp53_;
+	pdfpcPresentationControllerKeyAction* _tmp54_;
+	GeeHashMap* _tmp55_;
+	pdfpcPresentationControllerKeyAction* _tmp56_;
+	pdfpcPresentationControllerKeyAction* _tmp57_;
+	GeeHashMap* _tmp58_;
+	pdfpcPresentationControllerKeyAction* _tmp59_;
+	pdfpcPresentationControllerKeyAction* _tmp60_;
+	GeeHashMap* _tmp61_;
+	pdfpcPresentationControllerKeyAction* _tmp62_;
+	pdfpcPresentationControllerKeyAction* _tmp63_;
+	GeeHashMap* _tmp64_;
+	pdfpcPresentationControllerKeyAction* _tmp65_;
+	pdfpcPresentationControllerKeyAction* _tmp66_;
+	GeeHashMap* _tmp67_;
+	pdfpcPresentationControllerKeyAction* _tmp68_;
+	pdfpcPresentationControllerKeyAction* _tmp69_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = gee_hash_map_new (G_TYPE_STRING, (GBoxedCopyFunc) g_strdup, g_free, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, (GBoxedCopyFunc) pdfpc_presentation_controller_key_action_ref, pdfpc_presentation_controller_key_action_unref, NULL, NULL, NULL);
+	_g_object_unref0 (self->actionNames);
+	self->actionNames = _tmp0_;
+	_tmp1_ = self->actionNames;
+	_tmp2_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_next_page_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp3_ = _tmp2_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp1_, "next", _tmp3_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp3_);
+	_tmp4_ = self->actionNames;
+	_tmp5_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_jump10_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp6_ = _tmp5_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp4_, "next10", _tmp6_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp6_);
+	_tmp7_ = self->actionNames;
+	_tmp8_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_next_user_page_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp9_ = _tmp8_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp7_, "nextOverlay", _tmp9_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp9_);
+	_tmp10_ = self->actionNames;
+	_tmp11_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_previous_page_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp12_ = _tmp11_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp10_, "prev", _tmp12_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp12_);
+	_tmp13_ = self->actionNames;
+	_tmp14_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_back10_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp15_ = _tmp14_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp13_, "prev10", _tmp15_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp15_);
+	_tmp16_ = self->actionNames;
+	_tmp17_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_previous_user_page_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp18_ = _tmp17_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp16_, "prevOverlay", _tmp18_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp18_);
+	_tmp19_ = self->actionNames;
+	_tmp20_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_controllables_ask_goto_page_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp21_ = _tmp20_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp19_, "goto", _tmp21_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp21_);
+	_tmp22_ = self->actionNames;
+	_tmp23_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_goto_first_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp24_ = _tmp23_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp22_, "gotoFirst", _tmp24_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp24_);
+	_tmp25_ = self->actionNames;
+	_tmp26_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_goto_last_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp27_ = _tmp26_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp25_, "gotoLast", _tmp27_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp27_);
+	_tmp28_ = self->actionNames;
+	_tmp29_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_toggle_overview_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp30_ = _tmp29_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp28_, "overview", _tmp30_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp30_);
+	_tmp31_ = self->actionNames;
+	_tmp32_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_history_back_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp33_ = _tmp32_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp31_, "histBack", _tmp33_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp33_);
+	_tmp34_ = self->actionNames;
+	_tmp35_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_start_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp36_ = _tmp35_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp34_, "start", _tmp36_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp36_);
+	_tmp37_ = self->actionNames;
+	_tmp38_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_toggle_pause_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp39_ = _tmp38_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp37_, "pause", _tmp39_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp39_);
+	_tmp40_ = self->actionNames;
+	_tmp41_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_reset_timer_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp42_ = _tmp41_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp40_, "resetTimer", _tmp42_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp42_);
+	_tmp43_ = self->actionNames;
+	_tmp44_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_controllables_reset_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp45_ = _tmp44_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp43_, "reset", _tmp45_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp45_);
+	_tmp46_ = self->actionNames;
+	_tmp47_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_fade_to_black_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp48_ = _tmp47_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp46_, "blank", _tmp48_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp48_);
+	_tmp49_ = self->actionNames;
+	_tmp50_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_toggle_freeze_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp51_ = _tmp50_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp49_, "freeze", _tmp51_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp51_);
+	_tmp52_ = self->actionNames;
+	_tmp53_ = pdfpc_presentation_controller_key_action_new (___lambda7__pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp54_ = _tmp53_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp52_, "freezeOn", _tmp54_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp54_);
+	_tmp55_ = self->actionNames;
+	_tmp56_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_toggle_skip_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp57_ = _tmp56_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp55_, "overlay", _tmp57_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp57_);
+	_tmp58_ = self->actionNames;
+	_tmp59_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_controllables_edit_note_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp60_ = _tmp59_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp58_, "note", _tmp60_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp60_);
+	_tmp61_ = self->actionNames;
+	_tmp62_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_set_end_user_slide_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp63_ = _tmp62_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp61_, "endSlide", _tmp63_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp63_);
+	_tmp64_ = self->actionNames;
+	_tmp65_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_exit_state_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp66_ = _tmp65_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp64_, "exitState", _tmp66_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp66_);
+	_tmp67_ = self->actionNames;
+	_tmp68_ = pdfpc_presentation_controller_key_action_new (_pdfpc_presentation_controller_quit_pdfpc_presentation_controller_key_action_key_action_delegate, self);
+	_tmp69_ = _tmp68_;
+	gee_abstract_map_set ((GeeAbstractMap*) _tmp67_, "quit", _tmp69_);
+	_pdfpc_presentation_controller_key_action_unref0 (_tmp69_);
+}
+
+
+/**
+         * Gets an array wit all function names
+         *
+         * It would be more legant yo use the keys property of actionNames, but
+         * we would need an instance for doing this...
+         */
+gchar** pdfpc_presentation_controller_getActionDescriptions (int* result_length1) {
+	gchar** result = NULL;
+	gchar* _tmp0_;
+	gchar* _tmp1_;
+	gchar* _tmp2_;
+	gchar* _tmp3_;
+	gchar* _tmp4_;
+	gchar* _tmp5_;
+	gchar* _tmp6_;
+	gchar* _tmp7_;
+	gchar* _tmp8_;
+	gchar* _tmp9_;
+	gchar* _tmp10_;
+	gchar* _tmp11_;
+	gchar* _tmp12_;
+	gchar* _tmp13_;
+	gchar* _tmp14_;
+	gchar* _tmp15_;
+	gchar* _tmp16_;
+	gchar* _tmp17_;
+	gchar* _tmp18_;
+	gchar* _tmp19_;
+	gchar* _tmp20_;
+	gchar* _tmp21_;
+	gchar* _tmp22_;
+	gchar* _tmp23_;
+	gchar* _tmp24_;
+	gchar* _tmp25_;
+	gchar* _tmp26_;
+	gchar* _tmp27_;
+	gchar* _tmp28_;
+	gchar* _tmp29_;
+	gchar* _tmp30_;
+	gchar* _tmp31_;
+	gchar* _tmp32_;
+	gchar* _tmp33_;
+	gchar* _tmp34_;
+	gchar* _tmp35_;
+	gchar* _tmp36_;
+	gchar* _tmp37_;
+	gchar* _tmp38_;
+	gchar* _tmp39_;
+	gchar* _tmp40_;
+	gchar* _tmp41_;
+	gchar* _tmp42_;
+	gchar* _tmp43_;
+	gchar* _tmp44_;
+	gchar* _tmp45_;
+	gchar** _tmp46_ = NULL;
+	gchar** _tmp47_;
+	gint _tmp47__length1;
+	_tmp0_ = g_strdup ("next");
+	_tmp1_ = g_strdup ("Go to next slide");
+	_tmp2_ = g_strdup ("next10");
+	_tmp3_ = g_strdup ("Jump 10 slides forward");
+	_tmp4_ = g_strdup ("nextOverlay");
+	_tmp5_ = g_strdup ("Jump forward outside of current overlay");
+	_tmp6_ = g_strdup ("prev");
+	_tmp7_ = g_strdup ("Go to previous slide");
+	_tmp8_ = g_strdup ("prev10");
+	_tmp9_ = g_strdup ("Jump 10 slides back");
+	_tmp10_ = g_strdup ("prevOverlay");
+	_tmp11_ = g_strdup ("Jump back outside of current overlay");
+	_tmp12_ = g_strdup ("goto");
+	_tmp13_ = g_strdup ("Ask for a page to jump to");
+	_tmp14_ = g_strdup ("gotoFirst");
+	_tmp15_ = g_strdup ("Jump to first slide");
+	_tmp16_ = g_strdup ("gotoLast");
+	_tmp17_ = g_strdup ("Jump to last slide");
+	_tmp18_ = g_strdup ("overview");
+	_tmp19_ = g_strdup ("Show the overview mode");
+	_tmp20_ = g_strdup ("histBack");
+	_tmp21_ = g_strdup ("Go back in history");
+	_tmp22_ = g_strdup ("start");
+	_tmp23_ = g_strdup ("Start the timer");
+	_tmp24_ = g_strdup ("pause");
+	_tmp25_ = g_strdup ("Pause the timer");
+	_tmp26_ = g_strdup ("resetTimer");
+	_tmp27_ = g_strdup ("Reset the timer");
+	_tmp28_ = g_strdup ("reset");
+	_tmp29_ = g_strdup ("Reset the presentation");
+	_tmp30_ = g_strdup ("blank");
+	_tmp31_ = g_strdup ("Blank presentation screen");
+	_tmp32_ = g_strdup ("freeze");
+	_tmp33_ = g_strdup ("Toggle freeze presentation screen");
+	_tmp34_ = g_strdup ("freezeOn");
+	_tmp35_ = g_strdup ("Freeze presentation screen if unfrozen");
+	_tmp36_ = g_strdup ("overlay");
+	_tmp37_ = g_strdup ("Mark current slide as overlay slide");
+	_tmp38_ = g_strdup ("note");
+	_tmp39_ = g_strdup ("Edit note for current slide");
+	_tmp40_ = g_strdup ("endSlide");
+	_tmp41_ = g_strdup ("Set current slide as end slide");
+	_tmp42_ = g_strdup ("exitState");
+	_tmp43_ = g_strdup ("Exit \"special\" state (pause, freeze, blank)");
+	_tmp44_ = g_strdup ("quit");
+	_tmp45_ = g_strdup ("Exit pdfpc");
+	_tmp46_ = g_new0 (gchar*, 46 + 1);
+	_tmp46_[0] = _tmp0_;
+	_tmp46_[1] = _tmp1_;
+	_tmp46_[2] = _tmp2_;
+	_tmp46_[3] = _tmp3_;
+	_tmp46_[4] = _tmp4_;
+	_tmp46_[5] = _tmp5_;
+	_tmp46_[6] = _tmp6_;
+	_tmp46_[7] = _tmp7_;
+	_tmp46_[8] = _tmp8_;
+	_tmp46_[9] = _tmp9_;
+	_tmp46_[10] = _tmp10_;
+	_tmp46_[11] = _tmp11_;
+	_tmp46_[12] = _tmp12_;
+	_tmp46_[13] = _tmp13_;
+	_tmp46_[14] = _tmp14_;
+	_tmp46_[15] = _tmp15_;
+	_tmp46_[16] = _tmp16_;
+	_tmp46_[17] = _tmp17_;
+	_tmp46_[18] = _tmp18_;
+	_tmp46_[19] = _tmp19_;
+	_tmp46_[20] = _tmp20_;
+	_tmp46_[21] = _tmp21_;
+	_tmp46_[22] = _tmp22_;
+	_tmp46_[23] = _tmp23_;
+	_tmp46_[24] = _tmp24_;
+	_tmp46_[25] = _tmp25_;
+	_tmp46_[26] = _tmp26_;
+	_tmp46_[27] = _tmp27_;
+	_tmp46_[28] = _tmp28_;
+	_tmp46_[29] = _tmp29_;
+	_tmp46_[30] = _tmp30_;
+	_tmp46_[31] = _tmp31_;
+	_tmp46_[32] = _tmp32_;
+	_tmp46_[33] = _tmp33_;
+	_tmp46_[34] = _tmp34_;
+	_tmp46_[35] = _tmp35_;
+	_tmp46_[36] = _tmp36_;
+	_tmp46_[37] = _tmp37_;
+	_tmp46_[38] = _tmp38_;
+	_tmp46_[39] = _tmp39_;
+	_tmp46_[40] = _tmp40_;
+	_tmp46_[41] = _tmp41_;
+	_tmp46_[42] = _tmp42_;
+	_tmp46_[43] = _tmp43_;
+	_tmp46_[44] = _tmp44_;
+	_tmp46_[45] = _tmp45_;
+	_tmp47_ = _tmp46_;
+	_tmp47__length1 = 46;
+	if (result_length1) {
+		*result_length1 = _tmp47__length1;
+	}
+	result = _tmp47_;
 	return result;
 }
 
 
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press_normal (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventKey* key) {
+/**
+         * Bind the (user-defined) keys
+         */
+void pdfpc_presentation_controller_bind (pdfpcPresentationController* self, guint keycode, guint modMask, const gchar* function) {
+	GeeHashMap* _tmp0_;
+	const gchar* _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (function != NULL);
+	_tmp0_ = self->actionNames;
+	_tmp1_ = function;
+	_tmp2_ = gee_map_contains ((GeeMap*) _tmp0_, _tmp1_);
+	if (_tmp2_) {
+		GeeHashMap* _tmp3_;
+		guint _tmp4_;
+		guint _tmp5_;
+		pdfpcPresentationControllerKeyDef* _tmp6_;
+		pdfpcPresentationControllerKeyDef* _tmp7_;
+		GeeHashMap* _tmp8_;
+		const gchar* _tmp9_;
+		gpointer _tmp10_ = NULL;
+		pdfpcPresentationControllerKeyAction* _tmp11_;
+		_tmp3_ = self->keyBindings;
+		_tmp4_ = keycode;
+		_tmp5_ = modMask;
+		_tmp6_ = pdfpc_presentation_controller_key_def_new (_tmp4_, _tmp5_);
+		_tmp7_ = _tmp6_;
+		_tmp8_ = self->actionNames;
+		_tmp9_ = function;
+		_tmp10_ = gee_abstract_map_get ((GeeAbstractMap*) _tmp8_, _tmp9_);
+		_tmp11_ = (pdfpcPresentationControllerKeyAction*) _tmp10_;
+		gee_abstract_map_set ((GeeAbstractMap*) _tmp3_, _tmp7_, _tmp11_);
+		_pdfpc_presentation_controller_key_action_unref0 (_tmp11_);
+		_pdfpc_presentation_controller_key_def_unref0 (_tmp7_);
+	} else {
+		FILE* _tmp12_;
+		const gchar* _tmp13_;
+		_tmp12_ = stderr;
+		_tmp13_ = function;
+		fprintf (_tmp12_, "Warning: Unknown function %s\n", _tmp13_);
+	}
+}
+
+
+/**
+         * Unbind a key
+         */
+void pdfpc_presentation_controller_unbind (pdfpcPresentationController* self, guint keycode, guint modMask) {
+	GeeHashMap* _tmp0_;
+	guint _tmp1_;
+	guint _tmp2_;
+	pdfpcPresentationControllerKeyDef* _tmp3_;
+	pdfpcPresentationControllerKeyDef* _tmp4_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->keyBindings;
+	_tmp1_ = keycode;
+	_tmp2_ = modMask;
+	_tmp3_ = pdfpc_presentation_controller_key_def_new (_tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	gee_abstract_map_unset ((GeeAbstractMap*) _tmp0_, _tmp4_, NULL);
+	_pdfpc_presentation_controller_key_def_unref0 (_tmp4_);
+}
+
+
+/**
+         * Unbind all keybindings
+         */
+void pdfpc_presentation_controller_unbindAll (pdfpcPresentationController* self) {
+	GeeHashMap* _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->keyBindings;
+	gee_abstract_map_clear ((GeeAbstractMap*) _tmp0_);
+}
+
+
+/**
+         * Bind the (user-defined) keys
+         */
+void pdfpc_presentation_controller_bindMouse (pdfpcPresentationController* self, guint button, guint modMask, const gchar* function) {
+	GeeHashMap* _tmp0_;
+	const gchar* _tmp1_;
+	gboolean _tmp2_ = FALSE;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (function != NULL);
+	_tmp0_ = self->actionNames;
+	_tmp1_ = function;
+	_tmp2_ = gee_map_contains ((GeeMap*) _tmp0_, _tmp1_);
+	if (_tmp2_) {
+		GeeHashMap* _tmp3_;
+		guint _tmp4_;
+		guint _tmp5_;
+		pdfpcPresentationControllerKeyDef* _tmp6_;
+		pdfpcPresentationControllerKeyDef* _tmp7_;
+		GeeHashMap* _tmp8_;
+		const gchar* _tmp9_;
+		gpointer _tmp10_ = NULL;
+		pdfpcPresentationControllerKeyAction* _tmp11_;
+		_tmp3_ = self->mouseBindings;
+		_tmp4_ = button;
+		_tmp5_ = modMask;
+		_tmp6_ = pdfpc_presentation_controller_key_def_new (_tmp4_, _tmp5_);
+		_tmp7_ = _tmp6_;
+		_tmp8_ = self->actionNames;
+		_tmp9_ = function;
+		_tmp10_ = gee_abstract_map_get ((GeeAbstractMap*) _tmp8_, _tmp9_);
+		_tmp11_ = (pdfpcPresentationControllerKeyAction*) _tmp10_;
+		gee_abstract_map_set ((GeeAbstractMap*) _tmp3_, _tmp7_, _tmp11_);
+		_pdfpc_presentation_controller_key_action_unref0 (_tmp11_);
+		_pdfpc_presentation_controller_key_def_unref0 (_tmp7_);
+	} else {
+		FILE* _tmp12_;
+		const gchar* _tmp13_;
+		_tmp12_ = stderr;
+		_tmp13_ = function;
+		fprintf (_tmp12_, "Warning: Unknown function %s\n", _tmp13_);
+	}
+}
+
+
+/**
+         * Unbind a mouse button
+         */
+void pdfpc_presentation_controller_unbindMouse (pdfpcPresentationController* self, guint keycode, guint modMask) {
+	GeeHashMap* _tmp0_;
+	guint _tmp1_;
+	guint _tmp2_;
+	pdfpcPresentationControllerKeyDef* _tmp3_;
+	pdfpcPresentationControllerKeyDef* _tmp4_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->mouseBindings;
+	_tmp1_ = keycode;
+	_tmp2_ = modMask;
+	_tmp3_ = pdfpc_presentation_controller_key_def_new (_tmp1_, _tmp2_);
+	_tmp4_ = _tmp3_;
+	gee_abstract_map_unset ((GeeAbstractMap*) _tmp0_, _tmp4_, NULL);
+	_pdfpc_presentation_controller_key_def_unref0 (_tmp4_);
+}
+
+
+/**
+         * Unbind all keybindings
+         */
+void pdfpc_presentation_controller_unbindAllMouse (pdfpcPresentationController* self) {
+	GeeHashMap* _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->mouseBindings;
+	gee_abstract_map_clear ((GeeAbstractMap*) _tmp0_);
+}
+
+
+/**
+         * Handle keypresses to each of the controllables
+         *
+         * This seperate handling is needed because keypresses from any of the
+         * window have implications on the behaviour of both of them. Therefore
+         * this controller is needed to take care of the needed actions.
+         */
+gboolean pdfpc_presentation_controller_key_press (pdfpcPresentationController* self, GdkEventKey* key) {
 	gboolean result = FALSE;
-	gboolean _tmp0_;
+	gboolean _tmp0_ = FALSE;
+	GdkEventKey _tmp1_;
+	guint32 _tmp2_;
+	guint _tmp3_;
+	gboolean _tmp5_;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (key != NULL, FALSE);
-	_tmp0_ = self->ignore_keyboard_events;
-	if (!_tmp0_) {
-		GdkEventKey _tmp1_;
-		guint _tmp2_;
-		_tmp1_ = *key;
-		_tmp2_ = _tmp1_.keyval;
-		switch (_tmp2_) {
-			case 0xff0d:
-			case 0x1008ff17:
-			case 0xff53:
-			case 0xff56:
-			case 0x020:
-			{
-				GdkEventKey _tmp3_;
-				GdkModifierType _tmp4_;
-				_tmp3_ = *key;
-				_tmp4_ = _tmp3_.state;
-				if ((_tmp4_ & GDK_SHIFT_MASK) != 0) {
-					org_westhoffswelt_pdfpresenter_presentation_controller_jump10 (self);
-				} else {
-					org_westhoffswelt_pdfpresenter_presentation_controller_next_page (self);
-				}
-				break;
-			}
-			case 0xff54:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_next_user_page (self);
-				break;
-			}
-			case 0xff51:
-			case 0x1008ff16:
-			case 0xff55:
-			{
-				GdkEventKey _tmp5_;
-				GdkModifierType _tmp6_;
-				_tmp5_ = *key;
-				_tmp6_ = _tmp5_.state;
-				if ((_tmp6_ & GDK_SHIFT_MASK) != 0) {
-					org_westhoffswelt_pdfpresenter_presentation_controller_back10 (self);
-				} else {
-					org_westhoffswelt_pdfpresenter_presentation_controller_previous_page (self);
-				}
-				break;
-			}
-			case 0xff52:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_previous_user_page (self);
-				break;
-			}
-			case 0xff1b:
-			case 0x071:
-			{
-				orgwesthoffsweltpdfpresenterMetadataPdf* _tmp7_;
-				_tmp7_ = self->metadata;
-				org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (_tmp7_);
-				gtk_main_quit ();
-				break;
-			}
-			case 0x072:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_controllables_reset (self);
-				break;
-			}
-			case 0xff50:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_goto_first (self);
-				break;
-			}
-			case 0xff57:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_goto_last (self);
-				break;
-			}
-			case 0x062:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_fade_to_black (self);
-				break;
-			}
-			case 0x06e:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_controllables_edit_note (self);
-				break;
-			}
-			case 0x067:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_controllables_ask_goto_page (self);
-				break;
-			}
-			case 0x066:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_toggle_freeze (self);
-				break;
-			}
-			case 0x06f:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_toggle_skip (self);
-				break;
-			}
-			case 0x073:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_start (self);
-				break;
-			}
-			case 0x070:
-			case 0xff13:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_toggle_pause (self);
-				break;
-			}
-			case 0x065:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_set_end_user_slide (self);
-				break;
-			}
-			case 0xff09:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_controllables_show_overview (self);
-				break;
-			}
-			case 0xff08:
-			{
-				org_westhoffswelt_pdfpresenter_presentation_controller_history_back (self);
-				break;
-			}
-			default:
-			break;
+	_tmp1_ = *key;
+	_tmp2_ = _tmp1_.time;
+	_tmp3_ = self->last_key_event;
+	if (_tmp2_ != ((guint32) _tmp3_)) {
+		gboolean _tmp4_;
+		_tmp4_ = self->ignore_keyboard_events;
+		_tmp0_ = !_tmp4_;
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp5_ = _tmp0_;
+	if (_tmp5_) {
+		GdkEventKey _tmp6_;
+		guint32 _tmp7_;
+		GeeHashMap* _tmp8_;
+		GdkEventKey _tmp9_;
+		guint _tmp10_;
+		GdkEventKey _tmp11_;
+		GdkModifierType _tmp12_;
+		guint _tmp13_;
+		pdfpcPresentationControllerKeyDef* _tmp14_;
+		pdfpcPresentationControllerKeyDef* _tmp15_;
+		gpointer _tmp16_ = NULL;
+		pdfpcPresentationControllerKeyAction* _tmp17_;
+		pdfpcPresentationControllerKeyAction* action;
+		pdfpcPresentationControllerKeyAction* _tmp18_;
+		_tmp6_ = *key;
+		_tmp7_ = _tmp6_.time;
+		self->last_key_event = (guint) _tmp7_;
+		_tmp8_ = self->keyBindings;
+		_tmp9_ = *key;
+		_tmp10_ = _tmp9_.keyval;
+		_tmp11_ = *key;
+		_tmp12_ = _tmp11_.state;
+		_tmp13_ = self->priv->_accepted_key_mods;
+		_tmp14_ = pdfpc_presentation_controller_key_def_new (_tmp10_, (guint) (_tmp12_ & _tmp13_));
+		_tmp15_ = _tmp14_;
+		_tmp16_ = gee_abstract_map_get ((GeeAbstractMap*) _tmp8_, _tmp15_);
+		_tmp17_ = (pdfpcPresentationControllerKeyAction*) _tmp16_;
+		_pdfpc_presentation_controller_key_def_unref0 (_tmp15_);
+		action = _tmp17_;
+		_tmp18_ = action;
+		if (_tmp18_ != NULL) {
+			pdfpcPresentationControllerKeyAction* _tmp19_;
+			pdfpcPresentationControllerKeyActionKeyActionDelegate _tmp20_;
+			void* _tmp20__target;
+			_tmp19_ = action;
+			_tmp20_ = _tmp19_->d;
+			_tmp20__target = _tmp19_->d_target;
+			_tmp20_ (_tmp20__target);
 		}
 		result = TRUE;
+		_pdfpc_presentation_controller_key_action_unref0 (action);
 		return result;
 	} else {
 		result = FALSE;
@@ -462,98 +1186,9 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press_normal
 
 
 /**
-         * Handle key presses when in overview mode
-         *
-         * This is a subset of the keybindings above
-         */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_key_press_overview (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventKey* key) {
-	gboolean result = FALSE;
-	gboolean handled;
-	GdkEventKey _tmp0_;
-	guint _tmp1_;
-	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (key != NULL, FALSE);
-	handled = FALSE;
-	_tmp0_ = *key;
-	_tmp1_ = _tmp0_.keyval;
-	switch (_tmp1_) {
-		case 0xff1b:
-		case 0x071:
-		{
-			orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
-			_tmp2_ = self->metadata;
-			org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (_tmp2_);
-			gtk_main_quit ();
-			handled = TRUE;
-			break;
-		}
-		case 0x072:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_controllables_reset (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x062:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_fade_to_black (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x067:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_controllables_ask_goto_page (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x066:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_toggle_freeze (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x06f:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_toggle_skip_overview (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x073:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_start (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x070:
-		case 0xff13:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_toggle_pause (self);
-			handled = TRUE;
-			break;
-		}
-		case 0x065:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_set_end_user_slide_overview (self);
-			handled = TRUE;
-			break;
-		}
-		case 0xff09:
-		{
-			org_westhoffswelt_pdfpresenter_presentation_controller_controllables_hide_overview (self);
-			handled = TRUE;
-			break;
-		}
-		default:
-		break;
-	}
-	result = handled;
-	return result;
-}
-
-
-/**
          * Handle mouse clicks to each of the controllables
          */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_button_press (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventButton* button) {
+gboolean pdfpc_presentation_controller_button_press (pdfpcPresentationController* self, GdkEventButton* button) {
 	gboolean result = FALSE;
 	gboolean _tmp0_ = FALSE;
 	gboolean _tmp1_;
@@ -572,41 +1207,42 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_button_press (or
 	}
 	_tmp4_ = _tmp0_;
 	if (_tmp4_) {
-		GdkEventButton _tmp5_;
-		guint _tmp6_;
-		_tmp5_ = *button;
-		_tmp6_ = _tmp5_.button;
-		switch (_tmp6_) {
-			case 1:
-			{
-				GdkEventButton _tmp7_;
-				GdkModifierType _tmp8_;
-				_tmp7_ = *button;
-				_tmp8_ = _tmp7_.state;
-				if ((_tmp8_ & GDK_SHIFT_MASK) != 0) {
-					org_westhoffswelt_pdfpresenter_presentation_controller_jump10 (self);
-				} else {
-					org_westhoffswelt_pdfpresenter_presentation_controller_next_page (self);
-				}
-				break;
-			}
-			case 3:
-			{
-				GdkEventButton _tmp9_;
-				GdkModifierType _tmp10_;
-				_tmp9_ = *button;
-				_tmp10_ = _tmp9_.state;
-				if ((_tmp10_ & GDK_SHIFT_MASK) != 0) {
-					org_westhoffswelt_pdfpresenter_presentation_controller_back10 (self);
-				} else {
-					org_westhoffswelt_pdfpresenter_presentation_controller_previous_page (self);
-				}
-				break;
-			}
-			default:
-			break;
+		GeeHashMap* _tmp5_;
+		GdkEventButton _tmp6_;
+		guint _tmp7_;
+		GdkEventButton _tmp8_;
+		GdkModifierType _tmp9_;
+		guint _tmp10_;
+		pdfpcPresentationControllerKeyDef* _tmp11_;
+		pdfpcPresentationControllerKeyDef* _tmp12_;
+		gpointer _tmp13_ = NULL;
+		pdfpcPresentationControllerKeyAction* _tmp14_;
+		pdfpcPresentationControllerKeyAction* action;
+		pdfpcPresentationControllerKeyAction* _tmp15_;
+		_tmp5_ = self->mouseBindings;
+		_tmp6_ = *button;
+		_tmp7_ = _tmp6_.button;
+		_tmp8_ = *button;
+		_tmp9_ = _tmp8_.state;
+		_tmp10_ = self->priv->_accepted_key_mods;
+		_tmp11_ = pdfpc_presentation_controller_key_def_new (_tmp7_, (guint) (_tmp9_ & _tmp10_));
+		_tmp12_ = _tmp11_;
+		_tmp13_ = gee_abstract_map_get ((GeeAbstractMap*) _tmp5_, _tmp12_);
+		_tmp14_ = (pdfpcPresentationControllerKeyAction*) _tmp13_;
+		_pdfpc_presentation_controller_key_def_unref0 (_tmp12_);
+		action = _tmp14_;
+		_tmp15_ = action;
+		if (_tmp15_ != NULL) {
+			pdfpcPresentationControllerKeyAction* _tmp16_;
+			pdfpcPresentationControllerKeyActionKeyActionDelegate _tmp17_;
+			void* _tmp17__target;
+			_tmp16_ = action;
+			_tmp17_ = _tmp16_->d;
+			_tmp17__target = _tmp16_->d_target;
+			_tmp17_ (_tmp17__target);
 		}
 		result = TRUE;
+		_pdfpc_presentation_controller_key_action_unref0 (action);
 		return result;
 	} else {
 		result = FALSE;
@@ -618,7 +1254,7 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_button_press (or
 /**
          * Notify each of the controllables of mouse scrolling
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_scroll (orgwesthoffsweltpdfpresenterPresentationController* self, GdkEventScroll* scroll) {
+void pdfpc_presentation_controller_scroll (pdfpcPresentationController* self, GdkEventScroll* scroll) {
 	gboolean _tmp0_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (scroll != NULL);
@@ -637,9 +1273,9 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_scroll (orgwesthoffs
 				_tmp3_ = *scroll;
 				_tmp4_ = _tmp3_.state;
 				if ((_tmp4_ & GDK_SHIFT_MASK) != 0) {
-					org_westhoffswelt_pdfpresenter_presentation_controller_back10 (self);
+					pdfpc_presentation_controller_back10 (self);
 				} else {
-					org_westhoffswelt_pdfpresenter_presentation_controller_previous_page (self);
+					pdfpc_presentation_controller_previous_page (self);
 				}
 				break;
 			}
@@ -651,9 +1287,9 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_scroll (orgwesthoffs
 				_tmp5_ = *scroll;
 				_tmp6_ = _tmp5_.state;
 				if ((_tmp6_ & GDK_SHIFT_MASK) != 0) {
-					org_westhoffswelt_pdfpresenter_presentation_controller_jump10 (self);
+					pdfpc_presentation_controller_jump10 (self);
 				} else {
-					org_westhoffswelt_pdfpresenter_presentation_controller_next_page (self);
+					pdfpc_presentation_controller_next_page (self);
 				}
 				break;
 			}
@@ -667,7 +1303,7 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_scroll (orgwesthoffs
 /**
          * Get the current (real) slide number
          */
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_current_slide_number (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gint pdfpc_presentation_controller_get_current_slide_number (pdfpcPresentationController* self) {
 	gint result = 0;
 	gint _tmp0_;
 	g_return_val_if_fail (self != NULL, 0);
@@ -680,7 +1316,7 @@ gint org_westhoffswelt_pdfpresenter_presentation_controller_get_current_slide_nu
 /**
          * Get the current (user) slide number
          */
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_current_user_slide_number (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gint pdfpc_presentation_controller_get_current_user_slide_number (pdfpcPresentationController* self) {
 	gint result = 0;
 	gint _tmp0_;
 	g_return_val_if_fail (self != NULL, 0);
@@ -693,17 +1329,17 @@ gint org_westhoffswelt_pdfpresenter_presentation_controller_get_current_user_sli
 /**
          * Was the previous slide a skip one?
          */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_previous (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gboolean pdfpc_presentation_controller_skip_previous (pdfpcPresentationController* self) {
 	gboolean result = FALSE;
 	gint _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp1_;
+	pdfpcMetadataPdf* _tmp1_;
 	gint _tmp2_;
 	gint _tmp3_ = 0;
 	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp0_ = self->current_slide_number;
 	_tmp1_ = self->metadata;
 	_tmp2_ = self->current_user_slide_number;
-	_tmp3_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp1_, _tmp2_);
+	_tmp3_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp1_, _tmp2_);
 	result = _tmp0_ > _tmp3_;
 	return result;
 }
@@ -712,19 +1348,19 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_previous (o
 /**
          * Is the next slide a skip one?
          */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_next (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gboolean pdfpc_presentation_controller_skip_next (pdfpcPresentationController* self) {
 	gboolean result = FALSE;
 	gboolean _tmp0_ = FALSE;
 	gboolean _tmp1_ = FALSE;
 	gint _tmp2_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp3_;
+	pdfpcMetadataPdf* _tmp3_;
 	gint _tmp4_ = 0;
 	gboolean _tmp7_;
 	gboolean _tmp12_;
 	g_return_val_if_fail (self != NULL, FALSE);
 	_tmp2_ = self->current_user_slide_number;
 	_tmp3_ = self->metadata;
-	_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (_tmp3_);
+	_tmp4_ = pdfpc_metadata_pdf_get_user_slide_count (_tmp3_);
 	if (_tmp2_ >= (_tmp4_ - 1)) {
 		gint _tmp5_;
 		gint _tmp6_;
@@ -739,13 +1375,13 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_next (orgwe
 		_tmp0_ = TRUE;
 	} else {
 		gint _tmp8_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp9_;
+		pdfpcMetadataPdf* _tmp9_;
 		gint _tmp10_;
 		gint _tmp11_ = 0;
 		_tmp8_ = self->current_slide_number;
 		_tmp9_ = self->metadata;
 		_tmp10_ = self->current_user_slide_number;
-		_tmp11_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp9_, _tmp10_ + 1);
+		_tmp11_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp9_, _tmp10_ + 1);
 		_tmp0_ = (_tmp8_ + 1) < _tmp11_;
 	}
 	_tmp12_ = _tmp0_;
@@ -757,7 +1393,7 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_skip_next (orgwe
 /**
          * Get the real total number of slides
          */
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_n_slide (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gint pdfpc_presentation_controller_get_n_slide (pdfpcPresentationController* self) {
 	gint result = 0;
 	gint _tmp0_;
 	g_return_val_if_fail (self != NULL, 0);
@@ -770,13 +1406,13 @@ gint org_westhoffswelt_pdfpresenter_presentation_controller_get_n_slide (orgwest
 /**
          * Get the user total number of slides
          */
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_user_n_slides (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gint pdfpc_presentation_controller_get_user_n_slides (pdfpcPresentationController* self) {
 	gint result = 0;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp0_;
+	pdfpcMetadataPdf* _tmp0_;
 	gint _tmp1_ = 0;
 	g_return_val_if_fail (self != NULL, 0);
 	_tmp0_ = self->metadata;
-	_tmp1_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (_tmp0_);
+	_tmp1_ = pdfpc_metadata_pdf_get_user_slide_count (_tmp0_);
 	result = _tmp1_;
 	return result;
 }
@@ -785,13 +1421,13 @@ gint org_westhoffswelt_pdfpresenter_presentation_controller_get_user_n_slides (o
 /**
          * Get the last slide as defined by the user
          */
-gint org_westhoffswelt_pdfpresenter_presentation_controller_get_end_user_slide (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gint pdfpc_presentation_controller_get_end_user_slide (pdfpcPresentationController* self) {
 	gint result = 0;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp0_;
+	pdfpcMetadataPdf* _tmp0_;
 	gint _tmp1_ = 0;
 	g_return_val_if_fail (self != NULL, 0);
 	_tmp0_ = self->metadata;
-	_tmp1_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (_tmp0_);
+	_tmp1_ = pdfpc_metadata_pdf_get_end_user_slide (_tmp0_);
 	result = _tmp1_;
 	return result;
 }
@@ -800,31 +1436,33 @@ gint org_westhoffswelt_pdfpresenter_presentation_controller_get_end_user_slide (
 /**
          * Set the last slide as defined by the user
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_end_user_slide (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp0_;
+void pdfpc_presentation_controller_set_end_user_slide (pdfpcPresentationController* self) {
+	pdfpcMetadataPdf* _tmp0_;
 	gint _tmp1_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->metadata;
 	_tmp1_ = self->current_user_slide_number;
-	org_westhoffswelt_pdfpresenter_metadata_pdf_set_end_user_slide (_tmp0_, _tmp1_ + 1);
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_metadata_pdf_set_end_user_slide (_tmp0_, _tmp1_ + 1);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Set the last slide as defined by the user
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_end_user_slide_overview (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	orgwesthoffsweltpdfpresenterWindowOverview* _tmp0_;
-	gint _tmp1_ = 0;
+void pdfpc_presentation_controller_set_end_user_slide_overview (pdfpcPresentationController* self) {
+	pdfpcWindowOverview* _tmp0_;
+	gint _tmp1_;
+	gint _tmp2_;
 	gint user_selected;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
+	pdfpcMetadataPdf* _tmp3_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->overview;
-	_tmp1_ = org_westhoffswelt_pdfpresenter_window_overview_get_current_button (_tmp0_);
-	user_selected = _tmp1_;
-	_tmp2_ = self->metadata;
-	org_westhoffswelt_pdfpresenter_metadata_pdf_set_end_user_slide (_tmp2_, user_selected + 1);
+	_tmp1_ = pdfpc_window_overview_get_current_slide (_tmp0_);
+	_tmp2_ = _tmp1_;
+	user_selected = _tmp2_;
+	_tmp3_ = self->metadata;
+	pdfpc_metadata_pdf_set_end_user_slide (_tmp3_, user_selected + 1);
 }
 
 
@@ -840,7 +1478,7 @@ static void _vala_array_add1 (gint** array, int* length, int* size, gint value) 
 }
 
 
-static void org_westhoffswelt_pdfpresenter_presentation_controller_slide2history (orgwesthoffsweltpdfpresenterPresentationController* self) {
+static void pdfpc_presentation_controller_slide2history (pdfpcPresentationController* self) {
 	gint* _tmp0_;
 	gint _tmp0__length1;
 	gint _tmp1_;
@@ -855,33 +1493,36 @@ static void org_westhoffswelt_pdfpresenter_presentation_controller_slide2history
 /**
          * A request to change the page has been issued
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_page_change_request (orgwesthoffsweltpdfpresenterPresentationController* self, gint page_number) {
+void pdfpc_presentation_controller_page_change_request (pdfpcPresentationController* self, gint page_number) {
 	gint _tmp0_;
 	gint _tmp1_;
 	gint _tmp2_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp3_;
+	pdfpcMetadataPdf* _tmp3_;
 	gint _tmp4_;
 	gint _tmp5_ = 0;
+	pdfpcTimerLabel* _tmp6_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = page_number;
 	_tmp1_ = self->current_slide_number;
 	if (_tmp0_ != _tmp1_) {
-		org_westhoffswelt_pdfpresenter_presentation_controller_slide2history (self);
+		pdfpc_presentation_controller_slide2history (self);
 	}
 	_tmp2_ = page_number;
 	self->current_slide_number = _tmp2_;
 	_tmp3_ = self->metadata;
 	_tmp4_ = self->current_slide_number;
-	_tmp5_ = org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (_tmp3_, _tmp4_);
+	_tmp5_ = pdfpc_metadata_pdf_real_slide_to_user_slide (_tmp3_, _tmp4_);
 	self->current_user_slide_number = _tmp5_;
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	_tmp6_ = self->timer;
+	pdfpc_timer_label_start (_tmp6_);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Set the state of ignote_input_events
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_input_events (orgwesthoffsweltpdfpresenterPresentationController* self, gboolean v) {
+void pdfpc_presentation_controller_set_ignore_input_events (pdfpcPresentationController* self, gboolean v) {
 	gboolean _tmp0_;
 	gboolean _tmp1_;
 	g_return_if_fail (self != NULL);
@@ -892,11 +1533,26 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_input_eve
 }
 
 
-void org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_mouse_events (orgwesthoffsweltpdfpresenterPresentationController* self, gboolean v) {
+void pdfpc_presentation_controller_set_ignore_mouse_events (pdfpcPresentationController* self, gboolean v) {
 	gboolean _tmp0_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = v;
 	self->ignore_mouse_events = _tmp0_;
+}
+
+
+/**
+         * Get the timer
+         */
+pdfpcTimerLabel* pdfpc_presentation_controller_getTimer (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* result = NULL;
+	pdfpcTimerLabel* _tmp0_;
+	pdfpcTimerLabel* _tmp1_;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->timer;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	result = _tmp1_;
+	return result;
 }
 
 
@@ -906,13 +1562,13 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_mouse_eve
          * On success true is returned, in case the controllable has already been
          * registered false is returned.
          */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_register_controllable (orgwesthoffsweltpdfpresenterPresentationController* self, orgwesthoffsweltpdfpresenterControllable* controllable) {
+gboolean pdfpc_presentation_controller_register_controllable (pdfpcPresentationController* self, pdfpcControllable* controllable) {
 	gboolean result = FALSE;
 	GList* _tmp0_;
-	orgwesthoffsweltpdfpresenterControllable* _tmp1_;
+	pdfpcControllable* _tmp1_;
 	GList* _tmp2_ = NULL;
-	orgwesthoffsweltpdfpresenterControllable* _tmp3_;
-	orgwesthoffsweltpdfpresenterControllable* _tmp4_;
+	pdfpcControllable* _tmp3_;
+	pdfpcControllable* _tmp4_;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (controllable != NULL, FALSE);
 	_tmp0_ = self->controllables;
@@ -933,50 +1589,58 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_register_control
 /**
          * Go to the next slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_next_page (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	gint _tmp1_;
+void pdfpc_presentation_controller_next_page (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	pdfpcTimerLabel* _tmp1_;
+	gint _tmp2_;
+	gint _tmp3_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_slide_number;
-	_tmp1_ = self->n_slides;
-	if (_tmp0_ < (_tmp1_ - 1)) {
-		gint _tmp2_;
-		gint _tmp3_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp4_;
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		return;
+	}
+	_tmp1_ = self->timer;
+	pdfpc_timer_label_start (_tmp1_);
+	_tmp2_ = self->current_slide_number;
+	_tmp3_ = self->n_slides;
+	if (_tmp2_ < (_tmp3_ - 1)) {
+		gint _tmp4_;
 		gint _tmp5_;
-		gint _tmp6_ = 0;
-		gboolean _tmp8_;
-		_tmp2_ = self->current_slide_number;
-		self->current_slide_number = _tmp2_ + 1;
-		_tmp3_ = self->current_slide_number;
-		_tmp4_ = self->metadata;
-		_tmp5_ = self->current_user_slide_number;
-		_tmp6_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp4_, _tmp5_ + 1);
-		if (_tmp3_ == _tmp6_) {
-			gint _tmp7_;
-			_tmp7_ = self->current_user_slide_number;
-			self->current_user_slide_number = _tmp7_ + 1;
+		pdfpcMetadataPdf* _tmp6_;
+		gint _tmp7_;
+		gint _tmp8_ = 0;
+		gboolean _tmp10_;
+		_tmp4_ = self->current_slide_number;
+		self->current_slide_number = _tmp4_ + 1;
+		_tmp5_ = self->current_slide_number;
+		_tmp6_ = self->metadata;
+		_tmp7_ = self->current_user_slide_number;
+		_tmp8_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp6_, _tmp7_ + 1);
+		if (_tmp5_ == _tmp8_) {
+			gint _tmp9_;
+			_tmp9_ = self->current_user_slide_number;
+			self->current_user_slide_number = _tmp9_ + 1;
 		}
-		_tmp8_ = self->frozen;
-		if (!_tmp8_) {
+		_tmp10_ = self->frozen;
+		if (!_tmp10_) {
 			self->faded_to_black = FALSE;
 		}
-		org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+		pdfpc_presentation_controller_controllables_update (self);
 	} else {
-		gboolean _tmp9_ = FALSE;
-		gboolean _tmp10_;
+		gboolean _tmp11_ = FALSE;
 		gboolean _tmp12_;
-		_tmp10_ = self->black_on_end;
-		if (_tmp10_) {
-			gboolean _tmp11_ = FALSE;
-			_tmp11_ = org_westhoffswelt_pdfpresenter_presentation_controller_is_faded_to_black (self);
-			_tmp9_ = !_tmp11_;
-		} else {
-			_tmp9_ = FALSE;
-		}
-		_tmp12_ = _tmp9_;
+		gboolean _tmp14_;
+		_tmp12_ = self->black_on_end;
 		if (_tmp12_) {
-			org_westhoffswelt_pdfpresenter_presentation_controller_fade_to_black (self);
+			gboolean _tmp13_ = FALSE;
+			_tmp13_ = pdfpc_presentation_controller_is_faded_to_black (self);
+			_tmp11_ = !_tmp13_;
+		} else {
+			_tmp11_ = FALSE;
+		}
+		_tmp14_ = _tmp11_;
+		if (_tmp14_) {
+			pdfpc_presentation_controller_fade_to_black (self);
 		}
 	}
 }
@@ -985,70 +1649,73 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_next_page (orgwestho
 /**
          * Go to the next user slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_next_user_page (orgwesthoffsweltpdfpresenterPresentationController* self) {
+void pdfpc_presentation_controller_next_user_page (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
 	gboolean needs_update = FALSE;
-	gint _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp1_;
-	gint _tmp2_ = 0;
-	gboolean _tmp16_;
+	gint _tmp1_;
+	pdfpcMetadataPdf* _tmp2_;
+	gint _tmp3_ = 0;
+	gboolean _tmp17_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	_tmp1_ = self->metadata;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (_tmp1_);
-	if (_tmp0_ < (_tmp2_ - 1)) {
-		gint _tmp3_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp4_;
-		gint _tmp5_;
-		gint _tmp6_ = 0;
-		_tmp3_ = self->current_user_slide_number;
-		self->current_user_slide_number = _tmp3_ + 1;
-		_tmp4_ = self->metadata;
-		_tmp5_ = self->current_user_slide_number;
-		_tmp6_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp4_, _tmp5_);
-		self->current_slide_number = _tmp6_;
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	_tmp1_ = self->current_user_slide_number;
+	_tmp2_ = self->metadata;
+	_tmp3_ = pdfpc_metadata_pdf_get_user_slide_count (_tmp2_);
+	if (_tmp1_ < (_tmp3_ - 1)) {
+		gint _tmp4_;
+		pdfpcMetadataPdf* _tmp5_;
+		gint _tmp6_;
+		gint _tmp7_ = 0;
+		_tmp4_ = self->current_user_slide_number;
+		self->current_user_slide_number = _tmp4_ + 1;
+		_tmp5_ = self->metadata;
+		_tmp6_ = self->current_user_slide_number;
+		_tmp7_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp5_, _tmp6_);
+		self->current_slide_number = _tmp7_;
 		needs_update = TRUE;
 	} else {
-		gint _tmp7_;
 		gint _tmp8_;
-		_tmp7_ = self->current_slide_number;
-		_tmp8_ = self->n_slides;
-		if (_tmp7_ == (_tmp8_ - 1)) {
-			gboolean _tmp9_ = FALSE;
-			gboolean _tmp10_;
-			gboolean _tmp12_;
+		gint _tmp9_;
+		_tmp8_ = self->current_slide_number;
+		_tmp9_ = self->n_slides;
+		if (_tmp8_ == (_tmp9_ - 1)) {
+			gboolean _tmp10_ = FALSE;
+			gboolean _tmp11_;
+			gboolean _tmp13_;
 			needs_update = FALSE;
-			_tmp10_ = self->black_on_end;
-			if (_tmp10_) {
-				gboolean _tmp11_ = FALSE;
-				_tmp11_ = org_westhoffswelt_pdfpresenter_presentation_controller_is_faded_to_black (self);
-				_tmp9_ = !_tmp11_;
+			_tmp11_ = self->black_on_end;
+			if (_tmp11_) {
+				gboolean _tmp12_ = FALSE;
+				_tmp12_ = pdfpc_presentation_controller_is_faded_to_black (self);
+				_tmp10_ = !_tmp12_;
 			} else {
-				_tmp9_ = FALSE;
+				_tmp10_ = FALSE;
 			}
-			_tmp12_ = _tmp9_;
-			if (_tmp12_) {
-				org_westhoffswelt_pdfpresenter_presentation_controller_fade_to_black (self);
+			_tmp13_ = _tmp10_;
+			if (_tmp13_) {
+				pdfpc_presentation_controller_fade_to_black (self);
 			}
 		} else {
-			orgwesthoffsweltpdfpresenterMetadataPdf* _tmp13_;
-			gint _tmp14_ = 0;
-			gint _tmp15_;
-			_tmp13_ = self->metadata;
-			_tmp14_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (_tmp13_);
-			self->current_user_slide_number = _tmp14_ - 1;
-			_tmp15_ = self->n_slides;
-			self->current_slide_number = _tmp15_ - 1;
+			pdfpcMetadataPdf* _tmp14_;
+			gint _tmp15_ = 0;
+			gint _tmp16_;
+			_tmp14_ = self->metadata;
+			_tmp15_ = pdfpc_metadata_pdf_get_user_slide_count (_tmp14_);
+			self->current_user_slide_number = _tmp15_ - 1;
+			_tmp16_ = self->n_slides;
+			self->current_slide_number = _tmp16_ - 1;
 			needs_update = FALSE;
 		}
 	}
-	_tmp16_ = needs_update;
-	if (_tmp16_) {
-		gboolean _tmp17_;
-		_tmp17_ = self->frozen;
-		if (!_tmp17_) {
+	_tmp17_ = needs_update;
+	if (_tmp17_) {
+		gboolean _tmp18_;
+		_tmp18_ = self->frozen;
+		if (!_tmp18_) {
 			self->faded_to_black = FALSE;
 		}
-		org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+		pdfpc_presentation_controller_controllables_update (self);
 	}
 }
 
@@ -1056,41 +1723,44 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_next_user_page (orgw
 /**
          * Go to the previous slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_previous_page (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
+void pdfpc_presentation_controller_previous_page (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
+	gint _tmp1_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_slide_number;
-	if (_tmp0_ > 0) {
-		gint _tmp1_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
-		gint _tmp3_;
-		gint _tmp4_ = 0;
-		gboolean _tmp10_;
-		_tmp1_ = self->current_slide_number;
-		_tmp2_ = self->metadata;
-		_tmp3_ = self->current_user_slide_number;
-		_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp2_, _tmp3_);
-		if (_tmp1_ != _tmp4_) {
-			gint _tmp5_;
-			_tmp5_ = self->current_slide_number;
-			self->current_slide_number = _tmp5_ - 1;
-		} else {
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	_tmp1_ = self->current_slide_number;
+	if (_tmp1_ > 0) {
+		gint _tmp2_;
+		pdfpcMetadataPdf* _tmp3_;
+		gint _tmp4_;
+		gint _tmp5_ = 0;
+		gboolean _tmp11_;
+		_tmp2_ = self->current_slide_number;
+		_tmp3_ = self->metadata;
+		_tmp4_ = self->current_user_slide_number;
+		_tmp5_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp3_, _tmp4_);
+		if (_tmp2_ != _tmp5_) {
 			gint _tmp6_;
-			orgwesthoffsweltpdfpresenterMetadataPdf* _tmp7_;
-			gint _tmp8_;
-			gint _tmp9_ = 0;
-			_tmp6_ = self->current_user_slide_number;
-			self->current_user_slide_number = _tmp6_ - 1;
-			_tmp7_ = self->metadata;
-			_tmp8_ = self->current_user_slide_number;
-			_tmp9_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp7_, _tmp8_);
-			self->current_slide_number = _tmp9_;
+			_tmp6_ = self->current_slide_number;
+			self->current_slide_number = _tmp6_ - 1;
+		} else {
+			gint _tmp7_;
+			pdfpcMetadataPdf* _tmp8_;
+			gint _tmp9_;
+			gint _tmp10_ = 0;
+			_tmp7_ = self->current_user_slide_number;
+			self->current_user_slide_number = _tmp7_ - 1;
+			_tmp8_ = self->metadata;
+			_tmp9_ = self->current_user_slide_number;
+			_tmp10_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp8_, _tmp9_);
+			self->current_slide_number = _tmp10_;
 		}
-		_tmp10_ = self->frozen;
-		if (!_tmp10_) {
+		_tmp11_ = self->frozen;
+		if (!_tmp11_) {
 			self->faded_to_black = FALSE;
 		}
-		org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+		pdfpc_presentation_controller_controllables_update (self);
 	}
 }
 
@@ -1098,262 +1768,295 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_previous_page (orgwe
 /**
          * Go to the previous user slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_previous_user_page (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	gboolean _tmp5_;
+void pdfpc_presentation_controller_previous_user_page (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
+	gint _tmp1_;
+	gboolean _tmp6_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	if (_tmp0_ > 0) {
-		gint _tmp1_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
-		gint _tmp3_;
-		gint _tmp4_ = 0;
-		_tmp1_ = self->current_user_slide_number;
-		self->current_user_slide_number = _tmp1_ - 1;
-		_tmp2_ = self->metadata;
-		_tmp3_ = self->current_user_slide_number;
-		_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp2_, _tmp3_);
-		self->current_slide_number = _tmp4_;
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	_tmp1_ = self->current_user_slide_number;
+	if (_tmp1_ > 0) {
+		gint _tmp2_;
+		pdfpcMetadataPdf* _tmp3_;
+		gint _tmp4_;
+		gint _tmp5_ = 0;
+		_tmp2_ = self->current_user_slide_number;
+		self->current_user_slide_number = _tmp2_ - 1;
+		_tmp3_ = self->metadata;
+		_tmp4_ = self->current_user_slide_number;
+		_tmp5_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp3_, _tmp4_);
+		self->current_slide_number = _tmp5_;
 	} else {
 		self->current_user_slide_number = 0;
 		self->current_slide_number = 0;
 	}
-	_tmp5_ = self->frozen;
-	if (!_tmp5_) {
+	_tmp6_ = self->frozen;
+	if (!_tmp6_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Go to the first slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_goto_first (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	gboolean _tmp1_;
+void pdfpc_presentation_controller_goto_first (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
+	gint _tmp1_;
+	gboolean _tmp2_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_slide_number;
-	if (_tmp0_ != 0) {
-		org_westhoffswelt_pdfpresenter_presentation_controller_slide2history (self);
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	_tmp1_ = self->current_slide_number;
+	if (_tmp1_ != 0) {
+		pdfpc_presentation_controller_slide2history (self);
 	}
 	self->current_slide_number = 0;
 	self->current_user_slide_number = 0;
-	_tmp1_ = self->frozen;
-	if (!_tmp1_) {
+	_tmp2_ = self->frozen;
+	if (!_tmp2_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Go to the last slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_goto_last (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp1_;
-	gint _tmp2_ = 0;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp3_;
-	gint _tmp4_ = 0;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp5_;
-	gint _tmp6_;
-	gint _tmp7_ = 0;
-	gboolean _tmp8_;
+void pdfpc_presentation_controller_goto_last (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
+	gint _tmp1_;
+	pdfpcMetadataPdf* _tmp2_;
+	gint _tmp3_ = 0;
+	pdfpcMetadataPdf* _tmp4_;
+	gint _tmp5_ = 0;
+	pdfpcMetadataPdf* _tmp6_;
+	gint _tmp7_;
+	gint _tmp8_ = 0;
+	gboolean _tmp9_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	_tmp1_ = self->metadata;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (_tmp1_);
-	if (_tmp0_ != (_tmp2_ - 1)) {
-		org_westhoffswelt_pdfpresenter_presentation_controller_slide2history (self);
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	_tmp1_ = self->current_user_slide_number;
+	_tmp2_ = self->metadata;
+	_tmp3_ = pdfpc_metadata_pdf_get_end_user_slide (_tmp2_);
+	if (_tmp1_ != (_tmp3_ - 1)) {
+		pdfpc_presentation_controller_slide2history (self);
 	}
-	_tmp3_ = self->metadata;
-	_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (_tmp3_);
-	self->current_user_slide_number = _tmp4_ - 1;
-	_tmp5_ = self->metadata;
-	_tmp6_ = self->current_user_slide_number;
-	_tmp7_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp5_, _tmp6_);
-	self->current_slide_number = _tmp7_;
-	_tmp8_ = self->frozen;
-	if (!_tmp8_) {
+	_tmp4_ = self->metadata;
+	_tmp5_ = pdfpc_metadata_pdf_get_end_user_slide (_tmp4_);
+	self->current_user_slide_number = _tmp5_ - 1;
+	_tmp6_ = self->metadata;
+	_tmp7_ = self->current_user_slide_number;
+	_tmp8_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp6_, _tmp7_);
+	self->current_slide_number = _tmp8_;
+	_tmp9_ = self->frozen;
+	if (!_tmp9_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Jump 10 (user) slides forward
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_jump10 (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp1_;
-	gint _tmp2_ = 0;
+void pdfpc_presentation_controller_jump10 (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	pdfpcTimerLabel* _tmp1_;
+	gint _tmp2_;
+	pdfpcMetadataPdf* _tmp3_;
+	gint _tmp4_ = 0;
 	gint max_user_slide;
-	gint _tmp3_;
-	gint _tmp4_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp6_;
-	gint _tmp7_;
-	gint _tmp8_ = 0;
-	gboolean _tmp9_;
+	gint _tmp5_;
+	gint _tmp6_;
+	pdfpcMetadataPdf* _tmp8_;
+	gint _tmp9_;
+	gint _tmp10_ = 0;
+	gboolean _tmp11_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	self->current_user_slide_number = _tmp0_ + 10;
-	_tmp1_ = self->metadata;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (_tmp1_);
-	max_user_slide = _tmp2_;
-	_tmp3_ = self->current_user_slide_number;
-	_tmp4_ = max_user_slide;
-	if (_tmp3_ >= _tmp4_) {
-		gint _tmp5_;
-		_tmp5_ = max_user_slide;
-		self->current_user_slide_number = _tmp5_ - 1;
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		return;
 	}
-	_tmp6_ = self->metadata;
-	_tmp7_ = self->current_user_slide_number;
-	_tmp8_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp6_, _tmp7_);
-	self->current_slide_number = _tmp8_;
-	_tmp9_ = self->frozen;
-	if (!_tmp9_) {
+	_tmp1_ = self->timer;
+	pdfpc_timer_label_start (_tmp1_);
+	_tmp2_ = self->current_user_slide_number;
+	self->current_user_slide_number = _tmp2_ + 10;
+	_tmp3_ = self->metadata;
+	_tmp4_ = pdfpc_metadata_pdf_get_user_slide_count (_tmp3_);
+	max_user_slide = _tmp4_;
+	_tmp5_ = self->current_user_slide_number;
+	_tmp6_ = max_user_slide;
+	if (_tmp5_ >= _tmp6_) {
+		gint _tmp7_;
+		_tmp7_ = max_user_slide;
+		self->current_user_slide_number = _tmp7_ - 1;
+	}
+	_tmp8_ = self->metadata;
+	_tmp9_ = self->current_user_slide_number;
+	_tmp10_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp8_, _tmp9_);
+	self->current_slide_number = _tmp10_;
+	_tmp11_ = self->frozen;
+	if (!_tmp11_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Jump 10 (user) slides backward
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_back10 (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	gint _tmp1_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
+void pdfpc_presentation_controller_back10 (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	pdfpcTimerLabel* _tmp1_;
+	gint _tmp2_;
 	gint _tmp3_;
-	gint _tmp4_ = 0;
-	gboolean _tmp5_;
+	pdfpcMetadataPdf* _tmp4_;
+	gint _tmp5_;
+	gint _tmp6_ = 0;
+	gboolean _tmp7_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	self->current_user_slide_number = _tmp0_ - 10;
-	_tmp1_ = self->current_user_slide_number;
-	if (_tmp1_ < 0) {
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		return;
+	}
+	_tmp1_ = self->timer;
+	pdfpc_timer_label_start (_tmp1_);
+	_tmp2_ = self->current_user_slide_number;
+	self->current_user_slide_number = _tmp2_ - 10;
+	_tmp3_ = self->current_user_slide_number;
+	if (_tmp3_ < 0) {
 		self->current_user_slide_number = 0;
 	}
-	_tmp2_ = self->metadata;
-	_tmp3_ = self->current_user_slide_number;
-	_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp2_, _tmp3_);
-	self->current_slide_number = _tmp4_;
-	_tmp5_ = self->frozen;
-	if (!_tmp5_) {
+	_tmp4_ = self->metadata;
+	_tmp5_ = self->current_user_slide_number;
+	_tmp6_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp4_, _tmp5_);
+	self->current_slide_number = _tmp6_;
+	_tmp7_ = self->frozen;
+	if (!_tmp7_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Goto a slide in user page numbers
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_goto_user_page (orgwesthoffsweltpdfpresenterPresentationController* self, gint page_number) {
-	gint _tmp0_;
+void pdfpc_presentation_controller_goto_user_page (pdfpcPresentationController* self, gint page_number) {
+	pdfpcTimerLabel* _tmp0_;
 	gint _tmp1_;
 	gint _tmp2_;
+	gint _tmp3_;
 	gint destination;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp3_;
-	gint _tmp4_ = 0;
+	pdfpcMetadataPdf* _tmp4_;
+	gint _tmp5_ = 0;
 	gint n_user_slides;
-	gint _tmp5_;
-	gint _tmp9_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp10_;
-	gint _tmp11_;
-	gint _tmp12_ = 0;
-	gboolean _tmp13_;
+	gint _tmp6_;
+	gint _tmp10_;
+	pdfpcMetadataPdf* _tmp11_;
+	gint _tmp12_;
+	gint _tmp13_ = 0;
+	gboolean _tmp14_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	_tmp1_ = page_number;
-	if (_tmp0_ != (_tmp1_ - 1)) {
-		org_westhoffswelt_pdfpresenter_presentation_controller_slide2history (self);
-	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_hide_overview (self);
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	_tmp1_ = self->current_user_slide_number;
 	_tmp2_ = page_number;
-	destination = _tmp2_ - 1;
-	_tmp3_ = self->metadata;
-	_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (_tmp3_);
-	n_user_slides = _tmp4_;
-	_tmp5_ = page_number;
-	if (_tmp5_ < 1) {
+	if (_tmp1_ != (_tmp2_ - 1)) {
+		pdfpc_presentation_controller_slide2history (self);
+	}
+	pdfpc_presentation_controller_controllables_hide_overview (self);
+	_tmp3_ = page_number;
+	destination = _tmp3_ - 1;
+	_tmp4_ = self->metadata;
+	_tmp5_ = pdfpc_metadata_pdf_get_user_slide_count (_tmp4_);
+	n_user_slides = _tmp5_;
+	_tmp6_ = page_number;
+	if (_tmp6_ < 1) {
 		destination = 0;
 	} else {
-		gint _tmp6_;
 		gint _tmp7_;
-		_tmp6_ = page_number;
-		_tmp7_ = n_user_slides;
-		if (_tmp6_ >= _tmp7_) {
-			gint _tmp8_;
-			_tmp8_ = n_user_slides;
-			destination = _tmp8_ - 1;
+		gint _tmp8_;
+		_tmp7_ = page_number;
+		_tmp8_ = n_user_slides;
+		if (_tmp7_ >= _tmp8_) {
+			gint _tmp9_;
+			_tmp9_ = n_user_slides;
+			destination = _tmp9_ - 1;
 		}
 	}
-	_tmp9_ = destination;
-	self->current_user_slide_number = _tmp9_;
-	_tmp10_ = self->metadata;
-	_tmp11_ = self->current_user_slide_number;
-	_tmp12_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp10_, _tmp11_);
-	self->current_slide_number = _tmp12_;
-	_tmp13_ = self->frozen;
-	if (!_tmp13_) {
+	_tmp10_ = destination;
+	self->current_user_slide_number = _tmp10_;
+	_tmp11_ = self->metadata;
+	_tmp12_ = self->current_user_slide_number;
+	_tmp13_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp11_, _tmp12_);
+	self->current_slide_number = _tmp13_;
+	_tmp14_ = self->frozen;
+	if (!_tmp14_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_input_events (self, FALSE);
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_set_ignore_input_events (self, FALSE);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Go back in history
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_history_back (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint* _tmp0_;
-	gint _tmp0__length1;
+void pdfpc_presentation_controller_history_back (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	gint* _tmp1_;
+	gint _tmp1__length1;
 	gint history_length;
-	gint _tmp1_;
+	gint _tmp2_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->priv->history;
-	_tmp0__length1 = self->priv->history_length1;
-	history_length = _tmp0__length1;
-	_tmp1_ = history_length;
-	if (_tmp1_ == 0) {
-		org_westhoffswelt_pdfpresenter_presentation_controller_goto_first (self);
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		return;
+	}
+	_tmp1_ = self->priv->history;
+	_tmp1__length1 = self->priv->history_length1;
+	history_length = _tmp1__length1;
+	_tmp2_ = history_length;
+	if (_tmp2_ == 0) {
+		pdfpc_presentation_controller_goto_first (self);
 	} else {
-		gint* _tmp2_;
-		gint _tmp2__length1;
-		gint _tmp3_;
+		gint* _tmp3_;
+		gint _tmp3__length1;
 		gint _tmp4_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp5_;
-		gint _tmp6_;
-		gint _tmp7_ = 0;
-		gint _tmp8_;
-		gint _tmp9_ = 0;
-		gboolean _tmp10_;
-		_tmp2_ = self->priv->history;
-		_tmp2__length1 = self->priv->history_length1;
-		_tmp3_ = history_length;
-		_tmp4_ = _tmp2_[_tmp3_ - 1];
-		self->current_slide_number = _tmp4_;
-		_tmp5_ = self->metadata;
-		_tmp6_ = self->current_slide_number;
-		_tmp7_ = org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (_tmp5_, _tmp6_);
-		self->current_user_slide_number = _tmp7_;
-		_tmp8_ = history_length;
-		_tmp9_ = _tmp8_ - 1;
-		self->priv->history = g_renew (gint, self->priv->history, _tmp8_ - 1);
-		(_tmp9_ > self->priv->history_length1) ? memset (self->priv->history + self->priv->history_length1, 0, sizeof (gint) * (_tmp9_ - self->priv->history_length1)) : NULL;
-		self->priv->history_length1 = _tmp9_;
-		self->priv->_history_size_ = _tmp9_;
-		_tmp10_ = self->frozen;
-		if (!_tmp10_) {
+		gint _tmp5_;
+		pdfpcMetadataPdf* _tmp6_;
+		gint _tmp7_;
+		gint _tmp8_ = 0;
+		gint _tmp9_;
+		gint _tmp10_ = 0;
+		gboolean _tmp11_;
+		_tmp3_ = self->priv->history;
+		_tmp3__length1 = self->priv->history_length1;
+		_tmp4_ = history_length;
+		_tmp5_ = _tmp3_[_tmp4_ - 1];
+		self->current_slide_number = _tmp5_;
+		_tmp6_ = self->metadata;
+		_tmp7_ = self->current_slide_number;
+		_tmp8_ = pdfpc_metadata_pdf_real_slide_to_user_slide (_tmp6_, _tmp7_);
+		self->current_user_slide_number = _tmp8_;
+		_tmp9_ = history_length;
+		_tmp10_ = _tmp9_ - 1;
+		self->priv->history = g_renew (gint, self->priv->history, _tmp9_ - 1);
+		(_tmp10_ > self->priv->history_length1) ? memset (self->priv->history + self->priv->history_length1, 0, sizeof (gint) * (_tmp10_ - self->priv->history_length1)) : NULL;
+		self->priv->history_length1 = _tmp10_;
+		self->priv->_history_size_ = _tmp10_;
+		_tmp11_ = self->frozen;
+		if (!_tmp11_) {
 			self->faded_to_black = FALSE;
 		}
-		org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+		pdfpc_presentation_controller_controllables_update (self);
 	}
 }
 
@@ -1361,7 +2064,7 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_history_back (orgwes
 /**
          * Notify the controllables that they have to update the view
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (orgwesthoffsweltpdfpresenterPresentationController* self) {
+void pdfpc_presentation_controller_controllables_update (pdfpcPresentationController* self) {
 	GList* _tmp0_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->controllables;
@@ -1370,14 +2073,14 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update
 		GList* c_it = NULL;
 		c_collection = _tmp0_;
 		for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
-			orgwesthoffsweltpdfpresenterControllable* _tmp1_;
-			orgwesthoffsweltpdfpresenterControllable* c = NULL;
-			_tmp1_ = _g_object_ref0 ((orgwesthoffsweltpdfpresenterControllable*) c_it->data);
+			pdfpcControllable* _tmp1_;
+			pdfpcControllable* c = NULL;
+			_tmp1_ = _g_object_ref0 ((pdfpcControllable*) c_it->data);
 			c = _tmp1_;
 			{
-				orgwesthoffsweltpdfpresenterControllable* _tmp2_;
+				pdfpcControllable* _tmp2_;
 				_tmp2_ = c;
-				org_westhoffswelt_pdfpresenter_controllable_update (_tmp2_);
+				pdfpc_controllable_update (_tmp2_);
 				_g_object_unref0 (c);
 			}
 		}
@@ -1388,72 +2091,107 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update
 /**
          * Reset all registered controllables to their initial state
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_reset (orgwesthoffsweltpdfpresenterPresentationController* self) {
+void pdfpc_presentation_controller_controllables_reset (pdfpcPresentationController* self) {
 	g_return_if_fail (self != NULL);
 	self->current_slide_number = 0;
 	self->current_user_slide_number = 0;
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
-	org_westhoffswelt_pdfpresenter_presentation_controller_reset_timer (self);
+	pdfpc_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_reset_timer (self);
 }
 
 
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_show_overview (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	GList* _tmp0_;
+void pdfpc_presentation_controller_toggle_overview (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
 	g_return_if_fail (self != NULL);
-	org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_mouse_events (self, TRUE);
-	self->priv->current_key_mapping = ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Overview;
-	_tmp0_ = self->controllables;
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		pdfpc_presentation_controller_controllables_hide_overview (self);
+	} else {
+		pdfpc_presentation_controller_controllables_show_overview (self);
+	}
+}
+
+
+void pdfpc_presentation_controller_controllables_show_overview (pdfpcPresentationController* self) {
+	pdfpcWindowOverview* _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->overview;
+	if (_tmp0_ != NULL) {
+		GList* _tmp1_;
+		pdfpc_presentation_controller_set_ignore_mouse_events (self, TRUE);
+		_tmp1_ = self->controllables;
+		{
+			GList* c_collection = NULL;
+			GList* c_it = NULL;
+			c_collection = _tmp1_;
+			for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
+				pdfpcControllable* _tmp2_;
+				pdfpcControllable* c = NULL;
+				_tmp2_ = _g_object_ref0 ((pdfpcControllable*) c_it->data);
+				c = _tmp2_;
+				{
+					pdfpcControllable* _tmp3_;
+					_tmp3_ = c;
+					pdfpc_controllable_show_overview (_tmp3_);
+					_g_object_unref0 (c);
+				}
+			}
+		}
+		self->overview_shown = TRUE;
+	}
+}
+
+
+void pdfpc_presentation_controller_controllables_hide_overview (pdfpcPresentationController* self) {
+	gint _tmp0_;
+	gint _tmp1_ = 0;
+	GList* _tmp2_;
+	g_return_if_fail (self != NULL);
+	pdfpc_presentation_controller_set_ignore_mouse_events (self, FALSE);
+	_tmp0_ = self->current_user_slide_number;
+	_tmp1_ = pdfpc_presentation_controller_get_user_n_slides (self);
+	if (_tmp0_ >= _tmp1_) {
+		pdfpc_presentation_controller_goto_last (self);
+	}
+	self->overview_shown = FALSE;
+	_tmp2_ = self->controllables;
 	{
 		GList* c_collection = NULL;
 		GList* c_it = NULL;
-		c_collection = _tmp0_;
+		c_collection = _tmp2_;
 		for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
-			orgwesthoffsweltpdfpresenterControllable* _tmp1_;
-			orgwesthoffsweltpdfpresenterControllable* c = NULL;
-			_tmp1_ = _g_object_ref0 ((orgwesthoffsweltpdfpresenterControllable*) c_it->data);
-			c = _tmp1_;
+			pdfpcControllable* _tmp3_;
+			pdfpcControllable* c = NULL;
+			_tmp3_ = _g_object_ref0 ((pdfpcControllable*) c_it->data);
+			c = _tmp3_;
 			{
-				orgwesthoffsweltpdfpresenterControllable* _tmp2_;
-				_tmp2_ = c;
-				org_westhoffswelt_pdfpresenter_controllable_show_overview (_tmp2_);
+				pdfpcControllable* _tmp4_;
+				_tmp4_ = c;
+				pdfpc_controllable_hide_overview (_tmp4_);
 				_g_object_unref0 (c);
 			}
 		}
 	}
-}
-
-
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_hide_overview (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	gint _tmp1_ = 0;
-	g_return_if_fail (self != NULL);
-	org_westhoffswelt_pdfpresenter_presentation_controller_set_ignore_mouse_events (self, FALSE);
-	self->priv->current_key_mapping = ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Normal;
-	_tmp0_ = self->current_user_slide_number;
-	_tmp1_ = org_westhoffswelt_pdfpresenter_presentation_controller_get_user_n_slides (self);
-	if (_tmp0_ >= _tmp1_) {
-		org_westhoffswelt_pdfpresenter_presentation_controller_goto_last (self);
-	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Fill the presentation display with black
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_fade_to_black (orgwesthoffsweltpdfpresenterPresentationController* self) {
+void pdfpc_presentation_controller_fade_to_black (pdfpcPresentationController* self) {
 	gboolean _tmp0_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = self->faded_to_black;
 	self->faded_to_black = !_tmp0_;
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Is the presentation blanked?
          */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_is_faded_to_black (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gboolean pdfpc_presentation_controller_is_faded_to_black (pdfpcPresentationController* self) {
 	gboolean result = FALSE;
 	gboolean _tmp0_;
 	g_return_val_if_fail (self != NULL, FALSE);
@@ -1466,23 +2204,28 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_is_faded_to_blac
 /**
          * Edit note for current slide.
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_edit_note (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	GList* _tmp0_;
+void pdfpc_presentation_controller_controllables_edit_note (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	GList* _tmp1_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->controllables;
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		return;
+	}
+	_tmp1_ = self->controllables;
 	{
 		GList* c_collection = NULL;
 		GList* c_it = NULL;
-		c_collection = _tmp0_;
+		c_collection = _tmp1_;
 		for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
-			orgwesthoffsweltpdfpresenterControllable* _tmp1_;
-			orgwesthoffsweltpdfpresenterControllable* c = NULL;
-			_tmp1_ = _g_object_ref0 ((orgwesthoffsweltpdfpresenterControllable*) c_it->data);
-			c = _tmp1_;
+			pdfpcControllable* _tmp2_;
+			pdfpcControllable* c = NULL;
+			_tmp2_ = _g_object_ref0 ((pdfpcControllable*) c_it->data);
+			c = _tmp2_;
 			{
-				orgwesthoffsweltpdfpresenterControllable* _tmp2_;
-				_tmp2_ = c;
-				org_westhoffswelt_pdfpresenter_controllable_edit_note (_tmp2_);
+				pdfpcControllable* _tmp3_;
+				_tmp3_ = c;
+				pdfpc_controllable_edit_note (_tmp3_);
 				_g_object_unref0 (c);
 			}
 		}
@@ -1493,23 +2236,28 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_edit_n
 /**
          * Ask for the page to jump to
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_ask_goto_page (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	GList* _tmp0_;
+void pdfpc_presentation_controller_controllables_ask_goto_page (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	GList* _tmp1_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->controllables;
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		return;
+	}
+	_tmp1_ = self->controllables;
 	{
 		GList* c_collection = NULL;
 		GList* c_it = NULL;
-		c_collection = _tmp0_;
+		c_collection = _tmp1_;
 		for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
-			orgwesthoffsweltpdfpresenterControllable* _tmp1_;
-			orgwesthoffsweltpdfpresenterControllable* c = NULL;
-			_tmp1_ = _g_object_ref0 ((orgwesthoffsweltpdfpresenterControllable*) c_it->data);
-			c = _tmp1_;
+			pdfpcControllable* _tmp2_;
+			pdfpcControllable* c = NULL;
+			_tmp2_ = _g_object_ref0 ((pdfpcControllable*) c_it->data);
+			c = _tmp2_;
 			{
-				orgwesthoffsweltpdfpresenterControllable* _tmp2_;
-				_tmp2_ = c;
-				org_westhoffswelt_pdfpresenter_controllable_ask_goto_page (_tmp2_);
+				pdfpcControllable* _tmp3_;
+				_tmp3_ = c;
+				pdfpc_controllable_ask_goto_page (_tmp3_);
 				_g_object_unref0 (c);
 			}
 		}
@@ -1520,7 +2268,7 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_controllables_ask_go
 /**
          * Freeze the display
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_freeze (orgwesthoffsweltpdfpresenterPresentationController* self) {
+void pdfpc_presentation_controller_toggle_freeze (pdfpcPresentationController* self) {
 	gboolean _tmp0_;
 	gboolean _tmp1_;
 	g_return_if_fail (self != NULL);
@@ -1530,14 +2278,14 @@ void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_freeze (orgwe
 	if (!_tmp1_) {
 		self->faded_to_black = FALSE;
 	}
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Is the presentation frozen?
          */
-gboolean org_westhoffswelt_pdfpresenter_presentation_controller_is_frozen (orgwesthoffsweltpdfpresenterPresentationController* self) {
+gboolean pdfpc_presentation_controller_is_frozen (pdfpcPresentationController* self) {
 	gboolean result = FALSE;
 	gboolean _tmp0_;
 	g_return_val_if_fail (self != NULL, FALSE);
@@ -1550,160 +2298,750 @@ gboolean org_westhoffswelt_pdfpresenter_presentation_controller_is_frozen (orgwe
 /**
          * Toggle skip for current slide
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_skip (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	gint _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp1_;
-	gint _tmp2_;
-	gint _tmp3_;
-	gint _tmp4_ = 0;
-	orgwesthoffsweltpdfpresenterWindowOverview* _tmp5_;
-	gint _tmp6_ = 0;
+void pdfpc_presentation_controller_toggle_skip (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->current_user_slide_number;
-	_tmp1_ = self->metadata;
-	_tmp2_ = self->current_slide_number;
-	_tmp3_ = self->current_user_slide_number;
-	_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (_tmp1_, _tmp2_, _tmp3_);
-	self->current_user_slide_number = _tmp0_ + _tmp4_;
-	_tmp5_ = self->overview;
-	_tmp6_ = org_westhoffswelt_pdfpresenter_presentation_controller_get_user_n_slides (self);
-	org_westhoffswelt_pdfpresenter_window_overview_set_n_slides (_tmp5_, _tmp6_);
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
-}
-
-
-/**
-         * Toggle skip for current slide in overview mode
-         */
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_skip_overview (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	orgwesthoffsweltpdfpresenterWindowOverview* _tmp0_;
-	gint _tmp1_ = 0;
-	gint user_selected;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp2_;
-	gint _tmp3_ = 0;
-	gint slide_number;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp4_;
-	orgwesthoffsweltpdfpresenterWindowOverview* _tmp5_;
-	gint _tmp6_ = 0;
-	g_return_if_fail (self != NULL);
-	_tmp0_ = self->overview;
-	_tmp1_ = org_westhoffswelt_pdfpresenter_window_overview_get_current_button (_tmp0_);
-	user_selected = _tmp1_;
-	_tmp2_ = self->metadata;
-	_tmp3_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (_tmp2_, user_selected);
-	slide_number = _tmp3_;
-	_tmp4_ = self->metadata;
-	org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (_tmp4_, slide_number, user_selected);
-	_tmp5_ = self->overview;
-	_tmp6_ = org_westhoffswelt_pdfpresenter_presentation_controller_get_user_n_slides (self);
-	org_westhoffswelt_pdfpresenter_window_overview_set_n_slides (_tmp5_, _tmp6_);
+	_tmp0_ = self->overview_shown;
+	if (_tmp0_) {
+		pdfpcWindowOverview* _tmp1_;
+		gint _tmp2_;
+		gint _tmp3_;
+		gint user_selected;
+		pdfpcMetadataPdf* _tmp4_;
+		gint _tmp5_;
+		gint _tmp6_ = 0;
+		gint slide_number;
+		pdfpcMetadataPdf* _tmp7_;
+		gint _tmp8_;
+		gint _tmp9_;
+		gint _tmp10_ = 0;
+		_tmp1_ = self->overview;
+		_tmp2_ = pdfpc_window_overview_get_current_slide (_tmp1_);
+		_tmp3_ = _tmp2_;
+		user_selected = _tmp3_;
+		_tmp4_ = self->metadata;
+		_tmp5_ = user_selected;
+		_tmp6_ = pdfpc_metadata_pdf_user_slide_to_real_slide (_tmp4_, _tmp5_);
+		slide_number = _tmp6_;
+		_tmp7_ = self->metadata;
+		_tmp8_ = slide_number;
+		_tmp9_ = user_selected;
+		_tmp10_ = pdfpc_metadata_pdf_toggle_skip (_tmp7_, _tmp8_, _tmp9_);
+		if (_tmp10_ != 0) {
+			pdfpcWindowOverview* _tmp11_;
+			gint _tmp12_ = 0;
+			_tmp11_ = self->overview;
+			_tmp12_ = pdfpc_presentation_controller_get_user_n_slides (self);
+			pdfpc_window_overview_remove_current (_tmp11_, _tmp12_);
+		}
+	} else {
+		gint _tmp13_;
+		pdfpcMetadataPdf* _tmp14_;
+		gint _tmp15_;
+		gint _tmp16_;
+		gint _tmp17_ = 0;
+		pdfpcWindowOverview* _tmp18_;
+		gint _tmp19_ = 0;
+		_tmp13_ = self->current_user_slide_number;
+		_tmp14_ = self->metadata;
+		_tmp15_ = self->current_slide_number;
+		_tmp16_ = self->current_user_slide_number;
+		_tmp17_ = pdfpc_metadata_pdf_toggle_skip (_tmp14_, _tmp15_, _tmp16_);
+		self->current_user_slide_number = _tmp13_ + _tmp17_;
+		_tmp18_ = self->overview;
+		_tmp19_ = pdfpc_presentation_controller_get_user_n_slides (self);
+		pdfpc_window_overview_set_n_slides (_tmp18_, _tmp19_);
+		pdfpc_presentation_controller_controllables_update (self);
+	}
 }
 
 
 /**
          * Start the presentation (-> timer)
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_start (orgwesthoffsweltpdfpresenterPresentationController* self) {
+void pdfpc_presentation_controller_start (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
 	g_return_if_fail (self != NULL);
-	org_westhoffswelt_pdfpresenter_presentation_controller_controllables_update (self);
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_start (_tmp0_);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Pause the timer
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_toggle_pause (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	GList* _tmp0_;
+void pdfpc_presentation_controller_toggle_pause (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->controllables;
-	{
-		GList* c_collection = NULL;
-		GList* c_it = NULL;
-		c_collection = _tmp0_;
-		for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
-			orgwesthoffsweltpdfpresenterControllable* _tmp1_;
-			orgwesthoffsweltpdfpresenterControllable* c = NULL;
-			_tmp1_ = _g_object_ref0 ((orgwesthoffsweltpdfpresenterControllable*) c_it->data);
-			c = _tmp1_;
-			{
-				orgwesthoffsweltpdfpresenterControllable* _tmp2_;
-				_tmp2_ = c;
-				org_westhoffswelt_pdfpresenter_controllable_toggle_pause (_tmp2_);
-				_g_object_unref0 (c);
-			}
-		}
-	}
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_pause (_tmp0_);
+	pdfpc_presentation_controller_controllables_update (self);
 }
 
 
 /**
          * Reset the timer
          */
-void org_westhoffswelt_pdfpresenter_presentation_controller_reset_timer (orgwesthoffsweltpdfpresenterPresentationController* self) {
-	GList* _tmp0_;
+void pdfpc_presentation_controller_reset_timer (pdfpcPresentationController* self) {
+	pdfpcTimerLabel* _tmp0_;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = self->controllables;
-	{
-		GList* c_collection = NULL;
-		GList* c_it = NULL;
-		c_collection = _tmp0_;
-		for (c_it = c_collection; c_it != NULL; c_it = c_it->next) {
-			orgwesthoffsweltpdfpresenterControllable* _tmp1_;
-			orgwesthoffsweltpdfpresenterControllable* c = NULL;
-			_tmp1_ = _g_object_ref0 ((orgwesthoffsweltpdfpresenterControllable*) c_it->data);
-			c = _tmp1_;
-			{
-				orgwesthoffsweltpdfpresenterControllable* _tmp2_;
-				_tmp2_ = c;
-				org_westhoffswelt_pdfpresenter_controllable_reset_timer (_tmp2_);
-				_g_object_unref0 (c);
-			}
-		}
+	_tmp0_ = self->timer;
+	pdfpc_timer_label_reset (_tmp0_);
+}
+
+
+void pdfpc_presentation_controller_exit_state (pdfpcPresentationController* self) {
+	gboolean _tmp0_;
+	gboolean _tmp1_;
+	pdfpcTimerLabel* _tmp2_;
+	gboolean _tmp3_ = FALSE;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->faded_to_black;
+	if (_tmp0_) {
+		pdfpc_presentation_controller_fade_to_black (self);
+	}
+	_tmp1_ = self->frozen;
+	if (_tmp1_) {
+		pdfpc_presentation_controller_toggle_freeze (self);
+	}
+	_tmp2_ = self->timer;
+	_tmp3_ = pdfpc_timer_label_is_paused (_tmp2_);
+	if (_tmp3_) {
+		pdfpc_presentation_controller_toggle_pause (self);
 	}
 }
 
 
-static void org_westhoffswelt_pdfpresenter_presentation_controller_class_init (orgwesthoffsweltpdfpresenterPresentationControllerClass * klass) {
-	org_westhoffswelt_pdfpresenter_presentation_controller_parent_class = g_type_class_peek_parent (klass);
-	g_type_class_add_private (klass, sizeof (orgwesthoffsweltpdfpresenterPresentationControllerPrivate));
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_presentation_controller_finalize;
+void pdfpc_presentation_controller_quit (pdfpcPresentationController* self) {
+	pdfpcMetadataPdf* _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = self->metadata;
+	pdfpc_metadata_pdf_save_to_disk (_tmp0_);
+	gtk_main_quit ();
 }
 
 
-static void org_westhoffswelt_pdfpresenter_presentation_controller_instance_init (orgwesthoffsweltpdfpresenterPresentationController * self) {
-	self->priv = ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_GET_PRIVATE (self);
+/**
+         * Parse the given time string to a Time object
+         */
+static void g_time_local (time_t time, struct tm* result) {
+	struct tm _result_ = {0};
+	struct tm _tmp0_ = {0};
+	localtime_r (&time, &_tmp0_);
+	_result_ = _tmp0_;
+	*result = _result_;
+	return;
+}
+
+
+static time_t pdfpc_presentation_controller_parseTime (pdfpcPresentationController* self, const gchar* t) {
+	time_t result = 0;
+	time_t _tmp0_;
+	struct tm _tmp1_ = {0};
+	struct tm tm;
+	const gchar* _tmp2_;
+	gchar* _tmp3_;
+	gchar* _tmp4_;
+	time_t _tmp5_ = 0;
+	g_return_val_if_fail (self != NULL, 0);
+	g_return_val_if_fail (t != NULL, 0);
+	_tmp0_ = time (NULL);
+	g_time_local (_tmp0_, &_tmp1_);
+	tm = _tmp1_;
+	_tmp2_ = t;
+	_tmp3_ = g_strconcat (_tmp2_, ":00", NULL);
+	_tmp4_ = _tmp3_;
+	strptime (_tmp4_, "%H:%M:%S", &tm);
+	_g_free0 (_tmp4_);
+	_tmp5_ = mktime (&tm);
+	result = _tmp5_;
+	return result;
+}
+
+
+guint pdfpc_presentation_controller_get_accepted_key_mods (pdfpcPresentationController* self) {
+	guint result;
+	guint _tmp0_;
+	g_return_val_if_fail (self != NULL, 0U);
+	_tmp0_ = self->priv->_accepted_key_mods;
+	result = _tmp0_;
+	return result;
+}
+
+
+void pdfpc_presentation_controller_set_accepted_key_mods (pdfpcPresentationController* self, guint value) {
+	guint _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	self->priv->_accepted_key_mods = _tmp0_;
+	g_object_notify ((GObject *) self, "accepted-key-mods");
+}
+
+
+pdfpcPresentationControllerKeyAction* pdfpc_presentation_controller_key_action_construct (GType object_type, pdfpcPresentationControllerKeyActionKeyActionDelegate d, void* d_target) {
+	pdfpcPresentationControllerKeyAction* self = NULL;
+	pdfpcPresentationControllerKeyActionKeyActionDelegate _tmp0_;
+	void* _tmp0__target;
+	self = (pdfpcPresentationControllerKeyAction*) g_type_create_instance (object_type);
+	_tmp0_ = d;
+	_tmp0__target = d_target;
+	(self->d_target_destroy_notify == NULL) ? NULL : (self->d_target_destroy_notify (self->d_target), NULL);
+	self->d = NULL;
+	self->d_target = NULL;
+	self->d_target_destroy_notify = NULL;
+	self->d = _tmp0_;
+	self->d_target = _tmp0__target;
+	self->d_target_destroy_notify = NULL;
+	return self;
+}
+
+
+pdfpcPresentationControllerKeyAction* pdfpc_presentation_controller_key_action_new (pdfpcPresentationControllerKeyActionKeyActionDelegate d, void* d_target) {
+	return pdfpc_presentation_controller_key_action_construct (PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION, d, d_target);
+}
+
+
+static void pdfpc_presentation_controller_value_key_action_init (GValue* value) {
+	value->data[0].v_pointer = NULL;
+}
+
+
+static void pdfpc_presentation_controller_value_key_action_free_value (GValue* value) {
+	if (value->data[0].v_pointer) {
+		pdfpc_presentation_controller_key_action_unref (value->data[0].v_pointer);
+	}
+}
+
+
+static void pdfpc_presentation_controller_value_key_action_copy_value (const GValue* src_value, GValue* dest_value) {
+	if (src_value->data[0].v_pointer) {
+		dest_value->data[0].v_pointer = pdfpc_presentation_controller_key_action_ref (src_value->data[0].v_pointer);
+	} else {
+		dest_value->data[0].v_pointer = NULL;
+	}
+}
+
+
+static gpointer pdfpc_presentation_controller_value_key_action_peek_pointer (const GValue* value) {
+	return value->data[0].v_pointer;
+}
+
+
+static gchar* pdfpc_presentation_controller_value_key_action_collect_value (GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
+	if (collect_values[0].v_pointer) {
+		pdfpcPresentationControllerKeyAction* object;
+		object = collect_values[0].v_pointer;
+		if (object->parent_instance.g_class == NULL) {
+			return g_strconcat ("invalid unclassed object pointer for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
+		} else if (!g_value_type_compatible (G_TYPE_FROM_INSTANCE (object), G_VALUE_TYPE (value))) {
+			return g_strconcat ("invalid object type `", g_type_name (G_TYPE_FROM_INSTANCE (object)), "' for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
+		}
+		value->data[0].v_pointer = pdfpc_presentation_controller_key_action_ref (object);
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	return NULL;
+}
+
+
+static gchar* pdfpc_presentation_controller_value_key_action_lcopy_value (const GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
+	pdfpcPresentationControllerKeyAction** object_p;
+	object_p = collect_values[0].v_pointer;
+	if (!object_p) {
+		return g_strdup_printf ("value location for `%s' passed as NULL", G_VALUE_TYPE_NAME (value));
+	}
+	if (!value->data[0].v_pointer) {
+		*object_p = NULL;
+	} else if (collect_flags & G_VALUE_NOCOPY_CONTENTS) {
+		*object_p = value->data[0].v_pointer;
+	} else {
+		*object_p = pdfpc_presentation_controller_key_action_ref (value->data[0].v_pointer);
+	}
+	return NULL;
+}
+
+
+GParamSpec* pdfpc_presentation_controller_param_spec_key_action (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags) {
+	pdfpcPresentationControllerParamSpecKeyAction* spec;
+	g_return_val_if_fail (g_type_is_a (object_type, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION), NULL);
+	spec = g_param_spec_internal (G_TYPE_PARAM_OBJECT, name, nick, blurb, flags);
+	G_PARAM_SPEC (spec)->value_type = object_type;
+	return G_PARAM_SPEC (spec);
+}
+
+
+gpointer pdfpc_presentation_controller_value_get_key_action (const GValue* value) {
+	g_return_val_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION), NULL);
+	return value->data[0].v_pointer;
+}
+
+
+void pdfpc_presentation_controller_value_set_key_action (GValue* value, gpointer v_object) {
+	pdfpcPresentationControllerKeyAction* old;
+	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION));
+	old = value->data[0].v_pointer;
+	if (v_object) {
+		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION));
+		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
+		value->data[0].v_pointer = v_object;
+		pdfpc_presentation_controller_key_action_ref (value->data[0].v_pointer);
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	if (old) {
+		pdfpc_presentation_controller_key_action_unref (old);
+	}
+}
+
+
+void pdfpc_presentation_controller_value_take_key_action (GValue* value, gpointer v_object) {
+	pdfpcPresentationControllerKeyAction* old;
+	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION));
+	old = value->data[0].v_pointer;
+	if (v_object) {
+		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_ACTION));
+		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
+		value->data[0].v_pointer = v_object;
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	if (old) {
+		pdfpc_presentation_controller_key_action_unref (old);
+	}
+}
+
+
+static void pdfpc_presentation_controller_key_action_class_init (pdfpcPresentationControllerKeyActionClass * klass) {
+	pdfpc_presentation_controller_key_action_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION_CLASS (klass)->finalize = pdfpc_presentation_controller_key_action_finalize;
+}
+
+
+static void pdfpc_presentation_controller_key_action_instance_init (pdfpcPresentationControllerKeyAction * self) {
+	self->ref_count = 1;
+}
+
+
+static void pdfpc_presentation_controller_key_action_finalize (pdfpcPresentationControllerKeyAction* obj) {
+	pdfpcPresentationControllerKeyAction * self;
+	self = PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION (obj);
+	(self->d_target_destroy_notify == NULL) ? NULL : (self->d_target_destroy_notify (self->d_target), NULL);
+	self->d = NULL;
+	self->d_target = NULL;
+	self->d_target_destroy_notify = NULL;
+}
+
+
+/**
+         * The key bindings as a map from keycodes to actions
+         *
+         * Vala doesn't allow for delegates as the values in a HashMap (yet?). See
+         * http://stackoverflow.com/questions/6145635/gee-hashmap-containing-methods-as-values
+         * for this solution.
+         */
+GType pdfpc_presentation_controller_key_action_get_type (void) {
+	static volatile gsize pdfpc_presentation_controller_key_action_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_presentation_controller_key_action_type_id__volatile)) {
+		static const GTypeValueTable g_define_type_value_table = { pdfpc_presentation_controller_value_key_action_init, pdfpc_presentation_controller_value_key_action_free_value, pdfpc_presentation_controller_value_key_action_copy_value, pdfpc_presentation_controller_value_key_action_peek_pointer, "p", pdfpc_presentation_controller_value_key_action_collect_value, "p", pdfpc_presentation_controller_value_key_action_lcopy_value };
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcPresentationControllerKeyActionClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_presentation_controller_key_action_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcPresentationControllerKeyAction), 0, (GInstanceInitFunc) pdfpc_presentation_controller_key_action_instance_init, &g_define_type_value_table };
+		static const GTypeFundamentalInfo g_define_type_fundamental_info = { (G_TYPE_FLAG_CLASSED | G_TYPE_FLAG_INSTANTIATABLE | G_TYPE_FLAG_DERIVABLE | G_TYPE_FLAG_DEEP_DERIVABLE) };
+		GType pdfpc_presentation_controller_key_action_type_id;
+		pdfpc_presentation_controller_key_action_type_id = g_type_register_fundamental (g_type_fundamental_next (), "pdfpcPresentationControllerKeyAction", &g_define_type_info, &g_define_type_fundamental_info, 0);
+		g_once_init_leave (&pdfpc_presentation_controller_key_action_type_id__volatile, pdfpc_presentation_controller_key_action_type_id);
+	}
+	return pdfpc_presentation_controller_key_action_type_id__volatile;
+}
+
+
+gpointer pdfpc_presentation_controller_key_action_ref (gpointer instance) {
+	pdfpcPresentationControllerKeyAction* self;
+	self = instance;
+	g_atomic_int_inc (&self->ref_count);
+	return instance;
+}
+
+
+void pdfpc_presentation_controller_key_action_unref (gpointer instance) {
+	pdfpcPresentationControllerKeyAction* self;
+	self = instance;
+	if (g_atomic_int_dec_and_test (&self->ref_count)) {
+		PDFPC_PRESENTATION_CONTROLLER_KEY_ACTION_GET_CLASS (self)->finalize (self);
+		g_type_free_instance ((GTypeInstance *) self);
+	}
+}
+
+
+pdfpcPresentationControllerKeyDef* pdfpc_presentation_controller_key_def_construct (GType object_type, guint k, guint m) {
+	pdfpcPresentationControllerKeyDef* self = NULL;
+	guint _tmp0_;
+	guint _tmp1_;
+	self = (pdfpcPresentationControllerKeyDef*) g_type_create_instance (object_type);
+	_tmp0_ = k;
+	pdfpc_presentation_controller_key_def_set_keycode (self, _tmp0_);
+	_tmp1_ = m;
+	pdfpc_presentation_controller_key_def_set_modMask (self, _tmp1_);
+	return self;
+}
+
+
+pdfpcPresentationControllerKeyDef* pdfpc_presentation_controller_key_def_new (guint k, guint m) {
+	return pdfpc_presentation_controller_key_def_construct (PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF, k, m);
+}
+
+
+static gpointer _pdfpc_presentation_controller_key_def_ref0 (gpointer self) {
+	return self ? pdfpc_presentation_controller_key_def_ref (self) : NULL;
+}
+
+
+guint pdfpc_presentation_controller_key_def_hash (void* _a) {
+	guint result = 0U;
+	void* _tmp0_;
+	pdfpcPresentationControllerKeyDef* _tmp1_;
+	pdfpcPresentationControllerKeyDef* a;
+	GType _tmp2_ = 0UL;
+	GHashFunc _tmp3_ = NULL;
+	GHashFunc uintHashFunc;
+	guint _tmp4_;
+	guint _tmp5_;
+	guint _tmp6_ = 0U;
+	_tmp0_ = _a;
+	_tmp1_ = _pdfpc_presentation_controller_key_def_ref0 (PDFPC_PRESENTATION_CONTROLLER_KEY_DEF (_tmp0_));
+	a = _tmp1_;
+	_tmp2_ = g_type_from_name ("uint");
+	_tmp3_ = gee_functions_get_hash_func_for (_tmp2_);
+	uintHashFunc = _tmp3_;
+	_tmp4_ = a->priv->_keycode;
+	_tmp5_ = a->priv->_modMask;
+	_tmp6_ = uintHashFunc (_tmp4_ | _tmp5_);
+	result = _tmp6_;
+	_pdfpc_presentation_controller_key_def_unref0 (a);
+	return result;
+}
+
+
+gboolean pdfpc_presentation_controller_key_def_equal (void* _a, void* _b) {
+	gboolean result = FALSE;
+	void* _tmp0_;
+	pdfpcPresentationControllerKeyDef* _tmp1_;
+	pdfpcPresentationControllerKeyDef* a;
+	void* _tmp2_;
+	pdfpcPresentationControllerKeyDef* _tmp3_;
+	pdfpcPresentationControllerKeyDef* b;
+	gboolean _tmp4_ = FALSE;
+	pdfpcPresentationControllerKeyDef* _tmp5_;
+	guint _tmp6_;
+	pdfpcPresentationControllerKeyDef* _tmp7_;
+	guint _tmp8_;
+	gboolean _tmp13_;
+	_tmp0_ = _a;
+	_tmp1_ = _pdfpc_presentation_controller_key_def_ref0 (PDFPC_PRESENTATION_CONTROLLER_KEY_DEF (_tmp0_));
+	a = _tmp1_;
+	_tmp2_ = _b;
+	_tmp3_ = _pdfpc_presentation_controller_key_def_ref0 (PDFPC_PRESENTATION_CONTROLLER_KEY_DEF (_tmp2_));
+	b = _tmp3_;
+	_tmp5_ = a;
+	_tmp6_ = _tmp5_->priv->_keycode;
+	_tmp7_ = b;
+	_tmp8_ = _tmp7_->priv->_keycode;
+	if (_tmp6_ == _tmp8_) {
+		pdfpcPresentationControllerKeyDef* _tmp9_;
+		guint _tmp10_;
+		pdfpcPresentationControllerKeyDef* _tmp11_;
+		guint _tmp12_;
+		_tmp9_ = a;
+		_tmp10_ = _tmp9_->priv->_modMask;
+		_tmp11_ = b;
+		_tmp12_ = _tmp11_->priv->_modMask;
+		_tmp4_ = _tmp10_ == _tmp12_;
+	} else {
+		_tmp4_ = FALSE;
+	}
+	_tmp13_ = _tmp4_;
+	result = _tmp13_;
+	_pdfpc_presentation_controller_key_def_unref0 (b);
+	_pdfpc_presentation_controller_key_def_unref0 (a);
+	return result;
+}
+
+
+guint pdfpc_presentation_controller_key_def_get_keycode (pdfpcPresentationControllerKeyDef* self) {
+	guint result;
+	guint _tmp0_;
+	g_return_val_if_fail (self != NULL, 0U);
+	_tmp0_ = self->priv->_keycode;
+	result = _tmp0_;
+	return result;
+}
+
+
+void pdfpc_presentation_controller_key_def_set_keycode (pdfpcPresentationControllerKeyDef* self, guint value) {
+	guint _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	self->priv->_keycode = _tmp0_;
+}
+
+
+guint pdfpc_presentation_controller_key_def_get_modMask (pdfpcPresentationControllerKeyDef* self) {
+	guint result;
+	guint _tmp0_;
+	g_return_val_if_fail (self != NULL, 0U);
+	_tmp0_ = self->priv->_modMask;
+	result = _tmp0_;
+	return result;
+}
+
+
+void pdfpc_presentation_controller_key_def_set_modMask (pdfpcPresentationControllerKeyDef* self, guint value) {
+	guint _tmp0_;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = value;
+	self->priv->_modMask = _tmp0_;
+}
+
+
+static void pdfpc_presentation_controller_value_key_def_init (GValue* value) {
+	value->data[0].v_pointer = NULL;
+}
+
+
+static void pdfpc_presentation_controller_value_key_def_free_value (GValue* value) {
+	if (value->data[0].v_pointer) {
+		pdfpc_presentation_controller_key_def_unref (value->data[0].v_pointer);
+	}
+}
+
+
+static void pdfpc_presentation_controller_value_key_def_copy_value (const GValue* src_value, GValue* dest_value) {
+	if (src_value->data[0].v_pointer) {
+		dest_value->data[0].v_pointer = pdfpc_presentation_controller_key_def_ref (src_value->data[0].v_pointer);
+	} else {
+		dest_value->data[0].v_pointer = NULL;
+	}
+}
+
+
+static gpointer pdfpc_presentation_controller_value_key_def_peek_pointer (const GValue* value) {
+	return value->data[0].v_pointer;
+}
+
+
+static gchar* pdfpc_presentation_controller_value_key_def_collect_value (GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
+	if (collect_values[0].v_pointer) {
+		pdfpcPresentationControllerKeyDef* object;
+		object = collect_values[0].v_pointer;
+		if (object->parent_instance.g_class == NULL) {
+			return g_strconcat ("invalid unclassed object pointer for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
+		} else if (!g_value_type_compatible (G_TYPE_FROM_INSTANCE (object), G_VALUE_TYPE (value))) {
+			return g_strconcat ("invalid object type `", g_type_name (G_TYPE_FROM_INSTANCE (object)), "' for value type `", G_VALUE_TYPE_NAME (value), "'", NULL);
+		}
+		value->data[0].v_pointer = pdfpc_presentation_controller_key_def_ref (object);
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	return NULL;
+}
+
+
+static gchar* pdfpc_presentation_controller_value_key_def_lcopy_value (const GValue* value, guint n_collect_values, GTypeCValue* collect_values, guint collect_flags) {
+	pdfpcPresentationControllerKeyDef** object_p;
+	object_p = collect_values[0].v_pointer;
+	if (!object_p) {
+		return g_strdup_printf ("value location for `%s' passed as NULL", G_VALUE_TYPE_NAME (value));
+	}
+	if (!value->data[0].v_pointer) {
+		*object_p = NULL;
+	} else if (collect_flags & G_VALUE_NOCOPY_CONTENTS) {
+		*object_p = value->data[0].v_pointer;
+	} else {
+		*object_p = pdfpc_presentation_controller_key_def_ref (value->data[0].v_pointer);
+	}
+	return NULL;
+}
+
+
+GParamSpec* pdfpc_presentation_controller_param_spec_key_def (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags) {
+	pdfpcPresentationControllerParamSpecKeyDef* spec;
+	g_return_val_if_fail (g_type_is_a (object_type, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF), NULL);
+	spec = g_param_spec_internal (G_TYPE_PARAM_OBJECT, name, nick, blurb, flags);
+	G_PARAM_SPEC (spec)->value_type = object_type;
+	return G_PARAM_SPEC (spec);
+}
+
+
+gpointer pdfpc_presentation_controller_value_get_key_def (const GValue* value) {
+	g_return_val_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF), NULL);
+	return value->data[0].v_pointer;
+}
+
+
+void pdfpc_presentation_controller_value_set_key_def (GValue* value, gpointer v_object) {
+	pdfpcPresentationControllerKeyDef* old;
+	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF));
+	old = value->data[0].v_pointer;
+	if (v_object) {
+		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF));
+		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
+		value->data[0].v_pointer = v_object;
+		pdfpc_presentation_controller_key_def_ref (value->data[0].v_pointer);
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	if (old) {
+		pdfpc_presentation_controller_key_def_unref (old);
+	}
+}
+
+
+void pdfpc_presentation_controller_value_take_key_def (GValue* value, gpointer v_object) {
+	pdfpcPresentationControllerKeyDef* old;
+	g_return_if_fail (G_TYPE_CHECK_VALUE_TYPE (value, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF));
+	old = value->data[0].v_pointer;
+	if (v_object) {
+		g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (v_object, PDFPC_PRESENTATION_CONTROLLER_TYPE_KEY_DEF));
+		g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (v_object), G_VALUE_TYPE (value)));
+		value->data[0].v_pointer = v_object;
+	} else {
+		value->data[0].v_pointer = NULL;
+	}
+	if (old) {
+		pdfpc_presentation_controller_key_def_unref (old);
+	}
+}
+
+
+static void pdfpc_presentation_controller_key_def_class_init (pdfpcPresentationControllerKeyDefClass * klass) {
+	pdfpc_presentation_controller_key_def_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_CLASS (klass)->finalize = pdfpc_presentation_controller_key_def_finalize;
+	g_type_class_add_private (klass, sizeof (pdfpcPresentationControllerKeyDefPrivate));
+}
+
+
+static void pdfpc_presentation_controller_key_def_instance_init (pdfpcPresentationControllerKeyDef * self) {
+	self->priv = PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_GET_PRIVATE (self);
+	self->ref_count = 1;
+}
+
+
+static void pdfpc_presentation_controller_key_def_finalize (pdfpcPresentationControllerKeyDef* obj) {
+	pdfpcPresentationControllerKeyDef * self;
+	self = PDFPC_PRESENTATION_CONTROLLER_KEY_DEF (obj);
+}
+
+
+GType pdfpc_presentation_controller_key_def_get_type (void) {
+	static volatile gsize pdfpc_presentation_controller_key_def_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_presentation_controller_key_def_type_id__volatile)) {
+		static const GTypeValueTable g_define_type_value_table = { pdfpc_presentation_controller_value_key_def_init, pdfpc_presentation_controller_value_key_def_free_value, pdfpc_presentation_controller_value_key_def_copy_value, pdfpc_presentation_controller_value_key_def_peek_pointer, "p", pdfpc_presentation_controller_value_key_def_collect_value, "p", pdfpc_presentation_controller_value_key_def_lcopy_value };
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcPresentationControllerKeyDefClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_presentation_controller_key_def_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcPresentationControllerKeyDef), 0, (GInstanceInitFunc) pdfpc_presentation_controller_key_def_instance_init, &g_define_type_value_table };
+		static const GTypeFundamentalInfo g_define_type_fundamental_info = { (G_TYPE_FLAG_CLASSED | G_TYPE_FLAG_INSTANTIATABLE | G_TYPE_FLAG_DERIVABLE | G_TYPE_FLAG_DEEP_DERIVABLE) };
+		GType pdfpc_presentation_controller_key_def_type_id;
+		pdfpc_presentation_controller_key_def_type_id = g_type_register_fundamental (g_type_fundamental_next (), "pdfpcPresentationControllerKeyDef", &g_define_type_info, &g_define_type_fundamental_info, 0);
+		g_once_init_leave (&pdfpc_presentation_controller_key_def_type_id__volatile, pdfpc_presentation_controller_key_def_type_id);
+	}
+	return pdfpc_presentation_controller_key_def_type_id__volatile;
+}
+
+
+gpointer pdfpc_presentation_controller_key_def_ref (gpointer instance) {
+	pdfpcPresentationControllerKeyDef* self;
+	self = instance;
+	g_atomic_int_inc (&self->ref_count);
+	return instance;
+}
+
+
+void pdfpc_presentation_controller_key_def_unref (gpointer instance) {
+	pdfpcPresentationControllerKeyDef* self;
+	self = instance;
+	if (g_atomic_int_dec_and_test (&self->ref_count)) {
+		PDFPC_PRESENTATION_CONTROLLER_KEY_DEF_GET_CLASS (self)->finalize (self);
+		g_type_free_instance ((GTypeInstance *) self);
+	}
+}
+
+
+static void pdfpc_presentation_controller_class_init (pdfpcPresentationControllerClass * klass) {
+	pdfpc_presentation_controller_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (pdfpcPresentationControllerPrivate));
+	G_OBJECT_CLASS (klass)->get_property = _vala_pdfpc_presentation_controller_get_property;
+	G_OBJECT_CLASS (klass)->set_property = _vala_pdfpc_presentation_controller_set_property;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_presentation_controller_finalize;
+	/**
+	         * Key modifiers that we support
+	         */
+	g_object_class_install_property (G_OBJECT_CLASS (klass), PDFPC_PRESENTATION_CONTROLLER_ACCEPTED_KEY_MODS, g_param_spec_uint ("accepted-key-mods", "accepted-key-mods", "accepted-key-mods", 0, G_MAXUINT, 0U, G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB | G_PARAM_READABLE | G_PARAM_WRITABLE));
+}
+
+
+static void pdfpc_presentation_controller_instance_init (pdfpcPresentationController * self) {
+	self->priv = PDFPC_PRESENTATION_CONTROLLER_GET_PRIVATE (self);
 	self->faded_to_black = FALSE;
 	self->frozen = FALSE;
 	self->ignore_keyboard_events = FALSE;
 	self->ignore_mouse_events = FALSE;
+	self->overview_shown = FALSE;
 	self->last_key_event = (guint) 0;
-	self->priv->current_key_mapping = ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_KEY_MAPPINGS_Normal;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_presentation_controller_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterPresentationController * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER (obj);
+static void pdfpc_presentation_controller_finalize (GObject* obj) {
+	pdfpcPresentationController * self;
+	self = PDFPC_PRESENTATION_CONTROLLER (obj);
 	__g_list_free__g_object_unref0_0 (self->controllables);
 	_g_object_unref0 (self->metadata);
 	_g_object_unref0 (self->overview);
 	self->priv->history = (g_free (self->priv->history), NULL);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_presentation_controller_parent_class)->finalize (obj);
+	_g_object_unref0 (self->timer);
+	_g_object_unref0 (self->actionNames);
+	_g_object_unref0 (self->keyBindings);
+	_g_object_unref0 (self->mouseBindings);
+	G_OBJECT_CLASS (pdfpc_presentation_controller_parent_class)->finalize (obj);
 }
 
 
 /**
      * Controller handling all the triggered events/signals
      */
-GType org_westhoffswelt_pdfpresenter_presentation_controller_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_presentation_controller_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_presentation_controller_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterPresentationControllerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_presentation_controller_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterPresentationController), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_presentation_controller_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_presentation_controller_type_id;
-		org_westhoffswelt_pdfpresenter_presentation_controller_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterPresentationController", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_presentation_controller_type_id__volatile, org_westhoffswelt_pdfpresenter_presentation_controller_type_id);
+GType pdfpc_presentation_controller_get_type (void) {
+	static volatile gsize pdfpc_presentation_controller_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_presentation_controller_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcPresentationControllerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_presentation_controller_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcPresentationController), 0, (GInstanceInitFunc) pdfpc_presentation_controller_instance_init, NULL };
+		GType pdfpc_presentation_controller_type_id;
+		pdfpc_presentation_controller_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcPresentationController", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_presentation_controller_type_id__volatile, pdfpc_presentation_controller_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_presentation_controller_type_id__volatile;
+	return pdfpc_presentation_controller_type_id__volatile;
+}
+
+
+static void _vala_pdfpc_presentation_controller_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec) {
+	pdfpcPresentationController * self;
+	self = PDFPC_PRESENTATION_CONTROLLER (object);
+	switch (property_id) {
+		case PDFPC_PRESENTATION_CONTROLLER_ACCEPTED_KEY_MODS:
+		g_value_set_uint (value, pdfpc_presentation_controller_get_accepted_key_mods (self));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
+}
+
+
+static void _vala_pdfpc_presentation_controller_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec) {
+	pdfpcPresentationController * self;
+	self = PDFPC_PRESENTATION_CONTROLLER (object);
+	switch (property_id) {
+		case PDFPC_PRESENTATION_CONTROLLER_ACCEPTED_KEY_MODS:
+		pdfpc_presentation_controller_set_accepted_key_mods (self, g_value_get_uint (value));
+		break;
+		default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+	}
 }
 
 

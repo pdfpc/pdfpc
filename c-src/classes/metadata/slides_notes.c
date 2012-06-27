@@ -8,44 +8,44 @@
 #include <string.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES (org_westhoffswelt_pdfpresenter_slides_notes_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES, orgwesthoffsweltpdfpresenterslides_notes))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES, orgwesthoffsweltpdfpresenterslides_notesClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES, orgwesthoffsweltpdfpresenterslides_notesClass))
+#define PDFPC_TYPE_SLIDES_NOTES (pdfpc_slides_notes_get_type ())
+#define PDFPC_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notes))
+#define PDFPC_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
+#define PDFPC_IS_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SLIDES_NOTES))
+#define PDFPC_IS_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SLIDES_NOTES))
+#define PDFPC_SLIDES_NOTES_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterslides_notes orgwesthoffsweltpdfpresenterslides_notes;
-typedef struct _orgwesthoffsweltpdfpresenterslides_notesClass orgwesthoffsweltpdfpresenterslides_notesClass;
-typedef struct _orgwesthoffsweltpdfpresenterslides_notesPrivate orgwesthoffsweltpdfpresenterslides_notesPrivate;
+typedef struct _pdfpcslides_notes pdfpcslides_notes;
+typedef struct _pdfpcslides_notesClass pdfpcslides_notesClass;
+typedef struct _pdfpcslides_notesPrivate pdfpcslides_notesPrivate;
 #define _g_free0(var) (var = (g_free (var), NULL))
 
-struct _orgwesthoffsweltpdfpresenterslides_notes {
+struct _pdfpcslides_notes {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterslides_notesPrivate * priv;
+	pdfpcslides_notesPrivate * priv;
 	gchar** notes;
 	gint notes_length1;
 };
 
-struct _orgwesthoffsweltpdfpresenterslides_notesClass {
+struct _pdfpcslides_notesClass {
 	GObjectClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_slides_notes_parent_class = NULL;
+static gpointer pdfpc_slides_notes_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_slides_notes_get_type (void) G_GNUC_CONST;
+GType pdfpc_slides_notes_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES_DUMMY_PROPERTY
+	PDFPC_SLIDES_NOTES_DUMMY_PROPERTY
 };
-void org_westhoffswelt_pdfpresenter_slides_notes_set_note (orgwesthoffsweltpdfpresenterslides_notes* self, const gchar* note, gint slide_number);
-gchar* org_westhoffswelt_pdfpresenter_slides_notes_get_note_for_slide (orgwesthoffsweltpdfpresenterslides_notes* self, gint number);
-gboolean org_westhoffswelt_pdfpresenter_slides_notes_has_notes (orgwesthoffsweltpdfpresenterslides_notes* self);
-gchar* org_westhoffswelt_pdfpresenter_slides_notes_format_to_save (orgwesthoffsweltpdfpresenterslides_notes* self);
-void org_westhoffswelt_pdfpresenter_slides_notes_parse_lines (orgwesthoffsweltpdfpresenterslides_notes* self, gchar** lines, int lines_length1);
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_slides_notes_new (void);
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_slides_notes_construct (GType object_type);
-static void org_westhoffswelt_pdfpresenter_slides_notes_finalize (GObject* obj);
+void pdfpc_slides_notes_set_note (pdfpcslides_notes* self, const gchar* note, gint slide_number);
+gchar* pdfpc_slides_notes_get_note_for_slide (pdfpcslides_notes* self, gint number);
+gboolean pdfpc_slides_notes_has_notes (pdfpcslides_notes* self);
+gchar* pdfpc_slides_notes_format_to_save (pdfpcslides_notes* self);
+void pdfpc_slides_notes_parse_lines (pdfpcslides_notes* self, gchar** lines, int lines_length1);
+pdfpcslides_notes* pdfpc_slides_notes_new (void);
+pdfpcslides_notes* pdfpc_slides_notes_construct (GType object_type);
+static void pdfpc_slides_notes_finalize (GObject* obj);
 static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
 static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
 
@@ -53,7 +53,7 @@ static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify 
 /**
          * Set a note for a given slide
          */
-void org_westhoffswelt_pdfpresenter_slides_notes_set_note (orgwesthoffsweltpdfpresenterslides_notes* self, const gchar* note, gint slide_number) {
+void pdfpc_slides_notes_set_note (pdfpcslides_notes* self, const gchar* note, gint slide_number) {
 	gint _tmp0_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (note != NULL);
@@ -95,7 +95,7 @@ void org_westhoffswelt_pdfpresenter_slides_notes_set_note (orgwesthoffsweltpdfpr
 /**
          * Return the text of a note
          */
-gchar* org_westhoffswelt_pdfpresenter_slides_notes_get_note_for_slide (orgwesthoffsweltpdfpresenterslides_notes* self, gint number) {
+gchar* pdfpc_slides_notes_get_note_for_slide (pdfpcslides_notes* self, gint number) {
 	gchar* result = NULL;
 	gboolean _tmp0_ = FALSE;
 	gint _tmp1_;
@@ -145,7 +145,7 @@ gchar* org_westhoffswelt_pdfpresenter_slides_notes_get_note_for_slide (orgwestho
 /**
          * Does the user want notes?
          */
-gboolean org_westhoffswelt_pdfpresenter_slides_notes_has_notes (orgwesthoffsweltpdfpresenterslides_notes* self) {
+gboolean pdfpc_slides_notes_has_notes (pdfpcslides_notes* self) {
 	gboolean result = FALSE;
 	gchar** _tmp0_;
 	gint _tmp0__length1;
@@ -172,7 +172,7 @@ static gchar string_get (const gchar* self, glong index) {
 }
 
 
-gchar* org_westhoffswelt_pdfpresenter_slides_notes_format_to_save (orgwesthoffsweltpdfpresenterslides_notes* self) {
+gchar* pdfpc_slides_notes_format_to_save (pdfpcslides_notes* self) {
 	gchar* result = NULL;
 	gchar* _tmp0_;
 	gchar* text;
@@ -467,7 +467,7 @@ static gchar* string_substring (const gchar* self, glong offset, glong len) {
 }
 
 
-void org_westhoffswelt_pdfpresenter_slides_notes_parse_lines (orgwesthoffsweltpdfpresenterslides_notes* self, gchar** lines, int lines_length1) {
+void pdfpc_slides_notes_parse_lines (pdfpcslides_notes* self, gchar** lines, int lines_length1) {
 	gint current_slide;
 	gchar* _tmp0_;
 	gchar* current_note;
@@ -576,7 +576,7 @@ void org_westhoffswelt_pdfpresenter_slides_notes_parse_lines (orgwesthoffsweltpd
 					gchar* _tmp34_;
 					_tmp26_ = current_note;
 					_tmp27_ = current_slide;
-					org_westhoffswelt_pdfpresenter_slides_notes_set_note (self, _tmp26_, _tmp27_);
+					pdfpc_slides_notes_set_note (self, _tmp26_, _tmp27_);
 					_tmp28_ = lines;
 					_tmp28__length1 = lines_length1;
 					_tmp29_ = i;
@@ -615,54 +615,54 @@ void org_westhoffswelt_pdfpresenter_slides_notes_parse_lines (orgwesthoffsweltpd
 	}
 	_tmp42_ = current_note;
 	_tmp43_ = current_slide;
-	org_westhoffswelt_pdfpresenter_slides_notes_set_note (self, _tmp42_, _tmp43_);
+	pdfpc_slides_notes_set_note (self, _tmp42_, _tmp43_);
 	_g_free0 (current_note);
 }
 
 
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_slides_notes_construct (GType object_type) {
-	orgwesthoffsweltpdfpresenterslides_notes * self = NULL;
-	self = (orgwesthoffsweltpdfpresenterslides_notes*) g_object_new (object_type, NULL);
+pdfpcslides_notes* pdfpc_slides_notes_construct (GType object_type) {
+	pdfpcslides_notes * self = NULL;
+	self = (pdfpcslides_notes*) g_object_new (object_type, NULL);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_slides_notes_new (void) {
-	return org_westhoffswelt_pdfpresenter_slides_notes_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES);
+pdfpcslides_notes* pdfpc_slides_notes_new (void) {
+	return pdfpc_slides_notes_construct (PDFPC_TYPE_SLIDES_NOTES);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_slides_notes_class_init (orgwesthoffsweltpdfpresenterslides_notesClass * klass) {
-	org_westhoffswelt_pdfpresenter_slides_notes_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_slides_notes_finalize;
+static void pdfpc_slides_notes_class_init (pdfpcslides_notesClass * klass) {
+	pdfpc_slides_notes_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_slides_notes_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_slides_notes_instance_init (orgwesthoffsweltpdfpresenterslides_notes * self) {
+static void pdfpc_slides_notes_instance_init (pdfpcslides_notes * self) {
 	self->notes = NULL;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_slides_notes_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterslides_notes * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES (obj);
+static void pdfpc_slides_notes_finalize (GObject* obj) {
+	pdfpcslides_notes * self;
+	self = PDFPC_SLIDES_NOTES (obj);
 	self->notes = (_vala_array_free (self->notes, self->notes_length1, (GDestroyNotify) g_free), NULL);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_slides_notes_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_slides_notes_parent_class)->finalize (obj);
 }
 
 
 /**
      * Class for providing storage for the notes associate with a presentation
      */
-GType org_westhoffswelt_pdfpresenter_slides_notes_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_slides_notes_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_slides_notes_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterslides_notesClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_slides_notes_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterslides_notes), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_slides_notes_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_slides_notes_type_id;
-		org_westhoffswelt_pdfpresenter_slides_notes_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterslides_notes", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_slides_notes_type_id__volatile, org_westhoffswelt_pdfpresenter_slides_notes_type_id);
+GType pdfpc_slides_notes_get_type (void) {
+	static volatile gsize pdfpc_slides_notes_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_slides_notes_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcslides_notesClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_slides_notes_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcslides_notes), 0, (GInstanceInitFunc) pdfpc_slides_notes_instance_init, NULL };
+		GType pdfpc_slides_notes_type_id;
+		pdfpc_slides_notes_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcslides_notes", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_slides_notes_type_id__volatile, pdfpc_slides_notes_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_slides_notes_type_id__volatile;
+	return pdfpc_slides_notes_type_id__volatile;
 }
 
 

@@ -6,79 +6,79 @@
 #include <glib-object.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS (org_westhoffswelt_pdfpresenter_mutex_locks_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS, orgwesthoffsweltpdfpresenterMutexLocks))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS, orgwesthoffsweltpdfpresenterMutexLocksClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_MUTEX_LOCKS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS, orgwesthoffsweltpdfpresenterMutexLocksClass))
+#define PDFPC_TYPE_MUTEX_LOCKS (pdfpc_mutex_locks_get_type ())
+#define PDFPC_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocks))
+#define PDFPC_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocksClass))
+#define PDFPC_IS_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_MUTEX_LOCKS))
+#define PDFPC_IS_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_MUTEX_LOCKS))
+#define PDFPC_MUTEX_LOCKS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocksClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMutexLocks orgwesthoffsweltpdfpresenterMutexLocks;
-typedef struct _orgwesthoffsweltpdfpresenterMutexLocksClass orgwesthoffsweltpdfpresenterMutexLocksClass;
-typedef struct _orgwesthoffsweltpdfpresenterMutexLocksPrivate orgwesthoffsweltpdfpresenterMutexLocksPrivate;
+typedef struct _pdfpcMutexLocks pdfpcMutexLocks;
+typedef struct _pdfpcMutexLocksClass pdfpcMutexLocksClass;
+typedef struct _pdfpcMutexLocksPrivate pdfpcMutexLocksPrivate;
 #define _g_mutex_free0(var) ((var == NULL) ? NULL : (var = (g_mutex_free (var), NULL)))
 
-struct _orgwesthoffsweltpdfpresenterMutexLocks {
+struct _pdfpcMutexLocks {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterMutexLocksPrivate * priv;
+	pdfpcMutexLocksPrivate * priv;
 };
 
-struct _orgwesthoffsweltpdfpresenterMutexLocksClass {
+struct _pdfpcMutexLocksClass {
 	GObjectClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_mutex_locks_parent_class = NULL;
-extern GMutex* org_westhoffswelt_pdfpresenter_mutex_locks_poppler;
-GMutex* org_westhoffswelt_pdfpresenter_mutex_locks_poppler = NULL;
+static gpointer pdfpc_mutex_locks_parent_class = NULL;
+extern GMutex* pdfpc_mutex_locks_poppler;
+GMutex* pdfpc_mutex_locks_poppler = NULL;
 
-GType org_westhoffswelt_pdfpresenter_mutex_locks_get_type (void) G_GNUC_CONST;
+GType pdfpc_mutex_locks_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_MUTEX_LOCKS_DUMMY_PROPERTY
+	PDFPC_MUTEX_LOCKS_DUMMY_PROPERTY
 };
-void org_westhoffswelt_pdfpresenter_mutex_locks_init (void);
-orgwesthoffsweltpdfpresenterMutexLocks* org_westhoffswelt_pdfpresenter_mutex_locks_new (void);
-orgwesthoffsweltpdfpresenterMutexLocks* org_westhoffswelt_pdfpresenter_mutex_locks_construct (GType object_type);
-static void org_westhoffswelt_pdfpresenter_mutex_locks_finalize (GObject* obj);
+void pdfpc_mutex_locks_init (void);
+pdfpcMutexLocks* pdfpc_mutex_locks_new (void);
+pdfpcMutexLocks* pdfpc_mutex_locks_construct (GType object_type);
+static void pdfpc_mutex_locks_finalize (GObject* obj);
 
 
 /**
          * Initialize all used mutex objects for the first time
          */
-void org_westhoffswelt_pdfpresenter_mutex_locks_init (void) {
+void pdfpc_mutex_locks_init (void) {
 	GMutex* _tmp0_;
 	_tmp0_ = g_mutex_new ();
-	_g_mutex_free0 (org_westhoffswelt_pdfpresenter_mutex_locks_poppler);
-	org_westhoffswelt_pdfpresenter_mutex_locks_poppler = _tmp0_;
+	_g_mutex_free0 (pdfpc_mutex_locks_poppler);
+	pdfpc_mutex_locks_poppler = _tmp0_;
 }
 
 
-orgwesthoffsweltpdfpresenterMutexLocks* org_westhoffswelt_pdfpresenter_mutex_locks_construct (GType object_type) {
-	orgwesthoffsweltpdfpresenterMutexLocks * self = NULL;
-	self = (orgwesthoffsweltpdfpresenterMutexLocks*) g_object_new (object_type, NULL);
+pdfpcMutexLocks* pdfpc_mutex_locks_construct (GType object_type) {
+	pdfpcMutexLocks * self = NULL;
+	self = (pdfpcMutexLocks*) g_object_new (object_type, NULL);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterMutexLocks* org_westhoffswelt_pdfpresenter_mutex_locks_new (void) {
-	return org_westhoffswelt_pdfpresenter_mutex_locks_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_MUTEX_LOCKS);
+pdfpcMutexLocks* pdfpc_mutex_locks_new (void) {
+	return pdfpc_mutex_locks_construct (PDFPC_TYPE_MUTEX_LOCKS);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_mutex_locks_class_init (orgwesthoffsweltpdfpresenterMutexLocksClass * klass) {
-	org_westhoffswelt_pdfpresenter_mutex_locks_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_mutex_locks_finalize;
+static void pdfpc_mutex_locks_class_init (pdfpcMutexLocksClass * klass) {
+	pdfpc_mutex_locks_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_mutex_locks_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_mutex_locks_instance_init (orgwesthoffsweltpdfpresenterMutexLocks * self) {
+static void pdfpc_mutex_locks_instance_init (pdfpcMutexLocks * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_mutex_locks_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterMutexLocks * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_MUTEX_LOCKS (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_mutex_locks_parent_class)->finalize (obj);
+static void pdfpc_mutex_locks_finalize (GObject* obj) {
+	pdfpcMutexLocks * self;
+	self = PDFPC_MUTEX_LOCKS (obj);
+	G_OBJECT_CLASS (pdfpc_mutex_locks_parent_class)->finalize (obj);
 }
 
 
@@ -86,15 +86,15 @@ static void org_westhoffswelt_pdfpresenter_mutex_locks_finalize (GObject* obj) {
      * Static property container holding all mutex locks, which are needed
      * throughout the application.
      */
-GType org_westhoffswelt_pdfpresenter_mutex_locks_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_mutex_locks_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_mutex_locks_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterMutexLocksClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_mutex_locks_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterMutexLocks), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_mutex_locks_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_mutex_locks_type_id;
-		org_westhoffswelt_pdfpresenter_mutex_locks_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterMutexLocks", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_mutex_locks_type_id__volatile, org_westhoffswelt_pdfpresenter_mutex_locks_type_id);
+GType pdfpc_mutex_locks_get_type (void) {
+	static volatile gsize pdfpc_mutex_locks_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_mutex_locks_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcMutexLocksClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_mutex_locks_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcMutexLocks), 0, (GInstanceInitFunc) pdfpc_mutex_locks_instance_init, NULL };
+		GType pdfpc_mutex_locks_type_id;
+		pdfpc_mutex_locks_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcMutexLocks", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_mutex_locks_type_id__volatile, pdfpc_mutex_locks_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_mutex_locks_type_id__volatile;
+	return pdfpc_mutex_locks_type_id__volatile;
 }
 
 

@@ -7,55 +7,55 @@
 #include <gdk/gdk.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_TYPE_BASE (org_westhoffswelt_pdfpresenter_renderer_cache_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_TYPE_BASE, orgwesthoffsweltpdfpresenterRendererCacheBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_TYPE_BASE, orgwesthoffsweltpdfpresenterRendererCacheBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_TYPE_BASE, orgwesthoffsweltpdfpresenterRendererCacheBaseClass))
+#define PDFPC_RENDERER_CACHE_TYPE_BASE (pdfpc_renderer_cache_base_get_type ())
+#define PDFPC_RENDERER_CACHE_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBase))
+#define PDFPC_RENDERER_CACHE_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBaseClass))
+#define PDFPC_RENDERER_CACHE_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE))
+#define PDFPC_RENDERER_CACHE_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_TYPE_BASE))
+#define PDFPC_RENDERER_CACHE_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterRendererCacheBase orgwesthoffsweltpdfpresenterRendererCacheBase;
-typedef struct _orgwesthoffsweltpdfpresenterRendererCacheBaseClass orgwesthoffsweltpdfpresenterRendererCacheBaseClass;
-typedef struct _orgwesthoffsweltpdfpresenterRendererCacheBasePrivate orgwesthoffsweltpdfpresenterRendererCacheBasePrivate;
+typedef struct _pdfpcRendererCacheBase pdfpcRendererCacheBase;
+typedef struct _pdfpcRendererCacheBaseClass pdfpcRendererCacheBaseClass;
+typedef struct _pdfpcRendererCacheBasePrivate pdfpcRendererCacheBasePrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE (org_westhoffswelt_pdfpresenter_metadata_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
+#define PDFPC_METADATA_TYPE_BASE (pdfpc_metadata_base_get_type ())
+#define PDFPC_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBase))
+#define PDFPC_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
+#define PDFPC_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBase orgwesthoffsweltpdfpresenterMetadataBase;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBaseClass orgwesthoffsweltpdfpresenterMetadataBaseClass;
+typedef struct _pdfpcMetadataBase pdfpcMetadataBase;
+typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _orgwesthoffsweltpdfpresenterRendererCacheBase {
+struct _pdfpcRendererCacheBase {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterRendererCacheBasePrivate * priv;
-	orgwesthoffsweltpdfpresenterMetadataBase* metadata;
+	pdfpcRendererCacheBasePrivate * priv;
+	pdfpcMetadataBase* metadata;
 };
 
-struct _orgwesthoffsweltpdfpresenterRendererCacheBaseClass {
+struct _pdfpcRendererCacheBaseClass {
 	GObjectClass parent_class;
-	void (*store) (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index, GdkPixmap* pixmap);
-	GdkPixmap* (*retrieve) (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index);
+	void (*store) (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap);
+	GdkPixmap* (*retrieve) (pdfpcRendererCacheBase* self, guint index);
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_renderer_cache_base_parent_class = NULL;
+static gpointer pdfpc_renderer_cache_base_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_renderer_cache_base_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_metadata_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_renderer_cache_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_DUMMY_PROPERTY
+	PDFPC_RENDERER_CACHE_BASE_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterRendererCacheBase* org_westhoffswelt_pdfpresenter_renderer_cache_base_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataBase* metadata);
-gboolean org_westhoffswelt_pdfpresenter_renderer_cache_base_allows_prerendering (orgwesthoffsweltpdfpresenterRendererCacheBase* self);
-void org_westhoffswelt_pdfpresenter_renderer_cache_base_store (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index, GdkPixmap* pixmap);
-static void org_westhoffswelt_pdfpresenter_renderer_cache_base_real_store (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index, GdkPixmap* pixmap);
-GdkPixmap* org_westhoffswelt_pdfpresenter_renderer_cache_base_retrieve (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index);
-static GdkPixmap* org_westhoffswelt_pdfpresenter_renderer_cache_base_real_retrieve (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index);
-static void org_westhoffswelt_pdfpresenter_renderer_cache_base_finalize (GObject* obj);
+pdfpcRendererCacheBase* pdfpc_renderer_cache_base_construct (GType object_type, pdfpcMetadataBase* metadata);
+gboolean pdfpc_renderer_cache_base_allows_prerendering (pdfpcRendererCacheBase* self);
+void pdfpc_renderer_cache_base_store (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap);
+static void pdfpc_renderer_cache_base_real_store (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap);
+GdkPixmap* pdfpc_renderer_cache_base_retrieve (pdfpcRendererCacheBase* self, guint index);
+static GdkPixmap* pdfpc_renderer_cache_base_real_retrieve (pdfpcRendererCacheBase* self, guint index);
+static void pdfpc_renderer_cache_base_finalize (GObject* obj);
 
 
 /**
@@ -66,12 +66,12 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-orgwesthoffsweltpdfpresenterRendererCacheBase* org_westhoffswelt_pdfpresenter_renderer_cache_base_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataBase* metadata) {
-	orgwesthoffsweltpdfpresenterRendererCacheBase * self = NULL;
-	orgwesthoffsweltpdfpresenterMetadataBase* _tmp0_;
-	orgwesthoffsweltpdfpresenterMetadataBase* _tmp1_;
+pdfpcRendererCacheBase* pdfpc_renderer_cache_base_construct (GType object_type, pdfpcMetadataBase* metadata) {
+	pdfpcRendererCacheBase * self = NULL;
+	pdfpcMetadataBase* _tmp0_;
+	pdfpcMetadataBase* _tmp1_;
 	g_return_val_if_fail (metadata != NULL, NULL);
-	self = (orgwesthoffsweltpdfpresenterRendererCacheBase*) g_object_new (object_type, NULL);
+	self = (pdfpcRendererCacheBase*) g_object_new (object_type, NULL);
 	_tmp0_ = metadata;
 	_tmp1_ = _g_object_ref0 (_tmp0_);
 	_g_object_unref0 (self->metadata);
@@ -88,7 +88,7 @@ orgwesthoffsweltpdfpresenterRendererCacheBase* org_westhoffswelt_pdfpresenter_re
          * Therefore it can be disabled by overriding this method and returning
          * false.
          */
-gboolean org_westhoffswelt_pdfpresenter_renderer_cache_base_allows_prerendering (orgwesthoffsweltpdfpresenterRendererCacheBase* self) {
+gboolean pdfpc_renderer_cache_base_allows_prerendering (pdfpcRendererCacheBase* self) {
 	gboolean result = FALSE;
 	g_return_val_if_fail (self != NULL, FALSE);
 	result = TRUE;
@@ -99,15 +99,15 @@ gboolean org_westhoffswelt_pdfpresenter_renderer_cache_base_allows_prerendering 
 /**
          * Store a pixmap in the cache using the given index as identifier
          */
-static void org_westhoffswelt_pdfpresenter_renderer_cache_base_real_store (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index, GdkPixmap* pixmap) {
-	g_critical ("Type `%s' does not implement abstract method `org_westhoffswelt_pdfpresenter_renderer_cache_base_store'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
+static void pdfpc_renderer_cache_base_real_store (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap) {
+	g_critical ("Type `%s' does not implement abstract method `pdfpc_renderer_cache_base_store'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
 	return;
 }
 
 
-void org_westhoffswelt_pdfpresenter_renderer_cache_base_store (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index, GdkPixmap* pixmap) {
+void pdfpc_renderer_cache_base_store (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_GET_CLASS (self)->store (self, index, pixmap);
+	PDFPC_RENDERER_CACHE_BASE_GET_CLASS (self)->store (self, index, pixmap);
 }
 
 
@@ -116,35 +116,35 @@ void org_westhoffswelt_pdfpresenter_renderer_cache_base_store (orgwesthoffsweltp
          *
          * If no item with the given index is available null is returned
          */
-static GdkPixmap* org_westhoffswelt_pdfpresenter_renderer_cache_base_real_retrieve (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index) {
-	g_critical ("Type `%s' does not implement abstract method `org_westhoffswelt_pdfpresenter_renderer_cache_base_retrieve'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
+static GdkPixmap* pdfpc_renderer_cache_base_real_retrieve (pdfpcRendererCacheBase* self, guint index) {
+	g_critical ("Type `%s' does not implement abstract method `pdfpc_renderer_cache_base_retrieve'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
 	return NULL;
 }
 
 
-GdkPixmap* org_westhoffswelt_pdfpresenter_renderer_cache_base_retrieve (orgwesthoffsweltpdfpresenterRendererCacheBase* self, guint index) {
+GdkPixmap* pdfpc_renderer_cache_base_retrieve (pdfpcRendererCacheBase* self, guint index) {
 	g_return_val_if_fail (self != NULL, NULL);
-	return ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_GET_CLASS (self)->retrieve (self, index);
+	return PDFPC_RENDERER_CACHE_BASE_GET_CLASS (self)->retrieve (self, index);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_renderer_cache_base_class_init (orgwesthoffsweltpdfpresenterRendererCacheBaseClass * klass) {
-	org_westhoffswelt_pdfpresenter_renderer_cache_base_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_CLASS (klass)->store = org_westhoffswelt_pdfpresenter_renderer_cache_base_real_store;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE_CLASS (klass)->retrieve = org_westhoffswelt_pdfpresenter_renderer_cache_base_real_retrieve;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_renderer_cache_base_finalize;
+static void pdfpc_renderer_cache_base_class_init (pdfpcRendererCacheBaseClass * klass) {
+	pdfpc_renderer_cache_base_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_RENDERER_CACHE_BASE_CLASS (klass)->store = pdfpc_renderer_cache_base_real_store;
+	PDFPC_RENDERER_CACHE_BASE_CLASS (klass)->retrieve = pdfpc_renderer_cache_base_real_retrieve;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_renderer_cache_base_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_renderer_cache_base_instance_init (orgwesthoffsweltpdfpresenterRendererCacheBase * self) {
+static void pdfpc_renderer_cache_base_instance_init (pdfpcRendererCacheBase * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_renderer_cache_base_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterRendererCacheBase * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_BASE (obj);
+static void pdfpc_renderer_cache_base_finalize (GObject* obj) {
+	pdfpcRendererCacheBase * self;
+	self = PDFPC_RENDERER_CACHE_BASE (obj);
 	_g_object_unref0 (self->metadata);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_renderer_cache_base_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_renderer_cache_base_parent_class)->finalize (obj);
 }
 
 
@@ -152,15 +152,15 @@ static void org_westhoffswelt_pdfpresenter_renderer_cache_base_finalize (GObject
      * Base Cache store interface which needs to be implemented by every
      * working cache.
      */
-GType org_westhoffswelt_pdfpresenter_renderer_cache_base_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterRendererCacheBaseClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_renderer_cache_base_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterRendererCacheBase), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_renderer_cache_base_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id;
-		org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterRendererCacheBase", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id__volatile, org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id);
+GType pdfpc_renderer_cache_base_get_type (void) {
+	static volatile gsize pdfpc_renderer_cache_base_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_renderer_cache_base_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcRendererCacheBaseClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_renderer_cache_base_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcRendererCacheBase), 0, (GInstanceInitFunc) pdfpc_renderer_cache_base_instance_init, NULL };
+		GType pdfpc_renderer_cache_base_type_id;
+		pdfpc_renderer_cache_base_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcRendererCacheBase", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
+		g_once_init_leave (&pdfpc_renderer_cache_base_type_id__volatile, pdfpc_renderer_cache_base_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_renderer_cache_base_type_id__volatile;
+	return pdfpc_renderer_cache_base_type_id__volatile;
 }
 
 

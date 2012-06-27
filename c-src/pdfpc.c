@@ -11,188 +11,234 @@
 #include <gdk/gdk.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION (org_westhoffswelt_pdfpresenter_application_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION, orgwesthoffsweltpdfpresenterApplication))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION, orgwesthoffsweltpdfpresenterApplicationClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION, orgwesthoffsweltpdfpresenterApplicationClass))
+#define PDFPC_TYPE_APPLICATION (pdfpc_application_get_type ())
+#define PDFPC_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_APPLICATION, pdfpcApplication))
+#define PDFPC_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_APPLICATION, pdfpcApplicationClass))
+#define PDFPC_IS_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_APPLICATION))
+#define PDFPC_IS_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_APPLICATION))
+#define PDFPC_APPLICATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_APPLICATION, pdfpcApplicationClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterApplication orgwesthoffsweltpdfpresenterApplication;
-typedef struct _orgwesthoffsweltpdfpresenterApplicationClass orgwesthoffsweltpdfpresenterApplicationClass;
-typedef struct _orgwesthoffsweltpdfpresenterApplicationPrivate orgwesthoffsweltpdfpresenterApplicationPrivate;
+typedef struct _pdfpcApplication pdfpcApplication;
+typedef struct _pdfpcApplicationClass pdfpcApplicationClass;
+typedef struct _pdfpcApplicationPrivate pdfpcApplicationPrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN (org_westhoffswelt_pdfpresenter_window_fullscreen_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, orgwesthoffsweltpdfpresenterWindowFullscreen))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, orgwesthoffsweltpdfpresenterWindowFullscreenClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, orgwesthoffsweltpdfpresenterWindowFullscreenClass))
+#define PDFPC_WINDOW_TYPE_FULLSCREEN (pdfpc_window_fullscreen_get_type ())
+#define PDFPC_WINDOW_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreen))
+#define PDFPC_WINDOW_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreenClass))
+#define PDFPC_WINDOW_IS_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN))
+#define PDFPC_WINDOW_IS_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_WINDOW_TYPE_FULLSCREEN))
+#define PDFPC_WINDOW_FULLSCREEN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreenClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterWindowFullscreen orgwesthoffsweltpdfpresenterWindowFullscreen;
-typedef struct _orgwesthoffsweltpdfpresenterWindowFullscreenClass orgwesthoffsweltpdfpresenterWindowFullscreenClass;
+typedef struct _pdfpcWindowFullscreen pdfpcWindowFullscreen;
+typedef struct _pdfpcWindowFullscreenClass pdfpcWindowFullscreenClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTATION (org_westhoffswelt_pdfpresenter_window_presentation_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_PRESENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTATION, orgwesthoffsweltpdfpresenterWindowPresentation))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_PRESENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTATION, orgwesthoffsweltpdfpresenterWindowPresentationClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_PRESENTATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTATION))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_PRESENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTATION))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_PRESENTATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTATION, orgwesthoffsweltpdfpresenterWindowPresentationClass))
+#define PDFPC_WINDOW_TYPE_PRESENTATION (pdfpc_window_presentation_get_type ())
+#define PDFPC_WINDOW_PRESENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_PRESENTATION, pdfpcWindowPresentation))
+#define PDFPC_WINDOW_PRESENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_WINDOW_TYPE_PRESENTATION, pdfpcWindowPresentationClass))
+#define PDFPC_WINDOW_IS_PRESENTATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_WINDOW_TYPE_PRESENTATION))
+#define PDFPC_WINDOW_IS_PRESENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_WINDOW_TYPE_PRESENTATION))
+#define PDFPC_WINDOW_PRESENTATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_WINDOW_TYPE_PRESENTATION, pdfpcWindowPresentationClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterWindowPresentation orgwesthoffsweltpdfpresenterWindowPresentation;
-typedef struct _orgwesthoffsweltpdfpresenterWindowPresentationClass orgwesthoffsweltpdfpresenterWindowPresentationClass;
+typedef struct _pdfpcWindowPresentation pdfpcWindowPresentation;
+typedef struct _pdfpcWindowPresentationClass pdfpcWindowPresentationClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTER (org_westhoffswelt_pdfpresenter_window_presenter_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_PRESENTER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTER, orgwesthoffsweltpdfpresenterWindowPresenter))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_PRESENTER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTER, orgwesthoffsweltpdfpresenterWindowPresenterClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_PRESENTER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_PRESENTER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_PRESENTER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_PRESENTER, orgwesthoffsweltpdfpresenterWindowPresenterClass))
+#define PDFPC_WINDOW_TYPE_PRESENTER (pdfpc_window_presenter_get_type ())
+#define PDFPC_WINDOW_PRESENTER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_PRESENTER, pdfpcWindowPresenter))
+#define PDFPC_WINDOW_PRESENTER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_WINDOW_TYPE_PRESENTER, pdfpcWindowPresenterClass))
+#define PDFPC_WINDOW_IS_PRESENTER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_WINDOW_TYPE_PRESENTER))
+#define PDFPC_WINDOW_IS_PRESENTER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_WINDOW_TYPE_PRESENTER))
+#define PDFPC_WINDOW_PRESENTER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_WINDOW_TYPE_PRESENTER, pdfpcWindowPresenterClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterWindowPresenter orgwesthoffsweltpdfpresenterWindowPresenter;
-typedef struct _orgwesthoffsweltpdfpresenterWindowPresenterClass orgwesthoffsweltpdfpresenterWindowPresenterClass;
+typedef struct _pdfpcWindowPresenter pdfpcWindowPresenter;
+typedef struct _pdfpcWindowPresenterClass pdfpcWindowPresenterClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER (org_westhoffswelt_pdfpresenter_presentation_controller_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationController))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
+#define PDFPC_TYPE_PRESENTATION_CONTROLLER (pdfpc_presentation_controller_get_type ())
+#define PDFPC_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationController))
+#define PDFPC_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
+#define PDFPC_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterPresentationController orgwesthoffsweltpdfpresenterPresentationController;
-typedef struct _orgwesthoffsweltpdfpresenterPresentationControllerClass orgwesthoffsweltpdfpresenterPresentationControllerClass;
+typedef struct _pdfpcPresentationController pdfpcPresentationController;
+typedef struct _pdfpcPresentationControllerClass pdfpcPresentationControllerClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CACHE_STATUS (org_westhoffswelt_pdfpresenter_cache_status_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CACHE_STATUS, orgwesthoffsweltpdfpresenterCacheStatus))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CACHE_STATUS, orgwesthoffsweltpdfpresenterCacheStatusClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CACHE_STATUS))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CACHE_STATUS))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CACHE_STATUS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CACHE_STATUS, orgwesthoffsweltpdfpresenterCacheStatusClass))
+#define PDFPC_TYPE_CACHE_STATUS (pdfpc_cache_status_get_type ())
+#define PDFPC_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatus))
+#define PDFPC_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatusClass))
+#define PDFPC_IS_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CACHE_STATUS))
+#define PDFPC_IS_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_CACHE_STATUS))
+#define PDFPC_CACHE_STATUS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatusClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterCacheStatus orgwesthoffsweltpdfpresenterCacheStatus;
-typedef struct _orgwesthoffsweltpdfpresenterCacheStatusClass orgwesthoffsweltpdfpresenterCacheStatusClass;
+typedef struct _pdfpcCacheStatus pdfpcCacheStatus;
+typedef struct _pdfpcCacheStatusClass pdfpcCacheStatusClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
-#define _org_westhoffswelt_pdfpresenter_cache_status_unref0(var) ((var == NULL) ? NULL : (var = (org_westhoffswelt_pdfpresenter_cache_status_unref (var), NULL)))
+#define _pdfpc_cache_status_unref0(var) ((var == NULL) ? NULL : (var = (pdfpc_cache_status_unref (var), NULL)))
 #define _g_option_context_free0(var) ((var == NULL) ? NULL : (var = (g_option_context_free (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
 #define _g_error_free0(var) ((var == NULL) ? NULL : (var = (g_error_free (var), NULL)))
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE (org_westhoffswelt_pdfpresenter_metadata_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
+#define PDFPC_METADATA_TYPE_BASE (pdfpc_metadata_base_get_type ())
+#define PDFPC_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBase))
+#define PDFPC_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
+#define PDFPC_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBase orgwesthoffsweltpdfpresenterMetadataBase;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBaseClass orgwesthoffsweltpdfpresenterMetadataBaseClass;
+typedef struct _pdfpcMetadataBase pdfpcMetadataBase;
+typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF (org_westhoffswelt_pdfpresenter_metadata_pdf_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdf))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfClass))
+#define PDFPC_METADATA_TYPE_PDF (pdfpc_metadata_pdf_get_type ())
+#define PDFPC_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdf))
+#define PDFPC_METADATA_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfClass))
+#define PDFPC_METADATA_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_PDF))
+#define PDFPC_METADATA_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_PDF))
+#define PDFPC_METADATA_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdf orgwesthoffsweltpdfpresenterMetadataPdf;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdfClass orgwesthoffsweltpdfpresenterMetadataPdfClass;
+typedef struct _pdfpcMetadataPdf pdfpcMetadataPdf;
+typedef struct _pdfpcMetadataPdfClass pdfpcMetadataPdfClass;
 
-struct _orgwesthoffsweltpdfpresenterApplication {
+#define PDFPC_TYPE_CONFIG_FILE_READER (pdfpc_config_file_reader_get_type ())
+#define PDFPC_CONFIG_FILE_READER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReader))
+#define PDFPC_CONFIG_FILE_READER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReaderClass))
+#define PDFPC_IS_CONFIG_FILE_READER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONFIG_FILE_READER))
+#define PDFPC_IS_CONFIG_FILE_READER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_CONFIG_FILE_READER))
+#define PDFPC_CONFIG_FILE_READER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReaderClass))
+
+typedef struct _pdfpcConfigFileReader pdfpcConfigFileReader;
+typedef struct _pdfpcConfigFileReaderClass pdfpcConfigFileReaderClass;
+
+#define PDFPC_TYPE_CONTROLLABLE (pdfpc_controllable_get_type ())
+#define PDFPC_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllable))
+#define PDFPC_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONTROLLABLE))
+#define PDFPC_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllableIface))
+
+typedef struct _pdfpcControllable pdfpcControllable;
+typedef struct _pdfpcControllableIface pdfpcControllableIface;
+#define _pdfpc_config_file_reader_unref0(var) ((var == NULL) ? NULL : (var = (pdfpc_config_file_reader_unref (var), NULL)))
+
+struct _pdfpcApplication {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterApplicationPrivate * priv;
+	pdfpcApplicationPrivate * priv;
 };
 
-struct _orgwesthoffsweltpdfpresenterApplicationClass {
+struct _pdfpcApplicationClass {
 	GObjectClass parent_class;
 };
 
-struct _orgwesthoffsweltpdfpresenterApplicationPrivate {
-	orgwesthoffsweltpdfpresenterWindowPresentation* presentation_window;
-	orgwesthoffsweltpdfpresenterWindowPresenter* presenter_window;
-	orgwesthoffsweltpdfpresenterPresentationController* controller;
-	orgwesthoffsweltpdfpresenterCacheStatus* cache_status;
+struct _pdfpcApplicationPrivate {
+	pdfpcWindowPresentation* presentation_window;
+	pdfpcWindowPresenter* presenter_window;
+	pdfpcPresentationController* controller;
+	pdfpcCacheStatus* cache_status;
+};
+
+struct _pdfpcControllableIface {
+	GTypeInterface parent_iface;
+	pdfpcPresentationController* (*get_controller) (pdfpcControllable* self);
+	void (*update) (pdfpcControllable* self);
+	void (*edit_note) (pdfpcControllable* self);
+	void (*ask_goto_page) (pdfpcControllable* self);
+	void (*show_overview) (pdfpcControllable* self);
+	void (*hide_overview) (pdfpcControllable* self);
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_application_parent_class = NULL;
-extern guint org_westhoffswelt_pdfpresenter_options_duration;
-extern gchar* org_westhoffswelt_pdfpresenter_options_end_time;
-extern guint org_westhoffswelt_pdfpresenter_options_last_minutes;
-extern gchar* org_westhoffswelt_pdfpresenter_options_start_time;
-extern guint org_westhoffswelt_pdfpresenter_options_current_size;
-extern gint org_westhoffswelt_pdfpresenter_options_min_overview_width;
-extern gboolean org_westhoffswelt_pdfpresenter_options_display_switch;
-extern gboolean org_westhoffswelt_pdfpresenter_options_disable_caching;
-extern gboolean org_westhoffswelt_pdfpresenter_options_disable_cache_compression;
-extern gboolean org_westhoffswelt_pdfpresenter_options_black_on_end;
-extern gboolean org_westhoffswelt_pdfpresenter_options_single_screen;
+static gpointer pdfpc_application_parent_class = NULL;
+extern guint pdfpc_options_duration;
+extern gchar* pdfpc_options_end_time;
+extern guint pdfpc_options_last_minutes;
+extern gchar* pdfpc_options_start_time;
+extern guint pdfpc_options_current_size;
+extern gint pdfpc_options_min_overview_width;
+extern gboolean pdfpc_options_display_switch;
+extern gboolean pdfpc_options_disable_caching;
+extern gboolean pdfpc_options_disable_cache_compression;
+extern gboolean pdfpc_options_black_on_end;
+extern gboolean pdfpc_options_single_screen;
+extern gboolean pdfpc_options_list_actions;
+extern gboolean pdfpc_options_windowed;
 
-GType org_westhoffswelt_pdfpresenter_application_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_window_fullscreen_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_window_presentation_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_window_presenter_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_presentation_controller_get_type (void) G_GNUC_CONST;
-gpointer org_westhoffswelt_pdfpresenter_cache_status_ref (gpointer instance);
-void org_westhoffswelt_pdfpresenter_cache_status_unref (gpointer instance);
-GParamSpec* org_westhoffswelt_pdfpresenter_param_spec_cache_status (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
-void org_westhoffswelt_pdfpresenter_value_set_cache_status (GValue* value, gpointer v_object);
-void org_westhoffswelt_pdfpresenter_value_take_cache_status (GValue* value, gpointer v_object);
-gpointer org_westhoffswelt_pdfpresenter_value_get_cache_status (const GValue* value);
-GType org_westhoffswelt_pdfpresenter_cache_status_get_type (void) G_GNUC_CONST;
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION, orgwesthoffsweltpdfpresenterApplicationPrivate))
+GType pdfpc_application_get_type (void) G_GNUC_CONST;
+GType pdfpc_window_fullscreen_get_type (void) G_GNUC_CONST;
+GType pdfpc_window_presentation_get_type (void) G_GNUC_CONST;
+GType pdfpc_window_presenter_get_type (void) G_GNUC_CONST;
+GType pdfpc_presentation_controller_get_type (void) G_GNUC_CONST;
+gpointer pdfpc_cache_status_ref (gpointer instance);
+void pdfpc_cache_status_unref (gpointer instance);
+GParamSpec* pdfpc_param_spec_cache_status (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void pdfpc_value_set_cache_status (GValue* value, gpointer v_object);
+void pdfpc_value_take_cache_status (GValue* value, gpointer v_object);
+gpointer pdfpc_value_get_cache_status (const GValue* value);
+GType pdfpc_cache_status_get_type (void) G_GNUC_CONST;
+#define PDFPC_APPLICATION_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), PDFPC_TYPE_APPLICATION, pdfpcApplicationPrivate))
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_DUMMY_PROPERTY
+	PDFPC_APPLICATION_DUMMY_PROPERTY
 };
-void org_westhoffswelt_pdfpresenter_application_parse_command_line_options (orgwesthoffsweltpdfpresenterApplication* self, gchar** args, int args_length1);
-GType org_westhoffswelt_pdfpresenter_metadata_base_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_metadata_pdf_get_type (void) G_GNUC_CONST;
-static orgwesthoffsweltpdfpresenterWindowPresenter* org_westhoffswelt_pdfpresenter_application_create_presenter_window (orgwesthoffsweltpdfpresenterApplication* self, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint monitor);
-orgwesthoffsweltpdfpresenterWindowPresenter* org_westhoffswelt_pdfpresenter_window_presenter_new (orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint screen_num, orgwesthoffsweltpdfpresenterPresentationController* presentation_controller);
-orgwesthoffsweltpdfpresenterWindowPresenter* org_westhoffswelt_pdfpresenter_window_presenter_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint screen_num, orgwesthoffsweltpdfpresenterPresentationController* presentation_controller);
-void org_westhoffswelt_pdfpresenter_window_presenter_set_cache_observer (orgwesthoffsweltpdfpresenterWindowPresenter* self, orgwesthoffsweltpdfpresenterCacheStatus* observer);
-static orgwesthoffsweltpdfpresenterWindowPresentation* org_westhoffswelt_pdfpresenter_application_create_presentation_window (orgwesthoffsweltpdfpresenterApplication* self, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint monitor);
-orgwesthoffsweltpdfpresenterWindowPresentation* org_westhoffswelt_pdfpresenter_window_presentation_new (orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint screen_num, orgwesthoffsweltpdfpresenterPresentationController* presentation_controller);
-orgwesthoffsweltpdfpresenterWindowPresentation* org_westhoffswelt_pdfpresenter_window_presentation_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint screen_num, orgwesthoffsweltpdfpresenterPresentationController* presentation_controller);
-void org_westhoffswelt_pdfpresenter_window_presentation_set_cache_observer (orgwesthoffsweltpdfpresenterWindowPresentation* self, orgwesthoffsweltpdfpresenterCacheStatus* observer);
-void org_westhoffswelt_pdfpresenter_application_run (orgwesthoffsweltpdfpresenterApplication* self, gchar** args, int args_length1);
-void org_westhoffswelt_pdfpresenter_mutex_locks_init (void);
-orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata_pdf_new (const gchar* fname);
-orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata_pdf_construct (GType object_type, const gchar* fname);
-void org_westhoffswelt_pdfpresenter_metadata_pdf_set_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self, guint d);
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_presentation_controller_new (orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gboolean allow_black_on_end);
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_presentation_controller_construct (GType object_type, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gboolean allow_black_on_end);
-orgwesthoffsweltpdfpresenterCacheStatus* org_westhoffswelt_pdfpresenter_cache_status_new (void);
-orgwesthoffsweltpdfpresenterCacheStatus* org_westhoffswelt_pdfpresenter_cache_status_construct (GType object_type);
-gint org_westhoffswelt_pdfpresenter_application_main (gchar** args, int args_length1);
-orgwesthoffsweltpdfpresenterApplication* org_westhoffswelt_pdfpresenter_application_new (void);
-orgwesthoffsweltpdfpresenterApplication* org_westhoffswelt_pdfpresenter_application_construct (GType object_type);
-static void org_westhoffswelt_pdfpresenter_application_finalize (GObject* obj);
+gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gchar** args, int args_length1);
+GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_metadata_pdf_get_type (void) G_GNUC_CONST;
+static pdfpcWindowPresenter* pdfpc_application_create_presenter_window (pdfpcApplication* self, pdfpcMetadataPdf* metadata, gint monitor);
+pdfpcWindowPresenter* pdfpc_window_presenter_new (pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
+pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
+void pdfpc_window_presenter_set_cache_observer (pdfpcWindowPresenter* self, pdfpcCacheStatus* observer);
+static pdfpcWindowPresentation* pdfpc_application_create_presentation_window (pdfpcApplication* self, pdfpcMetadataPdf* metadata, gint monitor);
+pdfpcWindowPresentation* pdfpc_window_presentation_new (pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
+pdfpcWindowPresentation* pdfpc_window_presentation_construct (GType object_type, pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
+void pdfpc_window_presentation_set_cache_observer (pdfpcWindowPresentation* self, pdfpcCacheStatus* observer);
+void pdfpc_application_run (pdfpcApplication* self, gchar** args, int args_length1);
+gchar** pdfpc_presentation_controller_getActionDescriptions (int* result_length1);
+void pdfpc_mutex_locks_init (void);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_new (const gchar* fname);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_construct (GType object_type, const gchar* fname);
+void pdfpc_metadata_pdf_set_duration (pdfpcMetadataPdf* self, guint d);
+pdfpcPresentationController* pdfpc_presentation_controller_new (pdfpcMetadataPdf* metadata, gboolean allow_black_on_end);
+pdfpcPresentationController* pdfpc_presentation_controller_construct (GType object_type, pdfpcMetadataPdf* metadata, gboolean allow_black_on_end);
+pdfpcCacheStatus* pdfpc_cache_status_new (void);
+pdfpcCacheStatus* pdfpc_cache_status_construct (GType object_type);
+pdfpcConfigFileReader* pdfpc_config_file_reader_new (pdfpcPresentationController* controller);
+pdfpcConfigFileReader* pdfpc_config_file_reader_construct (GType object_type, pdfpcPresentationController* controller);
+gpointer pdfpc_config_file_reader_ref (gpointer instance);
+void pdfpc_config_file_reader_unref (gpointer instance);
+GParamSpec* pdfpc_param_spec_config_file_reader (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void pdfpc_value_set_config_file_reader (GValue* value, gpointer v_object);
+void pdfpc_value_take_config_file_reader (GValue* value, gpointer v_object);
+gpointer pdfpc_value_get_config_file_reader (const GValue* value);
+GType pdfpc_config_file_reader_get_type (void) G_GNUC_CONST;
+void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gchar* fname);
+#define etc_path "/etc"
+GType pdfpc_controllable_get_type (void) G_GNUC_CONST;
+void pdfpc_controllable_update (pdfpcControllable* self);
+gint pdfpc_application_main (gchar** args, int args_length1);
+pdfpcApplication* pdfpc_application_new (void);
+pdfpcApplication* pdfpc_application_construct (GType object_type);
+static void pdfpc_application_finalize (GObject* obj);
+static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
+static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
 
-static const GOptionEntry ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_options[13] = {{"duration", 'd', 0, G_OPTION_ARG_INT, &org_westhoffswelt_pdfpresenter_options_duration, "Duration in minutes of the presentation used for timer display.", "N"}, {"end-time", 'e', 0, G_OPTION_ARG_STRING, &org_westhoffswelt_pdfpresenter_options_end_time, "End time of the presentation. (Format: HH:MM (24h))", "T"}, {"last-minutes", 'l', 0, G_OPTION_ARG_INT, &org_westhoffswelt_pdfpresenter_options_last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5" \
-" minutes)", "N"}, {"start-time", 't', 0, G_OPTION_ARG_STRING, &org_westhoffswelt_pdfpresenter_options_start_time, "Start time of the presentation to be used as a countdown. (Format: HH:" \
-"MM (24h))", "T"}, {"last-minutes", 'l', 0, G_OPTION_ARG_INT, &org_westhoffswelt_pdfpresenter_options_last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5" \
-" minutes)", "N"}, {"current-size", 'u', 0, G_OPTION_ARG_INT, &org_westhoffswelt_pdfpresenter_options_current_size, "Percentage of the presenter screen to be used for the current slide. (" \
-"Default 60)", "N"}, {"overview-min-size", 'o', 0, G_OPTION_ARG_INT, &org_westhoffswelt_pdfpresenter_options_min_overview_width, "Minimum width for the overview miniatures, in pixels. (Default 150)", "N"}, {"switch-screens", 's', 0, 0, &org_westhoffswelt_pdfpresenter_options_display_switch, "Switch the presentation and the presenter screen.", NULL}, {"disable-cache", 'c', 0, 0, &org_westhoffswelt_pdfpresenter_options_disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost" \
-" of speed.", NULL}, {"disable-compression", 'z', 0, 0, &org_westhoffswelt_pdfpresenter_options_disable_cache_compression, "Disable the compression of slide images to trade memory consumption fo" \
-"r speed. (Avg. factor 30)", NULL}, {"black-on-end", 'b', 0, 0, &org_westhoffswelt_pdfpresenter_options_black_on_end, "Add an additional black slide at the end of the presentation", NULL}, {"single-screen", 'S', 0, 0, &org_westhoffswelt_pdfpresenter_options_single_screen, "Force to use only one screen", NULL}, {NULL}};
+static const GOptionEntry PDFPC_APPLICATION_options[14] = {{"duration", 'd', 0, G_OPTION_ARG_INT, &pdfpc_options_duration, "Duration in minutes of the presentation used for timer display.", "N"}, {"end-time", 'e', 0, G_OPTION_ARG_STRING, &pdfpc_options_end_time, "End time of the presentation. (Format: HH:MM (24h))", "T"}, {"last-minutes", 'l', 0, G_OPTION_ARG_INT, &pdfpc_options_last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5" \
+" minutes)", "N"}, {"start-time", 't', 0, G_OPTION_ARG_STRING, &pdfpc_options_start_time, "Start time of the presentation to be used as a countdown. (Format: HH:" \
+"MM (24h))", "T"}, {"current-size", 'u', 0, G_OPTION_ARG_INT, &pdfpc_options_current_size, "Percentage of the presenter screen to be used for the current slide. (" \
+"Default 60)", "N"}, {"overview-min-size", 'o', 0, G_OPTION_ARG_INT, &pdfpc_options_min_overview_width, "Minimum width for the overview miniatures, in pixels. (Default 150)", "N"}, {"switch-screens", 's', 0, 0, &pdfpc_options_display_switch, "Switch the presentation and the presenter screen.", NULL}, {"disable-cache", 'c', 0, 0, &pdfpc_options_disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost" \
+" of speed.", NULL}, {"disable-compression", 'z', 0, 0, &pdfpc_options_disable_cache_compression, "Disable the compression of slide images to trade memory consumption fo" \
+"r speed. (Avg. factor 30)", NULL}, {"black-on-end", 'b', 0, 0, &pdfpc_options_black_on_end, "Add an additional black slide at the end of the presentation", NULL}, {"single-screen", 'S', 0, 0, &pdfpc_options_single_screen, "Force to use only one screen", NULL}, {"list-actions", 'L', 0, 0, &pdfpc_options_list_actions, "List actions supported in the config file(s)", NULL}, {"windowed", 'w', 0, 0, &pdfpc_options_windowed, "Run in windowed mode (devel tool)", NULL}, {NULL}};
 
 /**
          * Parse the commandline and apply all found options to there according
          * static class members.
          *
-         * On error the usage help is shown and the application terminated with an
-         * errorcode 1
+ * Returns the name of the pdf file to open (or null if not present)
          */
-void org_westhoffswelt_pdfpresenter_application_parse_command_line_options (orgwesthoffsweltpdfpresenterApplication* self, gchar** args, int args_length1) {
+gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gchar** args, int args_length1) {
+	gchar* result = NULL;
 	GOptionContext* _tmp0_;
 	GOptionContext* context;
 	gchar** _tmp7_;
 	gint _tmp7__length1;
 	GError * _inner_error_ = NULL;
-	g_return_if_fail (self != NULL);
+	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = g_option_context_new ("<pdf-file>");
 	context = _tmp0_;
-	g_option_context_add_main_entries (context, ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_options, NULL);
+	g_option_context_add_main_entries (context, PDFPC_APPLICATION_options, NULL);
 	{
 		g_option_context_parse (context, &args_length1, &args, &_inner_error_);
 		if (_inner_error_ != NULL) {
@@ -202,7 +248,7 @@ void org_westhoffswelt_pdfpresenter_application_parse_command_line_options (orgw
 			_g_option_context_free0 (context);
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
-			return;
+			return NULL;
 		}
 	}
 	goto __finally0;
@@ -234,20 +280,26 @@ void org_westhoffswelt_pdfpresenter_application_parse_command_line_options (orgw
 		_g_option_context_free0 (context);
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
-		return;
+		return NULL;
 	}
 	_tmp7_ = args;
 	_tmp7__length1 = args_length1;
-	if (_tmp7__length1 != 2) {
-		FILE* _tmp8_;
-		gchar* _tmp9_ = NULL;
+	if (_tmp7__length1 < 2) {
+		result = NULL;
+		_g_option_context_free0 (context);
+		return result;
+	} else {
+		gchar** _tmp8_;
+		gint _tmp8__length1;
+		const gchar* _tmp9_;
 		gchar* _tmp10_;
-		_tmp8_ = stderr;
-		_tmp9_ = g_option_context_get_help (context, TRUE, NULL);
-		_tmp10_ = _tmp9_;
-		fprintf (_tmp8_, "%s", _tmp10_);
-		_g_free0 (_tmp10_);
-		exit (1);
+		_tmp8_ = args;
+		_tmp8__length1 = args_length1;
+		_tmp9_ = _tmp8_[1];
+		_tmp10_ = g_strdup (_tmp9_);
+		result = _tmp10_;
+		_g_option_context_free0 (context);
+		return result;
 	}
 	_g_option_context_free0 (context);
 }
@@ -257,25 +309,25 @@ void org_westhoffswelt_pdfpresenter_application_parse_command_line_options (orgw
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
-static orgwesthoffsweltpdfpresenterWindowPresenter* org_westhoffswelt_pdfpresenter_application_create_presenter_window (orgwesthoffsweltpdfpresenterApplication* self, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint monitor) {
-	orgwesthoffsweltpdfpresenterWindowPresenter* result = NULL;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp0_;
+static pdfpcWindowPresenter* pdfpc_application_create_presenter_window (pdfpcApplication* self, pdfpcMetadataPdf* metadata, gint monitor) {
+	pdfpcWindowPresenter* result = NULL;
+	pdfpcMetadataPdf* _tmp0_;
 	gint _tmp1_;
-	orgwesthoffsweltpdfpresenterPresentationController* _tmp2_;
-	orgwesthoffsweltpdfpresenterWindowPresenter* _tmp3_;
-	orgwesthoffsweltpdfpresenterWindowPresenter* _tmp4_;
-	orgwesthoffsweltpdfpresenterWindowPresenter* presenter_window;
-	orgwesthoffsweltpdfpresenterCacheStatus* _tmp5_;
+	pdfpcPresentationController* _tmp2_;
+	pdfpcWindowPresenter* _tmp3_;
+	pdfpcWindowPresenter* _tmp4_;
+	pdfpcWindowPresenter* presenter_window;
+	pdfpcCacheStatus* _tmp5_;
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (metadata != NULL, NULL);
 	_tmp0_ = metadata;
 	_tmp1_ = monitor;
 	_tmp2_ = self->priv->controller;
-	_tmp3_ = org_westhoffswelt_pdfpresenter_window_presenter_new (_tmp0_, _tmp1_, _tmp2_);
+	_tmp3_ = pdfpc_window_presenter_new (_tmp0_, _tmp1_, _tmp2_);
 	_tmp4_ = g_object_ref_sink (_tmp3_);
 	presenter_window = _tmp4_;
 	_tmp5_ = self->priv->cache_status;
-	org_westhoffswelt_pdfpresenter_window_presenter_set_cache_observer (presenter_window, _tmp5_);
+	pdfpc_window_presenter_set_cache_observer (presenter_window, _tmp5_);
 	result = presenter_window;
 	return result;
 }
@@ -285,25 +337,25 @@ static orgwesthoffsweltpdfpresenterWindowPresenter* org_westhoffswelt_pdfpresent
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-static orgwesthoffsweltpdfpresenterWindowPresentation* org_westhoffswelt_pdfpresenter_application_create_presentation_window (orgwesthoffsweltpdfpresenterApplication* self, orgwesthoffsweltpdfpresenterMetadataPdf* metadata, gint monitor) {
-	orgwesthoffsweltpdfpresenterWindowPresentation* result = NULL;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp0_;
+static pdfpcWindowPresentation* pdfpc_application_create_presentation_window (pdfpcApplication* self, pdfpcMetadataPdf* metadata, gint monitor) {
+	pdfpcWindowPresentation* result = NULL;
+	pdfpcMetadataPdf* _tmp0_;
 	gint _tmp1_;
-	orgwesthoffsweltpdfpresenterPresentationController* _tmp2_;
-	orgwesthoffsweltpdfpresenterWindowPresentation* _tmp3_;
-	orgwesthoffsweltpdfpresenterWindowPresentation* _tmp4_;
-	orgwesthoffsweltpdfpresenterWindowPresentation* presentation_window;
-	orgwesthoffsweltpdfpresenterCacheStatus* _tmp5_;
+	pdfpcPresentationController* _tmp2_;
+	pdfpcWindowPresentation* _tmp3_;
+	pdfpcWindowPresentation* _tmp4_;
+	pdfpcWindowPresentation* presentation_window;
+	pdfpcCacheStatus* _tmp5_;
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (metadata != NULL, NULL);
 	_tmp0_ = metadata;
 	_tmp1_ = monitor;
 	_tmp2_ = self->priv->controller;
-	_tmp3_ = org_westhoffswelt_pdfpresenter_window_presentation_new (_tmp0_, _tmp1_, _tmp2_);
+	_tmp3_ = pdfpc_window_presentation_new (_tmp0_, _tmp1_, _tmp2_);
 	_tmp4_ = g_object_ref_sink (_tmp3_);
 	presentation_window = _tmp4_;
 	_tmp5_ = self->priv->cache_status;
-	org_westhoffswelt_pdfpresenter_window_presentation_set_cache_observer (presentation_window, _tmp5_);
+	pdfpc_window_presentation_set_cache_observer (presentation_window, _tmp5_);
 	result = presentation_window;
 	return result;
 }
@@ -318,168 +370,328 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-void org_westhoffswelt_pdfpresenter_application_run (orgwesthoffsweltpdfpresenterApplication* self, gchar** args, int args_length1) {
+void pdfpc_application_run (pdfpcApplication* self, gchar** args, int args_length1) {
 	FILE* _tmp0_;
 	gchar** _tmp1_;
 	gint _tmp1__length1;
-	FILE* _tmp2_;
-	gchar** _tmp3_;
-	gint _tmp3__length1;
-	const gchar* _tmp4_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp5_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* metadata;
-	guint _tmp6_;
-	orgwesthoffsweltpdfpresenterMetadataPdf* _tmp9_;
-	gboolean _tmp10_;
-	orgwesthoffsweltpdfpresenterPresentationController* _tmp11_;
-	orgwesthoffsweltpdfpresenterCacheStatus* _tmp12_;
-	GdkScreen* _tmp13_ = NULL;
-	GdkScreen* _tmp14_;
+	gchar* _tmp2_ = NULL;
+	gchar* pdfFilename;
+	gboolean _tmp3_;
+	const gchar* _tmp28_;
+	FILE* _tmp30_;
+	const gchar* _tmp31_;
+	pdfpcMetadataPdf* _tmp32_;
+	pdfpcMetadataPdf* metadata;
+	guint _tmp33_;
+	pdfpcMetadataPdf* _tmp36_;
+	gboolean _tmp37_;
+	pdfpcPresentationController* _tmp38_;
+	pdfpcCacheStatus* _tmp39_;
+	pdfpcPresentationController* _tmp40_;
+	pdfpcConfigFileReader* _tmp41_;
+	pdfpcConfigFileReader* configFileReader;
+	pdfpcConfigFileReader* _tmp42_;
+	pdfpcConfigFileReader* _tmp43_;
+	const gchar* _tmp44_ = NULL;
+	gchar* _tmp45_;
+	gchar* _tmp46_;
+	GdkScreen* _tmp47_ = NULL;
+	GdkScreen* _tmp48_;
 	GdkScreen* screen;
-	gboolean _tmp15_ = FALSE;
-	gboolean _tmp16_;
-	gboolean _tmp19_;
-	orgwesthoffsweltpdfpresenterWindowPresentation* _tmp38_;
-	orgwesthoffsweltpdfpresenterWindowPresenter* _tmp40_;
+	gboolean _tmp49_ = FALSE;
+	gboolean _tmp50_ = FALSE;
+	gboolean _tmp51_;
+	gboolean _tmp53_;
+	gboolean _tmp56_;
+	pdfpcWindowPresentation* _tmp82_;
+	pdfpcWindowPresenter* _tmp85_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = stdout;
 	fprintf (_tmp0_, "%s", "pdfpc v3.0\n" "(C) 2012 David Vilar\n" "(C) 2009-2011 Jakob Westhoff\n\n");
 	gdk_threads_init ();
 	gtk_init (&args_length1, &args);
-	org_westhoffswelt_pdfpresenter_mutex_locks_init ();
 	_tmp1_ = args;
 	_tmp1__length1 = args_length1;
-	org_westhoffswelt_pdfpresenter_application_parse_command_line_options (self, _tmp1_, _tmp1__length1);
-	_tmp2_ = stdout;
-	fprintf (_tmp2_, "Initializing rendering...\n");
-	_tmp3_ = args;
-	_tmp3__length1 = args_length1;
-	_tmp4_ = _tmp3_[1];
-	_tmp5_ = org_westhoffswelt_pdfpresenter_metadata_pdf_new (_tmp4_);
-	metadata = _tmp5_;
-	_tmp6_ = org_westhoffswelt_pdfpresenter_options_duration;
-	if (_tmp6_ != 987654321U) {
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp7_;
-		guint _tmp8_;
-		_tmp7_ = metadata;
-		_tmp8_ = org_westhoffswelt_pdfpresenter_options_duration;
-		org_westhoffswelt_pdfpresenter_metadata_pdf_set_duration (_tmp7_, _tmp8_);
+	_tmp2_ = pdfpc_application_parse_command_line_options (self, _tmp1_, _tmp1__length1);
+	pdfFilename = _tmp2_;
+	_tmp3_ = pdfpc_options_list_actions;
+	if (_tmp3_) {
+		FILE* _tmp4_;
+		gint _tmp5_ = 0;
+		gchar** _tmp6_ = NULL;
+		gchar** actions;
+		gint actions_length1;
+		gint _actions_size_;
+		_tmp4_ = stdout;
+		fprintf (_tmp4_, "Config file commands accepted by pdfpc:\n");
+		_tmp6_ = pdfpc_presentation_controller_getActionDescriptions (&_tmp5_);
+		actions = _tmp6_;
+		actions_length1 = _tmp5_;
+		_actions_size_ = actions_length1;
+		{
+			gint i;
+			i = 0;
+			{
+				gboolean _tmp7_;
+				_tmp7_ = TRUE;
+				while (TRUE) {
+					gboolean _tmp8_;
+					gint _tmp10_;
+					gchar** _tmp11_;
+					gint _tmp11__length1;
+					gchar* _tmp12_;
+					gchar* tabAlignment;
+					gchar** _tmp13_;
+					gint _tmp13__length1;
+					gint _tmp14_;
+					const gchar* _tmp15_;
+					gint _tmp16_;
+					gint _tmp17_;
+					FILE* _tmp20_;
+					gchar** _tmp21_;
+					gint _tmp21__length1;
+					gint _tmp22_;
+					const gchar* _tmp23_;
+					const gchar* _tmp24_;
+					gchar** _tmp25_;
+					gint _tmp25__length1;
+					gint _tmp26_;
+					const gchar* _tmp27_;
+					_tmp8_ = _tmp7_;
+					if (!_tmp8_) {
+						gint _tmp9_;
+						_tmp9_ = i;
+						i = _tmp9_ + 2;
+					}
+					_tmp7_ = FALSE;
+					_tmp10_ = i;
+					_tmp11_ = actions;
+					_tmp11__length1 = actions_length1;
+					if (!(_tmp10_ < _tmp11__length1)) {
+						break;
+					}
+					_tmp12_ = g_strdup ("\t");
+					tabAlignment = _tmp12_;
+					_tmp13_ = actions;
+					_tmp13__length1 = actions_length1;
+					_tmp14_ = i;
+					_tmp15_ = _tmp13_[_tmp14_];
+					_tmp16_ = strlen (_tmp15_);
+					_tmp17_ = _tmp16_;
+					if (_tmp17_ < 8) {
+						const gchar* _tmp18_;
+						gchar* _tmp19_;
+						_tmp18_ = tabAlignment;
+						_tmp19_ = g_strconcat (_tmp18_, "\t", NULL);
+						_g_free0 (tabAlignment);
+						tabAlignment = _tmp19_;
+					}
+					_tmp20_ = stdout;
+					_tmp21_ = actions;
+					_tmp21__length1 = actions_length1;
+					_tmp22_ = i;
+					_tmp23_ = _tmp21_[_tmp22_];
+					_tmp24_ = tabAlignment;
+					_tmp25_ = actions;
+					_tmp25__length1 = actions_length1;
+					_tmp26_ = i;
+					_tmp27_ = _tmp25_[_tmp26_ + 1];
+					fprintf (_tmp20_, "\t%s%s=> %s\n", _tmp23_, _tmp24_, _tmp27_);
+					_g_free0 (tabAlignment);
+				}
+			}
+		}
+		actions = (_vala_array_free (actions, actions_length1, (GDestroyNotify) g_free), NULL);
+		_g_free0 (pdfFilename);
+		return;
 	}
-	_tmp9_ = metadata;
-	_tmp10_ = org_westhoffswelt_pdfpresenter_options_black_on_end;
-	_tmp11_ = org_westhoffswelt_pdfpresenter_presentation_controller_new (_tmp9_, _tmp10_);
+	_tmp28_ = pdfFilename;
+	if (_tmp28_ == NULL) {
+		FILE* _tmp29_;
+		_tmp29_ = stderr;
+		fprintf (_tmp29_, "Error: No pdf file given\n");
+		exit (1);
+	}
+	pdfpc_mutex_locks_init ();
+	_tmp30_ = stdout;
+	fprintf (_tmp30_, "Initializing rendering...\n");
+	_tmp31_ = pdfFilename;
+	_tmp32_ = pdfpc_metadata_pdf_new (_tmp31_);
+	metadata = _tmp32_;
+	_tmp33_ = pdfpc_options_duration;
+	if (_tmp33_ != 987654321U) {
+		pdfpcMetadataPdf* _tmp34_;
+		guint _tmp35_;
+		_tmp34_ = metadata;
+		_tmp35_ = pdfpc_options_duration;
+		pdfpc_metadata_pdf_set_duration (_tmp34_, _tmp35_);
+	}
+	_tmp36_ = metadata;
+	_tmp37_ = pdfpc_options_black_on_end;
+	_tmp38_ = pdfpc_presentation_controller_new (_tmp36_, _tmp37_);
 	_g_object_unref0 (self->priv->controller);
-	self->priv->controller = _tmp11_;
-	_tmp12_ = org_westhoffswelt_pdfpresenter_cache_status_new ();
-	_org_westhoffswelt_pdfpresenter_cache_status_unref0 (self->priv->cache_status);
-	self->priv->cache_status = _tmp12_;
-	_tmp13_ = gdk_screen_get_default ();
-	_tmp14_ = _g_object_ref0 (_tmp13_);
-	screen = _tmp14_;
-	_tmp16_ = org_westhoffswelt_pdfpresenter_options_single_screen;
-	if (!_tmp16_) {
-		GdkScreen* _tmp17_;
-		gint _tmp18_ = 0;
-		_tmp17_ = screen;
-		_tmp18_ = gdk_screen_get_n_monitors (_tmp17_);
-		_tmp15_ = _tmp18_ > 1;
+	self->priv->controller = _tmp38_;
+	_tmp39_ = pdfpc_cache_status_new ();
+	_pdfpc_cache_status_unref0 (self->priv->cache_status);
+	self->priv->cache_status = _tmp39_;
+	_tmp40_ = self->priv->controller;
+	_tmp41_ = pdfpc_config_file_reader_new (_tmp40_);
+	configFileReader = _tmp41_;
+	_tmp42_ = configFileReader;
+	pdfpc_config_file_reader_readConfig (_tmp42_, etc_path "/pdfpcrc");
+	_tmp43_ = configFileReader;
+	_tmp44_ = g_get_home_dir ();
+	_tmp45_ = g_strconcat (_tmp44_, "/.pdfpcrc", NULL);
+	_tmp46_ = _tmp45_;
+	pdfpc_config_file_reader_readConfig (_tmp43_, _tmp46_);
+	_g_free0 (_tmp46_);
+	_tmp47_ = gdk_screen_get_default ();
+	_tmp48_ = _g_object_ref0 (_tmp47_);
+	screen = _tmp48_;
+	_tmp51_ = pdfpc_options_windowed;
+	if (!_tmp51_) {
+		gboolean _tmp52_;
+		_tmp52_ = pdfpc_options_single_screen;
+		_tmp50_ = !_tmp52_;
 	} else {
-		_tmp15_ = FALSE;
+		_tmp50_ = FALSE;
 	}
-	_tmp19_ = _tmp15_;
-	if (_tmp19_) {
+	_tmp53_ = _tmp50_;
+	if (_tmp53_) {
+		GdkScreen* _tmp54_;
+		gint _tmp55_ = 0;
+		_tmp54_ = screen;
+		_tmp55_ = gdk_screen_get_n_monitors (_tmp54_);
+		_tmp49_ = _tmp55_ > 1;
+	} else {
+		_tmp49_ = FALSE;
+	}
+	_tmp56_ = _tmp49_;
+	if (_tmp56_) {
 		gint presenter_monitor = 0;
 		gint presentation_monitor = 0;
-		gboolean _tmp20_;
-		gint _tmp25_;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp26_;
-		gint _tmp27_;
-		orgwesthoffsweltpdfpresenterWindowPresentation* _tmp28_ = NULL;
-		orgwesthoffsweltpdfpresenterMetadataPdf* _tmp29_;
-		gint _tmp30_;
-		orgwesthoffsweltpdfpresenterWindowPresenter* _tmp31_ = NULL;
-		_tmp20_ = org_westhoffswelt_pdfpresenter_options_display_switch;
-		if (_tmp20_ != TRUE) {
-			GdkScreen* _tmp21_;
-			gint _tmp22_ = 0;
-			_tmp21_ = screen;
-			_tmp22_ = gdk_screen_get_primary_monitor (_tmp21_);
-			presenter_monitor = _tmp22_;
+		gboolean _tmp57_;
+		gint _tmp62_;
+		pdfpcMetadataPdf* _tmp63_;
+		gint _tmp64_;
+		pdfpcWindowPresentation* _tmp65_ = NULL;
+		pdfpcMetadataPdf* _tmp66_;
+		gint _tmp67_;
+		pdfpcWindowPresenter* _tmp68_ = NULL;
+		_tmp57_ = pdfpc_options_display_switch;
+		if (_tmp57_ != TRUE) {
+			GdkScreen* _tmp58_;
+			gint _tmp59_ = 0;
+			_tmp58_ = screen;
+			_tmp59_ = gdk_screen_get_primary_monitor (_tmp58_);
+			presenter_monitor = _tmp59_;
 		} else {
-			GdkScreen* _tmp23_;
-			gint _tmp24_ = 0;
-			_tmp23_ = screen;
-			_tmp24_ = gdk_screen_get_primary_monitor (_tmp23_);
-			presenter_monitor = (_tmp24_ + 1) % 2;
+			GdkScreen* _tmp60_;
+			gint _tmp61_ = 0;
+			_tmp60_ = screen;
+			_tmp61_ = gdk_screen_get_primary_monitor (_tmp60_);
+			presenter_monitor = (_tmp61_ + 1) % 2;
 		}
-		_tmp25_ = presenter_monitor;
-		presentation_monitor = (_tmp25_ + 1) % 2;
-		_tmp26_ = metadata;
-		_tmp27_ = presentation_monitor;
-		_tmp28_ = org_westhoffswelt_pdfpresenter_application_create_presentation_window (self, _tmp26_, _tmp27_);
+		_tmp62_ = presenter_monitor;
+		presentation_monitor = (_tmp62_ + 1) % 2;
+		_tmp63_ = metadata;
+		_tmp64_ = presentation_monitor;
+		_tmp65_ = pdfpc_application_create_presentation_window (self, _tmp63_, _tmp64_);
 		_g_object_unref0 (self->priv->presentation_window);
-		self->priv->presentation_window = _tmp28_;
-		_tmp29_ = metadata;
-		_tmp30_ = presenter_monitor;
-		_tmp31_ = org_westhoffswelt_pdfpresenter_application_create_presenter_window (self, _tmp29_, _tmp30_);
+		self->priv->presentation_window = _tmp65_;
+		_tmp66_ = metadata;
+		_tmp67_ = presenter_monitor;
+		_tmp68_ = pdfpc_application_create_presenter_window (self, _tmp66_, _tmp67_);
 		_g_object_unref0 (self->priv->presenter_window);
-		self->priv->presenter_window = _tmp31_;
+		self->priv->presenter_window = _tmp68_;
 	} else {
-		FILE* _tmp32_;
-		gboolean _tmp33_;
-		_tmp32_ = stdout;
-		fprintf (_tmp32_, "Using only one screen\n");
-		_tmp33_ = org_westhoffswelt_pdfpresenter_options_display_switch;
-		if (!_tmp33_) {
-			orgwesthoffsweltpdfpresenterMetadataPdf* _tmp34_;
-			orgwesthoffsweltpdfpresenterWindowPresenter* _tmp35_ = NULL;
-			_tmp34_ = metadata;
-			_tmp35_ = org_westhoffswelt_pdfpresenter_application_create_presenter_window (self, _tmp34_, -1);
-			_g_object_unref0 (self->priv->presenter_window);
-			self->priv->presenter_window = _tmp35_;
+		gboolean _tmp69_ = FALSE;
+		gboolean _tmp70_;
+		gboolean _tmp72_;
+		_tmp70_ = pdfpc_options_windowed;
+		if (_tmp70_) {
+			gboolean _tmp71_;
+			_tmp71_ = pdfpc_options_single_screen;
+			_tmp69_ = !_tmp71_;
 		} else {
-			orgwesthoffsweltpdfpresenterMetadataPdf* _tmp36_;
-			orgwesthoffsweltpdfpresenterWindowPresentation* _tmp37_ = NULL;
-			_tmp36_ = metadata;
-			_tmp37_ = org_westhoffswelt_pdfpresenter_application_create_presentation_window (self, _tmp36_, -1);
+			_tmp69_ = FALSE;
+		}
+		_tmp72_ = _tmp69_;
+		if (_tmp72_) {
+			pdfpcMetadataPdf* _tmp73_;
+			pdfpcWindowPresenter* _tmp74_ = NULL;
+			pdfpcMetadataPdf* _tmp75_;
+			pdfpcWindowPresentation* _tmp76_ = NULL;
+			_tmp73_ = metadata;
+			_tmp74_ = pdfpc_application_create_presenter_window (self, _tmp73_, -1);
+			_g_object_unref0 (self->priv->presenter_window);
+			self->priv->presenter_window = _tmp74_;
+			_tmp75_ = metadata;
+			_tmp76_ = pdfpc_application_create_presentation_window (self, _tmp75_, -1);
 			_g_object_unref0 (self->priv->presentation_window);
-			self->priv->presentation_window = _tmp37_;
+			self->priv->presentation_window = _tmp76_;
+		} else {
+			gboolean _tmp77_;
+			_tmp77_ = pdfpc_options_display_switch;
+			if (!_tmp77_) {
+				pdfpcMetadataPdf* _tmp78_;
+				pdfpcWindowPresenter* _tmp79_ = NULL;
+				_tmp78_ = metadata;
+				_tmp79_ = pdfpc_application_create_presenter_window (self, _tmp78_, -1);
+				_g_object_unref0 (self->priv->presenter_window);
+				self->priv->presenter_window = _tmp79_;
+			} else {
+				pdfpcMetadataPdf* _tmp80_;
+				pdfpcWindowPresentation* _tmp81_ = NULL;
+				_tmp80_ = metadata;
+				_tmp81_ = pdfpc_application_create_presentation_window (self, _tmp80_, -1);
+				_g_object_unref0 (self->priv->presentation_window);
+				self->priv->presentation_window = _tmp81_;
+			}
 		}
 	}
-	_tmp38_ = self->priv->presentation_window;
-	if (_tmp38_ != NULL) {
-		orgwesthoffsweltpdfpresenterWindowPresentation* _tmp39_;
-		_tmp39_ = self->priv->presentation_window;
-		gtk_widget_show_all ((GtkWidget*) _tmp39_);
+	_tmp82_ = self->priv->presentation_window;
+	if (_tmp82_ != NULL) {
+		pdfpcWindowPresentation* _tmp83_;
+		pdfpcWindowPresentation* _tmp84_;
+		_tmp83_ = self->priv->presentation_window;
+		gtk_widget_show_all ((GtkWidget*) _tmp83_);
+		_tmp84_ = self->priv->presentation_window;
+		pdfpc_controllable_update ((pdfpcControllable*) _tmp84_);
 	}
-	_tmp40_ = self->priv->presenter_window;
-	if (_tmp40_ != NULL) {
-		orgwesthoffsweltpdfpresenterWindowPresenter* _tmp41_;
-		_tmp41_ = self->priv->presenter_window;
-		gtk_widget_show_all ((GtkWidget*) _tmp41_);
+	_tmp85_ = self->priv->presenter_window;
+	if (_tmp85_ != NULL) {
+		pdfpcWindowPresenter* _tmp86_;
+		pdfpcWindowPresenter* _tmp87_;
+		_tmp86_ = self->priv->presenter_window;
+		gtk_widget_show_all ((GtkWidget*) _tmp86_);
+		_tmp87_ = self->priv->presenter_window;
+		pdfpc_controllable_update ((pdfpcControllable*) _tmp87_);
 	}
 	gdk_threads_enter ();
 	gtk_main ();
 	gdk_threads_leave ();
 	_g_object_unref0 (screen);
+	_pdfpc_config_file_reader_unref0 (configFileReader);
 	_g_object_unref0 (metadata);
+	_g_free0 (pdfFilename);
 }
 
 
 /**
          * Basic application entry point
          */
-gint org_westhoffswelt_pdfpresenter_application_main (gchar** args, int args_length1) {
+gint pdfpc_application_main (gchar** args, int args_length1) {
 	gint result = 0;
-	orgwesthoffsweltpdfpresenterApplication* _tmp0_;
-	orgwesthoffsweltpdfpresenterApplication* application;
+	pdfpcApplication* _tmp0_;
+	pdfpcApplication* application;
 	gchar** _tmp1_;
 	gint _tmp1__length1;
-	_tmp0_ = org_westhoffswelt_pdfpresenter_application_new ();
+	_tmp0_ = pdfpc_application_new ();
 	application = _tmp0_;
 	_tmp1_ = args;
 	_tmp1__length1 = args_length1;
-	org_westhoffswelt_pdfpresenter_application_run (application, _tmp1_, _tmp1__length1);
+	pdfpc_application_run (application, _tmp1_, _tmp1__length1);
 	result = 0;
 	_g_object_unref0 (application);
 	return result;
@@ -488,42 +700,42 @@ gint org_westhoffswelt_pdfpresenter_application_main (gchar** args, int args_len
 
 int main (int argc, char ** argv) {
 	g_type_init ();
-	return org_westhoffswelt_pdfpresenter_application_main (argv, argc);
+	return pdfpc_application_main (argv, argc);
 }
 
 
-orgwesthoffsweltpdfpresenterApplication* org_westhoffswelt_pdfpresenter_application_construct (GType object_type) {
-	orgwesthoffsweltpdfpresenterApplication * self = NULL;
-	self = (orgwesthoffsweltpdfpresenterApplication*) g_object_new (object_type, NULL);
+pdfpcApplication* pdfpc_application_construct (GType object_type) {
+	pdfpcApplication * self = NULL;
+	self = (pdfpcApplication*) g_object_new (object_type, NULL);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterApplication* org_westhoffswelt_pdfpresenter_application_new (void) {
-	return org_westhoffswelt_pdfpresenter_application_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_APPLICATION);
+pdfpcApplication* pdfpc_application_new (void) {
+	return pdfpc_application_construct (PDFPC_TYPE_APPLICATION);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_application_class_init (orgwesthoffsweltpdfpresenterApplicationClass * klass) {
-	org_westhoffswelt_pdfpresenter_application_parent_class = g_type_class_peek_parent (klass);
-	g_type_class_add_private (klass, sizeof (orgwesthoffsweltpdfpresenterApplicationPrivate));
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_application_finalize;
+static void pdfpc_application_class_init (pdfpcApplicationClass * klass) {
+	pdfpc_application_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (pdfpcApplicationPrivate));
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_application_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_application_instance_init (orgwesthoffsweltpdfpresenterApplication * self) {
-	self->priv = ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION_GET_PRIVATE (self);
+static void pdfpc_application_instance_init (pdfpcApplication * self) {
+	self->priv = PDFPC_APPLICATION_GET_PRIVATE (self);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_application_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterApplication * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_APPLICATION (obj);
+static void pdfpc_application_finalize (GObject* obj) {
+	pdfpcApplication * self;
+	self = PDFPC_APPLICATION (obj);
 	_g_object_unref0 (self->priv->presentation_window);
 	_g_object_unref0 (self->priv->presenter_window);
 	_g_object_unref0 (self->priv->controller);
-	_org_westhoffswelt_pdfpresenter_cache_status_unref0 (self->priv->cache_status);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_application_parent_class)->finalize (obj);
+	_pdfpc_cache_status_unref0 (self->priv->cache_status);
+	G_OBJECT_CLASS (pdfpc_application_parent_class)->finalize (obj);
 }
 
 
@@ -533,15 +745,33 @@ static void org_westhoffswelt_pdfpresenter_application_finalize (GObject* obj) {
      * This class contains the main method as well as all the logic needed for
      * initializing the application, like commandline parsing and window creation.
      */
-GType org_westhoffswelt_pdfpresenter_application_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_application_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_application_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterApplicationClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_application_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterApplication), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_application_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_application_type_id;
-		org_westhoffswelt_pdfpresenter_application_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterApplication", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_application_type_id__volatile, org_westhoffswelt_pdfpresenter_application_type_id);
+GType pdfpc_application_get_type (void) {
+	static volatile gsize pdfpc_application_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_application_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcApplicationClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_application_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcApplication), 0, (GInstanceInitFunc) pdfpc_application_instance_init, NULL };
+		GType pdfpc_application_type_id;
+		pdfpc_application_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcApplication", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_application_type_id__volatile, pdfpc_application_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_application_type_id__volatile;
+	return pdfpc_application_type_id__volatile;
+}
+
+
+static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func) {
+	if ((array != NULL) && (destroy_func != NULL)) {
+		int i;
+		for (i = 0; i < array_length; i = i + 1) {
+			if (((gpointer*) array)[i] != NULL) {
+				destroy_func (((gpointer*) array)[i]);
+			}
+		}
+	}
+}
+
+
+static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func) {
+	_vala_array_destroy (array, array_length, destroy_func);
+	g_free (array);
 }
 
 

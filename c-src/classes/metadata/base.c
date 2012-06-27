@@ -9,50 +9,50 @@
 #include <gio/gio.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE (org_westhoffswelt_pdfpresenter_metadata_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
+#define PDFPC_METADATA_TYPE_BASE (pdfpc_metadata_base_get_type ())
+#define PDFPC_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBase))
+#define PDFPC_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
+#define PDFPC_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBase orgwesthoffsweltpdfpresenterMetadataBase;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBaseClass orgwesthoffsweltpdfpresenterMetadataBaseClass;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBasePrivate orgwesthoffsweltpdfpresenterMetadataBasePrivate;
+typedef struct _pdfpcMetadataBase pdfpcMetadataBase;
+typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
+typedef struct _pdfpcMetadataBasePrivate pdfpcMetadataBasePrivate;
 #define _g_free0(var) (var = (g_free (var), NULL))
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _orgwesthoffsweltpdfpresenterMetadataBase {
+struct _pdfpcMetadataBase {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterMetadataBasePrivate * priv;
+	pdfpcMetadataBasePrivate * priv;
 	gchar* fname;
 	gchar* url;
 };
 
-struct _orgwesthoffsweltpdfpresenterMetadataBaseClass {
+struct _pdfpcMetadataBaseClass {
 	GObjectClass parent_class;
-	guint (*get_slide_count) (orgwesthoffsweltpdfpresenterMetadataBase* self);
+	guint (*get_slide_count) (pdfpcMetadataBase* self);
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_metadata_base_parent_class = NULL;
+static gpointer pdfpc_metadata_base_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_metadata_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_DUMMY_PROPERTY
+	PDFPC_METADATA_BASE_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterMetadataBase* org_westhoffswelt_pdfpresenter_metadata_base_construct (GType object_type, const gchar* fname);
-gchar* org_westhoffswelt_pdfpresenter_metadata_base_get_url (orgwesthoffsweltpdfpresenterMetadataBase* self);
-guint org_westhoffswelt_pdfpresenter_metadata_base_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* self);
-static guint org_westhoffswelt_pdfpresenter_metadata_base_real_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* self);
-static void org_westhoffswelt_pdfpresenter_metadata_base_finalize (GObject* obj);
+pdfpcMetadataBase* pdfpc_metadata_base_construct (GType object_type, const gchar* fname);
+gchar* pdfpc_metadata_base_get_url (pdfpcMetadataBase* self);
+guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self);
+static guint pdfpc_metadata_base_real_get_slide_count (pdfpcMetadataBase* self);
+static void pdfpc_metadata_base_finalize (GObject* obj);
 
 
 /**
          * Base constructor taking the url to specifiy the slideset as argument
          */
-orgwesthoffsweltpdfpresenterMetadataBase* org_westhoffswelt_pdfpresenter_metadata_base_construct (GType object_type, const gchar* fname) {
-	orgwesthoffsweltpdfpresenterMetadataBase * self = NULL;
+pdfpcMetadataBase* pdfpc_metadata_base_construct (GType object_type, const gchar* fname) {
+	pdfpcMetadataBase * self = NULL;
 	const gchar* _tmp0_;
 	gchar* _tmp1_;
 	const gchar* _tmp2_;
@@ -60,7 +60,7 @@ orgwesthoffsweltpdfpresenterMetadataBase* org_westhoffswelt_pdfpresenter_metadat
 	GFile* _tmp4_;
 	gchar* _tmp5_ = NULL;
 	g_return_val_if_fail (fname != NULL, NULL);
-	self = (orgwesthoffsweltpdfpresenterMetadataBase*) g_object_new (object_type, NULL);
+	self = (pdfpcMetadataBase*) g_object_new (object_type, NULL);
 	_tmp0_ = fname;
 	_tmp1_ = g_strdup (_tmp0_);
 	_g_free0 (self->fname);
@@ -79,7 +79,7 @@ orgwesthoffsweltpdfpresenterMetadataBase* org_westhoffswelt_pdfpresenter_metadat
 /**
          * Return the registered url
          */
-gchar* org_westhoffswelt_pdfpresenter_metadata_base_get_url (orgwesthoffsweltpdfpresenterMetadataBase* self) {
+gchar* pdfpc_metadata_base_get_url (pdfpcMetadataBase* self) {
 	gchar* result = NULL;
 	const gchar* _tmp0_;
 	gchar* _tmp1_;
@@ -94,35 +94,35 @@ gchar* org_westhoffswelt_pdfpresenter_metadata_base_get_url (orgwesthoffsweltpdf
 /**
          * Return the number of slides defined by the given url
          */
-static guint org_westhoffswelt_pdfpresenter_metadata_base_real_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* self) {
-	g_critical ("Type `%s' does not implement abstract method `org_westhoffswelt_pdfpresenter_metadata_base_get_slide_count'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
+static guint pdfpc_metadata_base_real_get_slide_count (pdfpcMetadataBase* self) {
+	g_critical ("Type `%s' does not implement abstract method `pdfpc_metadata_base_get_slide_count'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
 	return 0U;
 }
 
 
-guint org_westhoffswelt_pdfpresenter_metadata_base_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* self) {
+guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self) {
 	g_return_val_if_fail (self != NULL, 0U);
-	return ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_GET_CLASS (self)->get_slide_count (self);
+	return PDFPC_METADATA_BASE_GET_CLASS (self)->get_slide_count (self);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_base_class_init (orgwesthoffsweltpdfpresenterMetadataBaseClass * klass) {
-	org_westhoffswelt_pdfpresenter_metadata_base_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS (klass)->get_slide_count = org_westhoffswelt_pdfpresenter_metadata_base_real_get_slide_count;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_metadata_base_finalize;
+static void pdfpc_metadata_base_class_init (pdfpcMetadataBaseClass * klass) {
+	pdfpc_metadata_base_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_METADATA_BASE_CLASS (klass)->get_slide_count = pdfpc_metadata_base_real_get_slide_count;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_metadata_base_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_base_instance_init (orgwesthoffsweltpdfpresenterMetadataBase * self) {
+static void pdfpc_metadata_base_instance_init (pdfpcMetadataBase * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_base_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterMetadataBase * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE (obj);
+static void pdfpc_metadata_base_finalize (GObject* obj) {
+	pdfpcMetadataBase * self;
+	self = PDFPC_METADATA_BASE (obj);
 	_g_free0 (self->fname);
 	_g_free0 (self->url);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_metadata_base_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_metadata_base_parent_class)->finalize (obj);
 }
 
 
@@ -130,15 +130,15 @@ static void org_westhoffswelt_pdfpresenter_metadata_base_finalize (GObject* obj)
      * Metadata base class describing the basic metadata needed for every
      * slideset
      */
-GType org_westhoffswelt_pdfpresenter_metadata_base_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_metadata_base_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_metadata_base_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterMetadataBaseClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_metadata_base_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterMetadataBase), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_metadata_base_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_metadata_base_type_id;
-		org_westhoffswelt_pdfpresenter_metadata_base_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterMetadataBase", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_metadata_base_type_id__volatile, org_westhoffswelt_pdfpresenter_metadata_base_type_id);
+GType pdfpc_metadata_base_get_type (void) {
+	static volatile gsize pdfpc_metadata_base_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_metadata_base_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcMetadataBaseClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_metadata_base_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcMetadataBase), 0, (GInstanceInitFunc) pdfpc_metadata_base_instance_init, NULL };
+		GType pdfpc_metadata_base_type_id;
+		pdfpc_metadata_base_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcMetadataBase", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
+		g_once_init_leave (&pdfpc_metadata_base_type_id__volatile, pdfpc_metadata_base_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_metadata_base_type_id__volatile;
+	return pdfpc_metadata_base_type_id__volatile;
 }
 
 

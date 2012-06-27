@@ -6,42 +6,42 @@
 #include <glib-object.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM (org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_ITEM(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM, orgwesthoffsweltpdfpresenterRendererCachePNGItem))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_ITEM_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM, orgwesthoffsweltpdfpresenterRendererCachePNGItemClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_IS_ITEM(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_IS_ITEM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_ITEM_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM, orgwesthoffsweltpdfpresenterRendererCachePNGItemClass))
+#define PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM (pdfpc_renderer_cache_png_item_get_type ())
+#define PDFPC_RENDERER_CACHE_PNG_ITEM(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM, pdfpcRendererCachePNGItem))
+#define PDFPC_RENDERER_CACHE_PNG_ITEM_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM, pdfpcRendererCachePNGItemClass))
+#define PDFPC_RENDERER_CACHE_PNG_IS_ITEM(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM))
+#define PDFPC_RENDERER_CACHE_PNG_IS_ITEM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM))
+#define PDFPC_RENDERER_CACHE_PNG_ITEM_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM, pdfpcRendererCachePNGItemClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterRendererCachePNGItem orgwesthoffsweltpdfpresenterRendererCachePNGItem;
-typedef struct _orgwesthoffsweltpdfpresenterRendererCachePNGItemClass orgwesthoffsweltpdfpresenterRendererCachePNGItemClass;
-typedef struct _orgwesthoffsweltpdfpresenterRendererCachePNGItemPrivate orgwesthoffsweltpdfpresenterRendererCachePNGItemPrivate;
+typedef struct _pdfpcRendererCachePNGItem pdfpcRendererCachePNGItem;
+typedef struct _pdfpcRendererCachePNGItemClass pdfpcRendererCachePNGItemClass;
+typedef struct _pdfpcRendererCachePNGItemPrivate pdfpcRendererCachePNGItemPrivate;
 
-struct _orgwesthoffsweltpdfpresenterRendererCachePNGItem {
+struct _pdfpcRendererCachePNGItem {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterRendererCachePNGItemPrivate * priv;
+	pdfpcRendererCachePNGItemPrivate * priv;
 	guint8* data;
 	gint data_length1;
 };
 
-struct _orgwesthoffsweltpdfpresenterRendererCachePNGItemClass {
+struct _pdfpcRendererCachePNGItemClass {
 	GObjectClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_renderer_cache_png_item_parent_class = NULL;
+static gpointer pdfpc_renderer_cache_png_item_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_type (void) G_GNUC_CONST;
+GType pdfpc_renderer_cache_png_item_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_ITEM_DUMMY_PROPERTY
+	PDFPC_RENDERER_CACHE_PNG_ITEM_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterRendererCachePNGItem* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_new (guint8* data, int data_length1);
-orgwesthoffsweltpdfpresenterRendererCachePNGItem* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1);
+pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_new (guint8* data, int data_length1);
+pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1);
 static guint8* _vala_array_dup1 (guint8* self, int length);
-guint8* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_png_data (orgwesthoffsweltpdfpresenterRendererCachePNGItem* self, int* result_length1);
+guint8* pdfpc_renderer_cache_png_item_get_png_data (pdfpcRendererCachePNGItem* self, int* result_length1);
 static guint8* _vala_array_dup2 (guint8* self, int length);
-gint org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_length (orgwesthoffsweltpdfpresenterRendererCachePNGItem* self);
-static void org_westhoffswelt_pdfpresenter_renderer_cache_png_item_finalize (GObject* obj);
+gint pdfpc_renderer_cache_png_item_get_length (pdfpcRendererCachePNGItem* self);
+static void pdfpc_renderer_cache_png_item_finalize (GObject* obj);
 
 
 /**
@@ -52,13 +52,13 @@ static guint8* _vala_array_dup1 (guint8* self, int length) {
 }
 
 
-orgwesthoffsweltpdfpresenterRendererCachePNGItem* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1) {
-	orgwesthoffsweltpdfpresenterRendererCachePNGItem * self = NULL;
+pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1) {
+	pdfpcRendererCachePNGItem * self = NULL;
 	guint8* _tmp0_;
 	gint _tmp0__length1;
 	guint8* _tmp1_;
 	gint _tmp1__length1;
-	self = (orgwesthoffsweltpdfpresenterRendererCachePNGItem*) g_object_new (object_type, NULL);
+	self = (pdfpcRendererCachePNGItem*) g_object_new (object_type, NULL);
 	_tmp0_ = data;
 	_tmp0__length1 = data_length1;
 	_tmp1_ = (_tmp0_ != NULL) ? _vala_array_dup1 (_tmp0_, _tmp0__length1) : ((gpointer) _tmp0_);
@@ -70,8 +70,8 @@ orgwesthoffsweltpdfpresenterRendererCachePNGItem* org_westhoffswelt_pdfpresenter
 }
 
 
-orgwesthoffsweltpdfpresenterRendererCachePNGItem* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_new (guint8* data, int data_length1) {
-	return org_westhoffswelt_pdfpresenter_renderer_cache_png_item_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_TYPE_ITEM, data, data_length1);
+pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_new (guint8* data, int data_length1) {
+	return pdfpc_renderer_cache_png_item_construct (PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM, data, data_length1);
 }
 
 
@@ -83,7 +83,7 @@ static guint8* _vala_array_dup2 (guint8* self, int length) {
 }
 
 
-guint8* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_png_data (orgwesthoffsweltpdfpresenterRendererCachePNGItem* self, int* result_length1) {
+guint8* pdfpc_renderer_cache_png_item_get_png_data (pdfpcRendererCachePNGItem* self, int* result_length1) {
 	guint8* result = NULL;
 	guint8* _tmp0_;
 	gint _tmp0__length1;
@@ -109,7 +109,7 @@ guint8* org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_png_data (org
 /**
          * Shortcut to retrieve the length of the stored dataset
          */
-gint org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_length (orgwesthoffsweltpdfpresenterRendererCachePNGItem* self) {
+gint pdfpc_renderer_cache_png_item_get_length (pdfpcRendererCachePNGItem* self) {
 	gint result = 0;
 	guint8* _tmp0_;
 	gint _tmp0__length1;
@@ -121,36 +121,36 @@ gint org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_length (orgwesth
 }
 
 
-static void org_westhoffswelt_pdfpresenter_renderer_cache_png_item_class_init (orgwesthoffsweltpdfpresenterRendererCachePNGItemClass * klass) {
-	org_westhoffswelt_pdfpresenter_renderer_cache_png_item_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_renderer_cache_png_item_finalize;
+static void pdfpc_renderer_cache_png_item_class_init (pdfpcRendererCachePNGItemClass * klass) {
+	pdfpc_renderer_cache_png_item_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_renderer_cache_png_item_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_renderer_cache_png_item_instance_init (orgwesthoffsweltpdfpresenterRendererCachePNGItem * self) {
+static void pdfpc_renderer_cache_png_item_instance_init (pdfpcRendererCachePNGItem * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_renderer_cache_png_item_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterRendererCachePNGItem * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_RENDERER_CACHE_PNG_ITEM (obj);
+static void pdfpc_renderer_cache_png_item_finalize (GObject* obj) {
+	pdfpcRendererCachePNGItem * self;
+	self = PDFPC_RENDERER_CACHE_PNG_ITEM (obj);
 	self->data = (g_free (self->data), NULL);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_renderer_cache_png_item_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_renderer_cache_png_item_parent_class)->finalize (obj);
 }
 
 
 /**
      * PNG picture data stored by the PNG cache engine.
      */
-GType org_westhoffswelt_pdfpresenter_renderer_cache_png_item_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterRendererCachePNGItemClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_renderer_cache_png_item_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterRendererCachePNGItem), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_renderer_cache_png_item_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id;
-		org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterRendererCachePNGItem", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id__volatile, org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id);
+GType pdfpc_renderer_cache_png_item_get_type (void) {
+	static volatile gsize pdfpc_renderer_cache_png_item_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_renderer_cache_png_item_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcRendererCachePNGItemClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_renderer_cache_png_item_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcRendererCachePNGItem), 0, (GInstanceInitFunc) pdfpc_renderer_cache_png_item_instance_init, NULL };
+		GType pdfpc_renderer_cache_png_item_type_id;
+		pdfpc_renderer_cache_png_item_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcRendererCachePNGItem", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_renderer_cache_png_item_type_id__volatile, pdfpc_renderer_cache_png_item_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_renderer_cache_png_item_type_id__volatile;
+	return pdfpc_renderer_cache_png_item_type_id__volatile;
 }
 
 

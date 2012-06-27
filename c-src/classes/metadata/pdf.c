@@ -13,58 +13,58 @@
 #include <glib/gstdio.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE (org_westhoffswelt_pdfpresenter_metadata_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, orgwesthoffsweltpdfpresenterMetadataBaseClass))
+#define PDFPC_METADATA_TYPE_BASE (pdfpc_metadata_base_get_type ())
+#define PDFPC_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBase))
+#define PDFPC_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
+#define PDFPC_METADATA_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_BASE))
+#define PDFPC_METADATA_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBase orgwesthoffsweltpdfpresenterMetadataBase;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBaseClass orgwesthoffsweltpdfpresenterMetadataBaseClass;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataBasePrivate orgwesthoffsweltpdfpresenterMetadataBasePrivate;
+typedef struct _pdfpcMetadataBase pdfpcMetadataBase;
+typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
+typedef struct _pdfpcMetadataBasePrivate pdfpcMetadataBasePrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF (org_westhoffswelt_pdfpresenter_metadata_pdf_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdf))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfClass))
+#define PDFPC_METADATA_TYPE_PDF (pdfpc_metadata_pdf_get_type ())
+#define PDFPC_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdf))
+#define PDFPC_METADATA_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfClass))
+#define PDFPC_METADATA_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_METADATA_TYPE_PDF))
+#define PDFPC_METADATA_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_METADATA_TYPE_PDF))
+#define PDFPC_METADATA_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdf orgwesthoffsweltpdfpresenterMetadataPdf;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdfClass orgwesthoffsweltpdfpresenterMetadataPdfClass;
-typedef struct _orgwesthoffsweltpdfpresenterMetadataPdfPrivate orgwesthoffsweltpdfpresenterMetadataPdfPrivate;
+typedef struct _pdfpcMetadataPdf pdfpcMetadataPdf;
+typedef struct _pdfpcMetadataPdfClass pdfpcMetadataPdfClass;
+typedef struct _pdfpcMetadataPdfPrivate pdfpcMetadataPdfPrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES (org_westhoffswelt_pdfpresenter_slides_notes_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES, orgwesthoffsweltpdfpresenterslides_notes))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES, orgwesthoffsweltpdfpresenterslides_notesClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SLIDES_NOTES_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SLIDES_NOTES, orgwesthoffsweltpdfpresenterslides_notesClass))
+#define PDFPC_TYPE_SLIDES_NOTES (pdfpc_slides_notes_get_type ())
+#define PDFPC_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notes))
+#define PDFPC_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
+#define PDFPC_IS_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SLIDES_NOTES))
+#define PDFPC_IS_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SLIDES_NOTES))
+#define PDFPC_SLIDES_NOTES_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterslides_notes orgwesthoffsweltpdfpresenterslides_notes;
-typedef struct _orgwesthoffsweltpdfpresenterslides_notesClass orgwesthoffsweltpdfpresenterslides_notesClass;
+typedef struct _pdfpcslides_notes pdfpcslides_notes;
+typedef struct _pdfpcslides_notesClass pdfpcslides_notesClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_TYPE_PARSE_STATE (org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_get_type ())
+#define PDFPC_METADATA_PDF_TYPE_PARSE_STATE (pdfpc_metadata_pdf_parse_state_get_type ())
 #define _g_free0(var) (var = (g_free (var), NULL))
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_error_free0(var) ((var == NULL) ? NULL : (var = (g_error_free (var), NULL)))
 
-struct _orgwesthoffsweltpdfpresenterMetadataBase {
+struct _pdfpcMetadataBase {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterMetadataBasePrivate * priv;
+	pdfpcMetadataBasePrivate * priv;
 	gchar* fname;
 	gchar* url;
 };
 
-struct _orgwesthoffsweltpdfpresenterMetadataBaseClass {
+struct _pdfpcMetadataBaseClass {
 	GObjectClass parent_class;
-	guint (*get_slide_count) (orgwesthoffsweltpdfpresenterMetadataBase* self);
+	guint (*get_slide_count) (pdfpcMetadataBase* self);
 };
 
-struct _orgwesthoffsweltpdfpresenterMetadataPdf {
-	orgwesthoffsweltpdfpresenterMetadataBase parent_instance;
-	orgwesthoffsweltpdfpresenterMetadataPdfPrivate * priv;
+struct _pdfpcMetadataPdf {
+	pdfpcMetadataBase parent_instance;
+	pdfpcMetadataPdfPrivate * priv;
 	gchar* pdf_fname;
 	gchar* pdf_url;
 	gchar* pdfpc_url;
@@ -72,16 +72,16 @@ struct _orgwesthoffsweltpdfpresenterMetadataPdf {
 	gdouble page_width;
 	gdouble page_height;
 	guint page_count;
-	orgwesthoffsweltpdfpresenterslides_notes* notes;
+	pdfpcslides_notes* notes;
 	gboolean skips_by_user;
 	guint duration;
 };
 
-struct _orgwesthoffsweltpdfpresenterMetadataPdfClass {
-	orgwesthoffsweltpdfpresenterMetadataBaseClass parent_class;
+struct _pdfpcMetadataPdfClass {
+	pdfpcMetadataBaseClass parent_class;
 };
 
-struct _orgwesthoffsweltpdfpresenterMetadataPdfPrivate {
+struct _pdfpcMetadataPdfPrivate {
 	gint* user_view_indexes;
 	gint user_view_indexes_length1;
 	gint _user_view_indexes_size_;
@@ -89,62 +89,62 @@ struct _orgwesthoffsweltpdfpresenterMetadataPdfPrivate {
 };
 
 typedef enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_FILE,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_SKIP,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_DURATION,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_END_USER_SLIDE,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTES,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTHING
-} orgwesthoffsweltpdfpresenterMetadataPdfParseState;
+	PDFPC_METADATA_PDF_PARSE_STATE_FILE,
+	PDFPC_METADATA_PDF_PARSE_STATE_SKIP,
+	PDFPC_METADATA_PDF_PARSE_STATE_DURATION,
+	PDFPC_METADATA_PDF_PARSE_STATE_END_USER_SLIDE,
+	PDFPC_METADATA_PDF_PARSE_STATE_NOTES,
+	PDFPC_METADATA_PDF_PARSE_STATE_NOTHING
+} pdfpcMetadataPdfParseState;
 
 
-static gpointer org_westhoffswelt_pdfpresenter_metadata_pdf_parent_class = NULL;
-extern GMutex* org_westhoffswelt_pdfpresenter_mutex_locks_poppler;
+static gpointer pdfpc_metadata_pdf_parent_class = NULL;
+extern GMutex* pdfpc_mutex_locks_poppler;
 
-GType org_westhoffswelt_pdfpresenter_metadata_base_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_metadata_pdf_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_slides_notes_get_type (void) G_GNUC_CONST;
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, orgwesthoffsweltpdfpresenterMetadataPdfPrivate))
+GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_metadata_pdf_get_type (void) G_GNUC_CONST;
+GType pdfpc_slides_notes_get_type (void) G_GNUC_CONST;
+#define PDFPC_METADATA_PDF_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdfPrivate))
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_DUMMY_PROPERTY
+	PDFPC_METADATA_PDF_DUMMY_PROPERTY
 };
-static GType org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_get_type (void) G_GNUC_UNUSED;
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwesthoffsweltpdfpresenterMetadataPdf* self, gchar** skip_line);
-void org_westhoffswelt_pdfpresenter_slides_notes_parse_lines (orgwesthoffsweltpdfpresenterslides_notes* self, gchar** lines, int lines_length1);
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_skip_line (orgwesthoffsweltpdfpresenterMetadataPdf* self, const gchar* line);
+static GType pdfpc_metadata_pdf_parse_state_get_type (void) G_GNUC_UNUSED;
+static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar** skip_line);
+void pdfpc_slides_notes_parse_lines (pdfpcslides_notes* self, gchar** lines, int lines_length1);
+static void pdfpc_metadata_pdf_parse_skip_line (pdfpcMetadataPdf* self, const gchar* line);
+static void _vala_array_add2 (gint** array, int* length, int* size, gint value);
 static void _vala_array_add3 (gint** array, int* length, int* size, gint value);
+static void pdfpc_metadata_pdf_fill_path_info (pdfpcMetadataPdf* self, const gchar* fname);
+void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_duration (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_skips (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_end_user_slide (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_notes (pdfpcMetadataPdf* self);
+gboolean pdfpc_slides_notes_has_notes (pdfpcslides_notes* self);
+gchar* pdfpc_slides_notes_format_to_save (pdfpcslides_notes* self);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_new (const gchar* fname);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_construct (GType object_type, const gchar* fname);
+pdfpcMetadataBase* pdfpc_metadata_base_construct (GType object_type, const gchar* fname);
+pdfpcslides_notes* pdfpc_slides_notes_new (void);
+pdfpcslides_notes* pdfpc_slides_notes_construct (GType object_type);
+PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, const gchar* url);
 static void _vala_array_add4 (gint** array, int* length, int* size, gint value);
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_fill_path_info (orgwesthoffsweltpdfpresenterMetadataPdf* self, const gchar* fname);
-void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_skips (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_notes (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gboolean org_westhoffswelt_pdfpresenter_slides_notes_has_notes (orgwesthoffsweltpdfpresenterslides_notes* self);
-gchar* org_westhoffswelt_pdfpresenter_slides_notes_format_to_save (orgwesthoffsweltpdfpresenterslides_notes* self);
-orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata_pdf_new (const gchar* fname);
-orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata_pdf_construct (GType object_type, const gchar* fname);
-orgwesthoffsweltpdfpresenterMetadataBase* org_westhoffswelt_pdfpresenter_metadata_base_construct (GType object_type, const gchar* fname);
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_slides_notes_new (void);
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_slides_notes_construct (GType object_type);
-PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (orgwesthoffsweltpdfpresenterMetadataPdf* self, const gchar* url);
-static void _vala_array_add5 (gint** array, int* length, int* size, gint value);
-static guint org_westhoffswelt_pdfpresenter_metadata_pdf_real_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* base);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-void org_westhoffswelt_pdfpresenter_metadata_pdf_set_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint slide);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint slide_number, gint user_slide_number);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint number);
+static guint pdfpc_metadata_pdf_real_get_slide_count (pdfpcMetadataBase* base);
+gint pdfpc_metadata_pdf_get_user_slide_count (pdfpcMetadataPdf* self);
+gint pdfpc_metadata_pdf_get_end_user_slide (pdfpcMetadataPdf* self);
+void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide);
+gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, gint user_slide_number);
+gint pdfpc_metadata_pdf_user_slide_to_real_slide (pdfpcMetadataPdf* self, gint number);
 static gint* _vala_array_dup3 (gint* self, int length);
 static gint* _vala_array_dup4 (gint* self, int length);
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint number);
-gdouble org_westhoffswelt_pdfpresenter_metadata_pdf_get_page_width (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-gdouble org_westhoffswelt_pdfpresenter_metadata_pdf_get_page_height (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_get_document (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_metadata_pdf_get_notes (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-guint org_westhoffswelt_pdfpresenter_metadata_pdf_get_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self);
-void org_westhoffswelt_pdfpresenter_metadata_pdf_set_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self, guint d);
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_finalize (GObject* obj);
+gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number);
+gdouble pdfpc_metadata_pdf_get_page_width (pdfpcMetadataPdf* self);
+gdouble pdfpc_metadata_pdf_get_page_height (pdfpcMetadataPdf* self);
+PopplerDocument* pdfpc_metadata_pdf_get_document (pdfpcMetadataPdf* self);
+pdfpcslides_notes* pdfpc_metadata_pdf_get_notes (pdfpcMetadataPdf* self);
+guint pdfpc_metadata_pdf_get_duration (pdfpcMetadataPdf* self);
+void pdfpc_metadata_pdf_set_duration (pdfpcMetadataPdf* self, guint d);
+static void pdfpc_metadata_pdf_finalize (GObject* obj);
 static void _vala_array_destroy (gpointer array, gint array_length, GDestroyNotify destroy_func);
 static void _vala_array_free (gpointer array, gint array_length, GDestroyNotify destroy_func);
 static gint _vala_array_length (gpointer array);
@@ -153,15 +153,15 @@ static gint _vala_array_length (gpointer array);
 /**
          * The parsing states for the pdfpc file
          */
-static GType org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id__volatile)) {
-		static const GEnumValue values[] = {{ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_FILE, "ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_FILE", "file"}, {ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_SKIP, "ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_SKIP", "skip"}, {ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_DURATION, "ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_DURATION", "duration"}, {ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_END_USER_SLIDE, "ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_END_USER_SLIDE", "end-user-slide"}, {ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTES, "ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTES", "notes"}, {ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTHING, "ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTHING", "nothing"}, {0, NULL, NULL}};
-		GType org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id;
-		org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id = g_enum_register_static ("orgwesthoffsweltpdfpresenterMetadataPdfParseState", values);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id__volatile, org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id);
+static GType pdfpc_metadata_pdf_parse_state_get_type (void) {
+	static volatile gsize pdfpc_metadata_pdf_parse_state_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_metadata_pdf_parse_state_type_id__volatile)) {
+		static const GEnumValue values[] = {{PDFPC_METADATA_PDF_PARSE_STATE_FILE, "PDFPC_METADATA_PDF_PARSE_STATE_FILE", "file"}, {PDFPC_METADATA_PDF_PARSE_STATE_SKIP, "PDFPC_METADATA_PDF_PARSE_STATE_SKIP", "skip"}, {PDFPC_METADATA_PDF_PARSE_STATE_DURATION, "PDFPC_METADATA_PDF_PARSE_STATE_DURATION", "duration"}, {PDFPC_METADATA_PDF_PARSE_STATE_END_USER_SLIDE, "PDFPC_METADATA_PDF_PARSE_STATE_END_USER_SLIDE", "end-user-slide"}, {PDFPC_METADATA_PDF_PARSE_STATE_NOTES, "PDFPC_METADATA_PDF_PARSE_STATE_NOTES", "notes"}, {PDFPC_METADATA_PDF_PARSE_STATE_NOTHING, "PDFPC_METADATA_PDF_PARSE_STATE_NOTHING", "nothing"}, {0, NULL, NULL}};
+		GType pdfpc_metadata_pdf_parse_state_type_id;
+		pdfpc_metadata_pdf_parse_state_type_id = g_enum_register_static ("pdfpcMetadataPdfParseState", values);
+		g_once_init_leave (&pdfpc_metadata_pdf_parse_state_type_id__volatile, pdfpc_metadata_pdf_parse_state_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_metadata_pdf_parse_state_type_id__volatile;
+	return pdfpc_metadata_pdf_parse_state_type_id__volatile;
 }
 
 
@@ -183,7 +183,7 @@ static gchar* string_strip (const gchar* self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwesthoffsweltpdfpresenterMetadataPdf* self, gchar** skip_line) {
+static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar** skip_line) {
 	gchar* _vala_skip_line = NULL;
 	GError * _inner_error_ = NULL;
 	g_return_if_fail (self != NULL);
@@ -206,7 +206,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 		gchar** lines;
 		gint lines_length1;
 		gint _lines_size_;
-		orgwesthoffsweltpdfpresenterMetadataPdfParseState state;
+		pdfpcMetadataPdfParseState state;
 		_tmp0_ = self->pdfpc_url;
 		_tmp1_ = g_file_new_for_uri (_tmp0_);
 		file = _tmp1_;
@@ -219,7 +219,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 		if (_inner_error_ != NULL) {
 			raw_datau8 = (g_free (raw_datau8), NULL);
 			_g_object_unref0 (file);
-			goto __catch10_g_error;
+			goto __catch13_g_error;
 		}
 		_tmp5_ = raw_datau8;
 		_tmp5__length1 = raw_datau8_length1;
@@ -227,7 +227,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 		lines = _tmp7_;
 		lines_length1 = _vala_array_length (_tmp6_);
 		_lines_size_ = lines_length1;
-		state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTHING;
+		state = PDFPC_METADATA_PDF_PARSE_STATE_NOTHING;
 		{
 			gint i;
 			i = 0;
@@ -273,27 +273,27 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 					}
 					_tmp18_ = l;
 					if (g_strcmp0 (_tmp18_, "[file]") == 0) {
-						state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_FILE;
+						state = PDFPC_METADATA_PDF_PARSE_STATE_FILE;
 					} else {
 						const gchar* _tmp19_;
 						_tmp19_ = l;
 						if (g_strcmp0 (_tmp19_, "[skip]") == 0) {
-							state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_SKIP;
+							state = PDFPC_METADATA_PDF_PARSE_STATE_SKIP;
 						} else {
 							const gchar* _tmp20_;
 							_tmp20_ = l;
 							if (g_strcmp0 (_tmp20_, "[duration]") == 0) {
-								state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_DURATION;
+								state = PDFPC_METADATA_PDF_PARSE_STATE_DURATION;
 							} else {
 								const gchar* _tmp21_;
 								_tmp21_ = l;
 								if (g_strcmp0 (_tmp21_, "[end_user_slide]") == 0) {
-									state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_END_USER_SLIDE;
+									state = PDFPC_METADATA_PDF_PARSE_STATE_END_USER_SLIDE;
 								} else {
 									const gchar* _tmp22_;
 									_tmp22_ = l;
 									if (g_strcmp0 (_tmp22_, "[notes]") == 0) {
-										orgwesthoffsweltpdfpresenterslides_notes* _tmp23_;
+										pdfpcslides_notes* _tmp23_;
 										gchar** _tmp24_;
 										gint _tmp24__length1;
 										gint _tmp25_;
@@ -305,14 +305,14 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 										_tmp25_ = i;
 										_tmp26_ = lines;
 										_tmp26__length1 = lines_length1;
-										org_westhoffswelt_pdfpresenter_slides_notes_parse_lines (_tmp23_, _tmp24_ + (_tmp25_ + 1), _tmp26__length1 - (_tmp25_ + 1));
+										pdfpc_slides_notes_parse_lines (_tmp23_, _tmp24_ + (_tmp25_ + 1), _tmp26__length1 - (_tmp25_ + 1));
 										_g_free0 (l);
 										break;
 									} else {
-										orgwesthoffsweltpdfpresenterMetadataPdfParseState _tmp27_;
+										pdfpcMetadataPdfParseState _tmp27_;
 										_tmp27_ = state;
 										switch (_tmp27_) {
-											case ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_FILE:
+											case PDFPC_METADATA_PDF_PARSE_STATE_FILE:
 											{
 												const gchar* _tmp28_;
 												gchar* _tmp29_;
@@ -341,11 +341,11 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 												_tmp37_ = g_file_get_uri (_tmp36_);
 												_g_free0 (self->pdf_url);
 												self->pdf_url = _tmp37_;
-												state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTHING;
+												state = PDFPC_METADATA_PDF_PARSE_STATE_NOTHING;
 												_g_object_unref0 (pdffile);
 												break;
 											}
-											case ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_SKIP:
+											case PDFPC_METADATA_PDF_PARSE_STATE_SKIP:
 											{
 												const gchar* _tmp38_;
 												gchar* _tmp39_;
@@ -354,10 +354,10 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 												_g_free0 (_vala_skip_line);
 												_vala_skip_line = _tmp39_;
 												self->skips_by_user = TRUE;
-												state = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_NOTHING;
+												state = PDFPC_METADATA_PDF_PARSE_STATE_NOTHING;
 												break;
 											}
-											case ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_DURATION:
+											case PDFPC_METADATA_PDF_PARSE_STATE_DURATION:
 											{
 												const gchar* _tmp40_;
 												gint _tmp41_ = 0;
@@ -366,7 +366,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 												self->duration = (guint) _tmp41_;
 												break;
 											}
-											case ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_PARSE_STATE_END_USER_SLIDE:
+											case PDFPC_METADATA_PDF_PARSE_STATE_END_USER_SLIDE:
 											{
 												const gchar* _tmp42_;
 												gint _tmp43_ = 0;
@@ -391,8 +391,8 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 		raw_datau8 = (g_free (raw_datau8), NULL);
 		_g_object_unref0 (file);
 	}
-	goto __finally10;
-	__catch10_g_error:
+	goto __finally13;
+	__catch13_g_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp44_;
@@ -402,7 +402,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 		g_error ("pdf.vala:145: %s", _tmp44_);
 		_g_error_free0 (e);
 	}
-	__finally10:
+	__finally13:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
@@ -419,6 +419,15 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (orgwes
 /**
          * Parse the line for the skip slides
          */
+static void _vala_array_add2 (gint** array, int* length, int* size, gint value) {
+	if ((*length) == (*size)) {
+		*size = (*size) ? (2 * (*size)) : 4;
+		*array = g_renew (gint, *array, *size);
+	}
+	(*array)[(*length)++] = value;
+}
+
+
 static void _vala_array_add3 (gint** array, int* length, int* size, gint value) {
 	if ((*length) == (*size)) {
 		*size = (*size) ? (2 * (*size)) : 4;
@@ -428,16 +437,7 @@ static void _vala_array_add3 (gint** array, int* length, int* size, gint value) 
 }
 
 
-static void _vala_array_add4 (gint** array, int* length, int* size, gint value) {
-	if ((*length) == (*size)) {
-		*size = (*size) ? (2 * (*size)) : 4;
-		*array = g_renew (gint, *array, *size);
-	}
-	(*array)[(*length)++] = value;
-}
-
-
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_skip_line (orgwesthoffsweltpdfpresenterMetadataPdf* self, const gchar* line) {
+static void pdfpc_metadata_pdf_parse_skip_line (pdfpcMetadataPdf* self, const gchar* line) {
 	gint s;
 	const gchar* _tmp0_;
 	gchar** _tmp1_;
@@ -516,7 +516,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_skip_line (orgwest
 					_tmp17_ = self->priv->user_view_indexes;
 					_tmp17__length1 = self->priv->user_view_indexes_length1;
 					_tmp18_ = s;
-					_vala_array_add3 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp18_);
+					_vala_array_add2 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp18_);
 					_tmp19_ = s;
 					s = _tmp19_ + 1;
 				}
@@ -540,7 +540,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_parse_skip_line (orgwest
 		_tmp23_ = self->priv->user_view_indexes;
 		_tmp23__length1 = self->priv->user_view_indexes_length1;
 		_tmp24_ = s;
-		_vala_array_add4 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp24_);
+		_vala_array_add3 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp24_);
 		_tmp25_ = s;
 		s = _tmp25_ + 1;
 	}
@@ -652,7 +652,7 @@ static gint string_last_index_of (const gchar* self, const gchar* needle, gint s
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_fill_path_info (orgwesthoffsweltpdfpresenterMetadataPdf* self, const gchar* fname) {
+static void pdfpc_metadata_pdf_fill_path_info (pdfpcMetadataPdf* self, const gchar* fname) {
 	const gchar* _tmp0_;
 	gint _tmp1_;
 	gint _tmp2_;
@@ -774,7 +774,7 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_fill_path_info (orgwesth
          * Save the metadata to disk, if needed (i.e. if the user did something
          * with the notes or the skips)
          */
-void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self) {
 	gchar* _tmp0_ = NULL;
 	gchar* _tmp1_;
 	gchar* _tmp2_ = NULL;
@@ -792,17 +792,17 @@ void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltp
 	gchar* contents;
 	GError * _inner_error_ = NULL;
 	g_return_if_fail (self != NULL);
-	_tmp0_ = org_westhoffswelt_pdfpresenter_metadata_pdf_format_duration (self);
+	_tmp0_ = pdfpc_metadata_pdf_format_duration (self);
 	_tmp1_ = _tmp0_;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_metadata_pdf_format_skips (self);
+	_tmp2_ = pdfpc_metadata_pdf_format_skips (self);
 	_tmp3_ = _tmp2_;
 	_tmp4_ = g_strconcat (_tmp1_, _tmp3_, NULL);
 	_tmp5_ = _tmp4_;
-	_tmp6_ = org_westhoffswelt_pdfpresenter_metadata_pdf_format_end_user_slide (self);
+	_tmp6_ = pdfpc_metadata_pdf_format_end_user_slide (self);
 	_tmp7_ = _tmp6_;
 	_tmp8_ = g_strconcat (_tmp5_, _tmp7_, NULL);
 	_tmp9_ = _tmp8_;
-	_tmp10_ = org_westhoffswelt_pdfpresenter_metadata_pdf_format_notes (self);
+	_tmp10_ = pdfpc_metadata_pdf_format_notes (self);
 	_tmp11_ = _tmp10_;
 	_tmp12_ = g_strconcat (_tmp9_, _tmp11_, NULL);
 	_tmp13_ = _tmp12_;
@@ -859,7 +859,7 @@ void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltp
 			_g_free0 (_tmp26_);
 			if (_inner_error_ != NULL) {
 				_g_object_unref0 (pdfpc_file);
-				goto __catch11_g_error;
+				goto __catch14_g_error;
 			}
 			_g_object_unref0 (pdfpc_file);
 		} else {
@@ -879,14 +879,14 @@ void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltp
 				g_file_delete (_tmp35_, NULL, &_inner_error_);
 				if (_inner_error_ != NULL) {
 					_g_object_unref0 (file);
-					goto __catch11_g_error;
+					goto __catch14_g_error;
 				}
 			}
 			_g_object_unref0 (file);
 		}
 	}
-	goto __finally11;
-	__catch11_g_error:
+	goto __finally14;
+	__catch14_g_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp36_;
@@ -896,7 +896,7 @@ void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltp
 		g_error ("pdf.vala:212: %s", _tmp36_);
 		_g_error_free0 (e);
 	}
-	__finally11:
+	__finally14:
 	if (_inner_error_ != NULL) {
 		_g_free0 (contents);
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
@@ -910,7 +910,7 @@ void org_westhoffswelt_pdfpresenter_metadata_pdf_save_to_disk (orgwesthoffsweltp
 /**
          * Format the skip information for saving to disk
          */
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_skips (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gchar* pdfpc_metadata_pdf_format_skips (pdfpcMetadataPdf* self) {
 	gchar* result = NULL;
 	gchar* _tmp0_;
 	gchar* contents;
@@ -1008,7 +1008,7 @@ gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_skips (orgwesthoffswel
 }
 
 
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gchar* pdfpc_metadata_pdf_format_end_user_slide (pdfpcMetadataPdf* self) {
 	gchar* result = NULL;
 	gchar* _tmp0_;
 	gchar* contents;
@@ -1040,20 +1040,20 @@ gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_end_user_slide (orgwes
 /**
          * Format the notes for saving to disk
          */
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_notes (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gchar* pdfpc_metadata_pdf_format_notes (pdfpcMetadataPdf* self) {
 	gchar* result = NULL;
 	gchar* _tmp0_;
 	gchar* contents;
-	orgwesthoffsweltpdfpresenterslides_notes* _tmp1_;
+	pdfpcslides_notes* _tmp1_;
 	gboolean _tmp2_ = FALSE;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = g_strdup ("");
 	contents = _tmp0_;
 	_tmp1_ = self->notes;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_slides_notes_has_notes (_tmp1_);
+	_tmp2_ = pdfpc_slides_notes_has_notes (_tmp1_);
 	if (_tmp2_) {
 		const gchar* _tmp3_;
-		orgwesthoffsweltpdfpresenterslides_notes* _tmp4_;
+		pdfpcslides_notes* _tmp4_;
 		gchar* _tmp5_ = NULL;
 		gchar* _tmp6_;
 		gchar* _tmp7_;
@@ -1061,7 +1061,7 @@ gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_notes (orgwesthoffswel
 		gchar* _tmp9_;
 		_tmp3_ = contents;
 		_tmp4_ = self->notes;
-		_tmp5_ = org_westhoffswelt_pdfpresenter_slides_notes_format_to_save (_tmp4_);
+		_tmp5_ = pdfpc_slides_notes_format_to_save (_tmp4_);
 		_tmp6_ = _tmp5_;
 		_tmp7_ = g_strconcat ("[notes]\n", _tmp6_, NULL);
 		_tmp8_ = _tmp7_;
@@ -1076,7 +1076,7 @@ gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_notes (orgwesthoffswel
 }
 
 
-gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gchar* pdfpc_metadata_pdf_format_duration (pdfpcMetadataPdf* self) {
 	gchar* result = NULL;
 	gchar* _tmp0_;
 	gchar* contents;
@@ -1108,7 +1108,7 @@ gchar* org_westhoffswelt_pdfpresenter_metadata_pdf_format_duration (orgwesthoffs
 /**
          * Base constructor taking the file url to the pdf file
          */
-static void _vala_array_add5 (gint** array, int* length, int* size, gint value) {
+static void _vala_array_add4 (gint** array, int* length, int* size, gint value) {
 	if ((*length) == (*size)) {
 		*size = (*size) ? (2 * (*size)) : 4;
 		*array = g_renew (gint, *array, *size);
@@ -1117,11 +1117,11 @@ static void _vala_array_add5 (gint** array, int* length, int* size, gint value) 
 }
 
 
-orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata_pdf_construct (GType object_type, const gchar* fname) {
-	orgwesthoffsweltpdfpresenterMetadataPdf * self = NULL;
+pdfpcMetadataPdf* pdfpc_metadata_pdf_construct (GType object_type, const gchar* fname) {
+	pdfpcMetadataPdf * self = NULL;
 	const gchar* _tmp0_;
 	const gchar* _tmp1_;
-	orgwesthoffsweltpdfpresenterslides_notes* _tmp2_;
+	pdfpcslides_notes* _tmp2_;
 	gchar* skip_line;
 	const gchar* _tmp3_;
 	GFile* _tmp4_ = NULL;
@@ -1142,10 +1142,10 @@ orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata
 	GMutex* _tmp40_;
 	g_return_val_if_fail (fname != NULL, NULL);
 	_tmp0_ = fname;
-	self = (orgwesthoffsweltpdfpresenterMetadataPdf*) org_westhoffswelt_pdfpresenter_metadata_base_construct (object_type, _tmp0_);
+	self = (pdfpcMetadataPdf*) pdfpc_metadata_base_construct (object_type, _tmp0_);
 	_tmp1_ = fname;
-	org_westhoffswelt_pdfpresenter_metadata_pdf_fill_path_info (self, _tmp1_);
-	_tmp2_ = org_westhoffswelt_pdfpresenter_slides_notes_new ();
+	pdfpc_metadata_pdf_fill_path_info (self, _tmp1_);
+	_tmp2_ = pdfpc_slides_notes_new ();
 	_g_object_unref0 (self->notes);
 	self->notes = _tmp2_;
 	self->skips_by_user = FALSE;
@@ -1158,15 +1158,15 @@ orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata
 	_g_object_unref0 (_tmp5_);
 	if (_tmp7_) {
 		gchar* _tmp8_ = NULL;
-		org_westhoffswelt_pdfpresenter_metadata_pdf_parse_pdfpc_file (self, &_tmp8_);
+		pdfpc_metadata_pdf_parse_pdfpc_file (self, &_tmp8_);
 		_g_free0 (skip_line);
 		skip_line = _tmp8_;
 	}
 	_tmp9_ = self->pdf_url;
-	_tmp10_ = org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (self, _tmp9_);
+	_tmp10_ = pdfpc_metadata_pdf_open_pdf_document (self, _tmp9_);
 	_g_object_unref0 (self->document);
 	self->document = _tmp10_;
-	_tmp11_ = org_westhoffswelt_pdfpresenter_mutex_locks_poppler;
+	_tmp11_ = pdfpc_mutex_locks_poppler;
 	g_mutex_lock (_tmp11_);
 	_tmp12_ = self->document;
 	_tmp13_ = poppler_document_get_n_pages (_tmp12_);
@@ -1237,7 +1237,7 @@ orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata
 						_tmp34_ = self->priv->user_view_indexes;
 						_tmp34__length1 = self->priv->user_view_indexes_length1;
 						_tmp35_ = i;
-						_vala_array_add5 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp35_);
+						_vala_array_add4 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp35_);
 						_tmp36_ = this_label;
 						_tmp37_ = g_strdup (_tmp36_);
 						_g_free0 (previous_label);
@@ -1253,28 +1253,28 @@ orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata
 	} else {
 		const gchar* _tmp39_;
 		_tmp39_ = skip_line;
-		org_westhoffswelt_pdfpresenter_metadata_pdf_parse_skip_line (self, _tmp39_);
+		pdfpc_metadata_pdf_parse_skip_line (self, _tmp39_);
 	}
-	_tmp40_ = org_westhoffswelt_pdfpresenter_mutex_locks_poppler;
+	_tmp40_ = pdfpc_mutex_locks_poppler;
 	g_mutex_unlock (_tmp40_);
 	_g_free0 (skip_line);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterMetadataPdf* org_westhoffswelt_pdfpresenter_metadata_pdf_new (const gchar* fname) {
-	return org_westhoffswelt_pdfpresenter_metadata_pdf_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_PDF, fname);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_new (const gchar* fname) {
+	return pdfpc_metadata_pdf_construct (PDFPC_METADATA_TYPE_PDF, fname);
 }
 
 
 /**
          * Return the number of pages in the pdf document
          */
-static guint org_westhoffswelt_pdfpresenter_metadata_pdf_real_get_slide_count (orgwesthoffsweltpdfpresenterMetadataBase* base) {
-	orgwesthoffsweltpdfpresenterMetadataPdf * self;
+static guint pdfpc_metadata_pdf_real_get_slide_count (pdfpcMetadataBase* base) {
+	pdfpcMetadataPdf * self;
 	guint result = 0U;
 	guint _tmp0_;
-	self = (orgwesthoffsweltpdfpresenterMetadataPdf*) base;
+	self = (pdfpcMetadataPdf*) base;
 	_tmp0_ = self->page_count;
 	result = _tmp0_;
 	return result;
@@ -1284,7 +1284,7 @@ static guint org_westhoffswelt_pdfpresenter_metadata_pdf_real_get_slide_count (o
 /**
          * Return the number of user slides
          */
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gint pdfpc_metadata_pdf_get_user_slide_count (pdfpcMetadataPdf* self) {
 	gint result = 0;
 	gint* _tmp0_;
 	gint _tmp0__length1;
@@ -1300,7 +1300,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (orgwestho
          * Return the last slide defined by the user. It may be different as
          * get_user_slide_count()!
          */
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gint pdfpc_metadata_pdf_get_end_user_slide (pdfpcMetadataPdf* self) {
 	gint result = 0;
 	gint _tmp0_;
 	g_return_val_if_fail (self != NULL, 0);
@@ -1312,7 +1312,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (orgwesthoff
 		return result;
 	} else {
 		gint _tmp2_ = 0;
-		_tmp2_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (self);
+		_tmp2_ = pdfpc_metadata_pdf_get_user_slide_count (self);
 		result = _tmp2_;
 		return result;
 	}
@@ -1322,7 +1322,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_get_end_user_slide (orgwesthoff
 /**
          * Set the last slide defined by the user
          */
-void org_westhoffswelt_pdfpresenter_metadata_pdf_set_end_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint slide) {
+void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide) {
 	gint _tmp0_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = slide;
@@ -1348,7 +1348,7 @@ static gint* _vala_array_dup4 (gint* self, int length) {
 }
 
 
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint slide_number, gint user_slide_number) {
+gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, gint user_slide_number) {
 	gint result = 0;
 	gint _tmp0_;
 	gint _tmp1_;
@@ -1368,7 +1368,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (orgwesthoffsweltpd
 	}
 	self->skips_by_user = TRUE;
 	_tmp1_ = user_slide_number;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (self, _tmp1_);
+	_tmp2_ = pdfpc_metadata_pdf_user_slide_to_real_slide (self, _tmp1_);
 	converted_user_slide = _tmp2_;
 	_tmp3_ = self->priv->user_view_indexes;
 	_tmp3__length1 = self->priv->user_view_indexes_length1;
@@ -1655,7 +1655,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_toggle_skip (orgwesthoffsweltpd
 /**
          * Transform from user slide numbers to real slide numbers
          */
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint number) {
+gint pdfpc_metadata_pdf_user_slide_to_real_slide (pdfpcMetadataPdf* self, gint number) {
 	gint result = 0;
 	gint _tmp0_;
 	gint* _tmp1_;
@@ -1684,7 +1684,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (orgwe
 }
 
 
-gint org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (orgwesthoffsweltpdfpresenterMetadataPdf* self, gint number) {
+gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number) {
 	gint result = 0;
 	gint user_slide;
 	g_return_val_if_fail (self != NULL, 0);
@@ -1712,12 +1712,12 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (orgwe
 				}
 				_tmp0_ = FALSE;
 				_tmp3_ = u;
-				_tmp4_ = org_westhoffswelt_pdfpresenter_metadata_pdf_get_user_slide_count (self);
+				_tmp4_ = pdfpc_metadata_pdf_get_user_slide_count (self);
 				if (!(_tmp3_ < _tmp4_)) {
 					break;
 				}
 				_tmp5_ = u;
-				_tmp6_ = org_westhoffswelt_pdfpresenter_metadata_pdf_user_slide_to_real_slide (self, _tmp5_);
+				_tmp6_ = pdfpc_metadata_pdf_user_slide_to_real_slide (self, _tmp5_);
 				real_slide = _tmp6_;
 				_tmp7_ = number;
 				_tmp8_ = real_slide;
@@ -1752,7 +1752,7 @@ gint org_westhoffswelt_pdfpresenter_metadata_pdf_real_slide_to_user_slide (orgwe
          * In presentations all pages will have the same size in most cases,
          * therefore this value is assumed to be useful.
          */
-gdouble org_westhoffswelt_pdfpresenter_metadata_pdf_get_page_width (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gdouble pdfpc_metadata_pdf_get_page_width (pdfpcMetadataPdf* self) {
 	gdouble result = 0.0;
 	gdouble _tmp0_;
 	g_return_val_if_fail (self != NULL, 0.0);
@@ -1768,7 +1768,7 @@ gdouble org_westhoffswelt_pdfpresenter_metadata_pdf_get_page_width (orgwesthoffs
          * In presentations all pages will have the same size in most cases,
          * therefore this value is assumed to be useful.
          */
-gdouble org_westhoffswelt_pdfpresenter_metadata_pdf_get_page_height (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+gdouble pdfpc_metadata_pdf_get_page_height (pdfpcMetadataPdf* self) {
 	gdouble result = 0.0;
 	gdouble _tmp0_;
 	g_return_val_if_fail (self != NULL, 0.0);
@@ -1786,7 +1786,7 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_get_document (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+PopplerDocument* pdfpc_metadata_pdf_get_document (pdfpcMetadataPdf* self) {
 	PopplerDocument* result = NULL;
 	PopplerDocument* _tmp0_;
 	PopplerDocument* _tmp1_;
@@ -1801,10 +1801,10 @@ PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_get_document (orgwe
 /**
          * Return the notes for the presentation
          */
-orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_metadata_pdf_get_notes (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
-	orgwesthoffsweltpdfpresenterslides_notes* result = NULL;
-	orgwesthoffsweltpdfpresenterslides_notes* _tmp0_;
-	orgwesthoffsweltpdfpresenterslides_notes* _tmp1_;
+pdfpcslides_notes* pdfpc_metadata_pdf_get_notes (pdfpcMetadataPdf* self) {
+	pdfpcslides_notes* result = NULL;
+	pdfpcslides_notes* _tmp0_;
+	pdfpcslides_notes* _tmp1_;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->notes;
 	_tmp1_ = _g_object_ref0 (_tmp0_);
@@ -1816,7 +1816,7 @@ orgwesthoffsweltpdfpresenterslides_notes* org_westhoffswelt_pdfpresenter_metadat
 /**
          * Get the duration of the presentation
          */
-guint org_westhoffswelt_pdfpresenter_metadata_pdf_get_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self) {
+guint pdfpc_metadata_pdf_get_duration (pdfpcMetadataPdf* self) {
 	guint result = 0U;
 	guint _tmp0_;
 	g_return_val_if_fail (self != NULL, 0U);
@@ -1829,7 +1829,7 @@ guint org_westhoffswelt_pdfpresenter_metadata_pdf_get_duration (orgwesthoffswelt
 /**
          * Get the duration of the presentation
          */
-void org_westhoffswelt_pdfpresenter_metadata_pdf_set_duration (orgwesthoffsweltpdfpresenterMetadataPdf* self, guint d) {
+void pdfpc_metadata_pdf_set_duration (pdfpcMetadataPdf* self, guint d) {
 	guint _tmp0_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = d;
@@ -1840,7 +1840,7 @@ void org_westhoffswelt_pdfpresenter_metadata_pdf_set_duration (orgwesthoffsweltp
 /**
          * Open a given pdf document url and return a Poppler.Document for it.
          */
-PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (orgwesthoffsweltpdfpresenterMetadataPdf* self, const gchar* url) {
+PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, const gchar* url) {
 	PopplerDocument* result = NULL;
 	const gchar* _tmp0_;
 	GFile* _tmp1_ = NULL;
@@ -1855,7 +1855,7 @@ PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (
 	_tmp1_ = g_file_new_for_uri (_tmp0_);
 	file = _tmp1_;
 	document = NULL;
-	_tmp2_ = org_westhoffswelt_pdfpresenter_mutex_locks_poppler;
+	_tmp2_ = pdfpc_mutex_locks_poppler;
 	g_mutex_lock (_tmp2_);
 	{
 		gchar* _tmp3_ = NULL;
@@ -1870,13 +1870,13 @@ PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (
 		_g_free0 (_tmp4_);
 		_tmp7_ = _tmp6_;
 		if (_inner_error_ != NULL) {
-			goto __catch12_g_error;
+			goto __catch15_g_error;
 		}
 		_g_object_unref0 (document);
 		document = _tmp7_;
 	}
-	goto __finally12;
-	__catch12_g_error:
+	goto __finally15;
+	__catch15_g_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp8_;
@@ -1886,7 +1886,7 @@ PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (
 		g_error ("pdf.vala:462: Unable to open pdf file: %s", _tmp8_);
 		_g_error_free0 (e);
 	}
-	__finally12:
+	__finally15:
 	if (_inner_error_ != NULL) {
 		_g_object_unref0 (document);
 		_g_object_unref0 (file);
@@ -1894,7 +1894,7 @@ PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (
 		g_clear_error (&_inner_error_);
 		return NULL;
 	}
-	_tmp9_ = org_westhoffswelt_pdfpresenter_mutex_locks_poppler;
+	_tmp9_ = pdfpc_mutex_locks_poppler;
 	g_mutex_unlock (_tmp9_);
 	result = document;
 	_g_object_unref0 (file);
@@ -1902,16 +1902,16 @@ PopplerDocument* org_westhoffswelt_pdfpresenter_metadata_pdf_open_pdf_document (
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_class_init (orgwesthoffsweltpdfpresenterMetadataPdfClass * klass) {
-	org_westhoffswelt_pdfpresenter_metadata_pdf_parent_class = g_type_class_peek_parent (klass);
-	g_type_class_add_private (klass, sizeof (orgwesthoffsweltpdfpresenterMetadataPdfPrivate));
-	ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_BASE_CLASS (klass)->get_slide_count = org_westhoffswelt_pdfpresenter_metadata_pdf_real_get_slide_count;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_metadata_pdf_finalize;
+static void pdfpc_metadata_pdf_class_init (pdfpcMetadataPdfClass * klass) {
+	pdfpc_metadata_pdf_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (pdfpcMetadataPdfPrivate));
+	PDFPC_METADATA_BASE_CLASS (klass)->get_slide_count = pdfpc_metadata_pdf_real_get_slide_count;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_metadata_pdf_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_instance_init (orgwesthoffsweltpdfpresenterMetadataPdf * self) {
-	self->priv = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF_GET_PRIVATE (self);
+static void pdfpc_metadata_pdf_instance_init (pdfpcMetadataPdf * self) {
+	self->priv = PDFPC_METADATA_PDF_GET_PRIVATE (self);
 	self->pdf_fname = NULL;
 	self->pdf_url = NULL;
 	self->pdfpc_url = NULL;
@@ -1919,31 +1919,31 @@ static void org_westhoffswelt_pdfpresenter_metadata_pdf_instance_init (orgwestho
 }
 
 
-static void org_westhoffswelt_pdfpresenter_metadata_pdf_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterMetadataPdf * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_PDF (obj);
+static void pdfpc_metadata_pdf_finalize (GObject* obj) {
+	pdfpcMetadataPdf * self;
+	self = PDFPC_METADATA_PDF (obj);
 	_g_free0 (self->pdf_fname);
 	_g_free0 (self->pdf_url);
 	_g_free0 (self->pdfpc_url);
 	_g_object_unref0 (self->document);
 	_g_object_unref0 (self->notes);
 	self->priv->user_view_indexes = (g_free (self->priv->user_view_indexes), NULL);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_metadata_pdf_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_metadata_pdf_parent_class)->finalize (obj);
 }
 
 
 /**
      * Metadata for Pdf files
      */
-GType org_westhoffswelt_pdfpresenter_metadata_pdf_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_metadata_pdf_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_metadata_pdf_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterMetadataPdfClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_metadata_pdf_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterMetadataPdf), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_metadata_pdf_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_metadata_pdf_type_id;
-		org_westhoffswelt_pdfpresenter_metadata_pdf_type_id = g_type_register_static (ORG_WESTHOFFSWELT_PDFPRESENTER_METADATA_TYPE_BASE, "orgwesthoffsweltpdfpresenterMetadataPdf", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_metadata_pdf_type_id__volatile, org_westhoffswelt_pdfpresenter_metadata_pdf_type_id);
+GType pdfpc_metadata_pdf_get_type (void) {
+	static volatile gsize pdfpc_metadata_pdf_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_metadata_pdf_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcMetadataPdfClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_metadata_pdf_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcMetadataPdf), 0, (GInstanceInitFunc) pdfpc_metadata_pdf_instance_init, NULL };
+		GType pdfpc_metadata_pdf_type_id;
+		pdfpc_metadata_pdf_type_id = g_type_register_static (PDFPC_METADATA_TYPE_BASE, "pdfpcMetadataPdf", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_metadata_pdf_type_id__volatile, pdfpc_metadata_pdf_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_metadata_pdf_type_id__volatile;
+	return pdfpc_metadata_pdf_type_id__volatile;
 }
 
 

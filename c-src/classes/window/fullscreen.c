@@ -8,49 +8,52 @@
 #include <gdk/gdk.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN (org_westhoffswelt_pdfpresenter_window_fullscreen_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, orgwesthoffsweltpdfpresenterWindowFullscreen))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, orgwesthoffsweltpdfpresenterWindowFullscreenClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_IS_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, orgwesthoffsweltpdfpresenterWindowFullscreenClass))
+#define PDFPC_WINDOW_TYPE_FULLSCREEN (pdfpc_window_fullscreen_get_type ())
+#define PDFPC_WINDOW_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreen))
+#define PDFPC_WINDOW_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreenClass))
+#define PDFPC_WINDOW_IS_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN))
+#define PDFPC_WINDOW_IS_FULLSCREEN_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_WINDOW_TYPE_FULLSCREEN))
+#define PDFPC_WINDOW_FULLSCREEN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreenClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterWindowFullscreen orgwesthoffsweltpdfpresenterWindowFullscreen;
-typedef struct _orgwesthoffsweltpdfpresenterWindowFullscreenClass orgwesthoffsweltpdfpresenterWindowFullscreenClass;
-typedef struct _orgwesthoffsweltpdfpresenterWindowFullscreenPrivate orgwesthoffsweltpdfpresenterWindowFullscreenPrivate;
+typedef struct _pdfpcWindowFullscreen pdfpcWindowFullscreen;
+typedef struct _pdfpcWindowFullscreenClass pdfpcWindowFullscreenClass;
+typedef struct _pdfpcWindowFullscreenPrivate pdfpcWindowFullscreenPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _gdk_cursor_unref0(var) ((var == NULL) ? NULL : (var = (gdk_cursor_unref (var), NULL)))
 
-struct _orgwesthoffsweltpdfpresenterWindowFullscreen {
+struct _pdfpcWindowFullscreen {
 	GtkWindow parent_instance;
-	orgwesthoffsweltpdfpresenterWindowFullscreenPrivate * priv;
+	pdfpcWindowFullscreenPrivate * priv;
 	GdkRectangle screen_geometry;
 	guint hide_cursor_timeout;
 	gboolean faded_to_black;
 	gboolean frozen;
 };
 
-struct _orgwesthoffsweltpdfpresenterWindowFullscreenClass {
+struct _pdfpcWindowFullscreenClass {
 	GtkWindowClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_window_fullscreen_parent_class = NULL;
+static gpointer pdfpc_window_fullscreen_parent_class = NULL;
+extern gboolean pdfpc_options_windowed;
 
-GType org_westhoffswelt_pdfpresenter_window_fullscreen_get_type (void) G_GNUC_CONST;
+GType pdfpc_window_fullscreen_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN_DUMMY_PROPERTY
+	PDFPC_WINDOW_FULLSCREEN_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterWindowFullscreen* org_westhoffswelt_pdfpresenter_window_fullscreen_new (gint screen_num);
-orgwesthoffsweltpdfpresenterWindowFullscreen* org_westhoffswelt_pdfpresenter_window_fullscreen_construct (GType object_type, gint screen_num);
-void org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate (orgwesthoffsweltpdfpresenterWindowFullscreen* self, GtkWidget* source, GdkRectangle* r);
-static void _org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate_gtk_widget_size_allocate (GtkWidget* _sender, GdkRectangle* allocation, gpointer self);
-gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move (orgwesthoffsweltpdfpresenterWindowFullscreen* self, GtkWidget* source, GdkEventMotion* event);
-static gboolean _org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move_gtk_widget_motion_notify_event (GtkWidget* _sender, GdkEventMotion* event, gpointer self);
-void org_westhoffswelt_pdfpresenter_window_fullscreen_restart_hide_cursor_timer (orgwesthoffsweltpdfpresenterWindowFullscreen* self);
-gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout (orgwesthoffsweltpdfpresenterWindowFullscreen* self);
-static gboolean _org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout_gsource_func (gpointer self);
-static void org_westhoffswelt_pdfpresenter_window_fullscreen_finalize (GObject* obj);
+pdfpcWindowFullscreen* pdfpc_window_fullscreen_new (gint screen_num);
+pdfpcWindowFullscreen* pdfpc_window_fullscreen_construct (GType object_type, gint screen_num);
+void pdfpc_window_fullscreen_on_size_allocate (pdfpcWindowFullscreen* self, GtkWidget* source, GdkRectangle* r);
+static void _pdfpc_window_fullscreen_on_size_allocate_gtk_widget_size_allocate (GtkWidget* _sender, GdkRectangle* allocation, gpointer self);
+gboolean pdfpc_window_fullscreen_on_configure (pdfpcWindowFullscreen* self, GdkEventConfigure* e);
+static gboolean _pdfpc_window_fullscreen_on_configure_gtk_widget_configure_event (GtkWidget* _sender, GdkEventConfigure* event, gpointer self);
+gboolean pdfpc_window_fullscreen_on_mouse_move (pdfpcWindowFullscreen* self, GtkWidget* source, GdkEventMotion* event);
+static gboolean _pdfpc_window_fullscreen_on_mouse_move_gtk_widget_motion_notify_event (GtkWidget* _sender, GdkEventMotion* event, gpointer self);
+void pdfpc_window_fullscreen_restart_hide_cursor_timer (pdfpcWindowFullscreen* self);
+gboolean pdfpc_window_fullscreen_on_hide_cursor_timeout (pdfpcWindowFullscreen* self);
+static gboolean _pdfpc_window_fullscreen_on_hide_cursor_timeout_gsource_func (gpointer self);
+static void pdfpc_window_fullscreen_finalize (GObject* obj);
 
 
 static gpointer _g_object_ref0 (gpointer self) {
@@ -58,27 +61,31 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-static void _org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate_gtk_widget_size_allocate (GtkWidget* _sender, GdkRectangle* allocation, gpointer self) {
-	org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate (self, _sender, allocation);
+static void _pdfpc_window_fullscreen_on_size_allocate_gtk_widget_size_allocate (GtkWidget* _sender, GdkRectangle* allocation, gpointer self) {
+	pdfpc_window_fullscreen_on_size_allocate (self, _sender, allocation);
 }
 
 
-static gboolean _org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move_gtk_widget_motion_notify_event (GtkWidget* _sender, GdkEventMotion* event, gpointer self) {
+static gboolean _pdfpc_window_fullscreen_on_configure_gtk_widget_configure_event (GtkWidget* _sender, GdkEventConfigure* event, gpointer self) {
 	gboolean result;
-	result = org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move (self, _sender, event);
+	result = pdfpc_window_fullscreen_on_configure (self, event);
 	return result;
 }
 
 
-orgwesthoffsweltpdfpresenterWindowFullscreen* org_westhoffswelt_pdfpresenter_window_fullscreen_construct (GType object_type, gint screen_num) {
-	orgwesthoffsweltpdfpresenterWindowFullscreen * self = NULL;
+static gboolean _pdfpc_window_fullscreen_on_mouse_move_gtk_widget_motion_notify_event (GtkWidget* _sender, GdkEventMotion* event, gpointer self) {
+	gboolean result;
+	result = pdfpc_window_fullscreen_on_mouse_move (self, _sender, event);
+	return result;
+}
+
+
+pdfpcWindowFullscreen* pdfpc_window_fullscreen_construct (GType object_type, gint screen_num) {
+	pdfpcWindowFullscreen * self = NULL;
 	GdkScreen* screen = NULL;
 	gint _tmp0_;
-	GdkRectangle _tmp20_;
-	gint _tmp21_;
-	GdkRectangle _tmp22_;
-	gint _tmp23_;
-	self = (orgwesthoffsweltpdfpresenterWindowFullscreen*) g_object_new (object_type, NULL);
+	gboolean _tmp20_;
+	self = (pdfpcWindowFullscreen*) g_object_new (object_type, NULL);
 	_tmp0_ = screen_num;
 	if (_tmp0_ >= 0) {
 		GdkScreen* _tmp1_ = NULL;
@@ -134,23 +141,51 @@ orgwesthoffsweltpdfpresenterWindowFullscreen* org_westhoffswelt_pdfpresenter_win
 		self->screen_geometry = _tmp19_;
 		_g_object_unref0 (display);
 	}
-	_tmp20_ = self->screen_geometry;
-	_tmp21_ = _tmp20_.x;
-	_tmp22_ = self->screen_geometry;
-	_tmp23_ = _tmp22_.y;
-	gtk_window_move ((GtkWindow*) self, _tmp21_, _tmp23_);
-	gtk_window_fullscreen ((GtkWindow*) self);
-	g_signal_connect_object ((GtkWidget*) self, "size-allocate", (GCallback) _org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate_gtk_widget_size_allocate, self, 0);
+	_tmp20_ = pdfpc_options_windowed;
+	if (!_tmp20_) {
+		GdkRectangle _tmp21_;
+		gint _tmp22_;
+		GdkRectangle _tmp23_;
+		gint _tmp24_;
+		_tmp21_ = self->screen_geometry;
+		_tmp22_ = _tmp21_.x;
+		_tmp23_ = self->screen_geometry;
+		_tmp24_ = _tmp23_.y;
+		gtk_window_move ((GtkWindow*) self, _tmp22_, _tmp24_);
+		g_signal_connect_object ((GtkWidget*) self, "size-allocate", (GCallback) _pdfpc_window_fullscreen_on_size_allocate_gtk_widget_size_allocate, self, 0);
+		g_signal_connect_object ((GtkWidget*) self, "configure-event", (GCallback) _pdfpc_window_fullscreen_on_configure_gtk_widget_configure_event, self, 0);
+	} else {
+		gint _tmp25_;
+		gint _tmp26_;
+		_tmp25_ = self->screen_geometry.width;
+		self->screen_geometry.width = _tmp25_ / 2;
+		_tmp26_ = self->screen_geometry.height;
+		self->screen_geometry.height = _tmp26_ / 2;
+		gtk_window_set_resizable ((GtkWindow*) self, FALSE);
+	}
 	gtk_widget_add_events ((GtkWidget*) self, (gint) GDK_POINTER_MOTION_MASK);
-	g_signal_connect_object ((GtkWidget*) self, "motion-notify-event", (GCallback) _org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move_gtk_widget_motion_notify_event, self, 0);
-	org_westhoffswelt_pdfpresenter_window_fullscreen_restart_hide_cursor_timer (self);
+	g_signal_connect_object ((GtkWidget*) self, "motion-notify-event", (GCallback) _pdfpc_window_fullscreen_on_mouse_move_gtk_widget_motion_notify_event, self, 0);
+	pdfpc_window_fullscreen_restart_hide_cursor_timer (self);
 	_g_object_unref0 (screen);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterWindowFullscreen* org_westhoffswelt_pdfpresenter_window_fullscreen_new (gint screen_num) {
-	return org_westhoffswelt_pdfpresenter_window_fullscreen_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_TYPE_FULLSCREEN, screen_num);
+pdfpcWindowFullscreen* pdfpc_window_fullscreen_new (gint screen_num) {
+	return pdfpc_window_fullscreen_construct (PDFPC_WINDOW_TYPE_FULLSCREEN, screen_num);
+}
+
+
+gboolean pdfpc_window_fullscreen_on_configure (pdfpcWindowFullscreen* self, GdkEventConfigure* e) {
+	gboolean result = FALSE;
+	guint _tmp0_ = 0U;
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (e != NULL, FALSE);
+	gtk_window_fullscreen ((GtkWindow*) self);
+	g_signal_parse_name ("configure-event", GTK_TYPE_WIDGET, &_tmp0_, NULL, FALSE);
+	g_signal_handlers_disconnect_matched ((GtkWidget*) self, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA, _tmp0_, 0, NULL, (GCallback) _pdfpc_window_fullscreen_on_configure_gtk_widget_configure_event, self);
+	result = FALSE;
+	return result;
 }
 
 
@@ -161,7 +196,7 @@ orgwesthoffsweltpdfpresenterWindowFullscreen* org_westhoffswelt_pdfpresenter_win
          * movement commands before the window has been displayed for the first
          * time.
          */
-void org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate (orgwesthoffsweltpdfpresenterWindowFullscreen* self, GtkWidget* source, GdkRectangle* r) {
+void pdfpc_window_fullscreen_on_size_allocate (pdfpcWindowFullscreen* self, GtkWidget* source, GdkRectangle* r) {
 	gboolean _tmp0_ = FALSE;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (source != NULL);
@@ -182,12 +217,8 @@ void org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate (orgwesth
 		gint _tmp13_;
 		GdkRectangle _tmp14_;
 		gint _tmp15_;
-		GdkRectangle _tmp16_;
-		gint _tmp17_;
-		GdkRectangle _tmp18_;
-		gint _tmp19_;
 		g_signal_parse_name ("size-allocate", GTK_TYPE_WIDGET, &_tmp1_, NULL, FALSE);
-		g_signal_handlers_disconnect_matched ((GtkWidget*) self, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA, _tmp1_, 0, NULL, (GCallback) _org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate_gtk_widget_size_allocate, self);
+		g_signal_handlers_disconnect_matched ((GtkWidget*) self, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA, _tmp1_, 0, NULL, (GCallback) _pdfpc_window_fullscreen_on_size_allocate_gtk_widget_size_allocate, self);
 		gtk_window_get_position ((GtkWindow*) self, &_tmp2_, &_tmp3_);
 		x = _tmp2_;
 		y = _tmp3_;
@@ -209,18 +240,11 @@ void org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate (orgwesth
 		if (_tmp11_) {
 			return;
 		}
-		gtk_window_unfullscreen ((GtkWindow*) self);
-		gtk_window_unmaximize ((GtkWindow*) self);
 		_tmp12_ = self->screen_geometry;
 		_tmp13_ = _tmp12_.x;
 		_tmp14_ = self->screen_geometry;
 		_tmp15_ = _tmp14_.y;
 		gtk_window_move ((GtkWindow*) self, _tmp13_, _tmp15_);
-		_tmp16_ = self->screen_geometry;
-		_tmp17_ = _tmp16_.width;
-		_tmp18_ = self->screen_geometry;
-		_tmp19_ = _tmp18_.height;
-		gtk_window_resize ((GtkWindow*) self, _tmp17_, _tmp19_);
 		gtk_window_fullscreen ((GtkWindow*) self);
 	}
 }
@@ -229,7 +253,7 @@ void org_westhoffswelt_pdfpresenter_window_fullscreen_on_size_allocate (orgwesth
 /**
          * Called every time the mouse cursor is moved
          */
-gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move (orgwesthoffsweltpdfpresenterWindowFullscreen* self, GtkWidget* source, GdkEventMotion* event) {
+gboolean pdfpc_window_fullscreen_on_mouse_move (pdfpcWindowFullscreen* self, GtkWidget* source, GdkEventMotion* event) {
 	gboolean result = FALSE;
 	GdkWindow* _tmp0_;
 	g_return_val_if_fail (self != NULL, FALSE);
@@ -237,7 +261,7 @@ gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move (orgwest
 	g_return_val_if_fail (event != NULL, FALSE);
 	_tmp0_ = ((GtkWidget*) self)->window;
 	gdk_window_set_cursor (_tmp0_, NULL);
-	org_westhoffswelt_pdfpresenter_window_fullscreen_restart_hide_cursor_timer (self);
+	pdfpc_window_fullscreen_restart_hide_cursor_timer (self);
 	result = FALSE;
 	return result;
 }
@@ -246,14 +270,14 @@ gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_mouse_move (orgwest
 /**
          * Restart the 5 seconds timeout before hiding the mouse cursor
          */
-static gboolean _org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout_gsource_func (gpointer self) {
+static gboolean _pdfpc_window_fullscreen_on_hide_cursor_timeout_gsource_func (gpointer self) {
 	gboolean result;
-	result = org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout (self);
+	result = pdfpc_window_fullscreen_on_hide_cursor_timeout (self);
 	return result;
 }
 
 
-void org_westhoffswelt_pdfpresenter_window_fullscreen_restart_hide_cursor_timer (orgwesthoffsweltpdfpresenterWindowFullscreen* self) {
+void pdfpc_window_fullscreen_restart_hide_cursor_timer (pdfpcWindowFullscreen* self) {
 	guint _tmp0_;
 	guint _tmp2_ = 0U;
 	g_return_if_fail (self != NULL);
@@ -263,7 +287,7 @@ void org_westhoffswelt_pdfpresenter_window_fullscreen_restart_hide_cursor_timer 
 		_tmp1_ = self->hide_cursor_timeout;
 		g_source_remove (_tmp1_);
 	}
-	_tmp2_ = g_timeout_add_seconds_full (G_PRIORITY_DEFAULT, (guint) 5, _org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout_gsource_func, g_object_ref (self), g_object_unref);
+	_tmp2_ = g_timeout_add_seconds_full (G_PRIORITY_DEFAULT, (guint) 5, _pdfpc_window_fullscreen_on_hide_cursor_timeout_gsource_func, g_object_ref (self), g_object_unref);
 	self->hide_cursor_timeout = _tmp2_;
 }
 
@@ -272,7 +296,7 @@ void org_westhoffswelt_pdfpresenter_window_fullscreen_restart_hide_cursor_timer 
          * Timeout method called if the mouse pointer has not been moved for 5
          * seconds
          */
-gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout (orgwesthoffsweltpdfpresenterWindowFullscreen* self) {
+gboolean pdfpc_window_fullscreen_on_hide_cursor_timeout (pdfpcWindowFullscreen* self) {
 	gboolean result = FALSE;
 	GdkWindow* _tmp0_;
 	g_return_val_if_fail (self != NULL, FALSE);
@@ -296,23 +320,23 @@ gboolean org_westhoffswelt_pdfpresenter_window_fullscreen_on_hide_cursor_timeout
 }
 
 
-static void org_westhoffswelt_pdfpresenter_window_fullscreen_class_init (orgwesthoffsweltpdfpresenterWindowFullscreenClass * klass) {
-	org_westhoffswelt_pdfpresenter_window_fullscreen_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_window_fullscreen_finalize;
+static void pdfpc_window_fullscreen_class_init (pdfpcWindowFullscreenClass * klass) {
+	pdfpc_window_fullscreen_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_window_fullscreen_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_window_fullscreen_instance_init (orgwesthoffsweltpdfpresenterWindowFullscreen * self) {
+static void pdfpc_window_fullscreen_instance_init (pdfpcWindowFullscreen * self) {
 	self->hide_cursor_timeout = (guint) 0;
 	self->faded_to_black = FALSE;
 	self->frozen = FALSE;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_window_fullscreen_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterWindowFullscreen * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_WINDOW_FULLSCREEN (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_window_fullscreen_parent_class)->finalize (obj);
+static void pdfpc_window_fullscreen_finalize (GObject* obj) {
+	pdfpcWindowFullscreen * self;
+	self = PDFPC_WINDOW_FULLSCREEN (obj);
+	G_OBJECT_CLASS (pdfpc_window_fullscreen_parent_class)->finalize (obj);
 }
 
 
@@ -323,15 +347,15 @@ static void org_westhoffswelt_pdfpresenter_window_fullscreen_finalize (GObject* 
      * Methods to specify the monitor to be displayed on in a multi-head setup
      * are provided as well.
      */
-GType org_westhoffswelt_pdfpresenter_window_fullscreen_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_window_fullscreen_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_window_fullscreen_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterWindowFullscreenClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_window_fullscreen_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterWindowFullscreen), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_window_fullscreen_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_window_fullscreen_type_id;
-		org_westhoffswelt_pdfpresenter_window_fullscreen_type_id = g_type_register_static (GTK_TYPE_WINDOW, "orgwesthoffsweltpdfpresenterWindowFullscreen", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_window_fullscreen_type_id__volatile, org_westhoffswelt_pdfpresenter_window_fullscreen_type_id);
+GType pdfpc_window_fullscreen_get_type (void) {
+	static volatile gsize pdfpc_window_fullscreen_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_window_fullscreen_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcWindowFullscreenClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_window_fullscreen_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcWindowFullscreen), 0, (GInstanceInitFunc) pdfpc_window_fullscreen_instance_init, NULL };
+		GType pdfpc_window_fullscreen_type_id;
+		pdfpc_window_fullscreen_type_id = g_type_register_static (GTK_TYPE_WINDOW, "pdfpcWindowFullscreen", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_window_fullscreen_type_id__volatile, pdfpc_window_fullscreen_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_window_fullscreen_type_id__volatile;
+	return pdfpc_window_fullscreen_type_id__volatile;
 }
 
 

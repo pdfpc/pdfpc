@@ -10,49 +10,49 @@
 #include <string.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER (org_westhoffswelt_pdfpresenter_scaler_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SCALER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER, orgwesthoffsweltpdfpresenterScaler))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER, orgwesthoffsweltpdfpresenterScalerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_SCALER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_SCALER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER, orgwesthoffsweltpdfpresenterScalerClass))
+#define PDFPC_TYPE_SCALER (pdfpc_scaler_get_type ())
+#define PDFPC_SCALER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SCALER, pdfpcScaler))
+#define PDFPC_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SCALER, pdfpcScalerClass))
+#define PDFPC_IS_SCALER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SCALER))
+#define PDFPC_IS_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SCALER))
+#define PDFPC_SCALER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SCALER, pdfpcScalerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterScaler orgwesthoffsweltpdfpresenterScaler;
-typedef struct _orgwesthoffsweltpdfpresenterScalerClass orgwesthoffsweltpdfpresenterScalerClass;
-typedef struct _orgwesthoffsweltpdfpresenterScalerPrivate orgwesthoffsweltpdfpresenterScalerPrivate;
+typedef struct _pdfpcScaler pdfpcScaler;
+typedef struct _pdfpcScalerClass pdfpcScalerClass;
+typedef struct _pdfpcScalerPrivate pdfpcScalerPrivate;
 
-struct _orgwesthoffsweltpdfpresenterScaler {
+struct _pdfpcScaler {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterScalerPrivate * priv;
+	pdfpcScalerPrivate * priv;
 	gdouble initial_width;
 	gdouble initial_height;
 };
 
-struct _orgwesthoffsweltpdfpresenterScalerClass {
+struct _pdfpcScalerClass {
 	GObjectClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_scaler_parent_class = NULL;
+static gpointer pdfpc_scaler_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_scaler_get_type (void) G_GNUC_CONST;
+GType pdfpc_scaler_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_SCALER_DUMMY_PROPERTY
+	PDFPC_SCALER_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterScaler* org_westhoffswelt_pdfpresenter_scaler_new (gdouble width, gdouble height);
-orgwesthoffsweltpdfpresenterScaler* org_westhoffswelt_pdfpresenter_scaler_construct (GType object_type, gdouble width, gdouble height);
-void org_westhoffswelt_pdfpresenter_scaler_scale_to (orgwesthoffsweltpdfpresenterScaler* self, gint width, gint height, gboolean centered, gboolean allow_cutoff, GdkRectangle* result);
-static void org_westhoffswelt_pdfpresenter_scaler_finalize (GObject* obj);
+pdfpcScaler* pdfpc_scaler_new (gdouble width, gdouble height);
+pdfpcScaler* pdfpc_scaler_construct (GType object_type, gdouble width, gdouble height);
+void pdfpc_scaler_scale_to (pdfpcScaler* self, gint width, gint height, gboolean centered, gboolean allow_cutoff, GdkRectangle* result);
+static void pdfpc_scaler_finalize (GObject* obj);
 
 
 /**
          * Create a new Scaler taking initial width and height as input
          */
-orgwesthoffsweltpdfpresenterScaler* org_westhoffswelt_pdfpresenter_scaler_construct (GType object_type, gdouble width, gdouble height) {
-	orgwesthoffsweltpdfpresenterScaler * self = NULL;
+pdfpcScaler* pdfpc_scaler_construct (GType object_type, gdouble width, gdouble height) {
+	pdfpcScaler * self = NULL;
 	gdouble _tmp0_;
 	gdouble _tmp1_;
-	self = (orgwesthoffsweltpdfpresenterScaler*) g_object_new (object_type, NULL);
+	self = (pdfpcScaler*) g_object_new (object_type, NULL);
 	_tmp0_ = width;
 	self->initial_width = _tmp0_;
 	_tmp1_ = height;
@@ -61,8 +61,8 @@ orgwesthoffsweltpdfpresenterScaler* org_westhoffswelt_pdfpresenter_scaler_constr
 }
 
 
-orgwesthoffsweltpdfpresenterScaler* org_westhoffswelt_pdfpresenter_scaler_new (gdouble width, gdouble height) {
-	return org_westhoffswelt_pdfpresenter_scaler_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_SCALER, width, height);
+pdfpcScaler* pdfpc_scaler_new (gdouble width, gdouble height) {
+	return pdfpc_scaler_construct (PDFPC_TYPE_SCALER, width, height);
 }
 
 
@@ -77,7 +77,7 @@ orgwesthoffsweltpdfpresenterScaler* org_westhoffswelt_pdfpresenter_scaler_new (g
          * the given space by allowing to cut off certain parts of the initial
          * input.
          */
-void org_westhoffswelt_pdfpresenter_scaler_scale_to (orgwesthoffsweltpdfpresenterScaler* self, gint width, gint height, gboolean centered, gboolean allow_cutoff, GdkRectangle* result) {
+void pdfpc_scaler_scale_to (pdfpcScaler* self, gint width, gint height, gboolean centered, gboolean allow_cutoff, GdkRectangle* result) {
 	GdkRectangle target = {0};
 	gdouble factor;
 	gint _tmp0_;
@@ -171,20 +171,20 @@ void org_westhoffswelt_pdfpresenter_scaler_scale_to (orgwesthoffsweltpdfpresente
 }
 
 
-static void org_westhoffswelt_pdfpresenter_scaler_class_init (orgwesthoffsweltpdfpresenterScalerClass * klass) {
-	org_westhoffswelt_pdfpresenter_scaler_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_scaler_finalize;
+static void pdfpc_scaler_class_init (pdfpcScalerClass * klass) {
+	pdfpc_scaler_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_scaler_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_scaler_instance_init (orgwesthoffsweltpdfpresenterScaler * self) {
+static void pdfpc_scaler_instance_init (pdfpcScaler * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_scaler_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterScaler * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_SCALER (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_scaler_parent_class)->finalize (obj);
+static void pdfpc_scaler_finalize (GObject* obj) {
+	pdfpcScaler * self;
+	self = PDFPC_SCALER (obj);
+	G_OBJECT_CLASS (pdfpc_scaler_parent_class)->finalize (obj);
 }
 
 
@@ -192,15 +192,15 @@ static void org_westhoffswelt_pdfpresenter_scaler_finalize (GObject* obj) {
      * Scaling calculator which is able to calculate different scaling
      * scenarios while maintaining the correct aspect ratio.
      */
-GType org_westhoffswelt_pdfpresenter_scaler_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_scaler_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_scaler_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterScalerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_scaler_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterScaler), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_scaler_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_scaler_type_id;
-		org_westhoffswelt_pdfpresenter_scaler_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterScaler", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_scaler_type_id__volatile, org_westhoffswelt_pdfpresenter_scaler_type_id);
+GType pdfpc_scaler_get_type (void) {
+	static volatile gsize pdfpc_scaler_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_scaler_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcScalerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_scaler_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcScaler), 0, (GInstanceInitFunc) pdfpc_scaler_instance_init, NULL };
+		GType pdfpc_scaler_type_id;
+		pdfpc_scaler_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcScaler", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_scaler_type_id__volatile, pdfpc_scaler_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_scaler_type_id__volatile;
+	return pdfpc_scaler_type_id__volatile;
 }
 
 

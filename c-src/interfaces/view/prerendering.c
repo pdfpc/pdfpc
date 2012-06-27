@@ -6,24 +6,24 @@
 #include <glib-object.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING (org_westhoffswelt_pdfpresenter_view_prerendering_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_PRERENDERING(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING, orgwesthoffsweltpdfpresenterViewPrerendering))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_PRERENDERING(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_PRERENDERING_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING, orgwesthoffsweltpdfpresenterViewPrerenderingIface))
+#define PDFPC_VIEW_TYPE_PRERENDERING (pdfpc_view_prerendering_get_type ())
+#define PDFPC_VIEW_PRERENDERING(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_PRERENDERING, pdfpcViewPrerendering))
+#define PDFPC_VIEW_IS_PRERENDERING(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_PRERENDERING))
+#define PDFPC_VIEW_PRERENDERING_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_VIEW_TYPE_PRERENDERING, pdfpcViewPrerenderingIface))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewPrerendering orgwesthoffsweltpdfpresenterViewPrerendering;
-typedef struct _orgwesthoffsweltpdfpresenterViewPrerenderingIface orgwesthoffsweltpdfpresenterViewPrerenderingIface;
+typedef struct _pdfpcViewPrerendering pdfpcViewPrerendering;
+typedef struct _pdfpcViewPrerenderingIface pdfpcViewPrerenderingIface;
 
-struct _orgwesthoffsweltpdfpresenterViewPrerenderingIface {
+struct _pdfpcViewPrerenderingIface {
 	GTypeInterface parent_iface;
 };
 
 
 
-GType org_westhoffswelt_pdfpresenter_view_prerendering_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_prerendering_get_type (void) G_GNUC_CONST;
 
 
-static void org_westhoffswelt_pdfpresenter_view_prerendering_base_init (orgwesthoffsweltpdfpresenterViewPrerenderingIface * iface) {
+static void pdfpc_view_prerendering_base_init (pdfpcViewPrerenderingIface * iface) {
 	static gboolean initialized = FALSE;
 	if (!initialized) {
 		initialized = TRUE;
@@ -33,15 +33,15 @@ static void org_westhoffswelt_pdfpresenter_view_prerendering_base_init (orgwesth
 		         * This signal should be emitted slide_count number of times during a
 		         * precaching cylce.
 		         */
-		g_signal_new ("slide_prerendered", ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+		g_signal_new ("slide_prerendered", PDFPC_VIEW_TYPE_PRERENDERING, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 		/**
 		         * Signal emitted when the precaching cycle is complete
 		         */
-		g_signal_new ("prerendering_completed", ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+		g_signal_new ("prerendering_completed", PDFPC_VIEW_TYPE_PRERENDERING, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 		/**
 		         * Signal emitted when the precaching cycle just started
 		         */
-		g_signal_new ("prerendering_started", ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PRERENDERING, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+		g_signal_new ("prerendering_started", PDFPC_VIEW_TYPE_PRERENDERING, G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 	}
 }
 
@@ -52,16 +52,16 @@ static void org_westhoffswelt_pdfpresenter_view_prerendering_base_init (orgwesth
      * view, which does not implement the Renderer.Caching interface the
      * prerender functionallity can't be used.
      */
-GType org_westhoffswelt_pdfpresenter_view_prerendering_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_view_prerendering_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_view_prerendering_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterViewPrerenderingIface), (GBaseInitFunc) org_westhoffswelt_pdfpresenter_view_prerendering_base_init, (GBaseFinalizeFunc) NULL, (GClassInitFunc) NULL, (GClassFinalizeFunc) NULL, NULL, 0, 0, (GInstanceInitFunc) NULL, NULL };
-		GType org_westhoffswelt_pdfpresenter_view_prerendering_type_id;
-		org_westhoffswelt_pdfpresenter_view_prerendering_type_id = g_type_register_static (G_TYPE_INTERFACE, "orgwesthoffsweltpdfpresenterViewPrerendering", &g_define_type_info, 0);
-		g_type_interface_add_prerequisite (org_westhoffswelt_pdfpresenter_view_prerendering_type_id, G_TYPE_OBJECT);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_view_prerendering_type_id__volatile, org_westhoffswelt_pdfpresenter_view_prerendering_type_id);
+GType pdfpc_view_prerendering_get_type (void) {
+	static volatile gsize pdfpc_view_prerendering_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_view_prerendering_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcViewPrerenderingIface), (GBaseInitFunc) pdfpc_view_prerendering_base_init, (GBaseFinalizeFunc) NULL, (GClassInitFunc) NULL, (GClassFinalizeFunc) NULL, NULL, 0, 0, (GInstanceInitFunc) NULL, NULL };
+		GType pdfpc_view_prerendering_type_id;
+		pdfpc_view_prerendering_type_id = g_type_register_static (G_TYPE_INTERFACE, "pdfpcViewPrerendering", &g_define_type_info, 0);
+		g_type_interface_add_prerequisite (pdfpc_view_prerendering_type_id, G_TYPE_OBJECT);
+		g_once_init_leave (&pdfpc_view_prerendering_type_id__volatile, pdfpc_view_prerendering_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_view_prerendering_type_id__volatile;
+	return pdfpc_view_prerendering_type_id__volatile;
 }
 
 

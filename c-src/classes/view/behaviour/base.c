@@ -7,71 +7,71 @@
 #include <gtk/gtk.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE (org_westhoffswelt_pdfpresenter_view_behaviour_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBehaviourBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBehaviourBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBehaviourBaseClass))
+#define PDFPC_VIEW_BEHAVIOUR_TYPE_BASE (pdfpc_view_behaviour_base_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBase))
+#define PDFPC_VIEW_BEHAVIOUR_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
+#define PDFPC_VIEW_BEHAVIOUR_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
+#define PDFPC_VIEW_BEHAVIOUR_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
+#define PDFPC_VIEW_BEHAVIOUR_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourBase orgwesthoffsweltpdfpresenterViewBehaviourBase;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourBaseClass orgwesthoffsweltpdfpresenterViewBehaviourBaseClass;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourBasePrivate orgwesthoffsweltpdfpresenterViewBehaviourBasePrivate;
+typedef struct _pdfpcViewBehaviourBase pdfpcViewBehaviourBase;
+typedef struct _pdfpcViewBehaviourBaseClass pdfpcViewBehaviourBaseClass;
+typedef struct _pdfpcViewBehaviourBasePrivate pdfpcViewBehaviourBasePrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE (org_westhoffswelt_pdfpresenter_view_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBaseClass))
+#define PDFPC_VIEW_TYPE_BASE (pdfpc_view_base_get_type ())
+#define PDFPC_VIEW_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBase))
+#define PDFPC_VIEW_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
+#define PDFPC_VIEW_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_BASE))
+#define PDFPC_VIEW_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_BASE))
+#define PDFPC_VIEW_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewBase orgwesthoffsweltpdfpresenterViewBase;
-typedef struct _orgwesthoffsweltpdfpresenterViewBaseClass orgwesthoffsweltpdfpresenterViewBaseClass;
+typedef struct _pdfpcViewBase pdfpcViewBase;
+typedef struct _pdfpcViewBaseClass pdfpcViewBaseClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 typedef enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED
-} orgwesthoffsweltpdfpresenterViewBehaviourAssociationError;
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR org_westhoffswelt_pdfpresenter_view_behaviour_association_error_quark ()
-struct _orgwesthoffsweltpdfpresenterViewBehaviourBase {
+	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED,
+	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED
+} pdfpcViewBehaviourAssociationError;
+#define PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR pdfpc_view_behaviour_association_error_quark ()
+struct _pdfpcViewBehaviourBase {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterViewBehaviourBasePrivate * priv;
-	orgwesthoffsweltpdfpresenterViewBase* target;
+	pdfpcViewBehaviourBasePrivate * priv;
+	pdfpcViewBase* target;
 };
 
-struct _orgwesthoffsweltpdfpresenterViewBehaviourBaseClass {
+struct _pdfpcViewBehaviourBaseClass {
 	GObjectClass parent_class;
-	void (*associate) (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
+	void (*associate) (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
 };
 
 /**
      * Error domain used for association errors
      */
 
-static gpointer org_westhoffswelt_pdfpresenter_view_behaviour_base_parent_class = NULL;
+static gpointer pdfpc_view_behaviour_base_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_view_behaviour_base_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_view_base_get_type (void) G_GNUC_CONST;
-GQuark org_westhoffswelt_pdfpresenter_view_behaviour_association_error_quark (void);
+GType pdfpc_view_behaviour_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_base_get_type (void) G_GNUC_CONST;
+GQuark pdfpc_view_behaviour_association_error_quark (void);
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_DUMMY_PROPERTY
+	PDFPC_VIEW_BEHAVIOUR_BASE_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterViewBehaviourBase* org_westhoffswelt_pdfpresenter_view_behaviour_base_construct (GType object_type);
-orgwesthoffsweltpdfpresenterViewBase* org_westhoffswelt_pdfpresenter_view_behaviour_base_get_target (orgwesthoffsweltpdfpresenterViewBehaviourBase* self);
-void org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_association (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
-gboolean org_westhoffswelt_pdfpresenter_view_behaviour_base_is_supported (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target);
-void org_westhoffswelt_pdfpresenter_view_behaviour_base_associate (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
-static void org_westhoffswelt_pdfpresenter_view_behaviour_base_real_associate (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
-static void org_westhoffswelt_pdfpresenter_view_behaviour_base_finalize (GObject* obj);
+pdfpcViewBehaviourBase* pdfpc_view_behaviour_base_construct (GType object_type);
+pdfpcViewBase* pdfpc_view_behaviour_base_get_target (pdfpcViewBehaviourBase* self);
+void pdfpc_view_behaviour_base_enforce_exclusive_association (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+gboolean pdfpc_view_behaviour_base_is_supported (pdfpcViewBehaviourBase* self, pdfpcViewBase* target);
+void pdfpc_view_behaviour_base_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+static void pdfpc_view_behaviour_base_real_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+static void pdfpc_view_behaviour_base_finalize (GObject* obj);
 
 
 /**
          * Base constructor not taking any arguments
          */
-orgwesthoffsweltpdfpresenterViewBehaviourBase* org_westhoffswelt_pdfpresenter_view_behaviour_base_construct (GType object_type) {
-	orgwesthoffsweltpdfpresenterViewBehaviourBase * self = NULL;
-	self = (orgwesthoffsweltpdfpresenterViewBehaviourBase*) g_object_new (object_type, NULL);
+pdfpcViewBehaviourBase* pdfpc_view_behaviour_base_construct (GType object_type) {
+	pdfpcViewBehaviourBase * self = NULL;
+	self = (pdfpcViewBehaviourBase*) g_object_new (object_type, NULL);
 	return self;
 }
 
@@ -86,10 +86,10 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-orgwesthoffsweltpdfpresenterViewBase* org_westhoffswelt_pdfpresenter_view_behaviour_base_get_target (orgwesthoffsweltpdfpresenterViewBehaviourBase* self) {
-	orgwesthoffsweltpdfpresenterViewBase* result = NULL;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp0_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp1_;
+pdfpcViewBase* pdfpc_view_behaviour_base_get_target (pdfpcViewBehaviourBase* self) {
+	pdfpcViewBase* result = NULL;
+	pdfpcViewBase* _tmp0_;
+	pdfpcViewBase* _tmp1_;
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->target;
 	_tmp1_ = _g_object_ref0 (_tmp0_);
@@ -101,11 +101,11 @@ orgwesthoffsweltpdfpresenterViewBase* org_westhoffswelt_pdfpresenter_view_behavi
 /**
          * Enfore the fact that a Behaviour may only be associated to one View
          */
-void org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_association (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error) {
-	orgwesthoffsweltpdfpresenterViewBase* _tmp0_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp1_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp2_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp4_;
+void pdfpc_view_behaviour_base_enforce_exclusive_association (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error) {
+	pdfpcViewBase* _tmp0_;
+	pdfpcViewBase* _tmp1_;
+	pdfpcViewBase* _tmp2_;
+	pdfpcViewBase* _tmp4_;
 	gboolean _tmp5_ = FALSE;
 	GError * _inner_error_ = NULL;
 	g_return_if_fail (self != NULL);
@@ -118,9 +118,9 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_associ
 	_tmp2_ = self->target;
 	if (_tmp2_ != NULL) {
 		GError* _tmp3_;
-		_tmp3_ = g_error_new_literal (ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR, ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED, "A behaviour has been associated with two different Views.");
+		_tmp3_ = g_error_new_literal (PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR, PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED, "A behaviour has been associated with two different Views.");
 		_inner_error_ = _tmp3_;
-		if (_inner_error_->domain == ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
+		if (_inner_error_->domain == PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
 			g_propagate_error (error, _inner_error_);
 			return;
 		} else {
@@ -130,13 +130,13 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_associ
 		}
 	}
 	_tmp4_ = target;
-	_tmp5_ = org_westhoffswelt_pdfpresenter_view_behaviour_base_is_supported (self, _tmp4_);
+	_tmp5_ = pdfpc_view_behaviour_base_is_supported (self, _tmp4_);
 	if (!_tmp5_) {
 		GError* _tmp6_;
-		_tmp6_ = g_error_new_literal (ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR, ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED, "The View which should be associated is incompatible to the given Behav" \
+		_tmp6_ = g_error_new_literal (PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR, PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED, "The View which should be associated is incompatible to the given Behav" \
 "iour");
 		_inner_error_ = _tmp6_;
-		if (_inner_error_->domain == ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
+		if (_inner_error_->domain == PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
 			g_propagate_error (error, _inner_error_);
 			return;
 		} else {
@@ -151,15 +151,15 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_associ
 /**
          * Associate the implementing Behaviour with the given View
          */
-static void org_westhoffswelt_pdfpresenter_view_behaviour_base_real_associate (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error) {
-	g_critical ("Type `%s' does not implement abstract method `org_westhoffswelt_pdfpresenter_view_behaviour_base_associate'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
+static void pdfpc_view_behaviour_base_real_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error) {
+	g_critical ("Type `%s' does not implement abstract method `pdfpc_view_behaviour_base_associate'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
 	return;
 }
 
 
-void org_westhoffswelt_pdfpresenter_view_behaviour_base_associate (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error) {
+void pdfpc_view_behaviour_base_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_GET_CLASS (self)->associate (self, target, error);
+	PDFPC_VIEW_BEHAVIOUR_BASE_GET_CLASS (self)->associate (self, target, error);
 }
 
 
@@ -168,7 +168,7 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_base_associate (orgwesthoffsw
          *
          * By default every View is supported.
          */
-gboolean org_westhoffswelt_pdfpresenter_view_behaviour_base_is_supported (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target) {
+gboolean pdfpc_view_behaviour_base_is_supported (pdfpcViewBehaviourBase* self, pdfpcViewBase* target) {
 	gboolean result = FALSE;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (target != NULL, FALSE);
@@ -177,23 +177,23 @@ gboolean org_westhoffswelt_pdfpresenter_view_behaviour_base_is_supported (orgwes
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_base_class_init (orgwesthoffsweltpdfpresenterViewBehaviourBaseClass * klass) {
-	org_westhoffswelt_pdfpresenter_view_behaviour_base_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_CLASS (klass)->associate = org_westhoffswelt_pdfpresenter_view_behaviour_base_real_associate;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_view_behaviour_base_finalize;
+static void pdfpc_view_behaviour_base_class_init (pdfpcViewBehaviourBaseClass * klass) {
+	pdfpc_view_behaviour_base_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_VIEW_BEHAVIOUR_BASE_CLASS (klass)->associate = pdfpc_view_behaviour_base_real_associate;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_view_behaviour_base_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_base_instance_init (orgwesthoffsweltpdfpresenterViewBehaviourBase * self) {
+static void pdfpc_view_behaviour_base_instance_init (pdfpcViewBehaviourBase * self) {
 	self->target = NULL;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_base_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterViewBehaviourBase * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE (obj);
+static void pdfpc_view_behaviour_base_finalize (GObject* obj) {
+	pdfpcViewBehaviourBase * self;
+	self = PDFPC_VIEW_BEHAVIOUR_BASE (obj);
 	_g_object_unref0 (self->target);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_view_behaviour_base_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_view_behaviour_base_parent_class)->finalize (obj);
 }
 
 
@@ -203,20 +203,20 @@ static void org_westhoffswelt_pdfpresenter_view_behaviour_base_finalize (GObject
      * A Behaviour is a certain characteristic which is added to an existing
      * View on demand.
      */
-GType org_westhoffswelt_pdfpresenter_view_behaviour_base_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterViewBehaviourBaseClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_view_behaviour_base_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterViewBehaviourBase), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_view_behaviour_base_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id;
-		org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterViewBehaviourBase", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id__volatile, org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id);
+GType pdfpc_view_behaviour_base_get_type (void) {
+	static volatile gsize pdfpc_view_behaviour_base_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_view_behaviour_base_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcViewBehaviourBaseClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_view_behaviour_base_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcViewBehaviourBase), 0, (GInstanceInitFunc) pdfpc_view_behaviour_base_instance_init, NULL };
+		GType pdfpc_view_behaviour_base_type_id;
+		pdfpc_view_behaviour_base_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcViewBehaviourBase", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
+		g_once_init_leave (&pdfpc_view_behaviour_base_type_id__volatile, pdfpc_view_behaviour_base_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_view_behaviour_base_type_id__volatile;
+	return pdfpc_view_behaviour_base_type_id__volatile;
 }
 
 
-GQuark org_westhoffswelt_pdfpresenter_view_behaviour_association_error_quark (void) {
-	return g_quark_from_static_string ("org_westhoffswelt_pdfpresenter_view_behaviour_association_error-quark");
+GQuark pdfpc_view_behaviour_association_error_quark (void) {
+	return g_quark_from_static_string ("pdfpc_view_behaviour_association_error-quark");
 }
 
 

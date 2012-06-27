@@ -8,86 +8,90 @@
 #include <string.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS (org_westhoffswelt_pdfpresenter_options_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS, orgwesthoffsweltpdfpresenterOptions))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS, orgwesthoffsweltpdfpresenterOptionsClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_OPTIONS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS, orgwesthoffsweltpdfpresenterOptionsClass))
+#define PDFPC_TYPE_OPTIONS (pdfpc_options_get_type ())
+#define PDFPC_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_OPTIONS, pdfpcOptions))
+#define PDFPC_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_OPTIONS, pdfpcOptionsClass))
+#define PDFPC_IS_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_OPTIONS))
+#define PDFPC_IS_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_OPTIONS))
+#define PDFPC_OPTIONS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_OPTIONS, pdfpcOptionsClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterOptions orgwesthoffsweltpdfpresenterOptions;
-typedef struct _orgwesthoffsweltpdfpresenterOptionsClass orgwesthoffsweltpdfpresenterOptionsClass;
-typedef struct _orgwesthoffsweltpdfpresenterOptionsPrivate orgwesthoffsweltpdfpresenterOptionsPrivate;
+typedef struct _pdfpcOptions pdfpcOptions;
+typedef struct _pdfpcOptionsClass pdfpcOptionsClass;
+typedef struct _pdfpcOptionsPrivate pdfpcOptionsPrivate;
 
-struct _orgwesthoffsweltpdfpresenterOptions {
+struct _pdfpcOptions {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterOptionsPrivate * priv;
+	pdfpcOptionsPrivate * priv;
 };
 
-struct _orgwesthoffsweltpdfpresenterOptionsClass {
+struct _pdfpcOptionsClass {
 	GObjectClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_options_parent_class = NULL;
-extern gboolean org_westhoffswelt_pdfpresenter_options_display_switch;
-gboolean org_westhoffswelt_pdfpresenter_options_display_switch = FALSE;
-extern gboolean org_westhoffswelt_pdfpresenter_options_single_screen;
-gboolean org_westhoffswelt_pdfpresenter_options_single_screen = FALSE;
-extern gboolean org_westhoffswelt_pdfpresenter_options_disable_caching;
-gboolean org_westhoffswelt_pdfpresenter_options_disable_caching = FALSE;
-extern gboolean org_westhoffswelt_pdfpresenter_options_disable_cache_compression;
-gboolean org_westhoffswelt_pdfpresenter_options_disable_cache_compression = FALSE;
-extern guint org_westhoffswelt_pdfpresenter_options_duration;
-guint org_westhoffswelt_pdfpresenter_options_duration = 987654321U;
-extern guint org_westhoffswelt_pdfpresenter_options_last_minutes;
-guint org_westhoffswelt_pdfpresenter_options_last_minutes = (guint) 5;
-extern guint org_westhoffswelt_pdfpresenter_options_current_size;
-guint org_westhoffswelt_pdfpresenter_options_current_size = (guint) 60;
-extern gint org_westhoffswelt_pdfpresenter_options_min_overview_width;
-gint org_westhoffswelt_pdfpresenter_options_min_overview_width = 150;
-extern gchar* org_westhoffswelt_pdfpresenter_options_start_time;
-gchar* org_westhoffswelt_pdfpresenter_options_start_time = NULL;
-extern gchar* org_westhoffswelt_pdfpresenter_options_end_time;
-gchar* org_westhoffswelt_pdfpresenter_options_end_time = NULL;
-extern gboolean org_westhoffswelt_pdfpresenter_options_black_on_end;
-gboolean org_westhoffswelt_pdfpresenter_options_black_on_end = FALSE;
+static gpointer pdfpc_options_parent_class = NULL;
+extern gboolean pdfpc_options_display_switch;
+gboolean pdfpc_options_display_switch = FALSE;
+extern gboolean pdfpc_options_single_screen;
+gboolean pdfpc_options_single_screen = FALSE;
+extern gboolean pdfpc_options_windowed;
+gboolean pdfpc_options_windowed = FALSE;
+extern gboolean pdfpc_options_disable_caching;
+gboolean pdfpc_options_disable_caching = FALSE;
+extern gboolean pdfpc_options_disable_cache_compression;
+gboolean pdfpc_options_disable_cache_compression = FALSE;
+extern guint pdfpc_options_duration;
+guint pdfpc_options_duration = 987654321U;
+extern guint pdfpc_options_last_minutes;
+guint pdfpc_options_last_minutes = (guint) 5;
+extern guint pdfpc_options_current_size;
+guint pdfpc_options_current_size = (guint) 60;
+extern gint pdfpc_options_min_overview_width;
+gint pdfpc_options_min_overview_width = 150;
+extern gchar* pdfpc_options_start_time;
+gchar* pdfpc_options_start_time = NULL;
+extern gchar* pdfpc_options_end_time;
+gchar* pdfpc_options_end_time = NULL;
+extern gboolean pdfpc_options_black_on_end;
+gboolean pdfpc_options_black_on_end = FALSE;
+extern gboolean pdfpc_options_list_actions;
+gboolean pdfpc_options_list_actions = FALSE;
 
-GType org_westhoffswelt_pdfpresenter_options_get_type (void) G_GNUC_CONST;
+GType pdfpc_options_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_OPTIONS_DUMMY_PROPERTY
+	PDFPC_OPTIONS_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterOptions* org_westhoffswelt_pdfpresenter_options_new (void);
-orgwesthoffsweltpdfpresenterOptions* org_westhoffswelt_pdfpresenter_options_construct (GType object_type);
-static void org_westhoffswelt_pdfpresenter_options_finalize (GObject* obj);
+pdfpcOptions* pdfpc_options_new (void);
+pdfpcOptions* pdfpc_options_construct (GType object_type);
+static void pdfpc_options_finalize (GObject* obj);
 
 
-orgwesthoffsweltpdfpresenterOptions* org_westhoffswelt_pdfpresenter_options_construct (GType object_type) {
-	orgwesthoffsweltpdfpresenterOptions * self = NULL;
-	self = (orgwesthoffsweltpdfpresenterOptions*) g_object_new (object_type, NULL);
+pdfpcOptions* pdfpc_options_construct (GType object_type) {
+	pdfpcOptions * self = NULL;
+	self = (pdfpcOptions*) g_object_new (object_type, NULL);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterOptions* org_westhoffswelt_pdfpresenter_options_new (void) {
-	return org_westhoffswelt_pdfpresenter_options_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_OPTIONS);
+pdfpcOptions* pdfpc_options_new (void) {
+	return pdfpc_options_construct (PDFPC_TYPE_OPTIONS);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_options_class_init (orgwesthoffsweltpdfpresenterOptionsClass * klass) {
-	org_westhoffswelt_pdfpresenter_options_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_options_finalize;
+static void pdfpc_options_class_init (pdfpcOptionsClass * klass) {
+	pdfpc_options_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_options_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_options_instance_init (orgwesthoffsweltpdfpresenterOptions * self) {
+static void pdfpc_options_instance_init (pdfpcOptions * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_options_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterOptions * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_OPTIONS (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_options_parent_class)->finalize (obj);
+static void pdfpc_options_finalize (GObject* obj) {
+	pdfpcOptions * self;
+	self = PDFPC_OPTIONS (obj);
+	G_OBJECT_CLASS (pdfpc_options_parent_class)->finalize (obj);
 }
 
 
@@ -95,15 +99,15 @@ static void org_westhoffswelt_pdfpresenter_options_finalize (GObject* obj) {
      * Static property container holding the application wide option
      * information and their default values.
      */
-GType org_westhoffswelt_pdfpresenter_options_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_options_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_options_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterOptionsClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_options_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterOptions), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_options_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_options_type_id;
-		org_westhoffswelt_pdfpresenter_options_type_id = g_type_register_static (G_TYPE_OBJECT, "orgwesthoffsweltpdfpresenterOptions", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_options_type_id__volatile, org_westhoffswelt_pdfpresenter_options_type_id);
+GType pdfpc_options_get_type (void) {
+	static volatile gsize pdfpc_options_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_options_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcOptionsClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_options_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcOptions), 0, (GInstanceInitFunc) pdfpc_options_instance_init, NULL };
+		GType pdfpc_options_type_id;
+		pdfpc_options_type_id = g_type_register_static (G_TYPE_OBJECT, "pdfpcOptions", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_options_type_id__volatile, pdfpc_options_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_options_type_id__volatile;
+	return pdfpc_options_type_id__volatile;
 }
 
 

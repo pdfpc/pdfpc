@@ -11,140 +11,140 @@
 #include <string.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE (org_westhoffswelt_pdfpresenter_view_behaviour_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBehaviourBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBehaviourBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBehaviourBaseClass))
+#define PDFPC_VIEW_BEHAVIOUR_TYPE_BASE (pdfpc_view_behaviour_base_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBase))
+#define PDFPC_VIEW_BEHAVIOUR_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
+#define PDFPC_VIEW_BEHAVIOUR_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
+#define PDFPC_VIEW_BEHAVIOUR_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
+#define PDFPC_VIEW_BEHAVIOUR_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourBase orgwesthoffsweltpdfpresenterViewBehaviourBase;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourBaseClass orgwesthoffsweltpdfpresenterViewBehaviourBaseClass;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourBasePrivate orgwesthoffsweltpdfpresenterViewBehaviourBasePrivate;
+typedef struct _pdfpcViewBehaviourBase pdfpcViewBehaviourBase;
+typedef struct _pdfpcViewBehaviourBaseClass pdfpcViewBehaviourBaseClass;
+typedef struct _pdfpcViewBehaviourBasePrivate pdfpcViewBehaviourBasePrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE (org_westhoffswelt_pdfpresenter_view_base_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBase))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBaseClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_BASE, orgwesthoffsweltpdfpresenterViewBaseClass))
+#define PDFPC_VIEW_TYPE_BASE (pdfpc_view_base_get_type ())
+#define PDFPC_VIEW_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBase))
+#define PDFPC_VIEW_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
+#define PDFPC_VIEW_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_BASE))
+#define PDFPC_VIEW_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_BASE))
+#define PDFPC_VIEW_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewBase orgwesthoffsweltpdfpresenterViewBase;
-typedef struct _orgwesthoffsweltpdfpresenterViewBaseClass orgwesthoffsweltpdfpresenterViewBaseClass;
+typedef struct _pdfpcViewBase pdfpcViewBase;
+typedef struct _pdfpcViewBaseClass pdfpcViewBaseClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION (org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION (pdfpc_view_behaviour_pdf_link_implementation_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementation))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementationClass))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementationClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationPrivate orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationPrivate;
+typedef struct _pdfpcViewBehaviourPdfLinkImplementation pdfpcViewBehaviourPdfLinkImplementation;
+typedef struct _pdfpcViewBehaviourPdfLinkImplementationClass pdfpcViewBehaviourPdfLinkImplementationClass;
+typedef struct _pdfpcViewBehaviourPdfLinkImplementationPrivate pdfpcViewBehaviourPdfLinkImplementationPrivate;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER (org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProviderClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProviderClass))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER (pdfpc_view_behaviour_pdf_link_signal_provider_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProvider))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProviderClass))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProviderClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider;
-typedef struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProviderClass orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProviderClass;
+typedef struct _pdfpcViewBehaviourPdfLinkSignalProvider pdfpcViewBehaviourPdfLinkSignalProvider;
+typedef struct _pdfpcViewBehaviourPdfLinkSignalProviderClass pdfpcViewBehaviourPdfLinkSignalProviderClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER (org_westhoffswelt_pdfpresenter_presentation_controller_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationController))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
+#define PDFPC_TYPE_PRESENTATION_CONTROLLER (pdfpc_presentation_controller_get_type ())
+#define PDFPC_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationController))
+#define PDFPC_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
+#define PDFPC_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterPresentationController orgwesthoffsweltpdfpresenterPresentationController;
-typedef struct _orgwesthoffsweltpdfpresenterPresentationControllerClass orgwesthoffsweltpdfpresenterPresentationControllerClass;
+typedef struct _pdfpcPresentationController pdfpcPresentationController;
+typedef struct _pdfpcPresentationControllerClass pdfpcPresentationControllerClass;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_DEFAULT (org_westhoffswelt_pdfpresenter_view_default_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_DEFAULT, orgwesthoffsweltpdfpresenterViewDefault))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_DEFAULT, orgwesthoffsweltpdfpresenterViewDefaultClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_DEFAULT))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_DEFAULT))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_DEFAULT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_DEFAULT, orgwesthoffsweltpdfpresenterViewDefaultClass))
+#define PDFPC_VIEW_TYPE_DEFAULT (pdfpc_view_default_get_type ())
+#define PDFPC_VIEW_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefault))
+#define PDFPC_VIEW_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefaultClass))
+#define PDFPC_VIEW_IS_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_DEFAULT))
+#define PDFPC_VIEW_IS_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_DEFAULT))
+#define PDFPC_VIEW_DEFAULT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefaultClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewDefault orgwesthoffsweltpdfpresenterViewDefault;
-typedef struct _orgwesthoffsweltpdfpresenterViewDefaultClass orgwesthoffsweltpdfpresenterViewDefaultClass;
+typedef struct _pdfpcViewDefault pdfpcViewDefault;
+typedef struct _pdfpcViewDefaultClass pdfpcViewDefaultClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PDF (org_westhoffswelt_pdfpresenter_view_pdf_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PDF, orgwesthoffsweltpdfpresenterViewPdf))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PDF, orgwesthoffsweltpdfpresenterViewPdfClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PDF))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_TYPE_PDF, orgwesthoffsweltpdfpresenterViewPdfClass))
+#define PDFPC_VIEW_TYPE_PDF (pdfpc_view_pdf_get_type ())
+#define PDFPC_VIEW_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdf))
+#define PDFPC_VIEW_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdfClass))
+#define PDFPC_VIEW_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_PDF))
+#define PDFPC_VIEW_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_PDF))
+#define PDFPC_VIEW_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdfClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterViewPdf orgwesthoffsweltpdfpresenterViewPdf;
-typedef struct _orgwesthoffsweltpdfpresenterViewPdfClass orgwesthoffsweltpdfpresenterViewPdfClass;
+typedef struct _pdfpcViewPdf pdfpcViewPdf;
+typedef struct _pdfpcViewPdfClass pdfpcViewPdfClass;
 #define _gdk_cursor_unref0(var) ((var == NULL) ? NULL : (var = (gdk_cursor_unref (var), NULL)))
 
 typedef enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED,
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED
-} orgwesthoffsweltpdfpresenterViewBehaviourAssociationError;
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR org_westhoffswelt_pdfpresenter_view_behaviour_association_error_quark ()
-struct _orgwesthoffsweltpdfpresenterViewBehaviourBase {
+	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED,
+	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED
+} pdfpcViewBehaviourAssociationError;
+#define PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR pdfpc_view_behaviour_association_error_quark ()
+struct _pdfpcViewBehaviourBase {
 	GObject parent_instance;
-	orgwesthoffsweltpdfpresenterViewBehaviourBasePrivate * priv;
-	orgwesthoffsweltpdfpresenterViewBase* target;
+	pdfpcViewBehaviourBasePrivate * priv;
+	pdfpcViewBase* target;
 };
 
-struct _orgwesthoffsweltpdfpresenterViewBehaviourBaseClass {
+struct _pdfpcViewBehaviourBaseClass {
 	GObjectClass parent_class;
-	void (*associate) (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
+	void (*associate) (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
 };
 
-struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation {
-	orgwesthoffsweltpdfpresenterViewBehaviourBase parent_instance;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationPrivate * priv;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* signal_provider;
-	orgwesthoffsweltpdfpresenterPresentationController* presentation_controller;
+struct _pdfpcViewBehaviourPdfLinkImplementation {
+	pdfpcViewBehaviourBase parent_instance;
+	pdfpcViewBehaviourPdfLinkImplementationPrivate * priv;
+	pdfpcViewBehaviourPdfLinkSignalProvider* signal_provider;
+	pdfpcPresentationController* presentation_controller;
 };
 
-struct _orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass {
-	orgwesthoffsweltpdfpresenterViewBehaviourBaseClass parent_class;
+struct _pdfpcViewBehaviourPdfLinkImplementationClass {
+	pdfpcViewBehaviourBaseClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_parent_class = NULL;
+static gpointer pdfpc_view_behaviour_pdf_link_implementation_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_view_behaviour_base_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_view_base_get_type (void) G_GNUC_CONST;
-GQuark org_westhoffswelt_pdfpresenter_view_behaviour_association_error_quark (void);
-GType org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_presentation_controller_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_behaviour_base_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_base_get_type (void) G_GNUC_CONST;
+GQuark pdfpc_view_behaviour_association_error_quark (void);
+GType pdfpc_view_behaviour_pdf_link_implementation_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_behaviour_pdf_link_signal_provider_get_type (void) G_GNUC_CONST;
+GType pdfpc_presentation_controller_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_DUMMY_PROPERTY
+	PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_new (orgwesthoffsweltpdfpresenterPresentationController* presentation_controller);
-orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_construct (GType object_type, orgwesthoffsweltpdfpresenterPresentationController* presentation_controller);
-orgwesthoffsweltpdfpresenterViewBehaviourBase* org_westhoffswelt_pdfpresenter_view_behaviour_base_construct (GType object_type);
-orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_new (void);
-orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_construct (GType object_type);
-static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_real_associate (orgwesthoffsweltpdfpresenterViewBehaviourBase* base, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
-void org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_association (orgwesthoffsweltpdfpresenterViewBehaviourBase* self, orgwesthoffsweltpdfpresenterViewBase* target, GError** error);
-GType org_westhoffswelt_pdfpresenter_view_default_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_view_pdf_get_type (void) G_GNUC_CONST;
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_attach (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* self, orgwesthoffsweltpdfpresenterViewPdf* view);
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_enter (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_enter_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_link_mouse_enter (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self);
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_leave (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_leave_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_link_mouse_leave (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self);
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_internal_link (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, guint target_page_number);
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_internal_link_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_clicked_internal_link (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, guint target_page_number, gpointer self);
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_external_command (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments);
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_external_command_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_clicked_external_command (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments, gpointer self);
-gboolean org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_is_supported (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, orgwesthoffsweltpdfpresenterViewBase* target);
-void org_westhoffswelt_pdfpresenter_presentation_controller_page_change_request (orgwesthoffsweltpdfpresenterPresentationController* self, gint page_number);
-static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_finalize (GObject* obj);
+pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_new (pdfpcPresentationController* presentation_controller);
+pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_construct (GType object_type, pdfpcPresentationController* presentation_controller);
+pdfpcViewBehaviourBase* pdfpc_view_behaviour_base_construct (GType object_type);
+pdfpcViewBehaviourPdfLinkSignalProvider* pdfpc_view_behaviour_pdf_link_signal_provider_new (void);
+pdfpcViewBehaviourPdfLinkSignalProvider* pdfpc_view_behaviour_pdf_link_signal_provider_construct (GType object_type);
+static void pdfpc_view_behaviour_pdf_link_implementation_real_associate (pdfpcViewBehaviourBase* base, pdfpcViewBase* target, GError** error);
+void pdfpc_view_behaviour_base_enforce_exclusive_association (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+GType pdfpc_view_default_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_pdf_get_type (void) G_GNUC_CONST;
+void pdfpc_view_behaviour_pdf_link_signal_provider_attach (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewPdf* view);
+void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter_pdfpc_view_behaviour_pdf_link_signal_provider_link_mouse_enter (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self);
+void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave_pdfpc_view_behaviour_pdf_link_signal_provider_link_mouse_leave (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self);
+void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, guint target_page_number);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link_pdfpc_view_behaviour_pdf_link_signal_provider_clicked_internal_link (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, guint target_page_number, gpointer self);
+void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command_pdfpc_view_behaviour_pdf_link_signal_provider_clicked_external_command (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments, gpointer self);
+gboolean pdfpc_view_behaviour_pdf_link_implementation_is_supported (pdfpcViewBehaviourPdfLinkImplementation* self, pdfpcViewBase* target);
+void pdfpc_presentation_controller_page_change_request (pdfpcPresentationController* self, gint page_number);
+static void pdfpc_view_behaviour_pdf_link_implementation_finalize (GObject* obj);
 
 
 /**
@@ -155,14 +155,14 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_construct (GType object_type, orgwesthoffsweltpdfpresenterPresentationController* presentation_controller) {
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation * self = NULL;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _tmp0_;
-	orgwesthoffsweltpdfpresenterPresentationController* _tmp1_;
-	orgwesthoffsweltpdfpresenterPresentationController* _tmp2_;
+pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_construct (GType object_type, pdfpcPresentationController* presentation_controller) {
+	pdfpcViewBehaviourPdfLinkImplementation * self = NULL;
+	pdfpcViewBehaviourPdfLinkSignalProvider* _tmp0_;
+	pdfpcPresentationController* _tmp1_;
+	pdfpcPresentationController* _tmp2_;
 	g_return_val_if_fail (presentation_controller != NULL, NULL);
-	self = (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation*) org_westhoffswelt_pdfpresenter_view_behaviour_base_construct (object_type);
-	_tmp0_ = org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_new ();
+	self = (pdfpcViewBehaviourPdfLinkImplementation*) pdfpc_view_behaviour_base_construct (object_type);
+	_tmp0_ = pdfpc_view_behaviour_pdf_link_signal_provider_new ();
 	_g_object_unref0 (self->signal_provider);
 	self->signal_provider = _tmp0_;
 	_tmp1_ = presentation_controller;
@@ -173,8 +173,8 @@ orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* org_westhoffswel
 }
 
 
-orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_new (orgwesthoffsweltpdfpresenterPresentationController* presentation_controller) {
-	return org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, presentation_controller);
+pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_new (pdfpcPresentationController* presentation_controller) {
+	return pdfpc_view_behaviour_pdf_link_implementation_construct (PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, presentation_controller);
 }
 
 
@@ -184,44 +184,44 @@ orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* org_westhoffswel
          * This method will register a lot of new signals on the target to
          * handle all the different states.
          */
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_enter_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_link_mouse_enter (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self) {
-	org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_enter (self, link_rect, mapping);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter_pdfpc_view_behaviour_pdf_link_signal_provider_link_mouse_enter (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self) {
+	pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter (self, link_rect, mapping);
 }
 
 
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_leave_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_link_mouse_leave (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self) {
-	org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_leave (self, link_rect, mapping);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave_pdfpc_view_behaviour_pdf_link_signal_provider_link_mouse_leave (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, PopplerLinkMapping* mapping, gpointer self) {
+	pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave (self, link_rect, mapping);
 }
 
 
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_internal_link_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_clicked_internal_link (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, guint target_page_number, gpointer self) {
-	org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_internal_link (self, link_rect, source_page_number, target_page_number);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link_pdfpc_view_behaviour_pdf_link_signal_provider_clicked_internal_link (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, guint target_page_number, gpointer self) {
+	pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link (self, link_rect, source_page_number, target_page_number);
 }
 
 
-static void _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_external_command_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_clicked_external_command (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments, gpointer self) {
-	org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_external_command (self, link_rect, source_page_number, command, arguments);
+static void _pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command_pdfpc_view_behaviour_pdf_link_signal_provider_clicked_external_command (pdfpcViewBehaviourPdfLinkSignalProvider* _sender, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments, gpointer self) {
+	pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command (self, link_rect, source_page_number, command, arguments);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_real_associate (orgwesthoffsweltpdfpresenterViewBehaviourBase* base, orgwesthoffsweltpdfpresenterViewBase* target, GError** error) {
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation * self;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp0_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp1_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp2_;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _tmp3_;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp4_;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _tmp5_;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _tmp6_;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _tmp7_;
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkSignalProvider* _tmp8_;
+static void pdfpc_view_behaviour_pdf_link_implementation_real_associate (pdfpcViewBehaviourBase* base, pdfpcViewBase* target, GError** error) {
+	pdfpcViewBehaviourPdfLinkImplementation * self;
+	pdfpcViewBase* _tmp0_;
+	pdfpcViewBase* _tmp1_;
+	pdfpcViewBase* _tmp2_;
+	pdfpcViewBehaviourPdfLinkSignalProvider* _tmp3_;
+	pdfpcViewBase* _tmp4_;
+	pdfpcViewBehaviourPdfLinkSignalProvider* _tmp5_;
+	pdfpcViewBehaviourPdfLinkSignalProvider* _tmp6_;
+	pdfpcViewBehaviourPdfLinkSignalProvider* _tmp7_;
+	pdfpcViewBehaviourPdfLinkSignalProvider* _tmp8_;
 	GError * _inner_error_ = NULL;
-	self = (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation*) base;
+	self = (pdfpcViewBehaviourPdfLinkImplementation*) base;
 	g_return_if_fail (target != NULL);
 	_tmp0_ = target;
-	org_westhoffswelt_pdfpresenter_view_behaviour_base_enforce_exclusive_association ((orgwesthoffsweltpdfpresenterViewBehaviourBase*) self, _tmp0_, &_inner_error_);
+	pdfpc_view_behaviour_base_enforce_exclusive_association ((pdfpcViewBehaviourBase*) self, _tmp0_, &_inner_error_);
 	if (_inner_error_ != NULL) {
-		if (_inner_error_->domain == ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
+		if (_inner_error_->domain == PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
 			g_propagate_error (error, _inner_error_);
 			return;
 		} else {
@@ -232,19 +232,19 @@ static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementatio
 	}
 	_tmp1_ = target;
 	_tmp2_ = _g_object_ref0 (_tmp1_);
-	_g_object_unref0 (((orgwesthoffsweltpdfpresenterViewBehaviourBase*) self)->target);
-	((orgwesthoffsweltpdfpresenterViewBehaviourBase*) self)->target = _tmp2_;
+	_g_object_unref0 (((pdfpcViewBehaviourBase*) self)->target);
+	((pdfpcViewBehaviourBase*) self)->target = _tmp2_;
 	_tmp3_ = self->signal_provider;
 	_tmp4_ = target;
-	org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_attach (_tmp3_, ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_PDF (_tmp4_) ? ((orgwesthoffsweltpdfpresenterViewPdf*) _tmp4_) : NULL);
+	pdfpc_view_behaviour_pdf_link_signal_provider_attach (_tmp3_, PDFPC_VIEW_IS_PDF (_tmp4_) ? ((pdfpcViewPdf*) _tmp4_) : NULL);
 	_tmp5_ = self->signal_provider;
-	g_signal_connect_object (_tmp5_, "link-mouse-enter", (GCallback) _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_enter_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_link_mouse_enter, self, 0);
+	g_signal_connect_object (_tmp5_, "link-mouse-enter", (GCallback) _pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter_pdfpc_view_behaviour_pdf_link_signal_provider_link_mouse_enter, self, 0);
 	_tmp6_ = self->signal_provider;
-	g_signal_connect_object (_tmp6_, "link-mouse-leave", (GCallback) _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_leave_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_link_mouse_leave, self, 0);
+	g_signal_connect_object (_tmp6_, "link-mouse-leave", (GCallback) _pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave_pdfpc_view_behaviour_pdf_link_signal_provider_link_mouse_leave, self, 0);
 	_tmp7_ = self->signal_provider;
-	g_signal_connect_object (_tmp7_, "clicked-internal-link", (GCallback) _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_internal_link_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_clicked_internal_link, self, 0);
+	g_signal_connect_object (_tmp7_, "clicked-internal-link", (GCallback) _pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link_pdfpc_view_behaviour_pdf_link_signal_provider_clicked_internal_link, self, 0);
 	_tmp8_ = self->signal_provider;
-	g_signal_connect_object (_tmp8_, "clicked-external-command", (GCallback) _org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_external_command_org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_signal_provider_clicked_external_command, self, 0);
+	g_signal_connect_object (_tmp8_, "clicked-external-command", (GCallback) _pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command_pdfpc_view_behaviour_pdf_link_signal_provider_clicked_external_command, self, 0);
 }
 
 
@@ -254,13 +254,13 @@ static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementatio
          * Only View.Pdf and its descendants are allowed to be used in
          * conjunction with this Behaviour
          */
-gboolean org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_is_supported (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, orgwesthoffsweltpdfpresenterViewBase* target) {
+gboolean pdfpc_view_behaviour_pdf_link_implementation_is_supported (pdfpcViewBehaviourPdfLinkImplementation* self, pdfpcViewBase* target) {
 	gboolean result = FALSE;
-	orgwesthoffsweltpdfpresenterViewBase* _tmp0_;
+	pdfpcViewBase* _tmp0_;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (target != NULL, FALSE);
 	_tmp0_ = target;
-	result = ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_IS_PDF (_tmp0_);
+	result = PDFPC_VIEW_IS_PDF (_tmp0_);
 	return result;
 }
 
@@ -268,8 +268,8 @@ gboolean org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_i
 /**
          * The mouse pointer has entered a pdf link
          */
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_enter (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping) {
-	orgwesthoffsweltpdfpresenterViewBase* _tmp0_;
+void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping) {
+	pdfpcViewBase* _tmp0_;
 	GdkWindow* _tmp1_;
 	GdkDisplay* _tmp2_ = NULL;
 	GdkCursor* _tmp3_;
@@ -277,7 +277,7 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_li
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (link_rect != NULL);
 	g_return_if_fail (mapping != NULL);
-	_tmp0_ = ((orgwesthoffsweltpdfpresenterViewBehaviourBase*) self)->target;
+	_tmp0_ = ((pdfpcViewBehaviourBase*) self)->target;
 	_tmp1_ = ((GtkWidget*) _tmp0_)->window;
 	_tmp2_ = gdk_display_get_default ();
 	_tmp3_ = gdk_cursor_new_from_name (_tmp2_, "hand2");
@@ -290,13 +290,13 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_li
 /**
          * The mouse pointer has left a pdf link
          */
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_link_mouse_leave (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping) {
-	orgwesthoffsweltpdfpresenterViewBase* _tmp0_;
+void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping) {
+	pdfpcViewBase* _tmp0_;
 	GdkWindow* _tmp1_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (link_rect != NULL);
 	g_return_if_fail (mapping != NULL);
-	_tmp0_ = ((orgwesthoffsweltpdfpresenterViewBehaviourBase*) self)->target;
+	_tmp0_ = ((pdfpcViewBehaviourBase*) self)->target;
 	_tmp1_ = ((GtkWidget*) _tmp0_)->window;
 	gdk_window_set_cursor (_tmp1_, NULL);
 }
@@ -305,21 +305,21 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_li
 /**
          * An internal link has been clicked
          */
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_internal_link (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, guint target_page_number) {
-	orgwesthoffsweltpdfpresenterPresentationController* _tmp0_;
+void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, guint target_page_number) {
+	pdfpcPresentationController* _tmp0_;
 	guint _tmp1_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (link_rect != NULL);
 	_tmp0_ = self->presentation_controller;
 	_tmp1_ = target_page_number;
-	org_westhoffswelt_pdfpresenter_presentation_controller_page_change_request (_tmp0_, (gint) _tmp1_);
+	pdfpc_presentation_controller_page_change_request (_tmp0_, (gint) _tmp1_);
 }
 
 
 /**
          * An external command link has been clicked
          */
-void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_clicked_external_command (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments) {
+void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments) {
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (link_rect != NULL);
 	g_return_if_fail (command != NULL);
@@ -327,39 +327,39 @@ void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_on_cl
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_class_init (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass * klass) {
-	org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_BASE_CLASS (klass)->associate = org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_real_associate;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_finalize;
+static void pdfpc_view_behaviour_pdf_link_implementation_class_init (pdfpcViewBehaviourPdfLinkImplementationClass * klass) {
+	pdfpc_view_behaviour_pdf_link_implementation_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_VIEW_BEHAVIOUR_BASE_CLASS (klass)->associate = pdfpc_view_behaviour_pdf_link_implementation_real_associate;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_view_behaviour_pdf_link_implementation_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_instance_init (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation * self) {
+static void pdfpc_view_behaviour_pdf_link_implementation_instance_init (pdfpcViewBehaviourPdfLinkImplementation * self) {
 	self->signal_provider = NULL;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION (obj);
+static void pdfpc_view_behaviour_pdf_link_implementation_finalize (GObject* obj) {
+	pdfpcViewBehaviourPdfLinkImplementation * self;
+	self = PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION (obj);
 	_g_object_unref0 (self->signal_provider);
 	_g_object_unref0 (self->presentation_controller);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_parent_class)->finalize (obj);
+	G_OBJECT_CLASS (pdfpc_view_behaviour_pdf_link_implementation_parent_class)->finalize (obj);
 }
 
 
 /**
      * Behaviour which handles links inside of Pdf based Views
      */
-GType org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementationClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id;
-		org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id = g_type_register_static (ORG_WESTHOFFSWELT_PDFPRESENTER_VIEW_BEHAVIOUR_TYPE_BASE, "orgwesthoffsweltpdfpresenterViewBehaviourPdfLinkImplementation", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id__volatile, org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id);
+GType pdfpc_view_behaviour_pdf_link_implementation_get_type (void) {
+	static volatile gsize pdfpc_view_behaviour_pdf_link_implementation_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_view_behaviour_pdf_link_implementation_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcViewBehaviourPdfLinkImplementationClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_view_behaviour_pdf_link_implementation_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcViewBehaviourPdfLinkImplementation), 0, (GInstanceInitFunc) pdfpc_view_behaviour_pdf_link_implementation_instance_init, NULL };
+		GType pdfpc_view_behaviour_pdf_link_implementation_type_id;
+		pdfpc_view_behaviour_pdf_link_implementation_type_id = g_type_register_static (PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, "pdfpcViewBehaviourPdfLinkImplementation", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_view_behaviour_pdf_link_implementation_type_id__volatile, pdfpc_view_behaviour_pdf_link_implementation_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_view_behaviour_pdf_link_implementation_type_id__volatile;
+	return pdfpc_view_behaviour_pdf_link_implementation_type_id__volatile;
 }
 
 

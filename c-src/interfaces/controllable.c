@@ -10,123 +10,101 @@
 #include <glib-object.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE (org_westhoffswelt_pdfpresenter_controllable_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE, orgwesthoffsweltpdfpresenterControllable))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_CONTROLLABLE, orgwesthoffsweltpdfpresenterControllableIface))
+#define PDFPC_TYPE_CONTROLLABLE (pdfpc_controllable_get_type ())
+#define PDFPC_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllable))
+#define PDFPC_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONTROLLABLE))
+#define PDFPC_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllableIface))
 
-typedef struct _orgwesthoffsweltpdfpresenterControllable orgwesthoffsweltpdfpresenterControllable;
-typedef struct _orgwesthoffsweltpdfpresenterControllableIface orgwesthoffsweltpdfpresenterControllableIface;
+typedef struct _pdfpcControllable pdfpcControllable;
+typedef struct _pdfpcControllableIface pdfpcControllableIface;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER (org_westhoffswelt_pdfpresenter_presentation_controller_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationController))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_PRESENTATION_CONTROLLER, orgwesthoffsweltpdfpresenterPresentationControllerClass))
+#define PDFPC_TYPE_PRESENTATION_CONTROLLER (pdfpc_presentation_controller_get_type ())
+#define PDFPC_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationController))
+#define PDFPC_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
+#define PDFPC_IS_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_IS_PRESENTATION_CONTROLLER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_PRESENTATION_CONTROLLER))
+#define PDFPC_PRESENTATION_CONTROLLER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationControllerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterPresentationController orgwesthoffsweltpdfpresenterPresentationController;
-typedef struct _orgwesthoffsweltpdfpresenterPresentationControllerClass orgwesthoffsweltpdfpresenterPresentationControllerClass;
+typedef struct _pdfpcPresentationController pdfpcPresentationController;
+typedef struct _pdfpcPresentationControllerClass pdfpcPresentationControllerClass;
 
-struct _orgwesthoffsweltpdfpresenterControllableIface {
+struct _pdfpcControllableIface {
 	GTypeInterface parent_iface;
-	orgwesthoffsweltpdfpresenterPresentationController* (*get_controller) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*update) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*edit_note) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*ask_goto_page) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*toggle_pause) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*reset_timer) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*show_overview) (orgwesthoffsweltpdfpresenterControllable* self);
-	void (*hide_overview) (orgwesthoffsweltpdfpresenterControllable* self);
+	pdfpcPresentationController* (*get_controller) (pdfpcControllable* self);
+	void (*update) (pdfpcControllable* self);
+	void (*edit_note) (pdfpcControllable* self);
+	void (*ask_goto_page) (pdfpcControllable* self);
+	void (*show_overview) (pdfpcControllable* self);
+	void (*hide_overview) (pdfpcControllable* self);
 };
 
 
 
-GType org_westhoffswelt_pdfpresenter_presentation_controller_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_controllable_get_type (void) G_GNUC_CONST;
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_controllable_get_controller (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_update (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_edit_note (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_ask_goto_page (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_toggle_pause (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_reset_timer (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_show_overview (orgwesthoffsweltpdfpresenterControllable* self);
-void org_westhoffswelt_pdfpresenter_controllable_hide_overview (orgwesthoffsweltpdfpresenterControllable* self);
+GType pdfpc_presentation_controller_get_type (void) G_GNUC_CONST;
+GType pdfpc_controllable_get_type (void) G_GNUC_CONST;
+pdfpcPresentationController* pdfpc_controllable_get_controller (pdfpcControllable* self);
+void pdfpc_controllable_update (pdfpcControllable* self);
+void pdfpc_controllable_edit_note (pdfpcControllable* self);
+void pdfpc_controllable_ask_goto_page (pdfpcControllable* self);
+void pdfpc_controllable_show_overview (pdfpcControllable* self);
+void pdfpc_controllable_hide_overview (pdfpcControllable* self);
 
 
 /**
          * Return the registered PresentationController
          */
-orgwesthoffsweltpdfpresenterPresentationController* org_westhoffswelt_pdfpresenter_controllable_get_controller (orgwesthoffsweltpdfpresenterControllable* self) {
+pdfpcPresentationController* pdfpc_controllable_get_controller (pdfpcControllable* self) {
 	g_return_val_if_fail (self != NULL, NULL);
-	return ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->get_controller (self);
+	return PDFPC_CONTROLLABLE_GET_INTERFACE (self)->get_controller (self);
 }
 
 
 /**
          * Update the display
          */
-void org_westhoffswelt_pdfpresenter_controllable_update (orgwesthoffsweltpdfpresenterControllable* self) {
+void pdfpc_controllable_update (pdfpcControllable* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->update (self);
+	PDFPC_CONTROLLABLE_GET_INTERFACE (self)->update (self);
 }
 
 
 /**
          * Edit note for current slide
          */
-void org_westhoffswelt_pdfpresenter_controllable_edit_note (orgwesthoffsweltpdfpresenterControllable* self) {
+void pdfpc_controllable_edit_note (pdfpcControllable* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->edit_note (self);
+	PDFPC_CONTROLLABLE_GET_INTERFACE (self)->edit_note (self);
 }
 
 
 /**
          * Ask for the page to jump to
          */
-void org_westhoffswelt_pdfpresenter_controllable_ask_goto_page (orgwesthoffsweltpdfpresenterControllable* self) {
+void pdfpc_controllable_ask_goto_page (pdfpcControllable* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->ask_goto_page (self);
-}
-
-
-/**
-         * Pause the timer
-         */
-void org_westhoffswelt_pdfpresenter_controllable_toggle_pause (orgwesthoffsweltpdfpresenterControllable* self) {
-	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->toggle_pause (self);
-}
-
-
-/**
-         * Reset the timer
-         */
-void org_westhoffswelt_pdfpresenter_controllable_reset_timer (orgwesthoffsweltpdfpresenterControllable* self) {
-	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->reset_timer (self);
+	PDFPC_CONTROLLABLE_GET_INTERFACE (self)->ask_goto_page (self);
 }
 
 
 /**
          * Show an overview of all slides
          */
-void org_westhoffswelt_pdfpresenter_controllable_show_overview (orgwesthoffsweltpdfpresenterControllable* self) {
+void pdfpc_controllable_show_overview (pdfpcControllable* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->show_overview (self);
+	PDFPC_CONTROLLABLE_GET_INTERFACE (self)->show_overview (self);
 }
 
 
 /**
          * Hide the overview
          */
-void org_westhoffswelt_pdfpresenter_controllable_hide_overview (orgwesthoffsweltpdfpresenterControllable* self) {
+void pdfpc_controllable_hide_overview (pdfpcControllable* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_CONTROLLABLE_GET_INTERFACE (self)->hide_overview (self);
+	PDFPC_CONTROLLABLE_GET_INTERFACE (self)->hide_overview (self);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_controllable_base_init (orgwesthoffsweltpdfpresenterControllableIface * iface) {
+static void pdfpc_controllable_base_init (pdfpcControllableIface * iface) {
 	static gboolean initialized = FALSE;
 	if (!initialized) {
 		initialized = TRUE;
@@ -138,16 +116,16 @@ static void org_westhoffswelt_pdfpresenter_controllable_base_init (orgwesthoffsw
      * Every window or object which wants to be controlled by the
      * PresentationController needs to implement this interface.
      */
-GType org_westhoffswelt_pdfpresenter_controllable_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_controllable_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_controllable_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterControllableIface), (GBaseInitFunc) org_westhoffswelt_pdfpresenter_controllable_base_init, (GBaseFinalizeFunc) NULL, (GClassInitFunc) NULL, (GClassFinalizeFunc) NULL, NULL, 0, 0, (GInstanceInitFunc) NULL, NULL };
-		GType org_westhoffswelt_pdfpresenter_controllable_type_id;
-		org_westhoffswelt_pdfpresenter_controllable_type_id = g_type_register_static (G_TYPE_INTERFACE, "orgwesthoffsweltpdfpresenterControllable", &g_define_type_info, 0);
-		g_type_interface_add_prerequisite (org_westhoffswelt_pdfpresenter_controllable_type_id, G_TYPE_OBJECT);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_controllable_type_id__volatile, org_westhoffswelt_pdfpresenter_controllable_type_id);
+GType pdfpc_controllable_get_type (void) {
+	static volatile gsize pdfpc_controllable_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_controllable_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcControllableIface), (GBaseInitFunc) pdfpc_controllable_base_init, (GBaseFinalizeFunc) NULL, (GClassInitFunc) NULL, (GClassFinalizeFunc) NULL, NULL, 0, 0, (GInstanceInitFunc) NULL, NULL };
+		GType pdfpc_controllable_type_id;
+		pdfpc_controllable_type_id = g_type_register_static (G_TYPE_INTERFACE, "pdfpcControllable", &g_define_type_info, 0);
+		g_type_interface_add_prerequisite (pdfpc_controllable_type_id, G_TYPE_OBJECT);
+		g_once_init_leave (&pdfpc_controllable_type_id__volatile, pdfpc_controllable_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_controllable_type_id__volatile;
+	return pdfpc_controllable_type_id__volatile;
 }
 
 

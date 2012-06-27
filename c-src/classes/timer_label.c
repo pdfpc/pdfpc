@@ -11,54 +11,54 @@
 #include <string.h>
 
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL (org_westhoffswelt_pdfpresenter_timer_label_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL, orgwesthoffsweltpdfpresenterTimerLabel))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL, orgwesthoffsweltpdfpresenterTimerLabelClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_TIMER_LABEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_TIMER_LABEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL, orgwesthoffsweltpdfpresenterTimerLabelClass))
+#define PDFPC_TYPE_TIMER_LABEL (pdfpc_timer_label_get_type ())
+#define PDFPC_TIMER_LABEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_TIMER_LABEL, pdfpcTimerLabel))
+#define PDFPC_TIMER_LABEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_TIMER_LABEL, pdfpcTimerLabelClass))
+#define PDFPC_IS_TIMER_LABEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_TIMER_LABEL))
+#define PDFPC_IS_TIMER_LABEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_TIMER_LABEL))
+#define PDFPC_TIMER_LABEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_TIMER_LABEL, pdfpcTimerLabelClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterTimerLabel orgwesthoffsweltpdfpresenterTimerLabel;
-typedef struct _orgwesthoffsweltpdfpresenterTimerLabelClass orgwesthoffsweltpdfpresenterTimerLabelClass;
+typedef struct _pdfpcTimerLabel pdfpcTimerLabel;
+typedef struct _pdfpcTimerLabelClass pdfpcTimerLabelClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER (org_westhoffswelt_pdfpresenter_countdown_timer_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER, orgwesthoffsweltpdfpresenterCountdownTimer))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER, orgwesthoffsweltpdfpresenterCountdownTimerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_COUNTDOWN_TIMER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_COUNTDOWN_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER, orgwesthoffsweltpdfpresenterCountdownTimerClass))
+#define PDFPC_TYPE_COUNTDOWN_TIMER (pdfpc_countdown_timer_get_type ())
+#define PDFPC_COUNTDOWN_TIMER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_COUNTDOWN_TIMER, pdfpcCountdownTimer))
+#define PDFPC_COUNTDOWN_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_COUNTDOWN_TIMER, pdfpcCountdownTimerClass))
+#define PDFPC_IS_COUNTDOWN_TIMER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_COUNTDOWN_TIMER))
+#define PDFPC_IS_COUNTDOWN_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_COUNTDOWN_TIMER))
+#define PDFPC_COUNTDOWN_TIMER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_COUNTDOWN_TIMER, pdfpcCountdownTimerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterCountdownTimer orgwesthoffsweltpdfpresenterCountdownTimer;
-typedef struct _orgwesthoffsweltpdfpresenterCountdownTimerClass orgwesthoffsweltpdfpresenterCountdownTimerClass;
+typedef struct _pdfpcCountdownTimer pdfpcCountdownTimer;
+typedef struct _pdfpcCountdownTimerClass pdfpcCountdownTimerClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER (org_westhoffswelt_pdfpresenter_end_time_timer_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_END_TIME_TIMER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER, orgwesthoffsweltpdfpresenterEndTimeTimer))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_END_TIME_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER, orgwesthoffsweltpdfpresenterEndTimeTimerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_END_TIME_TIMER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_END_TIME_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_END_TIME_TIMER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER, orgwesthoffsweltpdfpresenterEndTimeTimerClass))
+#define PDFPC_TYPE_END_TIME_TIMER (pdfpc_end_time_timer_get_type ())
+#define PDFPC_END_TIME_TIMER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_END_TIME_TIMER, pdfpcEndTimeTimer))
+#define PDFPC_END_TIME_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_END_TIME_TIMER, pdfpcEndTimeTimerClass))
+#define PDFPC_IS_END_TIME_TIMER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_END_TIME_TIMER))
+#define PDFPC_IS_END_TIME_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_END_TIME_TIMER))
+#define PDFPC_END_TIME_TIMER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_END_TIME_TIMER, pdfpcEndTimeTimerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterEndTimeTimer orgwesthoffsweltpdfpresenterEndTimeTimer;
-typedef struct _orgwesthoffsweltpdfpresenterEndTimeTimerClass orgwesthoffsweltpdfpresenterEndTimeTimerClass;
+typedef struct _pdfpcEndTimeTimer pdfpcEndTimeTimer;
+typedef struct _pdfpcEndTimeTimerClass pdfpcEndTimeTimerClass;
 
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER (org_westhoffswelt_pdfpresenter_countup_timer_get_type ())
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTUP_TIMER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER, orgwesthoffsweltpdfpresenterCountupTimer))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTUP_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER, orgwesthoffsweltpdfpresenterCountupTimerClass))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_COUNTUP_TIMER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_IS_COUNTUP_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER))
-#define ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTUP_TIMER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER, orgwesthoffsweltpdfpresenterCountupTimerClass))
+#define PDFPC_TYPE_COUNTUP_TIMER (pdfpc_countup_timer_get_type ())
+#define PDFPC_COUNTUP_TIMER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_COUNTUP_TIMER, pdfpcCountupTimer))
+#define PDFPC_COUNTUP_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_COUNTUP_TIMER, pdfpcCountupTimerClass))
+#define PDFPC_IS_COUNTUP_TIMER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_COUNTUP_TIMER))
+#define PDFPC_IS_COUNTUP_TIMER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_COUNTUP_TIMER))
+#define PDFPC_COUNTUP_TIMER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_COUNTUP_TIMER, pdfpcCountupTimerClass))
 
-typedef struct _orgwesthoffsweltpdfpresenterCountupTimer orgwesthoffsweltpdfpresenterCountupTimer;
-typedef struct _orgwesthoffsweltpdfpresenterCountupTimerClass orgwesthoffsweltpdfpresenterCountupTimerClass;
-typedef struct _orgwesthoffsweltpdfpresenterTimerLabelPrivate orgwesthoffsweltpdfpresenterTimerLabelPrivate;
+typedef struct _pdfpcCountupTimer pdfpcCountupTimer;
+typedef struct _pdfpcCountupTimerClass pdfpcCountupTimerClass;
+typedef struct _pdfpcTimerLabelPrivate pdfpcTimerLabelPrivate;
 #define _g_free0(var) (var = (g_free (var), NULL))
-typedef struct _orgwesthoffsweltpdfpresenterCountdownTimerPrivate orgwesthoffsweltpdfpresenterCountdownTimerPrivate;
-typedef struct _orgwesthoffsweltpdfpresenterEndTimeTimerPrivate orgwesthoffsweltpdfpresenterEndTimeTimerPrivate;
-typedef struct _orgwesthoffsweltpdfpresenterCountupTimerPrivate orgwesthoffsweltpdfpresenterCountupTimerPrivate;
+typedef struct _pdfpcCountdownTimerPrivate pdfpcCountdownTimerPrivate;
+typedef struct _pdfpcEndTimeTimerPrivate pdfpcEndTimeTimerPrivate;
+typedef struct _pdfpcCountupTimerPrivate pdfpcCountupTimerPrivate;
 
-struct _orgwesthoffsweltpdfpresenterTimerLabel {
+struct _pdfpcTimerLabel {
 	GtkLabel parent_instance;
-	orgwesthoffsweltpdfpresenterTimerLabelPrivate * priv;
+	pdfpcTimerLabelPrivate * priv;
 	gint time;
 	time_t start_time;
 	guint timeout;
@@ -66,122 +66,123 @@ struct _orgwesthoffsweltpdfpresenterTimerLabel {
 	GdkColor pretalk_color;
 };
 
-struct _orgwesthoffsweltpdfpresenterTimerLabelClass {
+struct _pdfpcTimerLabelClass {
 	GtkLabelClass parent_class;
-	void (*start) (orgwesthoffsweltpdfpresenterTimerLabel* self);
-	void (*stop) (orgwesthoffsweltpdfpresenterTimerLabel* self);
-	void (*reset) (orgwesthoffsweltpdfpresenterTimerLabel* self);
-	gboolean (*on_timeout) (orgwesthoffsweltpdfpresenterTimerLabel* self);
-	void (*format_time) (orgwesthoffsweltpdfpresenterTimerLabel* self);
+	void (*start) (pdfpcTimerLabel* self);
+	void (*stop) (pdfpcTimerLabel* self);
+	void (*reset) (pdfpcTimerLabel* self);
+	gboolean (*on_timeout) (pdfpcTimerLabel* self);
+	void (*format_time) (pdfpcTimerLabel* self);
 };
 
-struct _orgwesthoffsweltpdfpresenterCountdownTimer {
-	orgwesthoffsweltpdfpresenterTimerLabel parent_instance;
-	orgwesthoffsweltpdfpresenterCountdownTimerPrivate * priv;
+struct _pdfpcCountdownTimer {
+	pdfpcTimerLabel parent_instance;
+	pdfpcCountdownTimerPrivate * priv;
 	gint duration;
 	guint last_minutes;
 	GdkColor last_minutes_color;
 	GdkColor negative_color;
 };
 
-struct _orgwesthoffsweltpdfpresenterCountdownTimerClass {
-	orgwesthoffsweltpdfpresenterTimerLabelClass parent_class;
+struct _pdfpcCountdownTimerClass {
+	pdfpcTimerLabelClass parent_class;
 };
 
-struct _orgwesthoffsweltpdfpresenterEndTimeTimer {
-	orgwesthoffsweltpdfpresenterCountdownTimer parent_instance;
-	orgwesthoffsweltpdfpresenterEndTimeTimerPrivate * priv;
+struct _pdfpcEndTimeTimer {
+	pdfpcCountdownTimer parent_instance;
+	pdfpcEndTimeTimerPrivate * priv;
 	time_t end_time;
 	struct tm end_time_object;
 };
 
-struct _orgwesthoffsweltpdfpresenterEndTimeTimerClass {
-	orgwesthoffsweltpdfpresenterCountdownTimerClass parent_class;
+struct _pdfpcEndTimeTimerClass {
+	pdfpcCountdownTimerClass parent_class;
 };
 
-struct _orgwesthoffsweltpdfpresenterCountupTimer {
-	orgwesthoffsweltpdfpresenterTimerLabel parent_instance;
-	orgwesthoffsweltpdfpresenterCountupTimerPrivate * priv;
+struct _pdfpcCountupTimer {
+	pdfpcTimerLabel parent_instance;
+	pdfpcCountupTimerPrivate * priv;
 };
 
-struct _orgwesthoffsweltpdfpresenterCountupTimerClass {
-	orgwesthoffsweltpdfpresenterTimerLabelClass parent_class;
+struct _pdfpcCountupTimerClass {
+	pdfpcTimerLabelClass parent_class;
 };
 
 
-static gpointer org_westhoffswelt_pdfpresenter_timer_label_parent_class = NULL;
-static gpointer org_westhoffswelt_pdfpresenter_countdown_timer_parent_class = NULL;
-static gpointer org_westhoffswelt_pdfpresenter_end_time_timer_parent_class = NULL;
-static gpointer org_westhoffswelt_pdfpresenter_countup_timer_parent_class = NULL;
+static gpointer pdfpc_timer_label_parent_class = NULL;
+static gpointer pdfpc_countdown_timer_parent_class = NULL;
+static gpointer pdfpc_end_time_timer_parent_class = NULL;
+static gpointer pdfpc_countup_timer_parent_class = NULL;
 
-GType org_westhoffswelt_pdfpresenter_timer_label_get_type (void) G_GNUC_CONST;
-orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_getTimerLabel (gint duration, time_t end_time, guint last_minutes, time_t start_time);
-orgwesthoffsweltpdfpresenterEndTimeTimer* org_westhoffswelt_pdfpresenter_end_time_timer_new (time_t end_time, guint last_minutes, time_t start_time);
-orgwesthoffsweltpdfpresenterEndTimeTimer* org_westhoffswelt_pdfpresenter_end_time_timer_construct (GType object_type, time_t end_time, guint last_minutes, time_t start_time);
-GType org_westhoffswelt_pdfpresenter_countdown_timer_get_type (void) G_GNUC_CONST;
-GType org_westhoffswelt_pdfpresenter_end_time_timer_get_type (void) G_GNUC_CONST;
-orgwesthoffsweltpdfpresenterCountdownTimer* org_westhoffswelt_pdfpresenter_countdown_timer_new (gint duration, guint last_minutes, time_t start_time);
-orgwesthoffsweltpdfpresenterCountdownTimer* org_westhoffswelt_pdfpresenter_countdown_timer_construct (GType object_type, gint duration, guint last_minutes, time_t start_time);
-orgwesthoffsweltpdfpresenterCountupTimer* org_westhoffswelt_pdfpresenter_countup_timer_new (time_t start_time);
-orgwesthoffsweltpdfpresenterCountupTimer* org_westhoffswelt_pdfpresenter_countup_timer_construct (GType object_type, time_t start_time);
-GType org_westhoffswelt_pdfpresenter_countup_timer_get_type (void) G_GNUC_CONST;
+GType pdfpc_timer_label_get_type (void) G_GNUC_CONST;
+pdfpcTimerLabel* pdfpc_getTimerLabel (gint duration, time_t end_time, guint last_minutes, time_t start_time);
+pdfpcEndTimeTimer* pdfpc_end_time_timer_new (time_t end_time, guint last_minutes, time_t start_time);
+pdfpcEndTimeTimer* pdfpc_end_time_timer_construct (GType object_type, time_t end_time, guint last_minutes, time_t start_time);
+GType pdfpc_countdown_timer_get_type (void) G_GNUC_CONST;
+GType pdfpc_end_time_timer_get_type (void) G_GNUC_CONST;
+pdfpcCountdownTimer* pdfpc_countdown_timer_new (gint duration, guint last_minutes, time_t start_time);
+pdfpcCountdownTimer* pdfpc_countdown_timer_construct (GType object_type, gint duration, guint last_minutes, time_t start_time);
+pdfpcCountupTimer* pdfpc_countup_timer_new (time_t start_time);
+pdfpcCountupTimer* pdfpc_countup_timer_construct (GType object_type, time_t start_time);
+GType pdfpc_countup_timer_get_type (void) G_GNUC_CONST;
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_DUMMY_PROPERTY
+	PDFPC_TIMER_LABEL_DUMMY_PROPERTY
 };
-orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_timer_label_construct (GType object_type, time_t start_time);
-void org_westhoffswelt_pdfpresenter_timer_label_start (orgwesthoffsweltpdfpresenterTimerLabel* self);
-static void org_westhoffswelt_pdfpresenter_timer_label_real_start (orgwesthoffsweltpdfpresenterTimerLabel* self);
-gboolean org_westhoffswelt_pdfpresenter_timer_label_on_timeout (orgwesthoffsweltpdfpresenterTimerLabel* self);
-static gboolean _org_westhoffswelt_pdfpresenter_timer_label_on_timeout_gsource_func (gpointer self);
-void org_westhoffswelt_pdfpresenter_timer_label_stop (orgwesthoffsweltpdfpresenterTimerLabel* self);
-static void org_westhoffswelt_pdfpresenter_timer_label_real_stop (orgwesthoffsweltpdfpresenterTimerLabel* self);
-gboolean org_westhoffswelt_pdfpresenter_timer_label_pause (orgwesthoffsweltpdfpresenterTimerLabel* self);
-void org_westhoffswelt_pdfpresenter_timer_label_reset (orgwesthoffsweltpdfpresenterTimerLabel* self);
-static void org_westhoffswelt_pdfpresenter_timer_label_real_reset (orgwesthoffsweltpdfpresenterTimerLabel* self);
-gint org_westhoffswelt_pdfpresenter_timer_label_calculate_countdown (orgwesthoffsweltpdfpresenterTimerLabel* self);
-void org_westhoffswelt_pdfpresenter_timer_label_format_time (orgwesthoffsweltpdfpresenterTimerLabel* self);
-static gboolean org_westhoffswelt_pdfpresenter_timer_label_real_on_timeout (orgwesthoffsweltpdfpresenterTimerLabel* self);
-static void org_westhoffswelt_pdfpresenter_timer_label_real_format_time (orgwesthoffsweltpdfpresenterTimerLabel* self);
-void org_westhoffswelt_pdfpresenter_timer_label_show_time (orgwesthoffsweltpdfpresenterTimerLabel* self, guint timeInSecs, const gchar* prefix);
-static void org_westhoffswelt_pdfpresenter_timer_label_finalize (GObject* obj);
+pdfpcTimerLabel* pdfpc_timer_label_construct (GType object_type, time_t start_time);
+void pdfpc_timer_label_start (pdfpcTimerLabel* self);
+static void pdfpc_timer_label_real_start (pdfpcTimerLabel* self);
+gboolean pdfpc_timer_label_on_timeout (pdfpcTimerLabel* self);
+static gboolean _pdfpc_timer_label_on_timeout_gsource_func (gpointer self);
+void pdfpc_timer_label_stop (pdfpcTimerLabel* self);
+static void pdfpc_timer_label_real_stop (pdfpcTimerLabel* self);
+gboolean pdfpc_timer_label_pause (pdfpcTimerLabel* self);
+gboolean pdfpc_timer_label_is_paused (pdfpcTimerLabel* self);
+void pdfpc_timer_label_reset (pdfpcTimerLabel* self);
+static void pdfpc_timer_label_real_reset (pdfpcTimerLabel* self);
+gint pdfpc_timer_label_calculate_countdown (pdfpcTimerLabel* self);
+void pdfpc_timer_label_format_time (pdfpcTimerLabel* self);
+static gboolean pdfpc_timer_label_real_on_timeout (pdfpcTimerLabel* self);
+static void pdfpc_timer_label_real_format_time (pdfpcTimerLabel* self);
+void pdfpc_timer_label_show_time (pdfpcTimerLabel* self, guint timeInSecs, const gchar* prefix);
+static void pdfpc_timer_label_finalize (GObject* obj);
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER_DUMMY_PROPERTY
+	PDFPC_COUNTDOWN_TIMER_DUMMY_PROPERTY
 };
-static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (orgwesthoffsweltpdfpresenterTimerLabel* base);
-static void org_westhoffswelt_pdfpresenter_countdown_timer_finalize (GObject* obj);
+static void pdfpc_countdown_timer_real_format_time (pdfpcTimerLabel* base);
+static void pdfpc_countdown_timer_finalize (GObject* obj);
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_END_TIME_TIMER_DUMMY_PROPERTY
+	PDFPC_END_TIME_TIMER_DUMMY_PROPERTY
 };
-static void org_westhoffswelt_pdfpresenter_end_time_timer_real_start (orgwesthoffsweltpdfpresenterTimerLabel* base);
-static void org_westhoffswelt_pdfpresenter_end_time_timer_real_stop (orgwesthoffsweltpdfpresenterTimerLabel* base);
-static void org_westhoffswelt_pdfpresenter_end_time_timer_real_reset (orgwesthoffsweltpdfpresenterTimerLabel* base);
-static gboolean org_westhoffswelt_pdfpresenter_end_time_timer_real_on_timeout (orgwesthoffsweltpdfpresenterTimerLabel* base);
-static void org_westhoffswelt_pdfpresenter_end_time_timer_finalize (GObject* obj);
+static void pdfpc_end_time_timer_real_start (pdfpcTimerLabel* base);
+static void pdfpc_end_time_timer_real_stop (pdfpcTimerLabel* base);
+static void pdfpc_end_time_timer_real_reset (pdfpcTimerLabel* base);
+static gboolean pdfpc_end_time_timer_real_on_timeout (pdfpcTimerLabel* base);
+static void pdfpc_end_time_timer_finalize (GObject* obj);
 enum  {
-	ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTUP_TIMER_DUMMY_PROPERTY
+	PDFPC_COUNTUP_TIMER_DUMMY_PROPERTY
 };
-static void org_westhoffswelt_pdfpresenter_countup_timer_real_format_time (orgwesthoffsweltpdfpresenterTimerLabel* base);
+static void pdfpc_countup_timer_real_format_time (pdfpcTimerLabel* base);
 
 
 /**
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_getTimerLabel (gint duration, time_t end_time, guint last_minutes, time_t start_time) {
-	orgwesthoffsweltpdfpresenterTimerLabel* result = NULL;
+pdfpcTimerLabel* pdfpc_getTimerLabel (gint duration, time_t end_time, guint last_minutes, time_t start_time) {
+	pdfpcTimerLabel* result = NULL;
 	time_t _tmp0_;
 	_tmp0_ = end_time;
 	if (_tmp0_ > ((time_t) 0)) {
 		time_t _tmp1_;
 		guint _tmp2_;
 		time_t _tmp3_;
-		orgwesthoffsweltpdfpresenterEndTimeTimer* _tmp4_;
-		orgwesthoffsweltpdfpresenterTimerLabel* _tmp5_;
+		pdfpcEndTimeTimer* _tmp4_;
+		pdfpcTimerLabel* _tmp5_;
 		_tmp1_ = end_time;
 		_tmp2_ = last_minutes;
 		_tmp3_ = start_time;
-		_tmp4_ = org_westhoffswelt_pdfpresenter_end_time_timer_new (_tmp1_, _tmp2_, _tmp3_);
-		_tmp5_ = (orgwesthoffsweltpdfpresenterTimerLabel*) g_object_ref_sink (_tmp4_);
+		_tmp4_ = pdfpc_end_time_timer_new (_tmp1_, _tmp2_, _tmp3_);
+		_tmp5_ = (pdfpcTimerLabel*) g_object_ref_sink (_tmp4_);
 		result = _tmp5_;
 		return result;
 	} else {
@@ -191,22 +192,22 @@ orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_getTimerL
 			gint _tmp7_;
 			guint _tmp8_;
 			time_t _tmp9_;
-			orgwesthoffsweltpdfpresenterCountdownTimer* _tmp10_;
-			orgwesthoffsweltpdfpresenterTimerLabel* _tmp11_;
+			pdfpcCountdownTimer* _tmp10_;
+			pdfpcTimerLabel* _tmp11_;
 			_tmp7_ = duration;
 			_tmp8_ = last_minutes;
 			_tmp9_ = start_time;
-			_tmp10_ = org_westhoffswelt_pdfpresenter_countdown_timer_new (_tmp7_, _tmp8_, _tmp9_);
-			_tmp11_ = (orgwesthoffsweltpdfpresenterTimerLabel*) g_object_ref_sink (_tmp10_);
+			_tmp10_ = pdfpc_countdown_timer_new (_tmp7_, _tmp8_, _tmp9_);
+			_tmp11_ = (pdfpcTimerLabel*) g_object_ref_sink (_tmp10_);
 			result = _tmp11_;
 			return result;
 		} else {
 			time_t _tmp12_;
-			orgwesthoffsweltpdfpresenterCountupTimer* _tmp13_;
-			orgwesthoffsweltpdfpresenterTimerLabel* _tmp14_;
+			pdfpcCountupTimer* _tmp13_;
+			pdfpcTimerLabel* _tmp14_;
 			_tmp12_ = start_time;
-			_tmp13_ = org_westhoffswelt_pdfpresenter_countup_timer_new (_tmp12_);
-			_tmp14_ = (orgwesthoffsweltpdfpresenterTimerLabel*) g_object_ref_sink (_tmp13_);
+			_tmp13_ = pdfpc_countup_timer_new (_tmp12_);
+			_tmp14_ = (pdfpcTimerLabel*) g_object_ref_sink (_tmp13_);
 			result = _tmp14_;
 			return result;
 		}
@@ -222,12 +223,12 @@ orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_getTimerL
          * the countdown will be disabled. The timer is paused in such a case
          * at the given intial_time.
          */
-orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_timer_label_construct (GType object_type, time_t start_time) {
-	orgwesthoffsweltpdfpresenterTimerLabel * self = NULL;
+pdfpcTimerLabel* pdfpc_timer_label_construct (GType object_type, time_t start_time) {
+	pdfpcTimerLabel * self = NULL;
 	time_t _tmp0_;
 	GdkColor _tmp1_ = {0};
 	GdkColor _tmp2_ = {0};
-	self = (orgwesthoffsweltpdfpresenterTimerLabel*) g_object_new (object_type, NULL);
+	self = (pdfpcTimerLabel*) g_object_new (object_type, NULL);
 	_tmp0_ = start_time;
 	self->start_time = _tmp0_;
 	gdk_color_parse ("white", &_tmp1_);
@@ -241,14 +242,14 @@ orgwesthoffsweltpdfpresenterTimerLabel* org_westhoffswelt_pdfpresenter_timer_lab
 /**
          * Start the timer
          */
-static gboolean _org_westhoffswelt_pdfpresenter_timer_label_on_timeout_gsource_func (gpointer self) {
+static gboolean _pdfpc_timer_label_on_timeout_gsource_func (gpointer self) {
 	gboolean result;
-	result = org_westhoffswelt_pdfpresenter_timer_label_on_timeout (self);
+	result = pdfpc_timer_label_on_timeout (self);
 	return result;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_timer_label_real_start (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+static void pdfpc_timer_label_real_start (pdfpcTimerLabel* self) {
 	gboolean _tmp0_ = FALSE;
 	guint _tmp1_;
 	gboolean _tmp3_;
@@ -268,23 +269,23 @@ static void org_westhoffswelt_pdfpresenter_timer_label_real_start (orgwesthoffsw
 		_tmp4_ = self->timeout;
 		if (_tmp4_ == ((guint) 0)) {
 			guint _tmp5_ = 0U;
-			_tmp5_ = g_timeout_add_full (G_PRIORITY_DEFAULT, (guint) 1000, _org_westhoffswelt_pdfpresenter_timer_label_on_timeout_gsource_func, g_object_ref (self), g_object_unref);
+			_tmp5_ = g_timeout_add_full (G_PRIORITY_DEFAULT, (guint) 1000, _pdfpc_timer_label_on_timeout_gsource_func, g_object_ref (self), g_object_unref);
 			self->timeout = _tmp5_;
 		}
 	}
 }
 
 
-void org_westhoffswelt_pdfpresenter_timer_label_start (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+void pdfpc_timer_label_start (pdfpcTimerLabel* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_GET_CLASS (self)->start (self);
+	PDFPC_TIMER_LABEL_GET_CLASS (self)->start (self);
 }
 
 
 /**
          * Stop the timer
          */
-static void org_westhoffswelt_pdfpresenter_timer_label_real_stop (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+static void pdfpc_timer_label_real_stop (pdfpcTimerLabel* self) {
 	guint _tmp0_;
 	_tmp0_ = self->timeout;
 	if (_tmp0_ != ((guint) 0)) {
@@ -296,16 +297,16 @@ static void org_westhoffswelt_pdfpresenter_timer_label_real_stop (orgwesthoffswe
 }
 
 
-void org_westhoffswelt_pdfpresenter_timer_label_stop (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+void pdfpc_timer_label_stop (pdfpcTimerLabel* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_GET_CLASS (self)->stop (self);
+	PDFPC_TIMER_LABEL_GET_CLASS (self)->stop (self);
 }
 
 
 /**
          * Pauses the timer if it's running. Returns if the timer is paused.
          */
-gboolean org_westhoffswelt_pdfpresenter_timer_label_pause (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+gboolean pdfpc_timer_label_pause (pdfpcTimerLabel* self) {
 	gboolean result = FALSE;
 	gboolean paused;
 	gint _tmp0_;
@@ -316,13 +317,36 @@ gboolean org_westhoffswelt_pdfpresenter_timer_label_pause (orgwesthoffsweltpdfpr
 		guint _tmp1_;
 		_tmp1_ = self->timeout;
 		if (_tmp1_ != ((guint) 0)) {
-			org_westhoffswelt_pdfpresenter_timer_label_stop (self);
+			pdfpc_timer_label_stop (self);
 			paused = TRUE;
 		} else {
-			org_westhoffswelt_pdfpresenter_timer_label_start (self);
+			pdfpc_timer_label_start (self);
 		}
 	}
 	result = paused;
+	return result;
+}
+
+
+/**
+         * Returns if the timer is paused
+         */
+gboolean pdfpc_timer_label_is_paused (pdfpcTimerLabel* self) {
+	gboolean result = FALSE;
+	gboolean _tmp0_ = FALSE;
+	gint _tmp1_;
+	gboolean _tmp3_;
+	g_return_val_if_fail (self != NULL, FALSE);
+	_tmp1_ = self->time;
+	if (_tmp1_ > 0) {
+		guint _tmp2_;
+		_tmp2_ = self->timeout;
+		_tmp0_ = _tmp2_ == ((guint) 0);
+	} else {
+		_tmp0_ = FALSE;
+	}
+	_tmp3_ = _tmp0_;
+	result = _tmp3_;
 	return result;
 }
 
@@ -337,25 +361,25 @@ gboolean org_westhoffswelt_pdfpresenter_timer_label_pause (orgwesthoffsweltpdfpr
          * In presentation mode the time will be reset to the initial
          * presentation time.
          */
-static void org_westhoffswelt_pdfpresenter_timer_label_real_reset (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+static void pdfpc_timer_label_real_reset (pdfpcTimerLabel* self) {
 	gint _tmp0_ = 0;
 	gint _tmp1_;
-	org_westhoffswelt_pdfpresenter_timer_label_stop (self);
-	_tmp0_ = org_westhoffswelt_pdfpresenter_timer_label_calculate_countdown (self);
+	pdfpc_timer_label_stop (self);
+	_tmp0_ = pdfpc_timer_label_calculate_countdown (self);
 	self->time = _tmp0_;
 	_tmp1_ = self->time;
 	if (_tmp1_ < 0) {
-		org_westhoffswelt_pdfpresenter_timer_label_start (self);
+		pdfpc_timer_label_start (self);
 	} else {
 		self->time = 0;
 	}
-	org_westhoffswelt_pdfpresenter_timer_label_format_time (self);
+	pdfpc_timer_label_format_time (self);
 }
 
 
-void org_westhoffswelt_pdfpresenter_timer_label_reset (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+void pdfpc_timer_label_reset (pdfpcTimerLabel* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_GET_CLASS (self)->reset (self);
+	PDFPC_TIMER_LABEL_GET_CLASS (self)->reset (self);
 }
 
 
@@ -373,7 +397,7 @@ static void g_time_local (time_t time, struct tm* result) {
 }
 
 
-gint org_westhoffswelt_pdfpresenter_timer_label_calculate_countdown (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+gint pdfpc_timer_label_calculate_countdown (pdfpcTimerLabel* self) {
 	gint result = 0;
 	time_t _tmp0_;
 	struct tm _tmp1_ = {0};
@@ -394,42 +418,42 @@ gint org_westhoffswelt_pdfpresenter_timer_label_calculate_countdown (orgwesthoff
 /**
          * Update the timer on every timeout step (every second)
          */
-static gboolean org_westhoffswelt_pdfpresenter_timer_label_real_on_timeout (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+static gboolean pdfpc_timer_label_real_on_timeout (pdfpcTimerLabel* self) {
 	gboolean result = FALSE;
 	gint _tmp0_;
 	_tmp0_ = self->time;
 	self->time = _tmp0_ + 1;
-	org_westhoffswelt_pdfpresenter_timer_label_format_time (self);
+	pdfpc_timer_label_format_time (self);
 	result = TRUE;
 	return result;
 }
 
 
-gboolean org_westhoffswelt_pdfpresenter_timer_label_on_timeout (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+gboolean pdfpc_timer_label_on_timeout (pdfpcTimerLabel* self) {
 	g_return_val_if_fail (self != NULL, FALSE);
-	return ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_GET_CLASS (self)->on_timeout (self);
+	return PDFPC_TIMER_LABEL_GET_CLASS (self)->on_timeout (self);
 }
 
 
 /**
          * Shows the corresponding time
          */
-static void org_westhoffswelt_pdfpresenter_timer_label_real_format_time (orgwesthoffsweltpdfpresenterTimerLabel* self) {
-	g_critical ("Type `%s' does not implement abstract method `org_westhoffswelt_pdfpresenter_timer_label_format_time'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
+static void pdfpc_timer_label_real_format_time (pdfpcTimerLabel* self) {
+	g_critical ("Type `%s' does not implement abstract method `pdfpc_timer_label_format_time'", g_type_name (G_TYPE_FROM_INSTANCE (self)));
 	return;
 }
 
 
-void org_westhoffswelt_pdfpresenter_timer_label_format_time (orgwesthoffsweltpdfpresenterTimerLabel* self) {
+void pdfpc_timer_label_format_time (pdfpcTimerLabel* self) {
 	g_return_if_fail (self != NULL);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_GET_CLASS (self)->format_time (self);
+	PDFPC_TIMER_LABEL_GET_CLASS (self)->format_time (self);
 }
 
 
 /**
          * Shows a time (in seconds) in hh:mm:ss format, with an additional prefix
          */
-void org_westhoffswelt_pdfpresenter_timer_label_show_time (orgwesthoffsweltpdfpresenterTimerLabel* self, guint timeInSecs, const gchar* prefix) {
+void pdfpc_timer_label_show_time (pdfpcTimerLabel* self, guint timeInSecs, const gchar* prefix) {
 	guint hours = 0U;
 	guint minutes = 0U;
 	guint seconds = 0U;
@@ -455,55 +479,55 @@ void org_westhoffswelt_pdfpresenter_timer_label_show_time (orgwesthoffsweltpdfpr
 }
 
 
-static void org_westhoffswelt_pdfpresenter_timer_label_class_init (orgwesthoffsweltpdfpresenterTimerLabelClass * klass) {
-	org_westhoffswelt_pdfpresenter_timer_label_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->start = org_westhoffswelt_pdfpresenter_timer_label_real_start;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->stop = org_westhoffswelt_pdfpresenter_timer_label_real_stop;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->reset = org_westhoffswelt_pdfpresenter_timer_label_real_reset;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->on_timeout = org_westhoffswelt_pdfpresenter_timer_label_real_on_timeout;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->format_time = org_westhoffswelt_pdfpresenter_timer_label_real_format_time;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_timer_label_finalize;
+static void pdfpc_timer_label_class_init (pdfpcTimerLabelClass * klass) {
+	pdfpc_timer_label_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_TIMER_LABEL_CLASS (klass)->start = pdfpc_timer_label_real_start;
+	PDFPC_TIMER_LABEL_CLASS (klass)->stop = pdfpc_timer_label_real_stop;
+	PDFPC_TIMER_LABEL_CLASS (klass)->reset = pdfpc_timer_label_real_reset;
+	PDFPC_TIMER_LABEL_CLASS (klass)->on_timeout = pdfpc_timer_label_real_on_timeout;
+	PDFPC_TIMER_LABEL_CLASS (klass)->format_time = pdfpc_timer_label_real_format_time;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_timer_label_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_timer_label_instance_init (orgwesthoffsweltpdfpresenterTimerLabel * self) {
+static void pdfpc_timer_label_instance_init (pdfpcTimerLabel * self) {
 	self->time = 0;
 	self->start_time = (time_t) 0;
 	self->timeout = (guint) 0;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_timer_label_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterTimerLabel * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_timer_label_parent_class)->finalize (obj);
+static void pdfpc_timer_label_finalize (GObject* obj) {
+	pdfpcTimerLabel * self;
+	self = PDFPC_TIMER_LABEL (obj);
+	G_OBJECT_CLASS (pdfpc_timer_label_parent_class)->finalize (obj);
 }
 
 
 /**
      * Specialized label, which is capable of easily displaying a timer
      */
-GType org_westhoffswelt_pdfpresenter_timer_label_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_timer_label_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_timer_label_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterTimerLabelClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_timer_label_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterTimerLabel), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_timer_label_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_timer_label_type_id;
-		org_westhoffswelt_pdfpresenter_timer_label_type_id = g_type_register_static (GTK_TYPE_LABEL, "orgwesthoffsweltpdfpresenterTimerLabel", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_timer_label_type_id__volatile, org_westhoffswelt_pdfpresenter_timer_label_type_id);
+GType pdfpc_timer_label_get_type (void) {
+	static volatile gsize pdfpc_timer_label_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_timer_label_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcTimerLabelClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_timer_label_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcTimerLabel), 0, (GInstanceInitFunc) pdfpc_timer_label_instance_init, NULL };
+		GType pdfpc_timer_label_type_id;
+		pdfpc_timer_label_type_id = g_type_register_static (GTK_TYPE_LABEL, "pdfpcTimerLabel", &g_define_type_info, G_TYPE_FLAG_ABSTRACT);
+		g_once_init_leave (&pdfpc_timer_label_type_id__volatile, pdfpc_timer_label_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_timer_label_type_id__volatile;
+	return pdfpc_timer_label_type_id__volatile;
 }
 
 
-orgwesthoffsweltpdfpresenterCountdownTimer* org_westhoffswelt_pdfpresenter_countdown_timer_construct (GType object_type, gint duration, guint last_minutes, time_t start_time) {
-	orgwesthoffsweltpdfpresenterCountdownTimer * self = NULL;
+pdfpcCountdownTimer* pdfpc_countdown_timer_construct (GType object_type, gint duration, guint last_minutes, time_t start_time) {
+	pdfpcCountdownTimer * self = NULL;
 	time_t _tmp0_;
 	gint _tmp1_;
 	guint _tmp2_;
 	GdkColor _tmp3_ = {0};
 	GdkColor _tmp4_ = {0};
 	_tmp0_ = start_time;
-	self = (orgwesthoffsweltpdfpresenterCountdownTimer*) org_westhoffswelt_pdfpresenter_timer_label_construct (object_type, _tmp0_);
+	self = (pdfpcCountdownTimer*) pdfpc_timer_label_construct (object_type, _tmp0_);
 	_tmp1_ = duration;
 	self->duration = _tmp1_;
 	_tmp2_ = last_minutes;
@@ -516,8 +540,8 @@ orgwesthoffsweltpdfpresenterCountdownTimer* org_westhoffswelt_pdfpresenter_count
 }
 
 
-orgwesthoffsweltpdfpresenterCountdownTimer* org_westhoffswelt_pdfpresenter_countdown_timer_new (gint duration, guint last_minutes, time_t start_time) {
-	return org_westhoffswelt_pdfpresenter_countdown_timer_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER, duration, last_minutes, start_time);
+pdfpcCountdownTimer* pdfpc_countdown_timer_new (gint duration, guint last_minutes, time_t start_time) {
+	return pdfpc_countdown_timer_construct (PDFPC_TYPE_COUNTDOWN_TIMER, duration, last_minutes, start_time);
 }
 
 
@@ -525,18 +549,18 @@ orgwesthoffsweltpdfpresenterCountdownTimer* org_westhoffswelt_pdfpresenter_count
          * Format the given time in a readable hh:mm:ss way and update the
          * label text
          */
-static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (orgwesthoffsweltpdfpresenterTimerLabel* base) {
-	orgwesthoffsweltpdfpresenterCountdownTimer * self;
+static void pdfpc_countdown_timer_real_format_time (pdfpcTimerLabel* base) {
+	pdfpcCountdownTimer * self;
 	guint timeInSecs = 0U;
 	gchar* _tmp0_;
 	gchar* prefix;
 	gint _tmp1_;
 	guint _tmp17_;
 	const gchar* _tmp18_;
-	self = (orgwesthoffsweltpdfpresenterCountdownTimer*) base;
+	self = (pdfpcCountdownTimer*) base;
 	_tmp0_ = g_strdup ("");
 	prefix = _tmp0_;
-	_tmp1_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+	_tmp1_ = ((pdfpcTimerLabel*) self)->time;
 	if (_tmp1_ < 0) {
 		gchar* _tmp2_;
 		gint _tmp3_;
@@ -544,14 +568,14 @@ static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (org
 		_tmp2_ = g_strdup ("-");
 		_g_free0 (prefix);
 		prefix = _tmp2_;
-		_tmp3_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+		_tmp3_ = ((pdfpcTimerLabel*) self)->time;
 		timeInSecs = (guint) (-_tmp3_);
-		_tmp4_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->pretalk_color;
+		_tmp4_ = ((pdfpcTimerLabel*) self)->pretalk_color;
 		gtk_widget_modify_fg ((GtkWidget*) self, GTK_STATE_NORMAL, &_tmp4_);
 	} else {
 		gint _tmp5_;
 		gint _tmp6_;
-		_tmp5_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+		_tmp5_ = ((pdfpcTimerLabel*) self)->time;
 		_tmp6_ = self->duration;
 		if (_tmp5_ < _tmp6_) {
 			gint _tmp7_;
@@ -559,7 +583,7 @@ static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (org
 			guint _tmp9_;
 			guint _tmp10_;
 			_tmp7_ = self->duration;
-			_tmp8_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+			_tmp8_ = ((pdfpcTimerLabel*) self)->time;
 			timeInSecs = (guint) (_tmp7_ - _tmp8_);
 			_tmp9_ = timeInSecs;
 			_tmp10_ = self->last_minutes;
@@ -569,7 +593,7 @@ static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (org
 				gtk_widget_modify_fg ((GtkWidget*) self, GTK_STATE_NORMAL, &_tmp11_);
 			} else {
 				GdkColor _tmp12_;
-				_tmp12_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->normal_color;
+				_tmp12_ = ((pdfpcTimerLabel*) self)->normal_color;
 				gtk_widget_modify_fg ((GtkWidget*) self, GTK_STATE_NORMAL, &_tmp12_);
 			}
 		} else {
@@ -579,7 +603,7 @@ static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (org
 			gchar* _tmp16_;
 			_tmp13_ = self->negative_color;
 			gtk_widget_modify_fg ((GtkWidget*) self, GTK_STATE_NORMAL, &_tmp13_);
-			_tmp14_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+			_tmp14_ = ((pdfpcTimerLabel*) self)->time;
 			_tmp15_ = self->duration;
 			timeInSecs = (guint) (_tmp14_ - _tmp15_);
 			_tmp16_ = g_strdup ("-");
@@ -589,44 +613,44 @@ static void org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time (org
 	}
 	_tmp17_ = timeInSecs;
 	_tmp18_ = prefix;
-	org_westhoffswelt_pdfpresenter_timer_label_show_time ((orgwesthoffsweltpdfpresenterTimerLabel*) self, _tmp17_, _tmp18_);
+	pdfpc_timer_label_show_time ((pdfpcTimerLabel*) self, _tmp17_, _tmp18_);
 	_g_free0 (prefix);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_countdown_timer_class_init (orgwesthoffsweltpdfpresenterCountdownTimerClass * klass) {
-	org_westhoffswelt_pdfpresenter_countdown_timer_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->format_time = org_westhoffswelt_pdfpresenter_countdown_timer_real_format_time;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_countdown_timer_finalize;
+static void pdfpc_countdown_timer_class_init (pdfpcCountdownTimerClass * klass) {
+	pdfpc_countdown_timer_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_TIMER_LABEL_CLASS (klass)->format_time = pdfpc_countdown_timer_real_format_time;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_countdown_timer_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_countdown_timer_instance_init (orgwesthoffsweltpdfpresenterCountdownTimer * self) {
+static void pdfpc_countdown_timer_instance_init (pdfpcCountdownTimer * self) {
 	self->last_minutes = (guint) 5;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_countdown_timer_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterCountdownTimer * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_countdown_timer_parent_class)->finalize (obj);
+static void pdfpc_countdown_timer_finalize (GObject* obj) {
+	pdfpcCountdownTimer * self;
+	self = PDFPC_COUNTDOWN_TIMER (obj);
+	G_OBJECT_CLASS (pdfpc_countdown_timer_parent_class)->finalize (obj);
 }
 
 
-GType org_westhoffswelt_pdfpresenter_countdown_timer_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_countdown_timer_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_countdown_timer_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterCountdownTimerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_countdown_timer_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterCountdownTimer), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_countdown_timer_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_countdown_timer_type_id;
-		org_westhoffswelt_pdfpresenter_countdown_timer_type_id = g_type_register_static (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL, "orgwesthoffsweltpdfpresenterCountdownTimer", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_countdown_timer_type_id__volatile, org_westhoffswelt_pdfpresenter_countdown_timer_type_id);
+GType pdfpc_countdown_timer_get_type (void) {
+	static volatile gsize pdfpc_countdown_timer_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_countdown_timer_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcCountdownTimerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_countdown_timer_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcCountdownTimer), 0, (GInstanceInitFunc) pdfpc_countdown_timer_instance_init, NULL };
+		GType pdfpc_countdown_timer_type_id;
+		pdfpc_countdown_timer_type_id = g_type_register_static (PDFPC_TYPE_TIMER_LABEL, "pdfpcCountdownTimer", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_countdown_timer_type_id__volatile, pdfpc_countdown_timer_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_countdown_timer_type_id__volatile;
+	return pdfpc_countdown_timer_type_id__volatile;
 }
 
 
-orgwesthoffsweltpdfpresenterEndTimeTimer* org_westhoffswelt_pdfpresenter_end_time_timer_construct (GType object_type, time_t end_time, guint last_minutes, time_t start_time) {
-	orgwesthoffsweltpdfpresenterEndTimeTimer * self = NULL;
+pdfpcEndTimeTimer* pdfpc_end_time_timer_construct (GType object_type, time_t end_time, guint last_minutes, time_t start_time) {
+	pdfpcEndTimeTimer * self = NULL;
 	guint _tmp0_;
 	time_t _tmp1_;
 	time_t _tmp2_;
@@ -634,7 +658,7 @@ orgwesthoffsweltpdfpresenterEndTimeTimer* org_westhoffswelt_pdfpresenter_end_tim
 	struct tm _tmp4_ = {0};
 	_tmp0_ = last_minutes;
 	_tmp1_ = start_time;
-	self = (orgwesthoffsweltpdfpresenterEndTimeTimer*) org_westhoffswelt_pdfpresenter_countdown_timer_construct (object_type, 1000, _tmp0_, _tmp1_);
+	self = (pdfpcEndTimeTimer*) pdfpc_countdown_timer_construct (object_type, 1000, _tmp0_, _tmp1_);
 	_tmp2_ = end_time;
 	self->end_time = _tmp2_;
 	_tmp3_ = end_time;
@@ -644,26 +668,26 @@ orgwesthoffsweltpdfpresenterEndTimeTimer* org_westhoffswelt_pdfpresenter_end_tim
 }
 
 
-orgwesthoffsweltpdfpresenterEndTimeTimer* org_westhoffswelt_pdfpresenter_end_time_timer_new (time_t end_time, guint last_minutes, time_t start_time) {
-	return org_westhoffswelt_pdfpresenter_end_time_timer_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_END_TIME_TIMER, end_time, last_minutes, start_time);
+pdfpcEndTimeTimer* pdfpc_end_time_timer_new (time_t end_time, guint last_minutes, time_t start_time) {
+	return pdfpc_end_time_timer_construct (PDFPC_TYPE_END_TIME_TIMER, end_time, last_minutes, start_time);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_end_time_timer_real_start (orgwesthoffsweltpdfpresenterTimerLabel* base) {
-	orgwesthoffsweltpdfpresenterEndTimeTimer * self;
+static void pdfpc_end_time_timer_real_start (pdfpcTimerLabel* base) {
+	pdfpcEndTimeTimer * self;
 	time_t _tmp0_;
 	struct tm _tmp1_ = {0};
 	time_t _tmp2_ = 0;
 	time_t now;
 	time_t _tmp3_;
-	self = (orgwesthoffsweltpdfpresenterEndTimeTimer*) base;
+	self = (pdfpcEndTimeTimer*) base;
 	_tmp0_ = time (NULL);
 	g_time_local (_tmp0_, &_tmp1_);
 	_tmp2_ = mktime (&_tmp1_);
 	now = _tmp2_;
 	_tmp3_ = self->end_time;
-	((orgwesthoffsweltpdfpresenterCountdownTimer*) self)->duration = (gint) (_tmp3_ - now);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (org_westhoffswelt_pdfpresenter_end_time_timer_parent_class)->start ((orgwesthoffsweltpdfpresenterTimerLabel*) ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER (self));
+	((pdfpcCountdownTimer*) self)->duration = (gint) (_tmp3_ - now);
+	PDFPC_TIMER_LABEL_CLASS (pdfpc_end_time_timer_parent_class)->start ((pdfpcTimerLabel*) PDFPC_COUNTDOWN_TIMER (self));
 }
 
 
@@ -697,12 +721,12 @@ static gchar* g_time_format (struct tm *self, const gchar* format) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_end_time_timer_real_stop (orgwesthoffsweltpdfpresenterTimerLabel* base) {
-	orgwesthoffsweltpdfpresenterEndTimeTimer * self;
+static void pdfpc_end_time_timer_real_stop (pdfpcTimerLabel* base) {
+	pdfpcEndTimeTimer * self;
 	gchar* _tmp0_ = NULL;
 	gchar* _tmp1_;
-	self = (orgwesthoffsweltpdfpresenterEndTimeTimer*) base;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (org_westhoffswelt_pdfpresenter_end_time_timer_parent_class)->stop ((orgwesthoffsweltpdfpresenterTimerLabel*) ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER (self));
+	self = (pdfpcEndTimeTimer*) base;
+	PDFPC_TIMER_LABEL_CLASS (pdfpc_end_time_timer_parent_class)->stop ((pdfpcTimerLabel*) PDFPC_COUNTDOWN_TIMER (self));
 	_tmp0_ = g_time_format (&self->end_time_object, "Until %H:%M");
 	_tmp1_ = _tmp0_;
 	gtk_label_set_text ((GtkLabel*) self, _tmp1_);
@@ -710,12 +734,12 @@ static void org_westhoffswelt_pdfpresenter_end_time_timer_real_stop (orgwesthoff
 }
 
 
-static void org_westhoffswelt_pdfpresenter_end_time_timer_real_reset (orgwesthoffsweltpdfpresenterTimerLabel* base) {
-	orgwesthoffsweltpdfpresenterEndTimeTimer * self;
+static void pdfpc_end_time_timer_real_reset (pdfpcTimerLabel* base) {
+	pdfpcEndTimeTimer * self;
 	guint _tmp0_;
-	self = (orgwesthoffsweltpdfpresenterEndTimeTimer*) base;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (org_westhoffswelt_pdfpresenter_end_time_timer_parent_class)->reset ((orgwesthoffsweltpdfpresenterTimerLabel*) ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER (self));
-	_tmp0_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->timeout;
+	self = (pdfpcEndTimeTimer*) base;
+	PDFPC_TIMER_LABEL_CLASS (pdfpc_end_time_timer_parent_class)->reset ((pdfpcTimerLabel*) PDFPC_COUNTDOWN_TIMER (self));
+	_tmp0_ = ((pdfpcTimerLabel*) self)->timeout;
 	if (_tmp0_ == ((guint) 0)) {
 		gchar* _tmp1_ = NULL;
 		gchar* _tmp2_;
@@ -727,13 +751,13 @@ static void org_westhoffswelt_pdfpresenter_end_time_timer_real_reset (orgwesthof
 }
 
 
-static gboolean org_westhoffswelt_pdfpresenter_end_time_timer_real_on_timeout (orgwesthoffsweltpdfpresenterTimerLabel* base) {
-	orgwesthoffsweltpdfpresenterEndTimeTimer * self;
+static gboolean pdfpc_end_time_timer_real_on_timeout (pdfpcTimerLabel* base) {
+	pdfpcEndTimeTimer * self;
 	gboolean result = FALSE;
 	gint _tmp0_;
 	gboolean _tmp6_ = FALSE;
-	self = (orgwesthoffsweltpdfpresenterEndTimeTimer*) base;
-	_tmp0_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+	self = (pdfpcEndTimeTimer*) base;
+	_tmp0_ = ((pdfpcTimerLabel*) self)->time;
 	if (_tmp0_ == (-1)) {
 		time_t _tmp1_;
 		struct tm _tmp2_ = {0};
@@ -747,58 +771,58 @@ static gboolean org_westhoffswelt_pdfpresenter_end_time_timer_real_on_timeout (o
 		now = _tmp3_;
 		_tmp4_ = self->end_time;
 		_tmp5_ = now;
-		((orgwesthoffsweltpdfpresenterCountdownTimer*) self)->duration = (gint) (_tmp4_ - _tmp5_);
+		((pdfpcCountdownTimer*) self)->duration = (gint) (_tmp4_ - _tmp5_);
 	}
-	_tmp6_ = ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (org_westhoffswelt_pdfpresenter_end_time_timer_parent_class)->on_timeout ((orgwesthoffsweltpdfpresenterTimerLabel*) ORG_WESTHOFFSWELT_PDFPRESENTER_COUNTDOWN_TIMER (self));
+	_tmp6_ = PDFPC_TIMER_LABEL_CLASS (pdfpc_end_time_timer_parent_class)->on_timeout ((pdfpcTimerLabel*) PDFPC_COUNTDOWN_TIMER (self));
 	result = _tmp6_;
 	return result;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_end_time_timer_class_init (orgwesthoffsweltpdfpresenterEndTimeTimerClass * klass) {
-	org_westhoffswelt_pdfpresenter_end_time_timer_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->start = org_westhoffswelt_pdfpresenter_end_time_timer_real_start;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->stop = org_westhoffswelt_pdfpresenter_end_time_timer_real_stop;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->reset = org_westhoffswelt_pdfpresenter_end_time_timer_real_reset;
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->on_timeout = org_westhoffswelt_pdfpresenter_end_time_timer_real_on_timeout;
-	G_OBJECT_CLASS (klass)->finalize = org_westhoffswelt_pdfpresenter_end_time_timer_finalize;
+static void pdfpc_end_time_timer_class_init (pdfpcEndTimeTimerClass * klass) {
+	pdfpc_end_time_timer_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_TIMER_LABEL_CLASS (klass)->start = pdfpc_end_time_timer_real_start;
+	PDFPC_TIMER_LABEL_CLASS (klass)->stop = pdfpc_end_time_timer_real_stop;
+	PDFPC_TIMER_LABEL_CLASS (klass)->reset = pdfpc_end_time_timer_real_reset;
+	PDFPC_TIMER_LABEL_CLASS (klass)->on_timeout = pdfpc_end_time_timer_real_on_timeout;
+	G_OBJECT_CLASS (klass)->finalize = pdfpc_end_time_timer_finalize;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_end_time_timer_instance_init (orgwesthoffsweltpdfpresenterEndTimeTimer * self) {
+static void pdfpc_end_time_timer_instance_init (pdfpcEndTimeTimer * self) {
 }
 
 
-static void org_westhoffswelt_pdfpresenter_end_time_timer_finalize (GObject* obj) {
-	orgwesthoffsweltpdfpresenterEndTimeTimer * self;
-	self = ORG_WESTHOFFSWELT_PDFPRESENTER_END_TIME_TIMER (obj);
-	G_OBJECT_CLASS (org_westhoffswelt_pdfpresenter_end_time_timer_parent_class)->finalize (obj);
+static void pdfpc_end_time_timer_finalize (GObject* obj) {
+	pdfpcEndTimeTimer * self;
+	self = PDFPC_END_TIME_TIMER (obj);
+	G_OBJECT_CLASS (pdfpc_end_time_timer_parent_class)->finalize (obj);
 }
 
 
-GType org_westhoffswelt_pdfpresenter_end_time_timer_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_end_time_timer_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_end_time_timer_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterEndTimeTimerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_end_time_timer_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterEndTimeTimer), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_end_time_timer_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_end_time_timer_type_id;
-		org_westhoffswelt_pdfpresenter_end_time_timer_type_id = g_type_register_static (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTDOWN_TIMER, "orgwesthoffsweltpdfpresenterEndTimeTimer", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_end_time_timer_type_id__volatile, org_westhoffswelt_pdfpresenter_end_time_timer_type_id);
+GType pdfpc_end_time_timer_get_type (void) {
+	static volatile gsize pdfpc_end_time_timer_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_end_time_timer_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcEndTimeTimerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_end_time_timer_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcEndTimeTimer), 0, (GInstanceInitFunc) pdfpc_end_time_timer_instance_init, NULL };
+		GType pdfpc_end_time_timer_type_id;
+		pdfpc_end_time_timer_type_id = g_type_register_static (PDFPC_TYPE_COUNTDOWN_TIMER, "pdfpcEndTimeTimer", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_end_time_timer_type_id__volatile, pdfpc_end_time_timer_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_end_time_timer_type_id__volatile;
+	return pdfpc_end_time_timer_type_id__volatile;
 }
 
 
-orgwesthoffsweltpdfpresenterCountupTimer* org_westhoffswelt_pdfpresenter_countup_timer_construct (GType object_type, time_t start_time) {
-	orgwesthoffsweltpdfpresenterCountupTimer * self = NULL;
+pdfpcCountupTimer* pdfpc_countup_timer_construct (GType object_type, time_t start_time) {
+	pdfpcCountupTimer * self = NULL;
 	time_t _tmp0_;
 	_tmp0_ = start_time;
-	self = (orgwesthoffsweltpdfpresenterCountupTimer*) org_westhoffswelt_pdfpresenter_timer_label_construct (object_type, _tmp0_);
+	self = (pdfpcCountupTimer*) pdfpc_timer_label_construct (object_type, _tmp0_);
 	return self;
 }
 
 
-orgwesthoffsweltpdfpresenterCountupTimer* org_westhoffswelt_pdfpresenter_countup_timer_new (time_t start_time) {
-	return org_westhoffswelt_pdfpresenter_countup_timer_construct (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_COUNTUP_TIMER, start_time);
+pdfpcCountupTimer* pdfpc_countup_timer_new (time_t start_time) {
+	return pdfpc_countup_timer_construct (PDFPC_TYPE_COUNTUP_TIMER, start_time);
 }
 
 
@@ -806,18 +830,18 @@ orgwesthoffsweltpdfpresenterCountupTimer* org_westhoffswelt_pdfpresenter_countup
          * Format the given time in a readable hh:mm:ss way and update the
          * label text
          */
-static void org_westhoffswelt_pdfpresenter_countup_timer_real_format_time (orgwesthoffsweltpdfpresenterTimerLabel* base) {
-	orgwesthoffsweltpdfpresenterCountupTimer * self;
+static void pdfpc_countup_timer_real_format_time (pdfpcTimerLabel* base) {
+	pdfpcCountupTimer * self;
 	guint timeInSecs = 0U;
 	gchar* _tmp0_;
 	gchar* prefix;
 	gint _tmp1_;
 	guint _tmp7_;
 	const gchar* _tmp8_;
-	self = (orgwesthoffsweltpdfpresenterCountupTimer*) base;
+	self = (pdfpcCountupTimer*) base;
 	_tmp0_ = g_strdup ("");
 	prefix = _tmp0_;
-	_tmp1_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+	_tmp1_ = ((pdfpcTimerLabel*) self)->time;
 	if (_tmp1_ < 0) {
 		gchar* _tmp2_;
 		gint _tmp3_;
@@ -825,44 +849,44 @@ static void org_westhoffswelt_pdfpresenter_countup_timer_real_format_time (orgwe
 		_tmp2_ = g_strdup ("-");
 		_g_free0 (prefix);
 		prefix = _tmp2_;
-		_tmp3_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+		_tmp3_ = ((pdfpcTimerLabel*) self)->time;
 		timeInSecs = (guint) (-_tmp3_);
-		_tmp4_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->pretalk_color;
+		_tmp4_ = ((pdfpcTimerLabel*) self)->pretalk_color;
 		gtk_widget_modify_fg ((GtkWidget*) self, GTK_STATE_NORMAL, &_tmp4_);
 	} else {
 		gint _tmp5_;
 		GdkColor _tmp6_;
-		_tmp5_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->time;
+		_tmp5_ = ((pdfpcTimerLabel*) self)->time;
 		timeInSecs = (guint) _tmp5_;
-		_tmp6_ = ((orgwesthoffsweltpdfpresenterTimerLabel*) self)->normal_color;
+		_tmp6_ = ((pdfpcTimerLabel*) self)->normal_color;
 		gtk_widget_modify_fg ((GtkWidget*) self, GTK_STATE_NORMAL, &_tmp6_);
 	}
 	_tmp7_ = timeInSecs;
 	_tmp8_ = prefix;
-	org_westhoffswelt_pdfpresenter_timer_label_show_time ((orgwesthoffsweltpdfpresenterTimerLabel*) self, _tmp7_, _tmp8_);
+	pdfpc_timer_label_show_time ((pdfpcTimerLabel*) self, _tmp7_, _tmp8_);
 	_g_free0 (prefix);
 }
 
 
-static void org_westhoffswelt_pdfpresenter_countup_timer_class_init (orgwesthoffsweltpdfpresenterCountupTimerClass * klass) {
-	org_westhoffswelt_pdfpresenter_countup_timer_parent_class = g_type_class_peek_parent (klass);
-	ORG_WESTHOFFSWELT_PDFPRESENTER_TIMER_LABEL_CLASS (klass)->format_time = org_westhoffswelt_pdfpresenter_countup_timer_real_format_time;
+static void pdfpc_countup_timer_class_init (pdfpcCountupTimerClass * klass) {
+	pdfpc_countup_timer_parent_class = g_type_class_peek_parent (klass);
+	PDFPC_TIMER_LABEL_CLASS (klass)->format_time = pdfpc_countup_timer_real_format_time;
 }
 
 
-static void org_westhoffswelt_pdfpresenter_countup_timer_instance_init (orgwesthoffsweltpdfpresenterCountupTimer * self) {
+static void pdfpc_countup_timer_instance_init (pdfpcCountupTimer * self) {
 }
 
 
-GType org_westhoffswelt_pdfpresenter_countup_timer_get_type (void) {
-	static volatile gsize org_westhoffswelt_pdfpresenter_countup_timer_type_id__volatile = 0;
-	if (g_once_init_enter (&org_westhoffswelt_pdfpresenter_countup_timer_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (orgwesthoffsweltpdfpresenterCountupTimerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) org_westhoffswelt_pdfpresenter_countup_timer_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (orgwesthoffsweltpdfpresenterCountupTimer), 0, (GInstanceInitFunc) org_westhoffswelt_pdfpresenter_countup_timer_instance_init, NULL };
-		GType org_westhoffswelt_pdfpresenter_countup_timer_type_id;
-		org_westhoffswelt_pdfpresenter_countup_timer_type_id = g_type_register_static (ORG_WESTHOFFSWELT_PDFPRESENTER_TYPE_TIMER_LABEL, "orgwesthoffsweltpdfpresenterCountupTimer", &g_define_type_info, 0);
-		g_once_init_leave (&org_westhoffswelt_pdfpresenter_countup_timer_type_id__volatile, org_westhoffswelt_pdfpresenter_countup_timer_type_id);
+GType pdfpc_countup_timer_get_type (void) {
+	static volatile gsize pdfpc_countup_timer_type_id__volatile = 0;
+	if (g_once_init_enter (&pdfpc_countup_timer_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pdfpcCountupTimerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pdfpc_countup_timer_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pdfpcCountupTimer), 0, (GInstanceInitFunc) pdfpc_countup_timer_instance_init, NULL };
+		GType pdfpc_countup_timer_type_id;
+		pdfpc_countup_timer_type_id = g_type_register_static (PDFPC_TYPE_TIMER_LABEL, "pdfpcCountupTimer", &g_define_type_info, 0);
+		g_once_init_leave (&pdfpc_countup_timer_type_id__volatile, pdfpc_countup_timer_type_id);
 	}
-	return org_westhoffswelt_pdfpresenter_countup_timer_type_id__volatile;
+	return pdfpc_countup_timer_type_id__volatile;
 }
 
 
