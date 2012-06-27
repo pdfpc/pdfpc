@@ -28,7 +28,7 @@ pdfpc file.pdf
 By default the presenter view appears in the primary monitor and the
 presentation view in the second monitor (provided you have two
 monitors).
-If you want to swith displays, start with the -s option (see below).
+If you want to swith displays, start with the \-s option (see below).
 
 .SH OPTIONS
 .TP
@@ -37,38 +37,38 @@ Duration in minutes of the presentation used for timer display. If not given or
 if a value of 0 is specified, the clock just measures the time in the
 presentation.
 .TP
-.BI "\-e, \-\-end-time"=T
+.BI "\-e, \-\-end\-time"=T
 End time of the presentation. (Format: HH:MM (24h))
 .TP
-.BI "\-l, \-\-last-minutes"=N
+.BI "\-l, \-\-last\-minutes"=N
 Time in minutes, from which on the timer changes its color. (Default 5 minutes)
 .TP
-.BI "\-t, \-\-start-time"=T
+.BI "\-t, \-\-start\-time"=T
 Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 .TP
-.BI "\-u, \-\-current-size"=N
+.BI "\-u, \-\-current\-size"=N
 Percentage of the presenter screen to be used for the current slide.  (Default 60)
 .TP
-.BI "\-o, \-\-overview-min-size"=N
+.BI "\-o, \-\-overview\-min\-size"=N
 Minimum width for the overview miniatures, in pixels. (Default 150)
 .TP
-.BI "\-s, \-\-switch-screens"
+.BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
 .TP
-.BI "\-c, \-\-disable-cache"
+.BI "\-c, \-\-disable\-cache"
 Disable caching and pre-rendering of slides to save memory at the cost of speed.
 .TP
-.BI "\-z, \-\-disable-compression"
+.BI "\-z, \-\-disable\-compression"
 Disable the compression of slide images to trade memory consumption for speed.
 (Avg.  factor 30)
 .TP
-.BI "\-b, \-\-black-on-end"
+.BI "\-b, \-\-black\-on\-end"
 Add an additional black slide at the end of the presentation
 .TP
-.BI "\-S, \-\-single-screen"
+.BI "\-S, \-\-single\-screen"
 Force to use only one screen
 .TP
-.BI "\-L, \-\-list-actions"
+.BI "\-L, \-\-list\-actions"
 List actions supported in the config file(s)
 .TP
 .BI "\-h, \-\-help"
@@ -151,13 +151,13 @@ below if you want to customize the keybindings.
 To allow fast changes between the different slides of the presentation the pdf
 pages are prerendered to memory.  The progress bar on the bottom of the
 presenter screen indicates how many percent of the slides have been
-pre-rendered already.  During the initial rendering phase this will slow-down
+pre-rendered already.  During the initial rendering phase this will slow down
 slide changes, as most cpu power is used for the rendering process in the
 background.  After the cache is fully primed however the changing of slides
 should be much faster, as with normal pdf viewers.
 
 As the prerendering takes a lot of memory it can be disabled using the
-\-\-disable-cache switch at the cost of speed.
+\-\-disable\-cache switch at the cost of speed.
 .SS Cache compression
 
 The prerendered and cached slides can be compressed in memory to save up some
@@ -172,9 +172,9 @@ warned using the uncompressed prerendering storage will use about 30 times the
 memory the new compressed storage utilizes (aka the 1.5gb become about 50mb)
 
 .SS Timer
-If a duration is given (-d option), the timer will show a countdown with the
+If a duration is given (\-d option), the timer will show a countdown with the
 given parameters.  If no duration is specified (or if a value of 0 is given to
-the -d option), the timer will show how much time has been spent.  The duration
+the \-d option), the timer will show how much time has been spent.  The duration
 is stored automatically, so you do not need to repeat it for every invocation.
 
 The timer is started if you are navigating away from the first page for the
@@ -324,7 +324,7 @@ A/M (for Alt/Meta). E.g.
 bind S+Next    next10
 .P
 A list of all possible functions can be obtained
-via the -L command line option.
+via the \-L command line option.
 
 Under
 .I http://davvil.github.com/pdfpc#configs 
