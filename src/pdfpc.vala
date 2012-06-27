@@ -81,10 +81,9 @@ namespace pdfpc {
          * Parse the commandline and apply all found options to there according
          * static class members.
          *
-         * On error the usage help is shown and the application terminated with an
-         * errorcode 1
+		 * Returns the name of the pdf file to open (or null if not present)
          */
-        protected void parse_command_line_options( string[] args ) {
+        protected string? parse_command_line_options( string[] args ) {
             var context = new OptionContext( "<pdf-file>" );
 
             context.add_main_entries( options, null );
@@ -97,6 +96,11 @@ namespace pdfpc {
                 stderr.printf( "%s", context.get_help( true, null ) );
                 Posix.exit( 1 );
             }
+            if ( args.length < 2 ) {
+				return null;
+            } else {
+				return args[1];
+			}
         }
 
         /**
@@ -132,7 +136,10 @@ namespace pdfpc {
                            + "(C) 2012 David Vilar\n"
                            + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
-            this.parse_command_line_options( args );
+            Gdk.threads_init();
+            Gtk.init( ref args );
+
+            string pdfFilename = this.parse_command_line_options( args );
             if (Options.list_actions) {
 				stdout.printf("Config file commands accepted by pdfpc:\n");
 				string[] actions = PresentationController.getActionDescriptions();
@@ -144,20 +151,17 @@ namespace pdfpc {
 				}
                 return;
             }
-            if ( args.length != 2 ) {
-                stderr.printf( "Error: No pdf file given\n");
-                Posix.exit( 1 );
-            }
-
-            Gdk.threads_init();
-            Gtk.init( ref args );
+			if (pdfFilename == null) {
+				stderr.printf( "Error: No pdf file given\n");
+				Posix.exit(1);
+			}
 
             // Initialize the application wide mutex objects
             MutexLocks.init();
 
             stdout.printf( "Initializing rendering...\n" );
 
-            var metadata = new Metadata.Pdf( args[1] );
+            var metadata = new Metadata.Pdf( pdfFilename );
             if ( Options.duration != 987654321u )
                 metadata.set_duration(Options.duration);
 
