@@ -174,7 +174,7 @@ memory.  Without compression a set of about 100 pdf pages can easily grow up to
 about 1.5gb size.  Netbooks with only 1gb of memory would swap themselves to
 death if pre-rendering is enabled in such a situation.  The compression is
 enabled by default as it does not harm rendering speed in a noticeable way on
-most systems.  It does however slows down pre-rendering by about a factor of 2.
+most systems.  It does however slow down prerendering by about a factor of two.
 If you have got enough memory and want to ensure the fastest possible
 pre-rendering you can disable slide compression by using the \-z switch. But be
 warned using the uncompressed pre-rendering storage will use about 30 times the
