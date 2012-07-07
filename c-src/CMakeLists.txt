@@ -39,7 +39,11 @@ set(LIB_PATHS
 )
 link_directories(${LIB_PATHS})
 
+# The files to be configured will be written automatically. In order for the
+# sed call to work properly, there mut be at least one line (may be empty)
+# between the markers.
 # BEGIN_CONFIGURE_FILES
+
 # END_CONFIGURE_FILES
 
 file (GLOB_RECURSE C_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
