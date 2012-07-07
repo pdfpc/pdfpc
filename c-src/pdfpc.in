@@ -407,7 +407,7 @@ void pdfpc_application_run (pdfpcApplication* self, gchar** args, int args_lengt
 	pdfpcWindowPresenter* _tmp85_;
 	g_return_if_fail (self != NULL);
 	_tmp0_ = stdout;
-	fprintf (_tmp0_, "%s", "pdfpc v3.0\n" "(C) 2012 David Vilar\n" "(C) 2009-2011 Jakob Westhoff\n\n");
+	fprintf (_tmp0_, "%s", "pdfpc v3.1.1\n" "(C) 2012 David Vilar\n" "(C) 2009-2011 Jakob Westhoff\n\n");
 	gdk_threads_init ();
 	gtk_init (&args_length1, &args);
 	_tmp1_ = args;
