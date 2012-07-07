@@ -80,12 +80,12 @@ void pdfpc_presentation_controller_bind (pdfpcPresentationController* self, guin
 static void pdfpc_config_file_reader_unbindKey (pdfpcConfigFileReader* self, const gchar* wholeLine, gchar** fields, int fields_length1);
 void pdfpc_presentation_controller_unbind (pdfpcPresentationController* self, guint keycode, guint modMask);
 static void pdfpc_config_file_reader_bindMouse (pdfpcConfigFileReader* self, const gchar* wholeLine, gchar** fields, int fields_length1);
-static guint __lambda9_ (pdfpcConfigFileReader* self, const gchar* x);
-static guint ___lambda9__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self);
+static guint __lambda8_ (pdfpcConfigFileReader* self, const gchar* x);
+static guint ___lambda8__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self);
 void pdfpc_presentation_controller_bindMouse (pdfpcPresentationController* self, guint button, guint modMask, const gchar* function);
 static void pdfpc_config_file_reader_unbindMouse (pdfpcConfigFileReader* self, const gchar* wholeLine, gchar** fields, int fields_length1);
-static guint __lambda10_ (pdfpcConfigFileReader* self, const gchar* x);
-static guint ___lambda10__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self);
+static guint __lambda9_ (pdfpcConfigFileReader* self, const gchar* x);
+static guint ___lambda9__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self);
 void pdfpc_presentation_controller_unbindMouse (pdfpcPresentationController* self, guint keycode, guint modMask);
 void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gchar* fname);
 void pdfpc_presentation_controller_unbindAll (pdfpcPresentationController* self);
@@ -404,7 +404,7 @@ static void pdfpc_config_file_reader_unbindKey (pdfpcConfigFileReader* self, con
 }
 
 
-static guint __lambda9_ (pdfpcConfigFileReader* self, const gchar* x) {
+static guint __lambda8_ (pdfpcConfigFileReader* self, const gchar* x) {
 	guint result = 0U;
 	const gchar* _tmp0_;
 	gint _tmp1_ = 0;
@@ -416,9 +416,9 @@ static guint __lambda9_ (pdfpcConfigFileReader* self, const gchar* x) {
 }
 
 
-static guint ___lambda9__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self) {
+static guint ___lambda8__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self) {
 	guint result;
-	result = __lambda9_ (self, a);
+	result = __lambda8_ (self, a);
 	return result;
 }
 
@@ -451,7 +451,7 @@ static void pdfpc_config_file_reader_bindMouse (pdfpcConfigFileReader* self, con
 	_tmp3_ = fields;
 	_tmp3__length1 = fields_length1;
 	_tmp4_ = _tmp3_[1];
-	pdfpc_config_file_reader_readBindDef (self, _tmp4_, ___lambda9__pdfpc_config_file_readerbinding2uint, self, &_tmp5_, &_tmp6_);
+	pdfpc_config_file_reader_readBindDef (self, _tmp4_, ___lambda8__pdfpc_config_file_readerbinding2uint, self, &_tmp5_, &_tmp6_);
 	button = _tmp5_;
 	modMask = _tmp6_;
 	_tmp7_ = button;
@@ -483,7 +483,7 @@ static void pdfpc_config_file_reader_bindMouse (pdfpcConfigFileReader* self, con
 }
 
 
-static guint __lambda10_ (pdfpcConfigFileReader* self, const gchar* x) {
+static guint __lambda9_ (pdfpcConfigFileReader* self, const gchar* x) {
 	guint result = 0U;
 	const gchar* _tmp0_;
 	gint _tmp1_ = 0;
@@ -495,9 +495,9 @@ static guint __lambda10_ (pdfpcConfigFileReader* self, const gchar* x) {
 }
 
 
-static guint ___lambda10__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self) {
+static guint ___lambda9__pdfpc_config_file_readerbinding2uint (const gchar* a, gpointer self) {
 	guint result;
-	result = __lambda10_ (self, a);
+	result = __lambda9_ (self, a);
 	return result;
 }
 
@@ -530,7 +530,7 @@ static void pdfpc_config_file_reader_unbindMouse (pdfpcConfigFileReader* self, c
 	_tmp3_ = fields;
 	_tmp3__length1 = fields_length1;
 	_tmp4_ = _tmp3_[1];
-	pdfpc_config_file_reader_readBindDef (self, _tmp4_, ___lambda10__pdfpc_config_file_readerbinding2uint, self, &_tmp5_, &_tmp6_);
+	pdfpc_config_file_reader_readBindDef (self, _tmp4_, ___lambda9__pdfpc_config_file_readerbinding2uint, self, &_tmp5_, &_tmp6_);
 	button = _tmp5_;
 	modMask = _tmp6_;
 	_tmp7_ = button;
@@ -608,7 +608,7 @@ void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gch
 		raw_datau8_length1 = _tmp6_;
 		_raw_datau8_size_ = raw_datau8_length1;
 		if (_inner_error_ != NULL) {
-			goto __catch4_g_error;
+			goto __catch0_g_error;
 		}
 		_tmp7_ = raw_datau8;
 		_tmp7__length1 = raw_datau8_length1;
@@ -677,7 +677,7 @@ void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gch
 					uncommentedLine = _tmp19_;
 					if (_inner_error_ != NULL) {
 						lines = (_vala_array_free (lines, lines_length1, (GDestroyNotify) g_free), NULL);
-						goto __catch4_g_error;
+						goto __catch0_g_error;
 					}
 					_tmp20_ = splitRegex;
 					_tmp21_ = uncommentedLine;
@@ -803,15 +803,15 @@ void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gch
 		}
 		lines = (_vala_array_free (lines, lines_length1, (GDestroyNotify) g_free), NULL);
 	}
-	goto __finally4;
-	__catch4_g_error:
+	goto __finally0;
+	__catch0_g_error:
 	{
 		GError* e = NULL;
 		e = _inner_error_;
 		_inner_error_ = NULL;
 		_g_error_free0 (e);
 	}
-	__finally4:
+	__finally0:
 	if (_inner_error_ != NULL) {
 		raw_datau8 = (g_free (raw_datau8), NULL);
 		_g_regex_unref0 (commentRegex);

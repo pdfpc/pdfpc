@@ -37,9 +37,9 @@ enum  {
 };
 pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_new (guint8* data, int data_length1);
 pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1);
-static guint8* _vala_array_dup1 (guint8* self, int length);
+static guint8* _vala_array_dup3 (guint8* self, int length);
 guint8* pdfpc_renderer_cache_png_item_get_png_data (pdfpcRendererCachePNGItem* self, int* result_length1);
-static guint8* _vala_array_dup2 (guint8* self, int length);
+static guint8* _vala_array_dup4 (guint8* self, int length);
 gint pdfpc_renderer_cache_png_item_get_length (pdfpcRendererCachePNGItem* self);
 static void pdfpc_renderer_cache_png_item_finalize (GObject* obj);
 
@@ -47,7 +47,7 @@ static void pdfpc_renderer_cache_png_item_finalize (GObject* obj);
 /**
          * Create the item from a uchar array
          */
-static guint8* _vala_array_dup1 (guint8* self, int length) {
+static guint8* _vala_array_dup3 (guint8* self, int length) {
 	return g_memdup (self, length * sizeof (guint8));
 }
 
@@ -61,7 +61,7 @@ pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_construct (GType object
 	self = (pdfpcRendererCachePNGItem*) g_object_new (object_type, NULL);
 	_tmp0_ = data;
 	_tmp0__length1 = data_length1;
-	_tmp1_ = (_tmp0_ != NULL) ? _vala_array_dup1 (_tmp0_, _tmp0__length1) : ((gpointer) _tmp0_);
+	_tmp1_ = (_tmp0_ != NULL) ? _vala_array_dup3 (_tmp0_, _tmp0__length1) : ((gpointer) _tmp0_);
 	_tmp1__length1 = _tmp0__length1;
 	self->data = (g_free (self->data), NULL);
 	self->data = _tmp1_;
@@ -78,7 +78,7 @@ pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_new (guint8* data, int 
 /**
          * Return the stored data
          */
-static guint8* _vala_array_dup2 (guint8* self, int length) {
+static guint8* _vala_array_dup4 (guint8* self, int length) {
 	return g_memdup (self, length * sizeof (guint8));
 }
 
@@ -94,7 +94,7 @@ guint8* pdfpc_renderer_cache_png_item_get_png_data (pdfpcRendererCachePNGItem* s
 	g_return_val_if_fail (self != NULL, NULL);
 	_tmp0_ = self->data;
 	_tmp0__length1 = self->data_length1;
-	_tmp1_ = (_tmp0_ != NULL) ? _vala_array_dup2 (_tmp0_, _tmp0__length1) : ((gpointer) _tmp0_);
+	_tmp1_ = (_tmp0_ != NULL) ? _vala_array_dup4 (_tmp0_, _tmp0__length1) : ((gpointer) _tmp0_);
 	_tmp1__length1 = _tmp0__length1;
 	_tmp2_ = _tmp1_;
 	_tmp2__length1 = _tmp1__length1;

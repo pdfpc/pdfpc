@@ -188,11 +188,11 @@ static void pdfpc_renderer_cache_png_engine_real_store (pdfpcRendererCacheBase* 
 		buffer_length1 = _tmp6_;
 		_buffer_size_ = buffer_length1;
 		if (_inner_error_ != NULL) {
-			goto __catch5_g_error;
+			goto __catch4_g_error;
 		}
 	}
-	goto __finally5;
-	__catch5_g_error:
+	goto __finally4;
+	__catch4_g_error:
 	{
 		GError* e = NULL;
 		guint _tmp7_;
@@ -204,7 +204,7 @@ static void pdfpc_renderer_cache_png_engine_real_store (pdfpcRendererCacheBase* 
 		g_error ("engine.vala:92: Could not generate PNG cache image for slide %u: %s", _tmp7_, _tmp8_);
 		_g_error_free0 (e);
 	}
-	__finally5:
+	__finally4:
 	if (_inner_error_ != NULL) {
 		buffer = (g_free (buffer), NULL);
 		_g_object_unref0 (pixbuf);
@@ -301,16 +301,16 @@ static GdkPixmap* pdfpc_renderer_cache_png_engine_real_retrieve (pdfpcRendererCa
 		gdk_pixbuf_loader_write (_tmp6_, _tmp10_, (gsize) _tmp8_, &_inner_error_);
 		_tmp10_ = (g_free (_tmp10_), NULL);
 		if (_inner_error_ != NULL) {
-			goto __catch6_g_error;
+			goto __catch5_g_error;
 		}
 		_tmp11_ = loader;
 		gdk_pixbuf_loader_close (_tmp11_, &_inner_error_);
 		if (_inner_error_ != NULL) {
-			goto __catch6_g_error;
+			goto __catch5_g_error;
 		}
 	}
-	goto __finally6;
-	__catch6_g_error:
+	goto __finally5;
+	__catch5_g_error:
 	{
 		GError* e = NULL;
 		guint _tmp12_;
@@ -322,7 +322,7 @@ static GdkPixmap* pdfpc_renderer_cache_png_engine_real_retrieve (pdfpcRendererCa
 		g_error ("engine.vala:119: Could not load cached PNG image for slide %u: %s", _tmp12_, _tmp13_);
 		_g_error_free0 (e);
 	}
-	__finally6:
+	__finally5:
 	if (_inner_error_ != NULL) {
 		_g_object_unref0 (loader);
 		_g_object_unref0 (item);

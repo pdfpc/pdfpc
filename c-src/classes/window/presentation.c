@@ -214,8 +214,8 @@ pdfpcWindowPresentation* pdfpc_window_presentation_new (pdfpcMetadataPdf* metada
 pdfpcWindowPresentation* pdfpc_window_presentation_construct (GType object_type, pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
 pdfpcWindowFullscreen* pdfpc_window_fullscreen_new (gint screen_num);
 pdfpcWindowFullscreen* pdfpc_window_fullscreen_construct (GType object_type, gint screen_num);
-static void __lambda8_ (pdfpcWindowPresentation* self, GtkObject* source);
-static void ___lambda8__gtk_object_destroy (GtkObject* _sender, gpointer self);
+static void __lambda10_ (pdfpcWindowPresentation* self, GtkObject* source);
+static void ___lambda10__gtk_object_destroy (GtkObject* _sender, gpointer self);
 gboolean pdfpc_presentation_controller_register_controllable (pdfpcPresentationController* self, pdfpcControllable* controllable);
 GType pdfpc_view_default_get_type (void) G_GNUC_CONST;
 GType pdfpc_view_pdf_get_type (void) G_GNUC_CONST;
@@ -264,14 +264,14 @@ static void pdfpc_window_presentation_finalize (GObject* obj);
 /**
          * Base constructor instantiating a new presentation window
          */
-static void __lambda8_ (pdfpcWindowPresentation* self, GtkObject* source) {
+static void __lambda10_ (pdfpcWindowPresentation* self, GtkObject* source) {
 	g_return_if_fail (source != NULL);
 	gtk_main_quit ();
 }
 
 
-static void ___lambda8__gtk_object_destroy (GtkObject* _sender, gpointer self) {
-	__lambda8_ (self, _sender);
+static void ___lambda10__gtk_object_destroy (GtkObject* _sender, gpointer self) {
+	__lambda10_ (self, _sender);
 }
 
 
@@ -340,7 +340,7 @@ pdfpcWindowPresentation* pdfpc_window_presentation_construct (GType object_type,
 	g_return_val_if_fail (presentation_controller != NULL, NULL);
 	_tmp0_ = screen_num;
 	self = (pdfpcWindowPresentation*) pdfpc_window_fullscreen_construct (object_type, _tmp0_);
-	g_signal_connect_object ((GtkObject*) self, "destroy", (GCallback) ___lambda8__gtk_object_destroy, self, 0);
+	g_signal_connect_object ((GtkObject*) self, "destroy", (GCallback) ___lambda10__gtk_object_destroy, self, 0);
 	_tmp1_ = presentation_controller;
 	_tmp2_ = _g_object_ref0 (_tmp1_);
 	_g_object_unref0 (self->presentation_controller);
@@ -547,15 +547,15 @@ static void pdfpc_window_presentation_real_update (pdfpcControllable* base) {
 		pdfpc_view_base_display (_tmp5_, _tmp7_, TRUE, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch7_pdfpc_renderer_render_error;
+				goto __catch9_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
 			return;
 		}
 	}
-	goto __finally7;
-	__catch7_pdfpc_renderer_render_error:
+	goto __finally9;
+	__catch9_pdfpc_renderer_render_error:
 	{
 		GError* e = NULL;
 		pdfpcPresentationController* _tmp8_;
@@ -569,7 +569,7 @@ static void pdfpc_window_presentation_real_update (pdfpcControllable* base) {
 		g_error ("presentation.vala:163: The pdf page %d could not be rendered: %s", _tmp9_, _tmp10_);
 		_g_error_free0 (e);
 	}
-	__finally7:
+	__finally9:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);

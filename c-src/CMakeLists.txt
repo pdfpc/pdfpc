@@ -40,20 +40,6 @@ set(LIB_PATHS
 link_directories(${LIB_PATHS})
 
 # BEGIN_CONFIGURE_FILES
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pdfpc.in ${CMAKE_CURRENT_SOURCE_DIR}/pdfpc.c)}}
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/classes/window/presenter.in ${CMAKE_CURRENT_SOURCE_DIR}/classes/window/presenter.c)}}
 # END_CONFIGURE_FILES
-
-file (GLOB_RECURSE C_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
-
-add_executable(pdfpc
-        ${C_SRC}
-)
-
-# explicitly add libraries (needed e.g. for Fedora 13+)
-target_link_libraries(pdfpc -lm)
-
-install(TARGETS 
-	pdfpc
-RUNTIME
-DESTINATION
-	bin
-)

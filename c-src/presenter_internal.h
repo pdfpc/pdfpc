@@ -6,36 +6,29 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <stdlib.h>
-#include <string.h>
 #include <float.h>
 #include <math.h>
-#include <gdk/gdk.h>
-#include <gtk/gtk.h>
+#include <stdlib.h>
+#include <string.h>
 #include <poppler.h>
+#include <gtk/gtk.h>
 #include <gee.h>
+#include <gdk/gdk.h>
 #include <time.h>
 
 G_BEGIN_DECLS
 
 
-#define PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE (pdfpc_view_behaviour_decoratable_get_type ())
-#define PDFPC_VIEW_BEHAVIOUR_DECORATABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE, pdfpcViewBehaviourDecoratable))
-#define PDFPC_VIEW_BEHAVIOUR_IS_DECORATABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE))
-#define PDFPC_VIEW_BEHAVIOUR_DECORATABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE, pdfpcViewBehaviourDecoratableIface))
+#define PDFPC_TYPE_CACHE_STATUS (pdfpc_cache_status_get_type ())
+#define PDFPC_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatus))
+#define PDFPC_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatusClass))
+#define PDFPC_IS_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CACHE_STATUS))
+#define PDFPC_IS_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_CACHE_STATUS))
+#define PDFPC_CACHE_STATUS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatusClass))
 
-typedef struct _pdfpcViewBehaviourDecoratable pdfpcViewBehaviourDecoratable;
-typedef struct _pdfpcViewBehaviourDecoratableIface pdfpcViewBehaviourDecoratableIface;
-
-#define PDFPC_VIEW_BEHAVIOUR_TYPE_BASE (pdfpc_view_behaviour_base_get_type ())
-#define PDFPC_VIEW_BEHAVIOUR_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBase))
-#define PDFPC_VIEW_BEHAVIOUR_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
-#define PDFPC_VIEW_BEHAVIOUR_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
-#define PDFPC_VIEW_BEHAVIOUR_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
-#define PDFPC_VIEW_BEHAVIOUR_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
-
-typedef struct _pdfpcViewBehaviourBase pdfpcViewBehaviourBase;
-typedef struct _pdfpcViewBehaviourBaseClass pdfpcViewBehaviourBaseClass;
+typedef struct _pdfpcCacheStatus pdfpcCacheStatus;
+typedef struct _pdfpcCacheStatusClass pdfpcCacheStatusClass;
+typedef struct _pdfpcCacheStatusPrivate pdfpcCacheStatusPrivate;
 
 #define PDFPC_VIEW_TYPE_PRERENDERING (pdfpc_view_prerendering_get_type ())
 #define PDFPC_VIEW_PRERENDERING(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_PRERENDERING, pdfpcViewPrerendering))
@@ -45,13 +38,16 @@ typedef struct _pdfpcViewBehaviourBaseClass pdfpcViewBehaviourBaseClass;
 typedef struct _pdfpcViewPrerendering pdfpcViewPrerendering;
 typedef struct _pdfpcViewPrerenderingIface pdfpcViewPrerenderingIface;
 
-#define PDFPC_TYPE_CONTROLLABLE (pdfpc_controllable_get_type ())
-#define PDFPC_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllable))
-#define PDFPC_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONTROLLABLE))
-#define PDFPC_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllableIface))
+#define PDFPC_TYPE_CONFIG_FILE_READER (pdfpc_config_file_reader_get_type ())
+#define PDFPC_CONFIG_FILE_READER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReader))
+#define PDFPC_CONFIG_FILE_READER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReaderClass))
+#define PDFPC_IS_CONFIG_FILE_READER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONFIG_FILE_READER))
+#define PDFPC_IS_CONFIG_FILE_READER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_CONFIG_FILE_READER))
+#define PDFPC_CONFIG_FILE_READER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReaderClass))
 
-typedef struct _pdfpcControllable pdfpcControllable;
-typedef struct _pdfpcControllableIface pdfpcControllableIface;
+typedef struct _pdfpcConfigFileReader pdfpcConfigFileReader;
+typedef struct _pdfpcConfigFileReaderClass pdfpcConfigFileReaderClass;
+typedef struct _pdfpcConfigFileReaderPrivate pdfpcConfigFileReaderPrivate;
 
 #define PDFPC_TYPE_PRESENTATION_CONTROLLER (pdfpc_presentation_controller_get_type ())
 #define PDFPC_PRESENTATION_CONTROLLER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_PRESENTATION_CONTROLLER, pdfpcPresentationController))
@@ -63,122 +59,6 @@ typedef struct _pdfpcControllableIface pdfpcControllableIface;
 typedef struct _pdfpcPresentationController pdfpcPresentationController;
 typedef struct _pdfpcPresentationControllerClass pdfpcPresentationControllerClass;
 
-#define PDFPC_RENDERER_TYPE_CACHING (pdfpc_renderer_caching_get_type ())
-#define PDFPC_RENDERER_CACHING(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_TYPE_CACHING, pdfpcRendererCaching))
-#define PDFPC_RENDERER_IS_CACHING(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_TYPE_CACHING))
-#define PDFPC_RENDERER_CACHING_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_RENDERER_TYPE_CACHING, pdfpcRendererCachingIface))
-
-typedef struct _pdfpcRendererCaching pdfpcRendererCaching;
-typedef struct _pdfpcRendererCachingIface pdfpcRendererCachingIface;
-
-#define PDFPC_RENDERER_CACHE_TYPE_BASE (pdfpc_renderer_cache_base_get_type ())
-#define PDFPC_RENDERER_CACHE_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBase))
-#define PDFPC_RENDERER_CACHE_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBaseClass))
-#define PDFPC_RENDERER_CACHE_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE))
-#define PDFPC_RENDERER_CACHE_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_TYPE_BASE))
-#define PDFPC_RENDERER_CACHE_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBaseClass))
-
-typedef struct _pdfpcRendererCacheBase pdfpcRendererCacheBase;
-typedef struct _pdfpcRendererCacheBaseClass pdfpcRendererCacheBaseClass;
-
-#define PDFPC_TYPE_APPLICATION (pdfpc_application_get_type ())
-#define PDFPC_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_APPLICATION, pdfpcApplication))
-#define PDFPC_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_APPLICATION, pdfpcApplicationClass))
-#define PDFPC_IS_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_APPLICATION))
-#define PDFPC_IS_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_APPLICATION))
-#define PDFPC_APPLICATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_APPLICATION, pdfpcApplicationClass))
-
-typedef struct _pdfpcApplication pdfpcApplication;
-typedef struct _pdfpcApplicationClass pdfpcApplicationClass;
-typedef struct _pdfpcApplicationPrivate pdfpcApplicationPrivate;
-
-#define PDFPC_TYPE_SCALER (pdfpc_scaler_get_type ())
-#define PDFPC_SCALER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SCALER, pdfpcScaler))
-#define PDFPC_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SCALER, pdfpcScalerClass))
-#define PDFPC_IS_SCALER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SCALER))
-#define PDFPC_IS_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SCALER))
-#define PDFPC_SCALER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SCALER, pdfpcScalerClass))
-
-typedef struct _pdfpcScaler pdfpcScaler;
-typedef struct _pdfpcScalerClass pdfpcScalerClass;
-typedef struct _pdfpcScalerPrivate pdfpcScalerPrivate;
-
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER (pdfpc_view_behaviour_pdf_link_signal_provider_get_type ())
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProvider))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProviderClass))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProviderClass))
-
-typedef struct _pdfpcViewBehaviourPdfLinkSignalProvider pdfpcViewBehaviourPdfLinkSignalProvider;
-typedef struct _pdfpcViewBehaviourPdfLinkSignalProviderClass pdfpcViewBehaviourPdfLinkSignalProviderClass;
-typedef struct _pdfpcViewBehaviourPdfLinkSignalProviderPrivate pdfpcViewBehaviourPdfLinkSignalProviderPrivate;
-
-#define PDFPC_VIEW_TYPE_BASE (pdfpc_view_base_get_type ())
-#define PDFPC_VIEW_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBase))
-#define PDFPC_VIEW_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
-#define PDFPC_VIEW_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_BASE))
-#define PDFPC_VIEW_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_BASE))
-#define PDFPC_VIEW_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
-
-typedef struct _pdfpcViewBase pdfpcViewBase;
-typedef struct _pdfpcViewBaseClass pdfpcViewBaseClass;
-
-#define PDFPC_VIEW_TYPE_DEFAULT (pdfpc_view_default_get_type ())
-#define PDFPC_VIEW_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefault))
-#define PDFPC_VIEW_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefaultClass))
-#define PDFPC_VIEW_IS_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_DEFAULT))
-#define PDFPC_VIEW_IS_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_DEFAULT))
-#define PDFPC_VIEW_DEFAULT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefaultClass))
-
-typedef struct _pdfpcViewDefault pdfpcViewDefault;
-typedef struct _pdfpcViewDefaultClass pdfpcViewDefaultClass;
-
-#define PDFPC_VIEW_TYPE_PDF (pdfpc_view_pdf_get_type ())
-#define PDFPC_VIEW_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdf))
-#define PDFPC_VIEW_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdfClass))
-#define PDFPC_VIEW_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_PDF))
-#define PDFPC_VIEW_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_PDF))
-#define PDFPC_VIEW_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdfClass))
-
-typedef struct _pdfpcViewPdf pdfpcViewPdf;
-typedef struct _pdfpcViewPdfClass pdfpcViewPdfClass;
-typedef struct _pdfpcViewBehaviourBasePrivate pdfpcViewBehaviourBasePrivate;
-
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION (pdfpc_view_behaviour_pdf_link_implementation_get_type ())
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementation))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementationClass))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
-#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementationClass))
-
-typedef struct _pdfpcViewBehaviourPdfLinkImplementation pdfpcViewBehaviourPdfLinkImplementation;
-typedef struct _pdfpcViewBehaviourPdfLinkImplementationClass pdfpcViewBehaviourPdfLinkImplementationClass;
-typedef struct _pdfpcViewBehaviourPdfLinkImplementationPrivate pdfpcViewBehaviourPdfLinkImplementationPrivate;
-typedef struct _pdfpcViewBasePrivate pdfpcViewBasePrivate;
-
-#define PDFPC_RENDERER_TYPE_BASE (pdfpc_renderer_base_get_type ())
-#define PDFPC_RENDERER_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_TYPE_BASE, pdfpcRendererBase))
-#define PDFPC_RENDERER_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_TYPE_BASE, pdfpcRendererBaseClass))
-#define PDFPC_RENDERER_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_TYPE_BASE))
-#define PDFPC_RENDERER_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_TYPE_BASE))
-#define PDFPC_RENDERER_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_TYPE_BASE, pdfpcRendererBaseClass))
-
-typedef struct _pdfpcRendererBase pdfpcRendererBase;
-typedef struct _pdfpcRendererBaseClass pdfpcRendererBaseClass;
-typedef struct _pdfpcViewDefaultPrivate pdfpcViewDefaultPrivate;
-typedef struct _pdfpcViewPdfPrivate pdfpcViewPdfPrivate;
-
-#define PDFPC_RENDERER_TYPE_PDF (pdfpc_renderer_pdf_get_type ())
-#define PDFPC_RENDERER_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_TYPE_PDF, pdfpcRendererPdf))
-#define PDFPC_RENDERER_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_TYPE_PDF, pdfpcRendererPdfClass))
-#define PDFPC_RENDERER_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_TYPE_PDF))
-#define PDFPC_RENDERER_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_TYPE_PDF))
-#define PDFPC_RENDERER_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_TYPE_PDF, pdfpcRendererPdfClass))
-
-typedef struct _pdfpcRendererPdf pdfpcRendererPdf;
-typedef struct _pdfpcRendererPdfClass pdfpcRendererPdfClass;
-
 #define PDFPC_METADATA_TYPE_BASE (pdfpc_metadata_base_get_type ())
 #define PDFPC_METADATA_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBase))
 #define PDFPC_METADATA_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_METADATA_TYPE_BASE, pdfpcMetadataBaseClass))
@@ -188,6 +68,7 @@ typedef struct _pdfpcRendererPdfClass pdfpcRendererPdfClass;
 
 typedef struct _pdfpcMetadataBase pdfpcMetadataBase;
 typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
+typedef struct _pdfpcMetadataBasePrivate pdfpcMetadataBasePrivate;
 
 #define PDFPC_METADATA_TYPE_PDF (pdfpc_metadata_pdf_get_type ())
 #define PDFPC_METADATA_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_METADATA_TYPE_PDF, pdfpcMetadataPdf))
@@ -198,7 +79,49 @@ typedef struct _pdfpcMetadataBaseClass pdfpcMetadataBaseClass;
 
 typedef struct _pdfpcMetadataPdf pdfpcMetadataPdf;
 typedef struct _pdfpcMetadataPdfClass pdfpcMetadataPdfClass;
+typedef struct _pdfpcMetadataPdfPrivate pdfpcMetadataPdfPrivate;
+
+#define PDFPC_TYPE_SLIDES_NOTES (pdfpc_slides_notes_get_type ())
+#define PDFPC_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notes))
+#define PDFPC_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
+#define PDFPC_IS_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SLIDES_NOTES))
+#define PDFPC_IS_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SLIDES_NOTES))
+#define PDFPC_SLIDES_NOTES_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
+
+typedef struct _pdfpcslides_notes pdfpcslides_notes;
+typedef struct _pdfpcslides_notesClass pdfpcslides_notesClass;
+typedef struct _pdfpcslides_notesPrivate pdfpcslides_notesPrivate;
+
+#define PDFPC_TYPE_MUTEX_LOCKS (pdfpc_mutex_locks_get_type ())
+#define PDFPC_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocks))
+#define PDFPC_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocksClass))
+#define PDFPC_IS_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_MUTEX_LOCKS))
+#define PDFPC_IS_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_MUTEX_LOCKS))
+#define PDFPC_MUTEX_LOCKS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocksClass))
+
+typedef struct _pdfpcMutexLocks pdfpcMutexLocks;
+typedef struct _pdfpcMutexLocksClass pdfpcMutexLocksClass;
+typedef struct _pdfpcMutexLocksPrivate pdfpcMutexLocksPrivate;
+
+#define PDFPC_TYPE_OPTIONS (pdfpc_options_get_type ())
+#define PDFPC_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_OPTIONS, pdfpcOptions))
+#define PDFPC_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_OPTIONS, pdfpcOptionsClass))
+#define PDFPC_IS_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_OPTIONS))
+#define PDFPC_IS_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_OPTIONS))
+#define PDFPC_OPTIONS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_OPTIONS, pdfpcOptionsClass))
+
+typedef struct _pdfpcOptions pdfpcOptions;
+typedef struct _pdfpcOptionsClass pdfpcOptionsClass;
+typedef struct _pdfpcOptionsPrivate pdfpcOptionsPrivate;
 typedef struct _pdfpcPresentationControllerPrivate pdfpcPresentationControllerPrivate;
+
+#define PDFPC_TYPE_CONTROLLABLE (pdfpc_controllable_get_type ())
+#define PDFPC_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllable))
+#define PDFPC_IS_CONTROLLABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONTROLLABLE))
+#define PDFPC_CONTROLLABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_TYPE_CONTROLLABLE, pdfpcControllableIface))
+
+typedef struct _pdfpcControllable pdfpcControllable;
+typedef struct _pdfpcControllableIface pdfpcControllableIface;
 
 #define PDFPC_WINDOW_TYPE_OVERVIEW (pdfpc_window_overview_get_type ())
 #define PDFPC_WINDOW_OVERVIEW(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_OVERVIEW, pdfpcWindowOverview))
@@ -242,29 +165,27 @@ typedef struct _pdfpcPresentationControllerKeyDefClass pdfpcPresentationControll
 typedef struct _pdfpcPresentationControllerKeyActionPrivate pdfpcPresentationControllerKeyActionPrivate;
 typedef struct _pdfpcPresentationControllerKeyDefPrivate pdfpcPresentationControllerKeyDefPrivate;
 
-#define PDFPC_TYPE_CONFIG_FILE_READER (pdfpc_config_file_reader_get_type ())
-#define PDFPC_CONFIG_FILE_READER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReader))
-#define PDFPC_CONFIG_FILE_READER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReaderClass))
-#define PDFPC_IS_CONFIG_FILE_READER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CONFIG_FILE_READER))
-#define PDFPC_IS_CONFIG_FILE_READER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_CONFIG_FILE_READER))
-#define PDFPC_CONFIG_FILE_READER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_CONFIG_FILE_READER, pdfpcConfigFileReaderClass))
+#define PDFPC_RENDERER_TYPE_BASE (pdfpc_renderer_base_get_type ())
+#define PDFPC_RENDERER_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_TYPE_BASE, pdfpcRendererBase))
+#define PDFPC_RENDERER_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_TYPE_BASE, pdfpcRendererBaseClass))
+#define PDFPC_RENDERER_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_TYPE_BASE))
+#define PDFPC_RENDERER_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_TYPE_BASE))
+#define PDFPC_RENDERER_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_TYPE_BASE, pdfpcRendererBaseClass))
 
-typedef struct _pdfpcConfigFileReader pdfpcConfigFileReader;
-typedef struct _pdfpcConfigFileReaderClass pdfpcConfigFileReaderClass;
-typedef struct _pdfpcConfigFileReaderPrivate pdfpcConfigFileReaderPrivate;
-
-#define PDFPC_TYPE_MUTEX_LOCKS (pdfpc_mutex_locks_get_type ())
-#define PDFPC_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocks))
-#define PDFPC_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocksClass))
-#define PDFPC_IS_MUTEX_LOCKS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_MUTEX_LOCKS))
-#define PDFPC_IS_MUTEX_LOCKS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_MUTEX_LOCKS))
-#define PDFPC_MUTEX_LOCKS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_MUTEX_LOCKS, pdfpcMutexLocksClass))
-
-typedef struct _pdfpcMutexLocks pdfpcMutexLocks;
-typedef struct _pdfpcMutexLocksClass pdfpcMutexLocksClass;
-typedef struct _pdfpcMutexLocksPrivate pdfpcMutexLocksPrivate;
+typedef struct _pdfpcRendererBase pdfpcRendererBase;
+typedef struct _pdfpcRendererBaseClass pdfpcRendererBaseClass;
 typedef struct _pdfpcRendererBasePrivate pdfpcRendererBasePrivate;
-typedef struct _pdfpcRendererPdfPrivate pdfpcRendererPdfPrivate;
+
+#define PDFPC_RENDERER_CACHE_TYPE_BASE (pdfpc_renderer_cache_base_get_type ())
+#define PDFPC_RENDERER_CACHE_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBase))
+#define PDFPC_RENDERER_CACHE_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBaseClass))
+#define PDFPC_RENDERER_CACHE_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE))
+#define PDFPC_RENDERER_CACHE_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_TYPE_BASE))
+#define PDFPC_RENDERER_CACHE_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_TYPE_BASE, pdfpcRendererCacheBaseClass))
+
+typedef struct _pdfpcRendererCacheBase pdfpcRendererCacheBase;
+typedef struct _pdfpcRendererCacheBaseClass pdfpcRendererCacheBaseClass;
+typedef struct _pdfpcRendererCacheBasePrivate pdfpcRendererCacheBasePrivate;
 
 #define PDFPC_RENDERER_CACHE_TYPE_OPTION_FACTORY (pdfpc_renderer_cache_option_factory_get_type ())
 #define PDFPC_RENDERER_CACHE_OPTION_FACTORY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_TYPE_OPTION_FACTORY, pdfpcRendererCacheOptionFactory))
@@ -276,18 +197,17 @@ typedef struct _pdfpcRendererPdfPrivate pdfpcRendererPdfPrivate;
 typedef struct _pdfpcRendererCacheOptionFactory pdfpcRendererCacheOptionFactory;
 typedef struct _pdfpcRendererCacheOptionFactoryClass pdfpcRendererCacheOptionFactoryClass;
 typedef struct _pdfpcRendererCacheOptionFactoryPrivate pdfpcRendererCacheOptionFactoryPrivate;
-typedef struct _pdfpcRendererCacheBasePrivate pdfpcRendererCacheBasePrivate;
 
-#define PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE (pdfpc_renderer_cache_simple_engine_get_type ())
-#define PDFPC_RENDERER_CACHE_SIMPLE_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE, pdfpcRendererCacheSimpleEngine))
-#define PDFPC_RENDERER_CACHE_SIMPLE_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE, pdfpcRendererCacheSimpleEngineClass))
-#define PDFPC_RENDERER_CACHE_SIMPLE_IS_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE))
-#define PDFPC_RENDERER_CACHE_SIMPLE_IS_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE))
-#define PDFPC_RENDERER_CACHE_SIMPLE_ENGINE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE, pdfpcRendererCacheSimpleEngineClass))
+#define PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE (pdfpc_renderer_cache_png_engine_get_type ())
+#define PDFPC_RENDERER_CACHE_PNG_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE, pdfpcRendererCachePNGEngine))
+#define PDFPC_RENDERER_CACHE_PNG_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE, pdfpcRendererCachePNGEngineClass))
+#define PDFPC_RENDERER_CACHE_PNG_IS_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE))
+#define PDFPC_RENDERER_CACHE_PNG_IS_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE))
+#define PDFPC_RENDERER_CACHE_PNG_ENGINE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE, pdfpcRendererCachePNGEngineClass))
 
-typedef struct _pdfpcRendererCacheSimpleEngine pdfpcRendererCacheSimpleEngine;
-typedef struct _pdfpcRendererCacheSimpleEngineClass pdfpcRendererCacheSimpleEngineClass;
-typedef struct _pdfpcRendererCacheSimpleEnginePrivate pdfpcRendererCacheSimpleEnginePrivate;
+typedef struct _pdfpcRendererCachePNGEngine pdfpcRendererCachePNGEngine;
+typedef struct _pdfpcRendererCachePNGEngineClass pdfpcRendererCachePNGEngineClass;
+typedef struct _pdfpcRendererCachePNGEnginePrivate pdfpcRendererCachePNGEnginePrivate;
 
 #define PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM (pdfpc_renderer_cache_png_item_get_type ())
 #define PDFPC_RENDERER_CACHE_PNG_ITEM(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ITEM, pdfpcRendererCachePNGItem))
@@ -300,16 +220,46 @@ typedef struct _pdfpcRendererCachePNGItem pdfpcRendererCachePNGItem;
 typedef struct _pdfpcRendererCachePNGItemClass pdfpcRendererCachePNGItemClass;
 typedef struct _pdfpcRendererCachePNGItemPrivate pdfpcRendererCachePNGItemPrivate;
 
-#define PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE (pdfpc_renderer_cache_png_engine_get_type ())
-#define PDFPC_RENDERER_CACHE_PNG_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE, pdfpcRendererCachePNGEngine))
-#define PDFPC_RENDERER_CACHE_PNG_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE, pdfpcRendererCachePNGEngineClass))
-#define PDFPC_RENDERER_CACHE_PNG_IS_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE))
-#define PDFPC_RENDERER_CACHE_PNG_IS_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE))
-#define PDFPC_RENDERER_CACHE_PNG_ENGINE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_PNG_TYPE_ENGINE, pdfpcRendererCachePNGEngineClass))
+#define PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE (pdfpc_renderer_cache_simple_engine_get_type ())
+#define PDFPC_RENDERER_CACHE_SIMPLE_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE, pdfpcRendererCacheSimpleEngine))
+#define PDFPC_RENDERER_CACHE_SIMPLE_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE, pdfpcRendererCacheSimpleEngineClass))
+#define PDFPC_RENDERER_CACHE_SIMPLE_IS_ENGINE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE))
+#define PDFPC_RENDERER_CACHE_SIMPLE_IS_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE))
+#define PDFPC_RENDERER_CACHE_SIMPLE_ENGINE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_CACHE_SIMPLE_TYPE_ENGINE, pdfpcRendererCacheSimpleEngineClass))
 
-typedef struct _pdfpcRendererCachePNGEngine pdfpcRendererCachePNGEngine;
-typedef struct _pdfpcRendererCachePNGEngineClass pdfpcRendererCachePNGEngineClass;
-typedef struct _pdfpcRendererCachePNGEnginePrivate pdfpcRendererCachePNGEnginePrivate;
+typedef struct _pdfpcRendererCacheSimpleEngine pdfpcRendererCacheSimpleEngine;
+typedef struct _pdfpcRendererCacheSimpleEngineClass pdfpcRendererCacheSimpleEngineClass;
+typedef struct _pdfpcRendererCacheSimpleEnginePrivate pdfpcRendererCacheSimpleEnginePrivate;
+
+#define PDFPC_RENDERER_TYPE_CACHING (pdfpc_renderer_caching_get_type ())
+#define PDFPC_RENDERER_CACHING(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_TYPE_CACHING, pdfpcRendererCaching))
+#define PDFPC_RENDERER_IS_CACHING(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_TYPE_CACHING))
+#define PDFPC_RENDERER_CACHING_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_RENDERER_TYPE_CACHING, pdfpcRendererCachingIface))
+
+typedef struct _pdfpcRendererCaching pdfpcRendererCaching;
+typedef struct _pdfpcRendererCachingIface pdfpcRendererCachingIface;
+
+#define PDFPC_RENDERER_TYPE_PDF (pdfpc_renderer_pdf_get_type ())
+#define PDFPC_RENDERER_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_RENDERER_TYPE_PDF, pdfpcRendererPdf))
+#define PDFPC_RENDERER_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_RENDERER_TYPE_PDF, pdfpcRendererPdfClass))
+#define PDFPC_RENDERER_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_RENDERER_TYPE_PDF))
+#define PDFPC_RENDERER_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_RENDERER_TYPE_PDF))
+#define PDFPC_RENDERER_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_RENDERER_TYPE_PDF, pdfpcRendererPdfClass))
+
+typedef struct _pdfpcRendererPdf pdfpcRendererPdf;
+typedef struct _pdfpcRendererPdfClass pdfpcRendererPdfClass;
+typedef struct _pdfpcRendererPdfPrivate pdfpcRendererPdfPrivate;
+
+#define PDFPC_TYPE_SCALER (pdfpc_scaler_get_type ())
+#define PDFPC_SCALER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SCALER, pdfpcScaler))
+#define PDFPC_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SCALER, pdfpcScalerClass))
+#define PDFPC_IS_SCALER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SCALER))
+#define PDFPC_IS_SCALER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SCALER))
+#define PDFPC_SCALER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SCALER, pdfpcScalerClass))
+
+typedef struct _pdfpcScaler pdfpcScaler;
+typedef struct _pdfpcScalerClass pdfpcScalerClass;
+typedef struct _pdfpcScalerPrivate pdfpcScalerPrivate;
 typedef struct _pdfpcTimerLabelPrivate pdfpcTimerLabelPrivate;
 
 #define PDFPC_TYPE_COUNTDOWN_TIMER (pdfpc_countdown_timer_get_type ())
@@ -345,28 +295,79 @@ typedef struct _pdfpcCountupTimer pdfpcCountupTimer;
 typedef struct _pdfpcCountupTimerClass pdfpcCountupTimerClass;
 typedef struct _pdfpcCountupTimerPrivate pdfpcCountupTimerPrivate;
 
-#define PDFPC_TYPE_OPTIONS (pdfpc_options_get_type ())
-#define PDFPC_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_OPTIONS, pdfpcOptions))
-#define PDFPC_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_OPTIONS, pdfpcOptionsClass))
-#define PDFPC_IS_OPTIONS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_OPTIONS))
-#define PDFPC_IS_OPTIONS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_OPTIONS))
-#define PDFPC_OPTIONS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_OPTIONS, pdfpcOptionsClass))
+#define PDFPC_VIEW_TYPE_BASE (pdfpc_view_base_get_type ())
+#define PDFPC_VIEW_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBase))
+#define PDFPC_VIEW_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
+#define PDFPC_VIEW_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_BASE))
+#define PDFPC_VIEW_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_BASE))
+#define PDFPC_VIEW_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_BASE, pdfpcViewBaseClass))
 
-typedef struct _pdfpcOptions pdfpcOptions;
-typedef struct _pdfpcOptionsClass pdfpcOptionsClass;
-typedef struct _pdfpcOptionsPrivate pdfpcOptionsPrivate;
+typedef struct _pdfpcViewBase pdfpcViewBase;
+typedef struct _pdfpcViewBaseClass pdfpcViewBaseClass;
+typedef struct _pdfpcViewBasePrivate pdfpcViewBasePrivate;
 
-#define PDFPC_TYPE_CACHE_STATUS (pdfpc_cache_status_get_type ())
-#define PDFPC_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatus))
-#define PDFPC_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatusClass))
-#define PDFPC_IS_CACHE_STATUS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_CACHE_STATUS))
-#define PDFPC_IS_CACHE_STATUS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_CACHE_STATUS))
-#define PDFPC_CACHE_STATUS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_CACHE_STATUS, pdfpcCacheStatusClass))
+#define PDFPC_VIEW_BEHAVIOUR_TYPE_BASE (pdfpc_view_behaviour_base_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_BASE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBase))
+#define PDFPC_VIEW_BEHAVIOUR_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
+#define PDFPC_VIEW_BEHAVIOUR_IS_BASE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
+#define PDFPC_VIEW_BEHAVIOUR_IS_BASE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE))
+#define PDFPC_VIEW_BEHAVIOUR_BASE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_BASE, pdfpcViewBehaviourBaseClass))
 
-typedef struct _pdfpcCacheStatus pdfpcCacheStatus;
-typedef struct _pdfpcCacheStatusClass pdfpcCacheStatusClass;
-typedef struct _pdfpcCacheStatusPrivate pdfpcCacheStatusPrivate;
-typedef struct _pdfpcWindowOverviewPrivate pdfpcWindowOverviewPrivate;
+typedef struct _pdfpcViewBehaviourBase pdfpcViewBehaviourBase;
+typedef struct _pdfpcViewBehaviourBaseClass pdfpcViewBehaviourBaseClass;
+typedef struct _pdfpcViewBehaviourBasePrivate pdfpcViewBehaviourBasePrivate;
+
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION (pdfpc_view_behaviour_pdf_link_implementation_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementation))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementationClass))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_IMPLEMENTATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IMPLEMENTATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_IMPLEMENTATION, pdfpcViewBehaviourPdfLinkImplementationClass))
+
+typedef struct _pdfpcViewBehaviourPdfLinkImplementation pdfpcViewBehaviourPdfLinkImplementation;
+typedef struct _pdfpcViewBehaviourPdfLinkImplementationClass pdfpcViewBehaviourPdfLinkImplementationClass;
+typedef struct _pdfpcViewBehaviourPdfLinkImplementationPrivate pdfpcViewBehaviourPdfLinkImplementationPrivate;
+
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER (pdfpc_view_behaviour_pdf_link_signal_provider_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProvider))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProviderClass))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_IS_SIGNAL_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER))
+#define PDFPC_VIEW_BEHAVIOUR_PDF_LINK_SIGNAL_PROVIDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_BEHAVIOUR_PDF_LINK_TYPE_SIGNAL_PROVIDER, pdfpcViewBehaviourPdfLinkSignalProviderClass))
+
+typedef struct _pdfpcViewBehaviourPdfLinkSignalProvider pdfpcViewBehaviourPdfLinkSignalProvider;
+typedef struct _pdfpcViewBehaviourPdfLinkSignalProviderClass pdfpcViewBehaviourPdfLinkSignalProviderClass;
+typedef struct _pdfpcViewBehaviourPdfLinkSignalProviderPrivate pdfpcViewBehaviourPdfLinkSignalProviderPrivate;
+
+#define PDFPC_VIEW_TYPE_DEFAULT (pdfpc_view_default_get_type ())
+#define PDFPC_VIEW_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefault))
+#define PDFPC_VIEW_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefaultClass))
+#define PDFPC_VIEW_IS_DEFAULT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_DEFAULT))
+#define PDFPC_VIEW_IS_DEFAULT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_DEFAULT))
+#define PDFPC_VIEW_DEFAULT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_DEFAULT, pdfpcViewDefaultClass))
+
+typedef struct _pdfpcViewDefault pdfpcViewDefault;
+typedef struct _pdfpcViewDefaultClass pdfpcViewDefaultClass;
+
+#define PDFPC_VIEW_TYPE_PDF (pdfpc_view_pdf_get_type ())
+#define PDFPC_VIEW_PDF(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdf))
+#define PDFPC_VIEW_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdfClass))
+#define PDFPC_VIEW_IS_PDF(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_TYPE_PDF))
+#define PDFPC_VIEW_IS_PDF_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_VIEW_TYPE_PDF))
+#define PDFPC_VIEW_PDF_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_VIEW_TYPE_PDF, pdfpcViewPdfClass))
+
+typedef struct _pdfpcViewPdf pdfpcViewPdf;
+typedef struct _pdfpcViewPdfClass pdfpcViewPdfClass;
+
+#define PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE (pdfpc_view_behaviour_decoratable_get_type ())
+#define PDFPC_VIEW_BEHAVIOUR_DECORATABLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE, pdfpcViewBehaviourDecoratable))
+#define PDFPC_VIEW_BEHAVIOUR_IS_DECORATABLE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE))
+#define PDFPC_VIEW_BEHAVIOUR_DECORATABLE_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), PDFPC_VIEW_BEHAVIOUR_TYPE_DECORATABLE, pdfpcViewBehaviourDecoratableIface))
+
+typedef struct _pdfpcViewBehaviourDecoratable pdfpcViewBehaviourDecoratable;
+typedef struct _pdfpcViewBehaviourDecoratableIface pdfpcViewBehaviourDecoratableIface;
+typedef struct _pdfpcViewDefaultPrivate pdfpcViewDefaultPrivate;
+typedef struct _pdfpcViewPdfPrivate pdfpcViewPdfPrivate;
 
 #define PDFPC_WINDOW_TYPE_FULLSCREEN (pdfpc_window_fullscreen_get_type ())
 #define PDFPC_WINDOW_FULLSCREEN(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_FULLSCREEN, pdfpcWindowFullscreen))
@@ -377,6 +378,8 @@ typedef struct _pdfpcWindowOverviewPrivate pdfpcWindowOverviewPrivate;
 
 typedef struct _pdfpcWindowFullscreen pdfpcWindowFullscreen;
 typedef struct _pdfpcWindowFullscreenClass pdfpcWindowFullscreenClass;
+typedef struct _pdfpcWindowFullscreenPrivate pdfpcWindowFullscreenPrivate;
+typedef struct _pdfpcWindowOverviewPrivate pdfpcWindowOverviewPrivate;
 
 #define PDFPC_WINDOW_TYPE_PRESENTER (pdfpc_window_presenter_get_type ())
 #define PDFPC_WINDOW_PRESENTER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_PRESENTER, pdfpcWindowPresenter))
@@ -398,7 +401,6 @@ typedef struct _pdfpcWindowPresenterClass pdfpcWindowPresenterClass;
 typedef struct _pdfpcWindowCellRendererHighlight pdfpcWindowCellRendererHighlight;
 typedef struct _pdfpcWindowCellRendererHighlightClass pdfpcWindowCellRendererHighlightClass;
 typedef struct _pdfpcWindowCellRendererHighlightPrivate pdfpcWindowCellRendererHighlightPrivate;
-typedef struct _pdfpcWindowFullscreenPrivate pdfpcWindowFullscreenPrivate;
 
 #define PDFPC_WINDOW_TYPE_PRESENTATION (pdfpc_window_presentation_get_type ())
 #define PDFPC_WINDOW_PRESENTATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_WINDOW_TYPE_PRESENTATION, pdfpcWindowPresentation))
@@ -411,27 +413,107 @@ typedef struct _pdfpcWindowPresentation pdfpcWindowPresentation;
 typedef struct _pdfpcWindowPresentationClass pdfpcWindowPresentationClass;
 typedef struct _pdfpcWindowPresentationPrivate pdfpcWindowPresentationPrivate;
 typedef struct _pdfpcWindowPresenterPrivate pdfpcWindowPresenterPrivate;
-typedef struct _pdfpcMetadataBasePrivate pdfpcMetadataBasePrivate;
-typedef struct _pdfpcMetadataPdfPrivate pdfpcMetadataPdfPrivate;
 
-#define PDFPC_TYPE_SLIDES_NOTES (pdfpc_slides_notes_get_type ())
-#define PDFPC_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notes))
-#define PDFPC_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
-#define PDFPC_IS_SLIDES_NOTES(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_SLIDES_NOTES))
-#define PDFPC_IS_SLIDES_NOTES_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_SLIDES_NOTES))
-#define PDFPC_SLIDES_NOTES_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_SLIDES_NOTES, pdfpcslides_notesClass))
+#define PDFPC_TYPE_APPLICATION (pdfpc_application_get_type ())
+#define PDFPC_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), PDFPC_TYPE_APPLICATION, pdfpcApplication))
+#define PDFPC_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), PDFPC_TYPE_APPLICATION, pdfpcApplicationClass))
+#define PDFPC_IS_APPLICATION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), PDFPC_TYPE_APPLICATION))
+#define PDFPC_IS_APPLICATION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), PDFPC_TYPE_APPLICATION))
+#define PDFPC_APPLICATION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), PDFPC_TYPE_APPLICATION, pdfpcApplicationClass))
 
-typedef struct _pdfpcslides_notes pdfpcslides_notes;
-typedef struct _pdfpcslides_notesClass pdfpcslides_notesClass;
-typedef struct _pdfpcslides_notesPrivate pdfpcslides_notesPrivate;
+typedef struct _pdfpcApplication pdfpcApplication;
+typedef struct _pdfpcApplicationClass pdfpcApplicationClass;
+typedef struct _pdfpcApplicationPrivate pdfpcApplicationPrivate;
 
-struct _pdfpcViewBehaviourDecoratableIface {
-	GTypeInterface parent_iface;
-	void (*associate_behaviour) (pdfpcViewBehaviourDecoratable* self, pdfpcViewBehaviourBase* behaviour);
+struct _pdfpcCacheStatus {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	pdfpcCacheStatusPrivate * priv;
+	gint current_value;
+	gint max_value;
 };
 
+struct _pdfpcCacheStatusClass {
+	GTypeClass parent_class;
+	void (*finalize) (pdfpcCacheStatus *self);
+};
+
+typedef void (*pdfpcCacheStatusUpdateFunction) (gdouble progress, void* user_data);
+typedef void (*pdfpcCacheStatusUpdateComplete) (void* user_data);
 struct _pdfpcViewPrerenderingIface {
 	GTypeInterface parent_iface;
+};
+
+struct _pdfpcConfigFileReader {
+	GTypeInstance parent_instance;
+	volatile int ref_count;
+	pdfpcConfigFileReaderPrivate * priv;
+	pdfpcPresentationController* presentation_controller;
+};
+
+struct _pdfpcConfigFileReaderClass {
+	GTypeClass parent_class;
+	void (*finalize) (pdfpcConfigFileReader *self);
+};
+
+struct _pdfpcMetadataBase {
+	GObject parent_instance;
+	pdfpcMetadataBasePrivate * priv;
+	gchar* fname;
+	gchar* url;
+};
+
+struct _pdfpcMetadataBaseClass {
+	GObjectClass parent_class;
+	guint (*get_slide_count) (pdfpcMetadataBase* self);
+};
+
+struct _pdfpcMetadataPdf {
+	pdfpcMetadataBase parent_instance;
+	pdfpcMetadataPdfPrivate * priv;
+	gchar* pdf_fname;
+	gchar* pdf_url;
+	gchar* pdfpc_url;
+	PopplerDocument* document;
+	gdouble page_width;
+	gdouble page_height;
+	guint page_count;
+	pdfpcslides_notes* notes;
+	gboolean skips_by_user;
+	guint duration;
+};
+
+struct _pdfpcMetadataPdfClass {
+	pdfpcMetadataBaseClass parent_class;
+};
+
+struct _pdfpcslides_notes {
+	GObject parent_instance;
+	pdfpcslides_notesPrivate * priv;
+	gchar** notes;
+	gint notes_length1;
+};
+
+struct _pdfpcslides_notesClass {
+	GObjectClass parent_class;
+};
+
+struct _pdfpcMutexLocks {
+	GObject parent_instance;
+	pdfpcMutexLocksPrivate * priv;
+};
+
+struct _pdfpcMutexLocksClass {
+	GObjectClass parent_class;
+};
+
+struct _pdfpcOptions {
+	GObject parent_instance;
+	pdfpcOptionsPrivate * priv;
+};
+
+struct _pdfpcOptionsClass {
+	GObjectClass parent_class;
 };
 
 struct _pdfpcControllableIface {
@@ -442,114 +524,6 @@ struct _pdfpcControllableIface {
 	void (*ask_goto_page) (pdfpcControllable* self);
 	void (*show_overview) (pdfpcControllable* self);
 	void (*hide_overview) (pdfpcControllable* self);
-};
-
-struct _pdfpcRendererCachingIface {
-	GTypeInterface parent_iface;
-	void (*set_cache) (pdfpcRendererCaching* self, pdfpcRendererCacheBase* cache);
-	pdfpcRendererCacheBase* (*get_cache) (pdfpcRendererCaching* self);
-};
-
-struct _pdfpcApplication {
-	GObject parent_instance;
-	pdfpcApplicationPrivate * priv;
-};
-
-struct _pdfpcApplicationClass {
-	GObjectClass parent_class;
-};
-
-struct _pdfpcScaler {
-	GObject parent_instance;
-	pdfpcScalerPrivate * priv;
-	gdouble initial_width;
-	gdouble initial_height;
-};
-
-struct _pdfpcScalerClass {
-	GObjectClass parent_class;
-};
-
-struct _pdfpcViewBehaviourPdfLinkSignalProvider {
-	GObject parent_instance;
-	pdfpcViewBehaviourPdfLinkSignalProviderPrivate * priv;
-	pdfpcViewPdf* target;
-	PopplerLinkMapping* active_mapping;
-	GList* page_link_mappings;
-	GdkRectangle* precalculated_mapping_rectangles;
-	gint precalculated_mapping_rectangles_length1;
-};
-
-struct _pdfpcViewBehaviourPdfLinkSignalProviderClass {
-	GObjectClass parent_class;
-};
-
-typedef enum  {
-	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED,
-	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED
-} pdfpcViewBehaviourAssociationError;
-#define PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR pdfpc_view_behaviour_association_error_quark ()
-struct _pdfpcViewBehaviourBase {
-	GObject parent_instance;
-	pdfpcViewBehaviourBasePrivate * priv;
-	pdfpcViewBase* target;
-};
-
-struct _pdfpcViewBehaviourBaseClass {
-	GObjectClass parent_class;
-	void (*associate) (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
-};
-
-struct _pdfpcViewBehaviourPdfLinkImplementation {
-	pdfpcViewBehaviourBase parent_instance;
-	pdfpcViewBehaviourPdfLinkImplementationPrivate * priv;
-	pdfpcViewBehaviourPdfLinkSignalProvider* signal_provider;
-	pdfpcPresentationController* presentation_controller;
-};
-
-struct _pdfpcViewBehaviourPdfLinkImplementationClass {
-	pdfpcViewBehaviourBaseClass parent_class;
-};
-
-typedef enum  {
-	PDFPC_RENDERER_RENDER_ERROR_SLIDE_DOES_NOT_EXIST
-} pdfpcRendererRenderError;
-#define PDFPC_RENDERER_RENDER_ERROR pdfpc_renderer_render_error_quark ()
-struct _pdfpcViewBase {
-	GtkDrawingArea parent_instance;
-	pdfpcViewBasePrivate * priv;
-	pdfpcRendererBase* renderer;
-};
-
-struct _pdfpcViewBaseClass {
-	GtkDrawingAreaClass parent_class;
-	void (*display) (pdfpcViewBase* self, gint slide_number, gboolean force_redraw, GError** error);
-	void (*fade_to_black) (pdfpcViewBase* self);
-	void (*redraw) (pdfpcViewBase* self, GError** error);
-	gint (*get_current_slide_number) (pdfpcViewBase* self);
-};
-
-struct _pdfpcViewDefault {
-	pdfpcViewBase parent_instance;
-	pdfpcViewDefaultPrivate * priv;
-	gint current_slide_number;
-	GdkPixmap* current_slide;
-	gint n_slides;
-	gint slide_limit;
-	GList* behaviours;
-};
-
-struct _pdfpcViewDefaultClass {
-	pdfpcViewBaseClass parent_class;
-};
-
-struct _pdfpcViewPdf {
-	pdfpcViewDefault parent_instance;
-	pdfpcViewPdfPrivate * priv;
-};
-
-struct _pdfpcViewPdfClass {
-	pdfpcViewDefaultClass parent_class;
 };
 
 struct _pdfpcPresentationController {
@@ -604,27 +578,10 @@ struct _pdfpcPresentationControllerKeyDefClass {
 	void (*finalize) (pdfpcPresentationControllerKeyDef *self);
 };
 
-struct _pdfpcConfigFileReader {
-	GTypeInstance parent_instance;
-	volatile int ref_count;
-	pdfpcConfigFileReaderPrivate * priv;
-	pdfpcPresentationController* presentation_controller;
-};
-
-struct _pdfpcConfigFileReaderClass {
-	GTypeClass parent_class;
-	void (*finalize) (pdfpcConfigFileReader *self);
-};
-
-struct _pdfpcMutexLocks {
-	GObject parent_instance;
-	pdfpcMutexLocksPrivate * priv;
-};
-
-struct _pdfpcMutexLocksClass {
-	GObjectClass parent_class;
-};
-
+typedef enum  {
+	PDFPC_RENDERER_RENDER_ERROR_SLIDE_DOES_NOT_EXIST
+} pdfpcRendererRenderError;
+#define PDFPC_RENDERER_RENDER_ERROR pdfpc_renderer_render_error_quark ()
 struct _pdfpcRendererBase {
 	GObject parent_instance;
 	pdfpcRendererBasePrivate * priv;
@@ -639,26 +596,6 @@ struct _pdfpcRendererBaseClass {
 	GdkPixmap* (*fade_to_black) (pdfpcRendererBase* self);
 };
 
-struct _pdfpcRendererPdf {
-	pdfpcRendererBase parent_instance;
-	pdfpcRendererPdfPrivate * priv;
-	gdouble scaling_factor;
-	pdfpcRendererCacheBase* cache;
-};
-
-struct _pdfpcRendererPdfClass {
-	pdfpcRendererBaseClass parent_class;
-};
-
-struct _pdfpcRendererCacheOptionFactory {
-	GObject parent_instance;
-	pdfpcRendererCacheOptionFactoryPrivate * priv;
-};
-
-struct _pdfpcRendererCacheOptionFactoryClass {
-	GObjectClass parent_class;
-};
-
 struct _pdfpcRendererCacheBase {
 	GObject parent_instance;
 	pdfpcRendererCacheBasePrivate * priv;
@@ -671,15 +608,24 @@ struct _pdfpcRendererCacheBaseClass {
 	GdkPixmap* (*retrieve) (pdfpcRendererCacheBase* self, guint index);
 };
 
-struct _pdfpcRendererCacheSimpleEngine {
+struct _pdfpcRendererCacheOptionFactory {
+	GObject parent_instance;
+	pdfpcRendererCacheOptionFactoryPrivate * priv;
+};
+
+struct _pdfpcRendererCacheOptionFactoryClass {
+	GObjectClass parent_class;
+};
+
+struct _pdfpcRendererCachePNGEngine {
 	pdfpcRendererCacheBase parent_instance;
-	pdfpcRendererCacheSimpleEnginePrivate * priv;
-	GdkPixmap** storage;
+	pdfpcRendererCachePNGEnginePrivate * priv;
+	pdfpcRendererCachePNGItem** storage;
 	gint storage_length1;
 	GMutex* mutex;
 };
 
-struct _pdfpcRendererCacheSimpleEngineClass {
+struct _pdfpcRendererCachePNGEngineClass {
 	pdfpcRendererCacheBaseClass parent_class;
 };
 
@@ -694,16 +640,44 @@ struct _pdfpcRendererCachePNGItemClass {
 	GObjectClass parent_class;
 };
 
-struct _pdfpcRendererCachePNGEngine {
+struct _pdfpcRendererCacheSimpleEngine {
 	pdfpcRendererCacheBase parent_instance;
-	pdfpcRendererCachePNGEnginePrivate * priv;
-	pdfpcRendererCachePNGItem** storage;
+	pdfpcRendererCacheSimpleEnginePrivate * priv;
+	GdkPixmap** storage;
 	gint storage_length1;
 	GMutex* mutex;
 };
 
-struct _pdfpcRendererCachePNGEngineClass {
+struct _pdfpcRendererCacheSimpleEngineClass {
 	pdfpcRendererCacheBaseClass parent_class;
+};
+
+struct _pdfpcRendererCachingIface {
+	GTypeInterface parent_iface;
+	void (*set_cache) (pdfpcRendererCaching* self, pdfpcRendererCacheBase* cache);
+	pdfpcRendererCacheBase* (*get_cache) (pdfpcRendererCaching* self);
+};
+
+struct _pdfpcRendererPdf {
+	pdfpcRendererBase parent_instance;
+	pdfpcRendererPdfPrivate * priv;
+	gdouble scaling_factor;
+	pdfpcRendererCacheBase* cache;
+};
+
+struct _pdfpcRendererPdfClass {
+	pdfpcRendererBaseClass parent_class;
+};
+
+struct _pdfpcScaler {
+	GObject parent_instance;
+	pdfpcScalerPrivate * priv;
+	gdouble initial_width;
+	gdouble initial_height;
+};
+
+struct _pdfpcScalerClass {
+	GObjectClass parent_class;
 };
 
 struct _pdfpcTimerLabel {
@@ -758,30 +732,102 @@ struct _pdfpcCountupTimerClass {
 	pdfpcTimerLabelClass parent_class;
 };
 
-struct _pdfpcOptions {
-	GObject parent_instance;
-	pdfpcOptionsPrivate * priv;
+struct _pdfpcViewBase {
+	GtkDrawingArea parent_instance;
+	pdfpcViewBasePrivate * priv;
+	pdfpcRendererBase* renderer;
 };
 
-struct _pdfpcOptionsClass {
+struct _pdfpcViewBaseClass {
+	GtkDrawingAreaClass parent_class;
+	void (*display) (pdfpcViewBase* self, gint slide_number, gboolean force_redraw, GError** error);
+	void (*fade_to_black) (pdfpcViewBase* self);
+	void (*redraw) (pdfpcViewBase* self, GError** error);
+	gint (*get_current_slide_number) (pdfpcViewBase* self);
+};
+
+typedef enum  {
+	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_BEHAVIOUR_ALREADY_ASSOCIATED,
+	PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR_VIEW_NOT_SUPPORTED
+} pdfpcViewBehaviourAssociationError;
+#define PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR pdfpc_view_behaviour_association_error_quark ()
+struct _pdfpcViewBehaviourBase {
+	GObject parent_instance;
+	pdfpcViewBehaviourBasePrivate * priv;
+	pdfpcViewBase* target;
+};
+
+struct _pdfpcViewBehaviourBaseClass {
+	GObjectClass parent_class;
+	void (*associate) (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+};
+
+struct _pdfpcViewBehaviourPdfLinkImplementation {
+	pdfpcViewBehaviourBase parent_instance;
+	pdfpcViewBehaviourPdfLinkImplementationPrivate * priv;
+	pdfpcViewBehaviourPdfLinkSignalProvider* signal_provider;
+	pdfpcPresentationController* presentation_controller;
+};
+
+struct _pdfpcViewBehaviourPdfLinkImplementationClass {
+	pdfpcViewBehaviourBaseClass parent_class;
+};
+
+struct _pdfpcViewBehaviourPdfLinkSignalProvider {
+	GObject parent_instance;
+	pdfpcViewBehaviourPdfLinkSignalProviderPrivate * priv;
+	pdfpcViewPdf* target;
+	PopplerLinkMapping* active_mapping;
+	GList* page_link_mappings;
+	GdkRectangle* precalculated_mapping_rectangles;
+	gint precalculated_mapping_rectangles_length1;
+};
+
+struct _pdfpcViewBehaviourPdfLinkSignalProviderClass {
 	GObjectClass parent_class;
 };
 
-struct _pdfpcCacheStatus {
-	GTypeInstance parent_instance;
-	volatile int ref_count;
-	pdfpcCacheStatusPrivate * priv;
-	gint current_value;
-	gint max_value;
+struct _pdfpcViewBehaviourDecoratableIface {
+	GTypeInterface parent_iface;
+	void (*associate_behaviour) (pdfpcViewBehaviourDecoratable* self, pdfpcViewBehaviourBase* behaviour);
 };
 
-struct _pdfpcCacheStatusClass {
-	GTypeClass parent_class;
-	void (*finalize) (pdfpcCacheStatus *self);
+struct _pdfpcViewDefault {
+	pdfpcViewBase parent_instance;
+	pdfpcViewDefaultPrivate * priv;
+	gint current_slide_number;
+	GdkPixmap* current_slide;
+	gint n_slides;
+	gint slide_limit;
+	GList* behaviours;
 };
 
-typedef void (*pdfpcCacheStatusUpdateFunction) (gdouble progress, void* user_data);
-typedef void (*pdfpcCacheStatusUpdateComplete) (void* user_data);
+struct _pdfpcViewDefaultClass {
+	pdfpcViewBaseClass parent_class;
+};
+
+struct _pdfpcViewPdf {
+	pdfpcViewDefault parent_instance;
+	pdfpcViewPdfPrivate * priv;
+};
+
+struct _pdfpcViewPdfClass {
+	pdfpcViewDefaultClass parent_class;
+};
+
+struct _pdfpcWindowFullscreen {
+	GtkWindow parent_instance;
+	pdfpcWindowFullscreenPrivate * priv;
+	GdkRectangle screen_geometry;
+	guint hide_cursor_timeout;
+	gboolean faded_to_black;
+	gboolean frozen;
+};
+
+struct _pdfpcWindowFullscreenClass {
+	GtkWindowClass parent_class;
+};
+
 struct _pdfpcWindowOverview {
 	GtkScrolledWindow parent_instance;
 	pdfpcWindowOverviewPrivate * priv;
@@ -813,19 +859,6 @@ struct _pdfpcWindowCellRendererHighlight {
 
 struct _pdfpcWindowCellRendererHighlightClass {
 	GtkCellRendererPixbufClass parent_class;
-};
-
-struct _pdfpcWindowFullscreen {
-	GtkWindow parent_instance;
-	pdfpcWindowFullscreenPrivate * priv;
-	GdkRectangle screen_geometry;
-	guint hide_cursor_timeout;
-	gboolean faded_to_black;
-	gboolean frozen;
-};
-
-struct _pdfpcWindowFullscreenClass {
-	GtkWindowClass parent_class;
 };
 
 struct _pdfpcWindowPresentation {
@@ -869,123 +902,95 @@ struct _pdfpcWindowPresenterClass {
 	pdfpcWindowFullscreenClass parent_class;
 };
 
-struct _pdfpcMetadataBase {
+struct _pdfpcApplication {
 	GObject parent_instance;
-	pdfpcMetadataBasePrivate * priv;
-	gchar* fname;
-	gchar* url;
+	pdfpcApplicationPrivate * priv;
 };
 
-struct _pdfpcMetadataBaseClass {
-	GObjectClass parent_class;
-	guint (*get_slide_count) (pdfpcMetadataBase* self);
-};
-
-struct _pdfpcMetadataPdf {
-	pdfpcMetadataBase parent_instance;
-	pdfpcMetadataPdfPrivate * priv;
-	gchar* pdf_fname;
-	gchar* pdf_url;
-	gchar* pdfpc_url;
-	PopplerDocument* document;
-	gdouble page_width;
-	gdouble page_height;
-	guint page_count;
-	pdfpcslides_notes* notes;
-	gboolean skips_by_user;
-	guint duration;
-};
-
-struct _pdfpcMetadataPdfClass {
-	pdfpcMetadataBaseClass parent_class;
-};
-
-struct _pdfpcslides_notes {
-	GObject parent_instance;
-	pdfpcslides_notesPrivate * priv;
-	gchar** notes;
-	gint notes_length1;
-};
-
-struct _pdfpcslides_notesClass {
+struct _pdfpcApplicationClass {
 	GObjectClass parent_class;
 };
 
 
-GType pdfpc_view_behaviour_base_get_type (void) G_GNUC_CONST;
-GType pdfpc_view_behaviour_decoratable_get_type (void) G_GNUC_CONST;
-void pdfpc_view_behaviour_decoratable_associate_behaviour (pdfpcViewBehaviourDecoratable* self, pdfpcViewBehaviourBase* behaviour);
+gpointer pdfpc_cache_status_ref (gpointer instance);
+void pdfpc_cache_status_unref (gpointer instance);
+GParamSpec* pdfpc_param_spec_cache_status (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void pdfpc_value_set_cache_status (GValue* value, gpointer v_object);
+void pdfpc_value_take_cache_status (GValue* value, gpointer v_object);
+gpointer pdfpc_value_get_cache_status (const GValue* value);
+GType pdfpc_cache_status_get_type (void) G_GNUC_CONST;
+void pdfpc_cache_status_register_update (pdfpcCacheStatus* self, pdfpcCacheStatusUpdateFunction update, void* update_target, pdfpcCacheStatusUpdateComplete complete, void* complete_target);
+void pdfpc_cache_status_update (pdfpcCacheStatus* self);
 GType pdfpc_view_prerendering_get_type (void) G_GNUC_CONST;
+void pdfpc_cache_status_monitor_view (pdfpcCacheStatus* self, pdfpcViewPrerendering* view);
+pdfpcCacheStatus* pdfpc_cache_status_new (void);
+pdfpcCacheStatus* pdfpc_cache_status_construct (GType object_type);
+gpointer pdfpc_config_file_reader_ref (gpointer instance);
+void pdfpc_config_file_reader_unref (gpointer instance);
+GParamSpec* pdfpc_param_spec_config_file_reader (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
+void pdfpc_value_set_config_file_reader (GValue* value, gpointer v_object);
+void pdfpc_value_take_config_file_reader (GValue* value, gpointer v_object);
+gpointer pdfpc_value_get_config_file_reader (const GValue* value);
+GType pdfpc_config_file_reader_get_type (void) G_GNUC_CONST;
 GType pdfpc_presentation_controller_get_type (void) G_GNUC_CONST;
-GType pdfpc_controllable_get_type (void) G_GNUC_CONST;
-pdfpcPresentationController* pdfpc_controllable_get_controller (pdfpcControllable* self);
-void pdfpc_controllable_update (pdfpcControllable* self);
-void pdfpc_controllable_edit_note (pdfpcControllable* self);
-void pdfpc_controllable_ask_goto_page (pdfpcControllable* self);
-void pdfpc_controllable_show_overview (pdfpcControllable* self);
-void pdfpc_controllable_hide_overview (pdfpcControllable* self);
-GType pdfpc_renderer_cache_base_get_type (void) G_GNUC_CONST;
-GType pdfpc_renderer_caching_get_type (void) G_GNUC_CONST;
-void pdfpc_renderer_caching_set_cache (pdfpcRendererCaching* self, pdfpcRendererCacheBase* cache);
-pdfpcRendererCacheBase* pdfpc_renderer_caching_get_cache (pdfpcRendererCaching* self);
-#define icon_path "/usr/share/pixmaps/pdfpc/"
-#define etc_path "/etc"
-GType pdfpc_application_get_type (void) G_GNUC_CONST;
-gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gchar** args, int args_length1);
-void pdfpc_application_run (pdfpcApplication* self, gchar** args, int args_length1);
-gint pdfpc_application_main (gchar** args, int args_length1);
-pdfpcApplication* pdfpc_application_new (void);
-pdfpcApplication* pdfpc_application_construct (GType object_type);
-GType pdfpc_scaler_get_type (void) G_GNUC_CONST;
-pdfpcScaler* pdfpc_scaler_new (gdouble width, gdouble height);
-pdfpcScaler* pdfpc_scaler_construct (GType object_type, gdouble width, gdouble height);
-void pdfpc_scaler_scale_to (pdfpcScaler* self, gint width, gint height, gboolean centered, gboolean allow_cutoff, GdkRectangle* result);
-GType pdfpc_view_behaviour_pdf_link_signal_provider_get_type (void) G_GNUC_CONST;
-GType pdfpc_view_base_get_type (void) G_GNUC_CONST;
-GType pdfpc_view_default_get_type (void) G_GNUC_CONST;
-GType pdfpc_view_pdf_get_type (void) G_GNUC_CONST;
-void pdfpc_view_behaviour_pdf_link_signal_provider_attach (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewPdf* view);
-PopplerLinkMapping* pdfpc_view_behaviour_pdf_link_signal_provider_get_link_mapping_by_coordinates (pdfpcViewBehaviourPdfLinkSignalProvider* self, gdouble x, gdouble y);
-void pdfpc_view_behaviour_pdf_link_signal_provider_handle_link_mapping (pdfpcViewBehaviourPdfLinkSignalProvider* self, PopplerLinkMapping* mapping);
-void pdfpc_view_behaviour_pdf_link_signal_provider_convert_poppler_rectangle_to_gdk_rectangle (pdfpcViewBehaviourPdfLinkSignalProvider* self, PopplerRectangle* poppler_rectangle, GdkRectangle* result);
-gboolean pdfpc_view_behaviour_pdf_link_signal_provider_on_button_press (pdfpcViewBehaviourPdfLinkSignalProvider* self, GtkWidget* source, GdkEventButton* e);
-gboolean pdfpc_view_behaviour_pdf_link_signal_provider_on_mouse_move (pdfpcViewBehaviourPdfLinkSignalProvider* self, GtkWidget* source, GdkEventMotion* event);
-void pdfpc_view_behaviour_pdf_link_signal_provider_on_entering_slide (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewBase* source, gint page_number);
-void pdfpc_view_behaviour_pdf_link_signal_provider_on_leaving_slide (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewBase* source, gint from, gint to);
-pdfpcViewBehaviourPdfLinkSignalProvider* pdfpc_view_behaviour_pdf_link_signal_provider_new (void);
-pdfpcViewBehaviourPdfLinkSignalProvider* pdfpc_view_behaviour_pdf_link_signal_provider_construct (GType object_type);
-GQuark pdfpc_view_behaviour_association_error_quark (void);
-GType pdfpc_view_behaviour_pdf_link_implementation_get_type (void) G_GNUC_CONST;
-pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_new (pdfpcPresentationController* presentation_controller);
-pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_construct (GType object_type, pdfpcPresentationController* presentation_controller);
-gboolean pdfpc_view_behaviour_pdf_link_implementation_is_supported (pdfpcViewBehaviourPdfLinkImplementation* self, pdfpcViewBase* target);
-void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
-void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
-void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, guint target_page_number);
-void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments);
-pdfpcViewBehaviourBase* pdfpc_view_behaviour_base_construct (GType object_type);
-pdfpcViewBase* pdfpc_view_behaviour_base_get_target (pdfpcViewBehaviourBase* self);
-void pdfpc_view_behaviour_base_enforce_exclusive_association (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
-void pdfpc_view_behaviour_base_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
-gboolean pdfpc_view_behaviour_base_is_supported (pdfpcViewBehaviourBase* self, pdfpcViewBase* target);
-GQuark pdfpc_renderer_render_error_quark (void);
-GType pdfpc_renderer_base_get_type (void) G_GNUC_CONST;
-GType pdfpc_renderer_pdf_get_type (void) G_GNUC_CONST;
-pdfpcViewPdf* pdfpc_view_pdf_new (pdfpcRendererPdf* renderer, gboolean allow_black_on_end, pdfpcPresentationController* presentation_controller);
-pdfpcViewPdf* pdfpc_view_pdf_construct (GType object_type, pdfpcRendererPdf* renderer, gboolean allow_black_on_end, pdfpcPresentationController* presentation_controller);
+pdfpcConfigFileReader* pdfpc_config_file_reader_new (pdfpcPresentationController* controller);
+pdfpcConfigFileReader* pdfpc_config_file_reader_construct (GType object_type, pdfpcPresentationController* controller);
+void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gchar* fname);
 GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
+pdfpcMetadataBase* pdfpc_metadata_base_construct (GType object_type, const gchar* fname);
+gchar* pdfpc_metadata_base_get_url (pdfpcMetadataBase* self);
+guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self);
 GType pdfpc_metadata_pdf_get_type (void) G_GNUC_CONST;
-pdfpcViewPdf* pdfpc_view_pdf_from_metadata (pdfpcMetadataPdf* metadata, gint width, gint height, gboolean allow_black_on_end, pdfpcPresentationController* presentation_controller, GdkRectangle* scale_rect);
-pdfpcRendererPdf* pdfpc_view_pdf_get_renderer (pdfpcViewPdf* self);
-pdfpcViewBase* pdfpc_view_base_construct (GType object_type, pdfpcRendererBase* renderer);
-pdfpcRendererBase* pdfpc_view_base_get_renderer (pdfpcViewBase* self);
-void pdfpc_view_base_display (pdfpcViewBase* self, gint slide_number, gboolean force_redraw, GError** error);
-void pdfpc_view_base_fade_to_black (pdfpcViewBase* self);
-void pdfpc_view_base_redraw (pdfpcViewBase* self, GError** error);
-gint pdfpc_view_base_get_current_slide_number (pdfpcViewBase* self);
-pdfpcViewDefault* pdfpc_view_default_new (pdfpcRendererBase* renderer);
-pdfpcViewDefault* pdfpc_view_default_construct (GType object_type, pdfpcRendererBase* renderer);
-void pdfpc_view_default_register_prerendering (pdfpcViewDefault* self);
+GType pdfpc_slides_notes_get_type (void) G_GNUC_CONST;
+void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_skips (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_end_user_slide (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_notes (pdfpcMetadataPdf* self);
+gchar* pdfpc_metadata_pdf_format_duration (pdfpcMetadataPdf* self);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_new (const gchar* fname);
+pdfpcMetadataPdf* pdfpc_metadata_pdf_construct (GType object_type, const gchar* fname);
+gint pdfpc_metadata_pdf_get_user_slide_count (pdfpcMetadataPdf* self);
+gint pdfpc_metadata_pdf_get_end_user_slide (pdfpcMetadataPdf* self);
+void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide);
+gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, gint user_slide_number);
+gint pdfpc_metadata_pdf_user_slide_to_real_slide (pdfpcMetadataPdf* self, gint number);
+gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number);
+gdouble pdfpc_metadata_pdf_get_page_width (pdfpcMetadataPdf* self);
+gdouble pdfpc_metadata_pdf_get_page_height (pdfpcMetadataPdf* self);
+PopplerDocument* pdfpc_metadata_pdf_get_document (pdfpcMetadataPdf* self);
+pdfpcslides_notes* pdfpc_metadata_pdf_get_notes (pdfpcMetadataPdf* self);
+guint pdfpc_metadata_pdf_get_duration (pdfpcMetadataPdf* self);
+void pdfpc_metadata_pdf_set_duration (pdfpcMetadataPdf* self, guint d);
+PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, const gchar* url);
+void pdfpc_slides_notes_set_note (pdfpcslides_notes* self, const gchar* note, gint slide_number);
+gchar* pdfpc_slides_notes_get_note_for_slide (pdfpcslides_notes* self, gint number);
+gboolean pdfpc_slides_notes_has_notes (pdfpcslides_notes* self);
+gchar* pdfpc_slides_notes_format_to_save (pdfpcslides_notes* self);
+void pdfpc_slides_notes_parse_lines (pdfpcslides_notes* self, gchar** lines, int lines_length1);
+pdfpcslides_notes* pdfpc_slides_notes_new (void);
+pdfpcslides_notes* pdfpc_slides_notes_construct (GType object_type);
+GType pdfpc_mutex_locks_get_type (void) G_GNUC_CONST;
+extern GMutex* pdfpc_mutex_locks_poppler;
+void pdfpc_mutex_locks_init (void);
+pdfpcMutexLocks* pdfpc_mutex_locks_new (void);
+pdfpcMutexLocks* pdfpc_mutex_locks_construct (GType object_type);
+GType pdfpc_options_get_type (void) G_GNUC_CONST;
+extern gboolean pdfpc_options_display_switch;
+extern gboolean pdfpc_options_single_screen;
+extern gboolean pdfpc_options_windowed;
+extern gboolean pdfpc_options_disable_caching;
+extern gboolean pdfpc_options_disable_cache_compression;
+extern guint pdfpc_options_duration;
+extern guint pdfpc_options_last_minutes;
+extern guint pdfpc_options_current_size;
+extern gint pdfpc_options_min_overview_width;
+extern gchar* pdfpc_options_start_time;
+extern gchar* pdfpc_options_end_time;
+extern gboolean pdfpc_options_black_on_end;
+extern gboolean pdfpc_options_list_actions;
+pdfpcOptions* pdfpc_options_new (void);
+pdfpcOptions* pdfpc_options_construct (GType object_type);
+GType pdfpc_controllable_get_type (void) G_GNUC_CONST;
 GType pdfpc_window_overview_get_type (void) G_GNUC_CONST;
 GType pdfpc_timer_label_get_type (void) G_GNUC_CONST;
 gpointer pdfpc_presentation_controller_key_action_ref (gpointer instance);
@@ -1069,46 +1074,40 @@ guint pdfpc_presentation_controller_key_def_get_keycode (pdfpcPresentationContro
 void pdfpc_presentation_controller_key_def_set_keycode (pdfpcPresentationControllerKeyDef* self, guint value);
 guint pdfpc_presentation_controller_key_def_get_modMask (pdfpcPresentationControllerKeyDef* self);
 void pdfpc_presentation_controller_key_def_set_modMask (pdfpcPresentationControllerKeyDef* self, guint value);
-gpointer pdfpc_config_file_reader_ref (gpointer instance);
-void pdfpc_config_file_reader_unref (gpointer instance);
-GParamSpec* pdfpc_param_spec_config_file_reader (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
-void pdfpc_value_set_config_file_reader (GValue* value, gpointer v_object);
-void pdfpc_value_take_config_file_reader (GValue* value, gpointer v_object);
-gpointer pdfpc_value_get_config_file_reader (const GValue* value);
-GType pdfpc_config_file_reader_get_type (void) G_GNUC_CONST;
-pdfpcConfigFileReader* pdfpc_config_file_reader_new (pdfpcPresentationController* controller);
-pdfpcConfigFileReader* pdfpc_config_file_reader_construct (GType object_type, pdfpcPresentationController* controller);
-void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gchar* fname);
-GType pdfpc_mutex_locks_get_type (void) G_GNUC_CONST;
-extern GMutex* pdfpc_mutex_locks_poppler;
-void pdfpc_mutex_locks_init (void);
-pdfpcMutexLocks* pdfpc_mutex_locks_new (void);
-pdfpcMutexLocks* pdfpc_mutex_locks_construct (GType object_type);
-pdfpcRendererPdf* pdfpc_renderer_pdf_new (pdfpcMetadataPdf* metadata, gint width, gint height);
-pdfpcRendererPdf* pdfpc_renderer_pdf_construct (GType object_type, pdfpcMetadataPdf* metadata, gint width, gint height);
-GType pdfpc_renderer_cache_option_factory_get_type (void) G_GNUC_CONST;
-pdfpcRendererCacheBase* pdfpc_renderer_cache_option_factory_create (pdfpcMetadataBase* metadata);
-pdfpcRendererCacheBase* pdfpc_renderer_cache_base_construct (GType object_type, pdfpcMetadataBase* metadata);
-gboolean pdfpc_renderer_cache_base_allows_prerendering (pdfpcRendererCacheBase* self);
-void pdfpc_renderer_cache_base_store (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap);
-GdkPixmap* pdfpc_renderer_cache_base_retrieve (pdfpcRendererCacheBase* self, guint index);
-GType pdfpc_renderer_cache_simple_engine_get_type (void) G_GNUC_CONST;
-pdfpcRendererCacheSimpleEngine* pdfpc_renderer_cache_simple_engine_new (pdfpcMetadataBase* metadata);
-pdfpcRendererCacheSimpleEngine* pdfpc_renderer_cache_simple_engine_construct (GType object_type, pdfpcMetadataBase* metadata);
-GType pdfpc_renderer_cache_png_item_get_type (void) G_GNUC_CONST;
-pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_new (guint8* data, int data_length1);
-pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1);
-guint8* pdfpc_renderer_cache_png_item_get_png_data (pdfpcRendererCachePNGItem* self, int* result_length1);
-gint pdfpc_renderer_cache_png_item_get_length (pdfpcRendererCachePNGItem* self);
-GType pdfpc_renderer_cache_png_engine_get_type (void) G_GNUC_CONST;
-pdfpcRendererCachePNGEngine* pdfpc_renderer_cache_png_engine_new (pdfpcMetadataBase* metadata);
-pdfpcRendererCachePNGEngine* pdfpc_renderer_cache_png_engine_construct (GType object_type, pdfpcMetadataBase* metadata);
+GType pdfpc_renderer_base_get_type (void) G_GNUC_CONST;
+GQuark pdfpc_renderer_render_error_quark (void);
 pdfpcRendererBase* pdfpc_renderer_base_construct (GType object_type, pdfpcMetadataBase* metadata, gint width, gint height);
 pdfpcMetadataBase* pdfpc_renderer_base_get_metadata (pdfpcRendererBase* self);
 gint pdfpc_renderer_base_get_width (pdfpcRendererBase* self);
 gint pdfpc_renderer_base_get_height (pdfpcRendererBase* self);
 GdkPixmap* pdfpc_renderer_base_render_to_pixmap (pdfpcRendererBase* self, gint slide_number, GError** error);
 GdkPixmap* pdfpc_renderer_base_fade_to_black (pdfpcRendererBase* self);
+GType pdfpc_renderer_cache_base_get_type (void) G_GNUC_CONST;
+pdfpcRendererCacheBase* pdfpc_renderer_cache_base_construct (GType object_type, pdfpcMetadataBase* metadata);
+gboolean pdfpc_renderer_cache_base_allows_prerendering (pdfpcRendererCacheBase* self);
+void pdfpc_renderer_cache_base_store (pdfpcRendererCacheBase* self, guint index, GdkPixmap* pixmap);
+GdkPixmap* pdfpc_renderer_cache_base_retrieve (pdfpcRendererCacheBase* self, guint index);
+GType pdfpc_renderer_cache_option_factory_get_type (void) G_GNUC_CONST;
+pdfpcRendererCacheBase* pdfpc_renderer_cache_option_factory_create (pdfpcMetadataBase* metadata);
+GType pdfpc_renderer_cache_png_engine_get_type (void) G_GNUC_CONST;
+GType pdfpc_renderer_cache_png_item_get_type (void) G_GNUC_CONST;
+pdfpcRendererCachePNGEngine* pdfpc_renderer_cache_png_engine_new (pdfpcMetadataBase* metadata);
+pdfpcRendererCachePNGEngine* pdfpc_renderer_cache_png_engine_construct (GType object_type, pdfpcMetadataBase* metadata);
+pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_new (guint8* data, int data_length1);
+pdfpcRendererCachePNGItem* pdfpc_renderer_cache_png_item_construct (GType object_type, guint8* data, int data_length1);
+guint8* pdfpc_renderer_cache_png_item_get_png_data (pdfpcRendererCachePNGItem* self, int* result_length1);
+gint pdfpc_renderer_cache_png_item_get_length (pdfpcRendererCachePNGItem* self);
+GType pdfpc_renderer_cache_simple_engine_get_type (void) G_GNUC_CONST;
+pdfpcRendererCacheSimpleEngine* pdfpc_renderer_cache_simple_engine_new (pdfpcMetadataBase* metadata);
+pdfpcRendererCacheSimpleEngine* pdfpc_renderer_cache_simple_engine_construct (GType object_type, pdfpcMetadataBase* metadata);
+GType pdfpc_renderer_caching_get_type (void) G_GNUC_CONST;
+GType pdfpc_renderer_pdf_get_type (void) G_GNUC_CONST;
+pdfpcRendererPdf* pdfpc_renderer_pdf_new (pdfpcMetadataPdf* metadata, gint width, gint height);
+pdfpcRendererPdf* pdfpc_renderer_pdf_construct (GType object_type, pdfpcMetadataPdf* metadata, gint width, gint height);
+GType pdfpc_scaler_get_type (void) G_GNUC_CONST;
+pdfpcScaler* pdfpc_scaler_new (gdouble width, gdouble height);
+pdfpcScaler* pdfpc_scaler_construct (GType object_type, gdouble width, gdouble height);
+void pdfpc_scaler_scale_to (pdfpcScaler* self, gint width, gint height, gboolean centered, gboolean allow_cutoff, GdkRectangle* result);
 pdfpcTimerLabel* pdfpc_getTimerLabel (gint duration, time_t end_time, guint last_minutes, time_t start_time);
 pdfpcTimerLabel* pdfpc_timer_label_construct (GType object_type, time_t start_time);
 void pdfpc_timer_label_start (pdfpcTimerLabel* self);
@@ -1129,35 +1128,57 @@ pdfpcEndTimeTimer* pdfpc_end_time_timer_construct (GType object_type, time_t end
 GType pdfpc_countup_timer_get_type (void) G_GNUC_CONST;
 pdfpcCountupTimer* pdfpc_countup_timer_new (time_t start_time);
 pdfpcCountupTimer* pdfpc_countup_timer_construct (GType object_type, time_t start_time);
-GType pdfpc_options_get_type (void) G_GNUC_CONST;
-extern gboolean pdfpc_options_display_switch;
-extern gboolean pdfpc_options_single_screen;
-extern gboolean pdfpc_options_windowed;
-extern gboolean pdfpc_options_disable_caching;
-extern gboolean pdfpc_options_disable_cache_compression;
-extern guint pdfpc_options_duration;
-extern guint pdfpc_options_last_minutes;
-extern guint pdfpc_options_current_size;
-extern gint pdfpc_options_min_overview_width;
-extern gchar* pdfpc_options_start_time;
-extern gchar* pdfpc_options_end_time;
-extern gboolean pdfpc_options_black_on_end;
-extern gboolean pdfpc_options_list_actions;
-pdfpcOptions* pdfpc_options_new (void);
-pdfpcOptions* pdfpc_options_construct (GType object_type);
-gpointer pdfpc_cache_status_ref (gpointer instance);
-void pdfpc_cache_status_unref (gpointer instance);
-GParamSpec* pdfpc_param_spec_cache_status (const gchar* name, const gchar* nick, const gchar* blurb, GType object_type, GParamFlags flags);
-void pdfpc_value_set_cache_status (GValue* value, gpointer v_object);
-void pdfpc_value_take_cache_status (GValue* value, gpointer v_object);
-gpointer pdfpc_value_get_cache_status (const GValue* value);
-GType pdfpc_cache_status_get_type (void) G_GNUC_CONST;
-void pdfpc_cache_status_register_update (pdfpcCacheStatus* self, pdfpcCacheStatusUpdateFunction update, void* update_target, pdfpcCacheStatusUpdateComplete complete, void* complete_target);
-void pdfpc_cache_status_update (pdfpcCacheStatus* self);
-void pdfpc_cache_status_monitor_view (pdfpcCacheStatus* self, pdfpcViewPrerendering* view);
-pdfpcCacheStatus* pdfpc_cache_status_new (void);
-pdfpcCacheStatus* pdfpc_cache_status_construct (GType object_type);
+GType pdfpc_view_base_get_type (void) G_GNUC_CONST;
+pdfpcViewBase* pdfpc_view_base_construct (GType object_type, pdfpcRendererBase* renderer);
+pdfpcRendererBase* pdfpc_view_base_get_renderer (pdfpcViewBase* self);
+void pdfpc_view_base_display (pdfpcViewBase* self, gint slide_number, gboolean force_redraw, GError** error);
+void pdfpc_view_base_fade_to_black (pdfpcViewBase* self);
+void pdfpc_view_base_redraw (pdfpcViewBase* self, GError** error);
+gint pdfpc_view_base_get_current_slide_number (pdfpcViewBase* self);
+GType pdfpc_view_behaviour_base_get_type (void) G_GNUC_CONST;
+GQuark pdfpc_view_behaviour_association_error_quark (void);
+pdfpcViewBehaviourBase* pdfpc_view_behaviour_base_construct (GType object_type);
+pdfpcViewBase* pdfpc_view_behaviour_base_get_target (pdfpcViewBehaviourBase* self);
+void pdfpc_view_behaviour_base_enforce_exclusive_association (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+void pdfpc_view_behaviour_base_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
+gboolean pdfpc_view_behaviour_base_is_supported (pdfpcViewBehaviourBase* self, pdfpcViewBase* target);
+GType pdfpc_view_behaviour_pdf_link_implementation_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_behaviour_pdf_link_signal_provider_get_type (void) G_GNUC_CONST;
+pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_new (pdfpcPresentationController* presentation_controller);
+pdfpcViewBehaviourPdfLinkImplementation* pdfpc_view_behaviour_pdf_link_implementation_construct (GType object_type, pdfpcPresentationController* presentation_controller);
+gboolean pdfpc_view_behaviour_pdf_link_implementation_is_supported (pdfpcViewBehaviourPdfLinkImplementation* self, pdfpcViewBase* target);
+void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_enter (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
+void pdfpc_view_behaviour_pdf_link_implementation_on_link_mouse_leave (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, PopplerLinkMapping* mapping);
+void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_internal_link (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, guint target_page_number);
+void pdfpc_view_behaviour_pdf_link_implementation_on_clicked_external_command (pdfpcViewBehaviourPdfLinkImplementation* self, GdkRectangle* link_rect, guint source_page_number, const gchar* command, const gchar* arguments);
+GType pdfpc_view_default_get_type (void) G_GNUC_CONST;
+GType pdfpc_view_pdf_get_type (void) G_GNUC_CONST;
+void pdfpc_view_behaviour_pdf_link_signal_provider_attach (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewPdf* view);
+PopplerLinkMapping* pdfpc_view_behaviour_pdf_link_signal_provider_get_link_mapping_by_coordinates (pdfpcViewBehaviourPdfLinkSignalProvider* self, gdouble x, gdouble y);
+void pdfpc_view_behaviour_pdf_link_signal_provider_handle_link_mapping (pdfpcViewBehaviourPdfLinkSignalProvider* self, PopplerLinkMapping* mapping);
+void pdfpc_view_behaviour_pdf_link_signal_provider_convert_poppler_rectangle_to_gdk_rectangle (pdfpcViewBehaviourPdfLinkSignalProvider* self, PopplerRectangle* poppler_rectangle, GdkRectangle* result);
+gboolean pdfpc_view_behaviour_pdf_link_signal_provider_on_button_press (pdfpcViewBehaviourPdfLinkSignalProvider* self, GtkWidget* source, GdkEventButton* e);
+gboolean pdfpc_view_behaviour_pdf_link_signal_provider_on_mouse_move (pdfpcViewBehaviourPdfLinkSignalProvider* self, GtkWidget* source, GdkEventMotion* event);
+void pdfpc_view_behaviour_pdf_link_signal_provider_on_entering_slide (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewBase* source, gint page_number);
+void pdfpc_view_behaviour_pdf_link_signal_provider_on_leaving_slide (pdfpcViewBehaviourPdfLinkSignalProvider* self, pdfpcViewBase* source, gint from, gint to);
+pdfpcViewBehaviourPdfLinkSignalProvider* pdfpc_view_behaviour_pdf_link_signal_provider_new (void);
+pdfpcViewBehaviourPdfLinkSignalProvider* pdfpc_view_behaviour_pdf_link_signal_provider_construct (GType object_type);
+GType pdfpc_view_behaviour_decoratable_get_type (void) G_GNUC_CONST;
+pdfpcViewDefault* pdfpc_view_default_new (pdfpcRendererBase* renderer);
+pdfpcViewDefault* pdfpc_view_default_construct (GType object_type, pdfpcRendererBase* renderer);
+void pdfpc_view_default_register_prerendering (pdfpcViewDefault* self);
+pdfpcViewPdf* pdfpc_view_pdf_new (pdfpcRendererPdf* renderer, gboolean allow_black_on_end, pdfpcPresentationController* presentation_controller);
+pdfpcViewPdf* pdfpc_view_pdf_construct (GType object_type, pdfpcRendererPdf* renderer, gboolean allow_black_on_end, pdfpcPresentationController* presentation_controller);
+pdfpcViewPdf* pdfpc_view_pdf_from_metadata (pdfpcMetadataPdf* metadata, gint width, gint height, gboolean allow_black_on_end, pdfpcPresentationController* presentation_controller, GdkRectangle* scale_rect);
+pdfpcRendererPdf* pdfpc_view_pdf_get_renderer (pdfpcViewPdf* self);
 GType pdfpc_window_fullscreen_get_type (void) G_GNUC_CONST;
+pdfpcWindowFullscreen* pdfpc_window_fullscreen_new (gint screen_num);
+pdfpcWindowFullscreen* pdfpc_window_fullscreen_construct (GType object_type, gint screen_num);
+gboolean pdfpc_window_fullscreen_on_configure (pdfpcWindowFullscreen* self, GdkEventConfigure* e);
+void pdfpc_window_fullscreen_on_size_allocate (pdfpcWindowFullscreen* self, GtkWidget* source, GdkRectangle* r);
+gboolean pdfpc_window_fullscreen_on_mouse_move (pdfpcWindowFullscreen* self, GtkWidget* source, GdkEventMotion* event);
+void pdfpc_window_fullscreen_restart_hide_cursor_timer (pdfpcWindowFullscreen* self);
+gboolean pdfpc_window_fullscreen_on_hide_cursor_timeout (pdfpcWindowFullscreen* self);
 GType pdfpc_window_presenter_get_type (void) G_GNUC_CONST;
 void pdfpc_window_overview_on_selection_changed (pdfpcWindowOverview* self, GtkWidget* source);
 pdfpcWindowOverview* pdfpc_window_overview_new (pdfpcMetadataPdf* metadata, pdfpcPresentationController* presentation_controller, pdfpcWindowPresenter* presenter);
@@ -1180,13 +1201,6 @@ void pdfpc_window_overview_set_current_slide (pdfpcWindowOverview* self, gint va
 GType pdfpc_window_cell_renderer_highlight_get_type (void) G_GNUC_CONST;
 pdfpcWindowCellRendererHighlight* pdfpc_window_cell_renderer_highlight_new (void);
 pdfpcWindowCellRendererHighlight* pdfpc_window_cell_renderer_highlight_construct (GType object_type);
-pdfpcWindowFullscreen* pdfpc_window_fullscreen_new (gint screen_num);
-pdfpcWindowFullscreen* pdfpc_window_fullscreen_construct (GType object_type, gint screen_num);
-gboolean pdfpc_window_fullscreen_on_configure (pdfpcWindowFullscreen* self, GdkEventConfigure* e);
-void pdfpc_window_fullscreen_on_size_allocate (pdfpcWindowFullscreen* self, GtkWidget* source, GdkRectangle* r);
-gboolean pdfpc_window_fullscreen_on_mouse_move (pdfpcWindowFullscreen* self, GtkWidget* source, GdkEventMotion* event);
-void pdfpc_window_fullscreen_restart_hide_cursor_timer (pdfpcWindowFullscreen* self);
-gboolean pdfpc_window_fullscreen_on_hide_cursor_timeout (pdfpcWindowFullscreen* self);
 GType pdfpc_window_presentation_get_type (void) G_GNUC_CONST;
 pdfpcWindowPresentation* pdfpc_window_presentation_new (pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
 pdfpcWindowPresentation* pdfpc_window_presentation_construct (GType object_type, pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
@@ -1209,37 +1223,23 @@ gboolean pdfpc_window_presenter_on_key_press_notes_view (pdfpcWindowPresenter* s
 void pdfpc_window_presenter_update_note (pdfpcWindowPresenter* self);
 void pdfpc_window_presenter_set_cache_observer (pdfpcWindowPresenter* self, pdfpcCacheStatus* observer);
 void pdfpc_window_presenter_prerender_finished (pdfpcWindowPresenter* self);
-GType pdfpc_slides_notes_get_type (void) G_GNUC_CONST;
-void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self);
-gchar* pdfpc_metadata_pdf_format_skips (pdfpcMetadataPdf* self);
-gchar* pdfpc_metadata_pdf_format_end_user_slide (pdfpcMetadataPdf* self);
-gchar* pdfpc_metadata_pdf_format_notes (pdfpcMetadataPdf* self);
-gchar* pdfpc_metadata_pdf_format_duration (pdfpcMetadataPdf* self);
-pdfpcMetadataPdf* pdfpc_metadata_pdf_new (const gchar* fname);
-pdfpcMetadataPdf* pdfpc_metadata_pdf_construct (GType object_type, const gchar* fname);
-gint pdfpc_metadata_pdf_get_user_slide_count (pdfpcMetadataPdf* self);
-gint pdfpc_metadata_pdf_get_end_user_slide (pdfpcMetadataPdf* self);
-void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide);
-gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, gint user_slide_number);
-gint pdfpc_metadata_pdf_user_slide_to_real_slide (pdfpcMetadataPdf* self, gint number);
-gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number);
-gdouble pdfpc_metadata_pdf_get_page_width (pdfpcMetadataPdf* self);
-gdouble pdfpc_metadata_pdf_get_page_height (pdfpcMetadataPdf* self);
-PopplerDocument* pdfpc_metadata_pdf_get_document (pdfpcMetadataPdf* self);
-pdfpcslides_notes* pdfpc_metadata_pdf_get_notes (pdfpcMetadataPdf* self);
-guint pdfpc_metadata_pdf_get_duration (pdfpcMetadataPdf* self);
-void pdfpc_metadata_pdf_set_duration (pdfpcMetadataPdf* self, guint d);
-PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, const gchar* url);
-void pdfpc_slides_notes_set_note (pdfpcslides_notes* self, const gchar* note, gint slide_number);
-gchar* pdfpc_slides_notes_get_note_for_slide (pdfpcslides_notes* self, gint number);
-gboolean pdfpc_slides_notes_has_notes (pdfpcslides_notes* self);
-gchar* pdfpc_slides_notes_format_to_save (pdfpcslides_notes* self);
-void pdfpc_slides_notes_parse_lines (pdfpcslides_notes* self, gchar** lines, int lines_length1);
-pdfpcslides_notes* pdfpc_slides_notes_new (void);
-pdfpcslides_notes* pdfpc_slides_notes_construct (GType object_type);
-pdfpcMetadataBase* pdfpc_metadata_base_construct (GType object_type, const gchar* fname);
-gchar* pdfpc_metadata_base_get_url (pdfpcMetadataBase* self);
-guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self);
+pdfpcPresentationController* pdfpc_controllable_get_controller (pdfpcControllable* self);
+void pdfpc_controllable_update (pdfpcControllable* self);
+void pdfpc_controllable_edit_note (pdfpcControllable* self);
+void pdfpc_controllable_ask_goto_page (pdfpcControllable* self);
+void pdfpc_controllable_show_overview (pdfpcControllable* self);
+void pdfpc_controllable_hide_overview (pdfpcControllable* self);
+void pdfpc_renderer_caching_set_cache (pdfpcRendererCaching* self, pdfpcRendererCacheBase* cache);
+pdfpcRendererCacheBase* pdfpc_renderer_caching_get_cache (pdfpcRendererCaching* self);
+void pdfpc_view_behaviour_decoratable_associate_behaviour (pdfpcViewBehaviourDecoratable* self, pdfpcViewBehaviourBase* behaviour);
+#define icon_path "/@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/"
+#define etc_path "/@SYSCONFDIR@"
+GType pdfpc_application_get_type (void) G_GNUC_CONST;
+gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gchar** args, int args_length1);
+void pdfpc_application_run (pdfpcApplication* self, gchar** args, int args_length1);
+gint pdfpc_application_main (gchar** args, int args_length1);
+pdfpcApplication* pdfpc_application_new (void);
+pdfpcApplication* pdfpc_application_construct (GType object_type);
 
 
 G_END_DECLS

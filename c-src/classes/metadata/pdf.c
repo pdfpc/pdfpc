@@ -112,8 +112,8 @@ static GType pdfpc_metadata_pdf_parse_state_get_type (void) G_GNUC_UNUSED;
 static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar** skip_line);
 void pdfpc_slides_notes_parse_lines (pdfpcslides_notes* self, gchar** lines, int lines_length1);
 static void pdfpc_metadata_pdf_parse_skip_line (pdfpcMetadataPdf* self, const gchar* line);
+static void _vala_array_add1 (gint** array, int* length, int* size, gint value);
 static void _vala_array_add2 (gint** array, int* length, int* size, gint value);
-static void _vala_array_add3 (gint** array, int* length, int* size, gint value);
 static void pdfpc_metadata_pdf_fill_path_info (pdfpcMetadataPdf* self, const gchar* fname);
 void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self);
 gchar* pdfpc_metadata_pdf_format_duration (pdfpcMetadataPdf* self);
@@ -128,15 +128,15 @@ pdfpcMetadataBase* pdfpc_metadata_base_construct (GType object_type, const gchar
 pdfpcslides_notes* pdfpc_slides_notes_new (void);
 pdfpcslides_notes* pdfpc_slides_notes_construct (GType object_type);
 PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, const gchar* url);
-static void _vala_array_add4 (gint** array, int* length, int* size, gint value);
+static void _vala_array_add3 (gint** array, int* length, int* size, gint value);
 static guint pdfpc_metadata_pdf_real_get_slide_count (pdfpcMetadataBase* base);
 gint pdfpc_metadata_pdf_get_user_slide_count (pdfpcMetadataPdf* self);
 gint pdfpc_metadata_pdf_get_end_user_slide (pdfpcMetadataPdf* self);
 void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide);
 gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, gint user_slide_number);
 gint pdfpc_metadata_pdf_user_slide_to_real_slide (pdfpcMetadataPdf* self, gint number);
-static gint* _vala_array_dup3 (gint* self, int length);
-static gint* _vala_array_dup4 (gint* self, int length);
+static gint* _vala_array_dup1 (gint* self, int length);
+static gint* _vala_array_dup2 (gint* self, int length);
 gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number);
 gdouble pdfpc_metadata_pdf_get_page_width (pdfpcMetadataPdf* self);
 gdouble pdfpc_metadata_pdf_get_page_height (pdfpcMetadataPdf* self);
@@ -219,7 +219,7 @@ static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar**
 		if (_inner_error_ != NULL) {
 			raw_datau8 = (g_free (raw_datau8), NULL);
 			_g_object_unref0 (file);
-			goto __catch13_g_error;
+			goto __catch1_g_error;
 		}
 		_tmp5_ = raw_datau8;
 		_tmp5__length1 = raw_datau8_length1;
@@ -391,8 +391,8 @@ static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar**
 		raw_datau8 = (g_free (raw_datau8), NULL);
 		_g_object_unref0 (file);
 	}
-	goto __finally13;
-	__catch13_g_error:
+	goto __finally1;
+	__catch1_g_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp44_;
@@ -402,7 +402,7 @@ static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar**
 		g_error ("pdf.vala:145: %s", _tmp44_);
 		_g_error_free0 (e);
 	}
-	__finally13:
+	__finally1:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
@@ -419,7 +419,7 @@ static void pdfpc_metadata_pdf_parse_pdfpc_file (pdfpcMetadataPdf* self, gchar**
 /**
          * Parse the line for the skip slides
          */
-static void _vala_array_add2 (gint** array, int* length, int* size, gint value) {
+static void _vala_array_add1 (gint** array, int* length, int* size, gint value) {
 	if ((*length) == (*size)) {
 		*size = (*size) ? (2 * (*size)) : 4;
 		*array = g_renew (gint, *array, *size);
@@ -428,7 +428,7 @@ static void _vala_array_add2 (gint** array, int* length, int* size, gint value) 
 }
 
 
-static void _vala_array_add3 (gint** array, int* length, int* size, gint value) {
+static void _vala_array_add2 (gint** array, int* length, int* size, gint value) {
 	if ((*length) == (*size)) {
 		*size = (*size) ? (2 * (*size)) : 4;
 		*array = g_renew (gint, *array, *size);
@@ -516,7 +516,7 @@ static void pdfpc_metadata_pdf_parse_skip_line (pdfpcMetadataPdf* self, const gc
 					_tmp17_ = self->priv->user_view_indexes;
 					_tmp17__length1 = self->priv->user_view_indexes_length1;
 					_tmp18_ = s;
-					_vala_array_add2 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp18_);
+					_vala_array_add1 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp18_);
 					_tmp19_ = s;
 					s = _tmp19_ + 1;
 				}
@@ -540,7 +540,7 @@ static void pdfpc_metadata_pdf_parse_skip_line (pdfpcMetadataPdf* self, const gc
 		_tmp23_ = self->priv->user_view_indexes;
 		_tmp23__length1 = self->priv->user_view_indexes_length1;
 		_tmp24_ = s;
-		_vala_array_add3 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp24_);
+		_vala_array_add2 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp24_);
 		_tmp25_ = s;
 		s = _tmp25_ + 1;
 	}
@@ -859,7 +859,7 @@ void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self) {
 			_g_free0 (_tmp26_);
 			if (_inner_error_ != NULL) {
 				_g_object_unref0 (pdfpc_file);
-				goto __catch14_g_error;
+				goto __catch2_g_error;
 			}
 			_g_object_unref0 (pdfpc_file);
 		} else {
@@ -879,14 +879,14 @@ void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self) {
 				g_file_delete (_tmp35_, NULL, &_inner_error_);
 				if (_inner_error_ != NULL) {
 					_g_object_unref0 (file);
-					goto __catch14_g_error;
+					goto __catch2_g_error;
 				}
 			}
 			_g_object_unref0 (file);
 		}
 	}
-	goto __finally14;
-	__catch14_g_error:
+	goto __finally2;
+	__catch2_g_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp36_;
@@ -896,7 +896,7 @@ void pdfpc_metadata_pdf_save_to_disk (pdfpcMetadataPdf* self) {
 		g_error ("pdf.vala:212: %s", _tmp36_);
 		_g_error_free0 (e);
 	}
-	__finally14:
+	__finally2:
 	if (_inner_error_ != NULL) {
 		_g_free0 (contents);
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
@@ -1108,7 +1108,7 @@ gchar* pdfpc_metadata_pdf_format_duration (pdfpcMetadataPdf* self) {
 /**
          * Base constructor taking the file url to the pdf file
          */
-static void _vala_array_add4 (gint** array, int* length, int* size, gint value) {
+static void _vala_array_add3 (gint** array, int* length, int* size, gint value) {
 	if ((*length) == (*size)) {
 		*size = (*size) ? (2 * (*size)) : 4;
 		*array = g_renew (gint, *array, *size);
@@ -1237,7 +1237,7 @@ pdfpcMetadataPdf* pdfpc_metadata_pdf_construct (GType object_type, const gchar* 
 						_tmp34_ = self->priv->user_view_indexes;
 						_tmp34__length1 = self->priv->user_view_indexes_length1;
 						_tmp35_ = i;
-						_vala_array_add4 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp35_);
+						_vala_array_add3 (&self->priv->user_view_indexes, &self->priv->user_view_indexes_length1, &self->priv->_user_view_indexes_size_, _tmp35_);
 						_tmp36_ = this_label;
 						_tmp37_ = g_strdup (_tmp36_);
 						_g_free0 (previous_label);
@@ -1338,12 +1338,12 @@ void pdfpc_metadata_pdf_set_end_user_slide (pdfpcMetadataPdf* self, gint slide) 
          *
          * Returns the offset to move the current user_slide_number
          */
-static gint* _vala_array_dup3 (gint* self, int length) {
+static gint* _vala_array_dup1 (gint* self, int length) {
 	return g_memdup (self, length * sizeof (gint));
 }
 
 
-static gint* _vala_array_dup4 (gint* self, int length) {
+static gint* _vala_array_dup2 (gint* self, int length) {
 	return g_memdup (self, length * sizeof (gint));
 }
 
@@ -1481,7 +1481,7 @@ gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, 
 		}
 		_tmp31_ = new_indexes;
 		_tmp31__length1 = new_indexes_length1;
-		_tmp32_ = (_tmp31_ != NULL) ? _vala_array_dup3 (_tmp31_, _tmp31__length1) : ((gpointer) _tmp31_);
+		_tmp32_ = (_tmp31_ != NULL) ? _vala_array_dup1 (_tmp31_, _tmp31__length1) : ((gpointer) _tmp31_);
 		_tmp32__length1 = _tmp31__length1;
 		self->priv->user_view_indexes = (g_free (self->priv->user_view_indexes), NULL);
 		self->priv->user_view_indexes = _tmp32_;
@@ -1622,7 +1622,7 @@ gint pdfpc_metadata_pdf_toggle_skip (pdfpcMetadataPdf* self, gint slide_number, 
 		}
 		_tmp68_ = new_indexes;
 		_tmp68__length1 = new_indexes_length1;
-		_tmp69_ = (_tmp68_ != NULL) ? _vala_array_dup4 (_tmp68_, _tmp68__length1) : ((gpointer) _tmp68_);
+		_tmp69_ = (_tmp68_ != NULL) ? _vala_array_dup2 (_tmp68_, _tmp68__length1) : ((gpointer) _tmp68_);
 		_tmp69__length1 = _tmp68__length1;
 		self->priv->user_view_indexes = (g_free (self->priv->user_view_indexes), NULL);
 		self->priv->user_view_indexes = _tmp69_;
@@ -1870,13 +1870,13 @@ PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, c
 		_g_free0 (_tmp4_);
 		_tmp7_ = _tmp6_;
 		if (_inner_error_ != NULL) {
-			goto __catch15_g_error;
+			goto __catch3_g_error;
 		}
 		_g_object_unref0 (document);
 		document = _tmp7_;
 	}
-	goto __finally15;
-	__catch15_g_error:
+	goto __finally3;
+	__catch3_g_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp8_;
@@ -1886,7 +1886,7 @@ PopplerDocument* pdfpc_metadata_pdf_open_pdf_document (pdfpcMetadataPdf* self, c
 		g_error ("pdf.vala:462: Unable to open pdf file: %s", _tmp8_);
 		_g_error_free0 (e);
 	}
-	__finally15:
+	__finally3:
 	if (_inner_error_ != NULL) {
 		_g_object_unref0 (document);
 		_g_object_unref0 (file);

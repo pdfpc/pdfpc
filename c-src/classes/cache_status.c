@@ -111,16 +111,16 @@ void pdfpc_cache_status_register_update (pdfpcCacheStatus* self, pdfpcCacheStatu
 void pdfpc_cache_status_update (pdfpcCacheStatus* self);
 GType pdfpc_view_prerendering_get_type (void) G_GNUC_CONST;
 void pdfpc_cache_status_monitor_view (pdfpcCacheStatus* self, pdfpcViewPrerendering* view);
-static void __lambda5_ (pdfpcCacheStatus* self, pdfpcViewPrerendering* v);
+static void __lambda2_ (pdfpcCacheStatus* self, pdfpcViewPrerendering* v);
 GType pdfpc_view_base_get_type (void) G_GNUC_CONST;
 GType pdfpc_renderer_base_get_type (void) G_GNUC_CONST;
 pdfpcRendererBase* pdfpc_view_base_get_renderer (pdfpcViewBase* self);
 GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
 pdfpcMetadataBase* pdfpc_renderer_base_get_metadata (pdfpcRendererBase* self);
 guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self);
-static void ___lambda5__pdfpc_view_prerendering_prerendering_started (pdfpcViewPrerendering* _sender, gpointer self);
-static void __lambda6_ (pdfpcCacheStatus* self);
-static void ___lambda6__pdfpc_view_prerendering_slide_prerendered (pdfpcViewPrerendering* _sender, gpointer self);
+static void ___lambda2__pdfpc_view_prerendering_prerendering_started (pdfpcViewPrerendering* _sender, gpointer self);
+static void __lambda3_ (pdfpcCacheStatus* self);
+static void ___lambda3__pdfpc_view_prerendering_slide_prerendered (pdfpcViewPrerendering* _sender, gpointer self);
 pdfpcCacheStatus* pdfpc_cache_status_new (void);
 pdfpcCacheStatus* pdfpc_cache_status_construct (GType object_type);
 static void pdfpc_cache_status_finalize (pdfpcCacheStatus* obj);
@@ -200,7 +200,7 @@ void pdfpc_cache_status_update (pdfpcCacheStatus* self) {
 /**
          * Monitor a new view for prerendering information
          */
-static void __lambda5_ (pdfpcCacheStatus* self, pdfpcViewPrerendering* v) {
+static void __lambda2_ (pdfpcCacheStatus* self, pdfpcViewPrerendering* v) {
 	gint _tmp0_;
 	pdfpcViewPrerendering* _tmp1_;
 	pdfpcRendererBase* _tmp2_ = NULL;
@@ -222,12 +222,12 @@ static void __lambda5_ (pdfpcCacheStatus* self, pdfpcViewPrerendering* v) {
 }
 
 
-static void ___lambda5__pdfpc_view_prerendering_prerendering_started (pdfpcViewPrerendering* _sender, gpointer self) {
-	__lambda5_ (self, _sender);
+static void ___lambda2__pdfpc_view_prerendering_prerendering_started (pdfpcViewPrerendering* _sender, gpointer self) {
+	__lambda2_ (self, _sender);
 }
 
 
-static void __lambda6_ (pdfpcCacheStatus* self) {
+static void __lambda3_ (pdfpcCacheStatus* self) {
 	gint _tmp0_;
 	_tmp0_ = self->current_value;
 	self->current_value = _tmp0_ + 1;
@@ -235,8 +235,8 @@ static void __lambda6_ (pdfpcCacheStatus* self) {
 }
 
 
-static void ___lambda6__pdfpc_view_prerendering_slide_prerendered (pdfpcViewPrerendering* _sender, gpointer self) {
-	__lambda6_ (self);
+static void ___lambda3__pdfpc_view_prerendering_slide_prerendered (pdfpcViewPrerendering* _sender, gpointer self) {
+	__lambda3_ (self);
 }
 
 
@@ -246,9 +246,9 @@ void pdfpc_cache_status_monitor_view (pdfpcCacheStatus* self, pdfpcViewPrerender
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (view != NULL);
 	_tmp0_ = view;
-	g_signal_connect (_tmp0_, "prerendering-started", (GCallback) ___lambda5__pdfpc_view_prerendering_prerendering_started, self);
+	g_signal_connect (_tmp0_, "prerendering-started", (GCallback) ___lambda2__pdfpc_view_prerendering_prerendering_started, self);
 	_tmp1_ = view;
-	g_signal_connect (_tmp1_, "slide-prerendered", (GCallback) ___lambda6__pdfpc_view_prerendering_slide_prerendered, self);
+	g_signal_connect (_tmp1_, "slide-prerendered", (GCallback) ___lambda3__pdfpc_view_prerendering_slide_prerendered, self);
 }
 
 

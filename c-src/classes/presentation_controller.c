@@ -310,7 +310,7 @@ void pdfpc_presentation_controller_controllables_update (pdfpcPresentationContro
 void pdfpc_presentation_controller_set_end_user_slide_overview (pdfpcPresentationController* self);
 gint pdfpc_window_overview_get_current_slide (pdfpcWindowOverview* self);
 static void pdfpc_presentation_controller_slide2history (pdfpcPresentationController* self);
-static void _vala_array_add1 (gint** array, int* length, int* size, gint value);
+static void _vala_array_add4 (gint** array, int* length, int* size, gint value);
 void pdfpc_presentation_controller_page_change_request (pdfpcPresentationController* self, gint page_number);
 gint pdfpc_metadata_pdf_real_slide_to_user_slide (pdfpcMetadataPdf* self, gint number);
 void pdfpc_timer_label_start (pdfpcTimerLabel* self);
@@ -1469,7 +1469,7 @@ void pdfpc_presentation_controller_set_end_user_slide_overview (pdfpcPresentatio
 /**
          * Register the current slide in the history
          */
-static void _vala_array_add1 (gint** array, int* length, int* size, gint value) {
+static void _vala_array_add4 (gint** array, int* length, int* size, gint value) {
 	if ((*length) == (*size)) {
 		*size = (*size) ? (2 * (*size)) : 4;
 		*array = g_renew (gint, *array, *size);
@@ -1486,7 +1486,7 @@ static void pdfpc_presentation_controller_slide2history (pdfpcPresentationContro
 	_tmp0_ = self->priv->history;
 	_tmp0__length1 = self->priv->history_length1;
 	_tmp1_ = self->current_slide_number;
-	_vala_array_add1 (&self->priv->history, &self->priv->history_length1, &self->priv->_history_size_, _tmp1_);
+	_vala_array_add4 (&self->priv->history, &self->priv->history_length1, &self->priv->_history_size_, _tmp1_);
 }
 
 

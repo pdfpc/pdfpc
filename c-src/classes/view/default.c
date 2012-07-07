@@ -184,20 +184,20 @@ pdfpcViewBase* pdfpc_view_base_construct (GType object_type, pdfpcRendererBase* 
 GType pdfpc_metadata_base_get_type (void) G_GNUC_CONST;
 pdfpcMetadataBase* pdfpc_renderer_base_get_metadata (pdfpcRendererBase* self);
 guint pdfpc_metadata_base_get_slide_count (pdfpcMetadataBase* self);
-static void __lambda3_ (pdfpcViewDefault* self);
+static void __lambda5_ (pdfpcViewDefault* self);
 void pdfpc_view_base_display (pdfpcViewBase* self, gint slide_number, gboolean force_redraw, GError** error);
 GType pdfpc_renderer_cache_base_get_type (void) G_GNUC_CONST;
 GType pdfpc_renderer_caching_get_type (void) G_GNUC_CONST;
 pdfpcRendererCacheBase* pdfpc_renderer_caching_get_cache (pdfpcRendererCaching* self);
 gboolean pdfpc_renderer_cache_base_allows_prerendering (pdfpcRendererCacheBase* self);
 void pdfpc_view_default_register_prerendering (pdfpcViewDefault* self);
-static void ___lambda3__gtk_widget_realize (GtkWidget* _sender, gpointer self);
+static void ___lambda5__gtk_widget_realize (GtkWidget* _sender, gpointer self);
 static Block1Data* block1_data_ref (Block1Data* _data1_);
 static void block1_data_unref (void * _userdata_);
 pdfpcRendererBase* pdfpc_view_base_get_renderer (pdfpcViewBase* self);
-static gboolean __lambda4_ (Block1Data* _data1_);
+static gboolean __lambda6_ (Block1Data* _data1_);
 GdkPixmap* pdfpc_renderer_base_render_to_pixmap (pdfpcRendererBase* self, gint slide_number, GError** error);
-static gboolean ___lambda4__gsource_func (gpointer self);
+static gboolean ___lambda6__gsource_func (gpointer self);
 static void pdfpc_view_default_real_associate_behaviour (pdfpcViewBehaviourDecoratable* base, pdfpcViewBehaviourBase* behaviour);
 GQuark pdfpc_view_behaviour_association_error_quark (void);
 void pdfpc_view_behaviour_base_associate (pdfpcViewBehaviourBase* self, pdfpcViewBase* target, GError** error);
@@ -231,7 +231,7 @@ static gpointer _g_object_ref0 (gpointer self) {
 }
 
 
-static void __lambda3_ (pdfpcViewDefault* self) {
+static void __lambda5_ (pdfpcViewDefault* self) {
 	pdfpcRendererBase* _tmp3_;
 	pdfpcRendererCaching* _tmp4_;
 	pdfpcRendererCaching* caching_renderer;
@@ -247,15 +247,15 @@ static void __lambda3_ (pdfpcViewDefault* self) {
 		pdfpc_view_base_display ((pdfpcViewBase*) self, _tmp0_, FALSE, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch1_pdfpc_renderer_render_error;
+				goto __catch6_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
 			return;
 		}
 	}
-	goto __finally1;
-	__catch1_pdfpc_renderer_render_error:
+	goto __finally6;
+	__catch6_pdfpc_renderer_render_error:
 	{
 		GError* e = NULL;
 		gint _tmp1_;
@@ -267,7 +267,7 @@ static void __lambda3_ (pdfpcViewDefault* self) {
 		g_error ("default.vala:79: Could not render initial page %d: %s", _tmp1_, _tmp2_);
 		_g_error_free0 (e);
 	}
-	__finally1:
+	__finally6:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
@@ -312,8 +312,8 @@ static void __lambda3_ (pdfpcViewDefault* self) {
 }
 
 
-static void ___lambda3__gtk_widget_realize (GtkWidget* _sender, gpointer self) {
-	__lambda3_ (self);
+static void ___lambda5__gtk_widget_realize (GtkWidget* _sender, gpointer self) {
+	__lambda5_ (self);
 }
 
 
@@ -339,7 +339,7 @@ pdfpcViewDefault* pdfpc_view_default_construct (GType object_type, pdfpcRenderer
 	_tmp5_ = self->n_slides;
 	self->slide_limit = _tmp5_ + 1;
 	gtk_widget_add_events ((GtkWidget*) self, (gint) GDK_STRUCTURE_MASK);
-	g_signal_connect_object ((GtkWidget*) self, "realize", (GCallback) ___lambda3__gtk_widget_realize, self, 0);
+	g_signal_connect_object ((GtkWidget*) self, "realize", (GCallback) ___lambda5__gtk_widget_realize, self, 0);
 	return self;
 }
 
@@ -374,7 +374,7 @@ static void block1_data_unref (void * _userdata_) {
 }
 
 
-static gboolean __lambda4_ (Block1Data* _data1_) {
+static gboolean __lambda6_ (Block1Data* _data1_) {
 	pdfpcViewDefault * self;
 	gboolean result = FALSE;
 	gint _tmp7_;
@@ -401,15 +401,15 @@ static gboolean __lambda4_ (Block1Data* _data1_) {
 		_g_object_unref0 (_tmp3_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch2_pdfpc_renderer_render_error;
+				goto __catch7_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
 			return FALSE;
 		}
 	}
-	goto __finally2;
-	__catch2_pdfpc_renderer_render_error:
+	goto __finally7;
+	__catch7_pdfpc_renderer_render_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp6_;
@@ -419,7 +419,7 @@ static gboolean __lambda4_ (Block1Data* _data1_) {
 		g_error ("default.vala:127: Could not render page '%i' while pre-rendering: %s", *_data1_->i, _tmp6_);
 		_g_error_free0 (e);
 	}
-	__finally2:
+	__finally7:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
@@ -440,9 +440,9 @@ static gboolean __lambda4_ (Block1Data* _data1_) {
 }
 
 
-static gboolean ___lambda4__gsource_func (gpointer self) {
+static gboolean ___lambda6__gsource_func (gpointer self) {
 	gboolean result;
-	result = __lambda4_ (self);
+	result = __lambda6_ (self);
 	return result;
 }
 
@@ -470,7 +470,7 @@ void pdfpc_view_default_register_prerendering (pdfpcViewDefault* self) {
 	_g_object_unref0 (_tmp1_);
 	_data1_->page_count = _tmp5_;
 	g_signal_emit_by_name ((pdfpcViewPrerendering*) self, "prerendering-started");
-	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE, ___lambda4__gsource_func, block1_data_ref (_data1_), block1_data_unref);
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE, ___lambda6__gsource_func, block1_data_ref (_data1_), block1_data_unref);
 	block1_data_unref (_data1_);
 	_data1_ = NULL;
 }
@@ -498,15 +498,15 @@ static void pdfpc_view_default_real_associate_behaviour (pdfpcViewBehaviourDecor
 		pdfpc_view_behaviour_base_associate (_tmp2_, (pdfpcViewBase*) self, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_VIEW_BEHAVIOUR_ASSOCIATION_ERROR) {
-				goto __catch3_pdfpc_view_behaviour_association_error;
+				goto __catch8_pdfpc_view_behaviour_association_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
 			return;
 		}
 	}
-	goto __finally3;
-	__catch3_pdfpc_view_behaviour_association_error:
+	goto __finally8;
+	__catch8_pdfpc_view_behaviour_association_error:
 	{
 		GError* e = NULL;
 		const gchar* _tmp3_;
@@ -516,7 +516,7 @@ static void pdfpc_view_default_real_associate_behaviour (pdfpcViewBehaviourDecor
 		g_error ("default.vala:159: Behaviour association failure: %s", _tmp3_);
 		_g_error_free0 (e);
 	}
-	__finally3:
+	__finally8:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
