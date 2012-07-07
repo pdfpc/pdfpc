@@ -2,6 +2,12 @@
 pdfpc Changelog
 ===============
 
+Version 3.1.1
+=============
+*Released: July 2012*
+
+- Bug fix for released C sources
+
 Version 3.1
 ===========
 
