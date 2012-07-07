@@ -279,8 +279,8 @@ pdfpcWindowPresenter* pdfpc_window_presenter_new (pdfpcMetadataPdf* metadata, gi
 pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpcMetadataPdf* metadata, gint screen_num, pdfpcPresentationController* presentation_controller);
 pdfpcWindowFullscreen* pdfpc_window_fullscreen_new (gint screen_num);
 pdfpcWindowFullscreen* pdfpc_window_fullscreen_construct (GType object_type, gint screen_num);
-static void __lambda2_ (pdfpcWindowPresenter* self, GtkObject* source);
-static void ___lambda2__gtk_object_destroy (GtkObject* _sender, gpointer self);
+static void __lambda4_ (pdfpcWindowPresenter* self, GtkObject* source);
+static void ___lambda4__gtk_object_destroy (GtkObject* _sender, gpointer self);
 gboolean pdfpc_presentation_controller_register_controllable (pdfpcPresentationController* self, pdfpcControllable* controllable);
 GType pdfpc_view_default_get_type (void) G_GNUC_CONST;
 GType pdfpc_view_pdf_get_type (void) G_GNUC_CONST;
@@ -290,7 +290,7 @@ static gboolean _pdfpc_window_presenter_on_key_press_notes_view_gtk_widget_key_p
 pdfpcTimerLabel* pdfpc_presentation_controller_getTimer (pdfpcPresentationController* self);
 gboolean pdfpc_window_presenter_on_key_press_slide_progress (pdfpcWindowPresenter* self, GtkWidget* source, GdkEventKey* key);
 static gboolean _pdfpc_window_presenter_on_key_press_slide_progress_gtk_widget_key_press_event (GtkWidget* _sender, GdkEventKey* event, gpointer self);
-#define icon_path "/usr/share/pixmaps/pdfpc/"
+#define icon_path "@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/"
 gboolean pdfpc_window_presenter_on_key_pressed (pdfpcWindowPresenter* self, GtkWidget* source, GdkEventKey* key);
 static gboolean _pdfpc_window_presenter_on_key_pressed_gtk_widget_key_press_event (GtkWidget* _sender, GdkEventKey* event, gpointer self);
 gboolean pdfpc_window_presenter_on_button_press (pdfpcWindowPresenter* self, GtkWidget* source, GdkEventButton* button);
@@ -366,14 +366,14 @@ static void pdfpc_window_presenter_finalize (GObject* obj);
 /**
          * Base constructor instantiating a new presenter window
          */
-static void __lambda2_ (pdfpcWindowPresenter* self, GtkObject* source) {
+static void __lambda4_ (pdfpcWindowPresenter* self, GtkObject* source) {
 	g_return_if_fail (source != NULL);
 	gtk_main_quit ();
 }
 
 
-static void ___lambda2__gtk_object_destroy (GtkObject* _sender, gpointer self) {
-	__lambda2_ (self, _sender);
+static void ___lambda4__gtk_object_destroy (GtkObject* _sender, gpointer self) {
+	__lambda4_ (self, _sender);
 }
 
 
@@ -537,7 +537,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 	g_return_val_if_fail (presentation_controller != NULL, NULL);
 	_tmp0_ = screen_num;
 	self = (pdfpcWindowPresenter*) pdfpc_window_fullscreen_construct (object_type, _tmp0_);
-	g_signal_connect_object ((GtkObject*) self, "destroy", (GCallback) ___lambda2__gtk_object_destroy, self, 0);
+	g_signal_connect_object ((GtkObject*) self, "destroy", (GCallback) ___lambda4__gtk_object_destroy, self, 0);
 	_tmp1_ = presentation_controller;
 	_tmp2_ = _g_object_ref0 (_tmp1_);
 	_g_object_unref0 (self->presentation_controller);
@@ -701,7 +701,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		_tmp94_ = _g_object_ref0 (_tmp93_);
 		blank_pixbuf = _tmp94_;
 		if (_inner_error_ != NULL) {
-			goto __catch8_g_error;
+			goto __catch10_g_error;
 		}
 		_tmp95_ = (GtkImage*) gtk_image_new_from_pixbuf (blank_pixbuf);
 		_tmp96_ = g_object_ref_sink (_tmp95_);
@@ -711,8 +711,8 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		gtk_widget_set_no_show_all ((GtkWidget*) _tmp97_, TRUE);
 		_g_object_unref0 (blank_pixbuf);
 	}
-	goto __finally8;
-	__catch8_g_error:
+	goto __finally10;
+	__catch10_g_error:
 	{
 		GError* e = NULL;
 		FILE* _tmp98_;
@@ -732,7 +732,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		self->blank_icon = _tmp102_;
 		_g_error_free0 (e);
 	}
-	__finally8:
+	__finally10:
 	if (_inner_error_ != NULL) {
 		_pango_font_description_free0 (font);
 		_pango_font_description_free0 (notes_font);
@@ -751,7 +751,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		_tmp104_ = _g_object_ref0 (_tmp103_);
 		frozen_pixbuf = _tmp104_;
 		if (_inner_error_ != NULL) {
-			goto __catch9_g_error;
+			goto __catch11_g_error;
 		}
 		_tmp105_ = (GtkImage*) gtk_image_new_from_pixbuf (frozen_pixbuf);
 		_tmp106_ = g_object_ref_sink (_tmp105_);
@@ -761,8 +761,8 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		gtk_widget_set_no_show_all ((GtkWidget*) _tmp107_, TRUE);
 		_g_object_unref0 (frozen_pixbuf);
 	}
-	goto __finally9;
-	__catch9_g_error:
+	goto __finally11;
+	__catch11_g_error:
 	{
 		GError* e = NULL;
 		FILE* _tmp108_;
@@ -782,7 +782,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		self->frozen_icon = _tmp112_;
 		_g_error_free0 (e);
 	}
-	__finally9:
+	__finally11:
 	if (_inner_error_ != NULL) {
 		_pango_font_description_free0 (font);
 		_pango_font_description_free0 (notes_font);
@@ -801,7 +801,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		_tmp114_ = _g_object_ref0 (_tmp113_);
 		pause_pixbuf = _tmp114_;
 		if (_inner_error_ != NULL) {
-			goto __catch10_g_error;
+			goto __catch12_g_error;
 		}
 		_tmp115_ = (GtkImage*) gtk_image_new_from_pixbuf (pause_pixbuf);
 		_tmp116_ = g_object_ref_sink (_tmp115_);
@@ -811,8 +811,8 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		gtk_widget_set_no_show_all ((GtkWidget*) _tmp117_, TRUE);
 		_g_object_unref0 (pause_pixbuf);
 	}
-	goto __finally10;
-	__catch10_g_error:
+	goto __finally12;
+	__catch12_g_error:
 	{
 		GError* e = NULL;
 		FILE* _tmp118_;
@@ -832,7 +832,7 @@ pdfpcWindowPresenter* pdfpc_window_presenter_construct (GType object_type, pdfpc
 		self->pause_icon = _tmp122_;
 		_g_error_free0 (e);
 	}
-	__finally10:
+	__finally12:
 	if (_inner_error_ != NULL) {
 		_pango_font_description_free0 (font);
 		_pango_font_description_free0 (notes_font);
@@ -1309,7 +1309,7 @@ static void pdfpc_window_presenter_real_update (pdfpcControllable* base) {
 		pdfpc_view_base_display (_tmp4_, _tmp5_, FALSE, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch11_pdfpc_renderer_render_error;
+				goto __catch13_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
@@ -1322,7 +1322,7 @@ static void pdfpc_window_presenter_real_update (pdfpcControllable* base) {
 		pdfpc_view_base_display (_tmp6_, _tmp9_, FALSE, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch11_pdfpc_renderer_render_error;
+				goto __catch13_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
@@ -1338,7 +1338,7 @@ static void pdfpc_window_presenter_real_update (pdfpcControllable* base) {
 			pdfpc_view_base_display (_tmp12_, _tmp13_ + 1, TRUE, &_inner_error_);
 			if (_inner_error_ != NULL) {
 				if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-					goto __catch11_pdfpc_renderer_render_error;
+					goto __catch13_pdfpc_renderer_render_error;
 				}
 				g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 				g_clear_error (&_inner_error_);
@@ -1359,7 +1359,7 @@ static void pdfpc_window_presenter_real_update (pdfpcControllable* base) {
 			pdfpc_view_base_display (_tmp17_, _tmp18_ - 1, TRUE, &_inner_error_);
 			if (_inner_error_ != NULL) {
 				if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-					goto __catch11_pdfpc_renderer_render_error;
+					goto __catch13_pdfpc_renderer_render_error;
 				}
 				g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 				g_clear_error (&_inner_error_);
@@ -1371,8 +1371,8 @@ static void pdfpc_window_presenter_real_update (pdfpcControllable* base) {
 			pdfpc_view_base_fade_to_black (_tmp19_);
 		}
 	}
-	goto __finally11;
-	__catch11_pdfpc_renderer_render_error:
+	goto __finally13;
+	__catch13_pdfpc_renderer_render_error:
 	{
 		GError* e = NULL;
 		gint _tmp20_;
@@ -1384,7 +1384,7 @@ static void pdfpc_window_presenter_real_update (pdfpcControllable* base) {
 		g_error ("presenter.vala:483: The pdf page %d could not be rendered: %s", _tmp20_, _tmp21_);
 		_g_error_free0 (e);
 	}
-	__finally11:
+	__finally13:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
@@ -1446,7 +1446,7 @@ void pdfpc_window_presenter_goto_page (pdfpcWindowPresenter* self, gint page_num
 		pdfpc_view_base_display (_tmp0_, _tmp1_, FALSE, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch12_pdfpc_renderer_render_error;
+				goto __catch14_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
@@ -1457,15 +1457,15 @@ void pdfpc_window_presenter_goto_page (pdfpcWindowPresenter* self, gint page_num
 		pdfpc_view_base_display (_tmp2_, _tmp3_ + 1, FALSE, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == PDFPC_RENDERER_RENDER_ERROR) {
-				goto __catch12_pdfpc_renderer_render_error;
+				goto __catch14_pdfpc_renderer_render_error;
 			}
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 			g_clear_error (&_inner_error_);
 			return;
 		}
 	}
-	goto __finally12;
-	__catch12_pdfpc_renderer_render_error:
+	goto __finally14;
+	__catch14_pdfpc_renderer_render_error:
 	{
 		GError* e = NULL;
 		gint _tmp4_;
@@ -1477,7 +1477,7 @@ void pdfpc_window_presenter_goto_page (pdfpcWindowPresenter* self, gint page_num
 		g_error ("presenter.vala:513: The pdf page %d could not be rendered: %s", _tmp4_, _tmp5_);
 		_g_error_free0 (e);
 	}
-	__finally12:
+	__finally14:
 	if (_inner_error_ != NULL) {
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);

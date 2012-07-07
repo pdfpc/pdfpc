@@ -205,7 +205,7 @@ void pdfpc_value_take_config_file_reader (GValue* value, gpointer v_object);
 gpointer pdfpc_value_get_config_file_reader (const GValue* value);
 GType pdfpc_config_file_reader_get_type (void) G_GNUC_CONST;
 void pdfpc_config_file_reader_readConfig (pdfpcConfigFileReader* self, const gchar* fname);
-#define etc_path "/etc"
+#define etc_path "@SYSCONFDIR@"
 GType pdfpc_controllable_get_type (void) G_GNUC_CONST;
 void pdfpc_controllable_update (pdfpcControllable* self);
 gint pdfpc_application_main (gchar** args, int args_length1);
@@ -243,7 +243,7 @@ gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gch
 		g_option_context_parse (context, &args_length1, &args, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == G_OPTION_ERROR) {
-				goto __catch0_g_option_error;
+				goto __catch15_g_option_error;
 			}
 			_g_option_context_free0 (context);
 			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
@@ -251,8 +251,8 @@ gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gch
 			return NULL;
 		}
 	}
-	goto __finally0;
-	__catch0_g_option_error:
+	goto __finally15;
+	__catch15_g_option_error:
 	{
 		GError* e = NULL;
 		FILE* _tmp1_;
@@ -275,7 +275,7 @@ gchar* pdfpc_application_parse_command_line_options (pdfpcApplication* self, gch
 		exit (1);
 		_g_error_free0 (e);
 	}
-	__finally0:
+	__finally15:
 	if (_inner_error_ != NULL) {
 		_g_option_context_free0 (context);
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
