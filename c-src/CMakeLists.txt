@@ -43,7 +43,8 @@ link_directories(${LIB_PATHS})
 # sed call to work properly, there mut be at least one line (may be empty)
 # between the markers.
 # BEGIN_CONFIGURE_FILES
-
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pdfpc.in ${CMAKE_CURRENT_SOURCE_DIR}/pdfpc.c)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/classes/window/presenter.in ${CMAKE_CURRENT_SOURCE_DIR}/classes/window/presenter.c)
 # END_CONFIGURE_FILES
 
 file (GLOB_RECURSE C_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
