@@ -132,7 +132,7 @@ namespace pdfpc {
          * initializes the Gtk system.
          */
         public void run( string[] args ) {
-            stdout.printf( "pdfpc v3.0\n"
+            stdout.printf( "pdfpc v3.1.1\n"
                            + "(C) 2012 David Vilar\n"
                            + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
