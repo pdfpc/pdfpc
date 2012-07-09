@@ -257,6 +257,25 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Fill the slide notes from pdf text annotations.
+         */
+        private void notes_from_document() {
+            for(int i = 0; i < this.page_count; i++) {
+                var page = this.document.get_page(i);
+                unowned List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
+                foreach(unowned Poppler.AnnotMapping am in anns) {
+                    var a = am.annot;
+                    switch(a.get_annot_type()) {
+                        case Poppler.AnnotType.TEXT:
+                            this.notes.set_note(a.get_contents(), real_slide_to_user_slide(i));
+                            break;
+                    }
+                }
+                page.free_annot_mapping(anns);
+            }
+        }
+
+        /**
          * Base constructor taking the file url to the pdf file
          */
         public Pdf( string fname ) {
@@ -294,6 +313,10 @@ namespace pdfpc.Metadata {
             } else {
                 parse_skip_line(skip_line);
             }
+
+            // Prepopulate notes from annotations
+            notes_from_document();
+
             MutexLocks.poppler.unlock();
         }
     
