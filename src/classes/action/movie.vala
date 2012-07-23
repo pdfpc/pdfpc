@@ -158,10 +158,10 @@ namespace pdfpc {
             string uri;
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.FILE_ATTACHMENT:
-                var attach = ((Poppler.AnnotFileAttachment)annot).get_attachment();
-                if (!("video" in attach.description))
+                if (!("video" in annot.get_contents()))
                     return null;
                 
+                var attach = ((Poppler.AnnotFileAttachment)annot).get_attachment();
                 string tmp_fn;
                 int fh;
                 try {
