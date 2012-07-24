@@ -114,16 +114,7 @@ namespace pdfpc {
             var loop = "loop" in queryarray;
             
             stdout.printf(@"File name: $file\n");
-            var uriRE = new Regex("^[a-z]*://");
-            string uri;
-            if (uriRE.match(file)) {
-                uri = file;
-            } else if (GLib.Path.is_absolute(file)) {
-                uri = "file://" + file;
-            } else {
-                var dirname = GLib.Path.get_dirname(controller.get_pdf_url());
-                uri = GLib.Path.build_filename(dirname, file);
-            }
+            string uri = filename_to_uri(file, controller.get_pdf_url());
             bool uncertain;
             var ctype = GLib.ContentType.guess(uri, null, out uncertain);
             if (!("video" in ctype))
@@ -156,29 +147,42 @@ namespace pdfpc {
                 PresentationController controller, Poppler.Document document) {
             var annot = mapping.annot;
             string uri;
+            bool temp = false;
             switch (annot.get_annot_type()) {
-            case Poppler.AnnotType.FILE_ATTACHMENT:
+            case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents()))
                     return null;
                 
-                var attach = ((Poppler.AnnotFileAttachment)annot).get_attachment();
-                string tmp_fn;
-                int fh;
-                try {
-                    fh = FileUtils.open_tmp(null, out tmp_fn);
-                } catch (FileError e) {
-                    warning("Could not create temp file: %s", e.message);
-                    return null;
+                var action = ((Poppler.AnnotScreen) annot).get_action();
+                var movie = (Poppler.Media) action.movie.movie;
+                
+                if (movie.is_embedded()) {
+                    string tmp_fn;
+                    int fh;
+                    try {
+                        fh = FileUtils.open_tmp(null, out tmp_fn);
+                    } catch (FileError e) {
+                        warning("Could not create temp file: %s", e.message);
+                        return null;
+                    }
+                    FileUtils.close(fh);
+                    try {
+                        movie.save(tmp_fn);
+                    } catch (Error e) {
+                        warning("Could not save temp file: %s", e.message);
+                        return null;
+                    }
+                    uri = "file://" + tmp_fn;
+                    temp = true;
+                } else {
+                    string file = movie.get_filename();
+                    if (file == null) {
+                        warning("Movie not embedded and has no file name");
+                        return null;
+                    }
+                    uri = filename_to_uri(file, controller.get_pdf_url());
+                    temp = false;
                 }
-                FileUtils.close(fh);
-                try {
-                    attach.save(tmp_fn);
-                } catch (Error e) {
-                    warning("Could not save temp file: %s", e.message);
-                    return null;
-                }
-                stdout.printf(@"Temp file $tmp_fn\n");
-                uri = "file://" + tmp_fn;
                 break;
             default:
                 return null;
@@ -186,7 +190,7 @@ namespace pdfpc {
             
             var type = Type.from_instance(this);
             var new_obj = GLib.Object.new(type) as ActionMapping;
-            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, true);
+            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, temp);
             return new_obj;
         }
         
@@ -240,6 +244,19 @@ namespace pdfpc {
         protected virtual Element link_additional(int n, Element source, Bin bin,
                                                   Gdk.Rectangle rect) {
             return source;
+        }
+        
+        /**
+         * Utility function for converting filenames to uris.
+         */
+        public string filename_to_uri(string file, string pdf_url) {
+            var uriRE = new Regex("^[a-z]*://");
+            if (uriRE.match(file))
+                return file;
+            if (GLib.Path.is_absolute(file))
+                return "file://" + file;
+            var dirname = GLib.Path.get_dirname(pdf_url);
+            return GLib.Path.build_filename(dirname, file);
         }
         
         /**
