@@ -218,6 +218,7 @@ namespace pdfpc {
                 
                 var xoverlay = sink as XOverlay;
                 xoverlay.set_window_handle(xid);
+                xoverlay.handle_events(false);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
                 n++;
             }
