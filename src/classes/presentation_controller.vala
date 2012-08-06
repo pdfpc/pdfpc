@@ -864,7 +864,7 @@ namespace pdfpc {
          * controllable's main view.  Also, return the XID for the view's window,
          * useful for overlays.
          */
-        public ulong overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect) {
+        public uint overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect) {
             Controllable c = this.controllables.nth_data(n);
             if (c == null) {
                 rect = Gdk.Rectangle();
@@ -876,7 +876,7 @@ namespace pdfpc {
                 return 0;
             }
             rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
-            return (ulong)Gdk.x11_drawable_get_xid(view.get_window());
+            return (uint)Gdk.x11_drawable_get_xid(view.get_window());
         }
     }
 }

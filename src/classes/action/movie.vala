@@ -204,7 +204,7 @@ namespace pdfpc {
             bin.add_pad(new GhostPad("sink", tee.get_pad("sink")));
             Gdk.Rectangle rect;
             int n = 0;
-            ulong xid;
+            uint xid;
             while (true) {
                 xid = this.controller.overlay_pos(n, this.area, out rect);
                 if (xid == 0)
@@ -217,7 +217,7 @@ namespace pdfpc {
                 ad_element.link(sink);
                 
                 var xoverlay = sink as XOverlay;
-                xoverlay.set_xwindow_id(xid);
+                xoverlay.set_window_handle(xid);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
                 n++;
             }
