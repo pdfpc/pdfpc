@@ -271,11 +271,7 @@ namespace pdfpc.Metadata {
         private void notes_from_document() {
             for(int i = 0; i < this.page_count; i++) {
                 var page = this.document.get_page(i);
-#if VALA_0_16
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
-#else
-                unowned List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
-#endif
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
                     switch(a.get_annot_type()) {
@@ -284,9 +280,7 @@ namespace pdfpc.Metadata {
                             break;
                     }
                 }
-#if !VALA_0_16
-                page.free_annot_mapping(anns);
-#endif
+                //page.free_annot_mapping(anns);
             }
         }
 
@@ -525,11 +519,7 @@ namespace pdfpc.Metadata {
                     mapping.deactivate();
                 this.action_mapping = null; //.Is this really the correct way to clear a list?
 
-#if VALA_0_16
                 GLib.List<Poppler.LinkMapping> link_mappings;
-#else
-                unowned GLib.List<unowned Poppler.LinkMapping> link_mappings;
-#endif
                 link_mappings = this.get_document().get_page(page_num).get_link_mapping();
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
                     foreach (var blank in blanks) {
@@ -541,15 +531,9 @@ namespace pdfpc.Metadata {
                     }
                 }
                 // Free the mapping memory; already in lock
-#if !VALA_0_16
-                Poppler.Page.free_link_mapping(link_mappings);
-#endif
+                //Poppler.Page.free_link_mapping(link_mappings);
 
-#if VALA_0_16
                 GLib.List<Poppler.AnnotMapping> annot_mappings;
-#else
-                unowned GLib.List<Poppler.AnnotMapping> annot_mappings;
-#endif
                 annot_mappings = this.get_document().get_page(page_num).get_annot_mapping();
                 foreach (unowned Poppler.AnnotMapping mapping in annot_mappings) {
                     foreach (var blank in blanks) {
@@ -561,9 +545,7 @@ namespace pdfpc.Metadata {
                     }
                 }
                 // Free the mapping memory; already in lock
-#if !VALA_0_16
-                Poppler.Page.free_annot_mapping(annot_mappings);
-#endif
+                //Poppler.Page.free_annot_mapping(annot_mappings);
 
                 this.mapping_page_num = page_num;
             }

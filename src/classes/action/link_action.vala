@@ -75,11 +75,7 @@ namespace pdfpc {
             
             unowned Poppler.ActionGotoDest* action = (Poppler.ActionGotoDest*)this.action;
             MutexLocks.poppler.lock();
-#if VALA_0_16
             Poppler.Dest destination;
-#else
-            unowned Poppler.Dest destination;
-#endif
             destination = this.document.find_dest(action.dest.named_dest);
             MutexLocks.poppler.unlock();
             
