@@ -113,7 +113,6 @@ namespace pdfpc {
             var autostart = "autostart" in queryarray;
             var loop = "loop" in queryarray;
             
-            stdout.printf(@"File name: $file\n");
             string uri = filename_to_uri(file, controller.get_pdf_url());
             bool uncertain;
             var ctype = GLib.ContentType.guess(uri, null, out uncertain);
@@ -306,7 +305,7 @@ namespace pdfpc {
             GLib.Error err;
             string debug;
             message.parse_error(out err, out debug);
-            stdout.printf("Error %s\n", err.message);
+            stderr.printf("Gstreamer error %s\n", err.message);
         }
         
         /**
@@ -424,7 +423,7 @@ namespace pdfpc {
             filter.caps = caps;
             bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
             if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
-                stdout.printf("Trouble in linksville\n");
+                stderr.printf("Gstreamer error in linking pipeline\n");
             
             overlay.draw.connect(this.on_draw);
             overlay.caps_changed.connect(this.on_prepare);
@@ -441,14 +440,12 @@ namespace pdfpc {
             int width = -1, height = -1;
             VideoFormat format = VideoFormat.UNKNOWN;
             Gst.video_format_parse_caps(caps, ref format, ref width, ref height);
-            stdout.printf("%ix%i\n", width, height);
             scalex = 1.0*width / rect.width;
             scaley = 1.0*height / rect.height;
             vheight = height;
             
             var tformat = Gst.Format.TIME;
             overlay.query_duration(ref tformat, out duration);
-            stdout.printf("%f s\n", 1.0*duration / SECOND);
         }
         
         /**
