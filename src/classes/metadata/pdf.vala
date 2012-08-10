@@ -262,7 +262,11 @@ namespace pdfpc.Metadata {
         private void notes_from_document() {
             for(int i = 0; i < this.page_count; i++) {
                 var page = this.document.get_page(i);
+#if VALA_0_16
+                List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
+#else
                 unowned List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
+#endif
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
                     switch(a.get_annot_type()) {
@@ -271,7 +275,9 @@ namespace pdfpc.Metadata {
                             break;
                     }
                 }
+#if !VALA_0_16
                 page.free_annot_mapping(anns);
+#endif
             }
         }
 
