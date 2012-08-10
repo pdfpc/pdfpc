@@ -89,7 +89,7 @@ namespace pdfpc {
          * movies in presentations.  As a bonus, a query string on the video
          * filename can activate the autostart and loop properties.  (E.g., link
          * to movie.avi?autostart&loop to make movie.avi start playing with the
-         * page is entered and loop back to the beginning when it reaches the end.
+         * page is entered and loop back to the beginning when it reaches the end.)
          * 
          * In LaTeX, create such links with
          *      \usepackage{hyperref}
@@ -126,21 +126,18 @@ namespace pdfpc {
         }
         
         /**
-         * Create a new Movie from an annotation mapping, if the annotation
-         * is a file attachment of a video file.  This is probably a bit incorrect,
-         * we should be looking for Screen and/or Movie annotations for positioning,
-         * and to the FileAttachment for possible content (I think).  This works
-         * okay in the interim, but to get various flags about playback we probably
-         * need the Screen and Movie annotations.
+         * Create a new Movie from an annotation mapping, if the annotation is a
+         * screen annotation with a video file.  Various options to modify the
+         * behavior of the playback are not yet supported, since they're missing
+         * from poppler.
          * 
          * In LaTeX, create such annotations with
          *      \usepackage{movie15}
          *      \includemovie[text=<placeholder content>]{}{}{<movie file>}
          * The movie size is determined by the size of the placeholder content, so
-         * a frame from the movie is a good choice.  (Note that the poster option is
-         * not yet supported.  Also, attach=false will keep this from working.  [And I
-         * know that movie15 is deprecated.  But it works. (As long as you run ps2pdf
-         * with the -dNOSAFER flag.)])
+         * a frame from the movie is a good choice.  Note that the poster, autoplay,
+         * and repeat options are not yet supported.  (Also note that movie15 is
+         * deprecated, but it works as long as you run ps2pdf with the -dNOSAFER flag.)
          */
         public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
