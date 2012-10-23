@@ -144,11 +144,17 @@ namespace pdfpc {
         protected HashMap<KeyDef, KeyAction> keyBindings;
         protected HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
 
+        /*
+         * "Main" view of current slide
+         */
+        public View.Pdf main_view = null;
+
         /**
          * Instantiate a new controller
          */
         public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
             this.metadata = metadata;
+            this.metadata.controller = this;
             this.black_on_end = allow_black_on_end;
 
             this.controllables = new GLib.List<Controllable>();
@@ -185,6 +191,14 @@ namespace pdfpc {
             this.keyBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
             this.mouseBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
             this.fillActionNames();
+        }
+
+        /*
+         * Inform metadata of quit, and then quit.
+         */
+        public void quit() {
+            this.metadata.quit();
+            Gtk.main_quit();
         }
 
         public void set_overview(Window.Overview o) {
@@ -365,6 +379,13 @@ namespace pdfpc {
         }
         
         /**
+         * Get the PDF URL
+         */
+        public string? get_pdf_url() {
+            return this.metadata.pdf_url;
+        }
+        
+        /**
          * Get the current (real) slide number
          */
         public int get_current_slide_number() {
@@ -485,6 +506,8 @@ namespace pdfpc {
 
             //controllable.set_controller( this );
             this.controllables.append( controllable );
+            if (this.main_view == null)
+                this.main_view = controllable.get_main_view();
             
             return true;
         }
@@ -826,11 +849,6 @@ namespace pdfpc {
             }
         }
 
-        protected void quit() {
-            this.metadata.save_to_disk();
-            Gtk.main_quit();              
-        }
-
         /**
          * Parse the given time string to a Time object
          */
@@ -839,6 +857,26 @@ namespace pdfpc {
             var tm = Time.local( time_t() );
             tm.strptime( t + ":00", "%H:%M:%S" );
             return tm.mktime();
+        }
+        
+        /**
+         * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
+         * controllable's main view.  Also, return the XID for the view's window,
+         * useful for overlays.
+         */
+        public uint overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect) {
+            Controllable c = this.controllables.nth_data(n);
+            if (c == null) {
+                rect = Gdk.Rectangle();
+                return 0;
+            }
+            View.Pdf view = c.get_main_view();
+            if (view == null) {
+                rect = Gdk.Rectangle();
+                return 0;
+            }
+            rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
+            return (uint)Gdk.x11_drawable_get_xid(view.get_window());
         }
     }
 }

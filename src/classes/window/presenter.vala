@@ -141,11 +141,10 @@ namespace pdfpc.Window {
             base( screen_num );
 
             this.destroy.connect( (source) => {
-                Gtk.main_quit();
+                presentation_controller.quit();
             } );
 
             this.presentation_controller = presentation_controller;
-            this.presentation_controller.register_controllable( this );
             
             this.metadata = metadata;
 
@@ -173,6 +172,7 @@ namespace pdfpc.Window {
                 current_allocated_width,
                 (int)Math.floor(0.8*bottom_position),
                 Options.black_on_end,
+                true,
                 this.presentation_controller,
                 out current_scale_rect
             );
@@ -189,6 +189,7 @@ namespace pdfpc.Window {
                 next_allocated_width,
                 (int)Math.floor(0.7*bottom_position),
                 true,
+                false,
                 this.presentation_controller,
                 out next_scale_rect
             );
@@ -198,6 +199,7 @@ namespace pdfpc.Window {
                 (int)Math.floor(0.5*current_allocated_width),
                 (int)Math.floor(0.19*bottom_position) - 2,
                 true,
+                false,
                 this.presentation_controller,
                 out next_scale_rect
             );
@@ -206,6 +208,7 @@ namespace pdfpc.Window {
                 (int)Math.floor(0.5*current_allocated_width),
                 (int)Math.floor(0.19*bottom_position) - 2,
                 true,
+                false,
                 this.presentation_controller,
                 out next_scale_rect
             );
@@ -304,6 +307,7 @@ namespace pdfpc.Window {
             this.overview = new Overview( this.metadata, this.presentation_controller, this );
             this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
             this.presentation_controller.set_overview(this.overview);
+            this.presentation_controller.register_controllable( this );
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if ( !Options.disable_caching ) {               
@@ -625,6 +629,13 @@ namespace pdfpc.Window {
         public void prerender_finished() {
             this.prerender_progress.hide();
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
+        }
+
+        /**
+         * Only handle links and annotations on the current_view
+         */
+        public View.Pdf? get_main_view() {
+            return this.current_view as View.Pdf;
         }
     }
 }

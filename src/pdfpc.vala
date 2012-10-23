@@ -138,6 +138,7 @@ namespace pdfpc {
 
             Gdk.threads_init();
             Gtk.init( ref args );
+            Gst.init( ref args );
 
             string pdfFilename = this.parse_command_line_options( args );
             if (Options.list_actions) {
@@ -182,10 +183,10 @@ namespace pdfpc {
                 else
                     presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
                 presentation_monitor = (presenter_monitor + 1) % 2;
-                this.presentation_window = 
-                    this.create_presentation_window( metadata, presentation_monitor );
                 this.presenter_window = 
                     this.create_presenter_window( metadata, presenter_monitor );
+                this.presentation_window = 
+                    this.create_presentation_window( metadata, presentation_monitor );
             } else if (Options.windowed && !Options.single_screen) {
                 this.presenter_window =
                     this.create_presenter_window( metadata, -1 );

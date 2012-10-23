@@ -6,6 +6,11 @@ pkg_check_modules(POPPLER REQUIRED poppler-glib)
 pkg_check_modules(GTK REQUIRED gtk+-2.0)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
 pkg_check_modules(RSVG REQUIRED librsvg-2.0)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
+pkg_check_modules(GSTINTERFACES REQUIRED gstreamer-interfaces-0.10)
+pkg_check_modules(GSTVIDEO REQUIRED gstreamer-video-0.10)
+pkg_check_modules(GDKX11 REQUIRED gdk-x11-2.0)
+pkg_check_modules(GEE REQUIRED gee-1.0)
 
 set(CFLAGS
 	${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
@@ -15,6 +20,11 @@ set(CFLAGS
 	${GTK_CFLAGS} ${GTK_CFLAGS_OTHER}
 	${GTHREAD_CFLAGS} ${GTHREAD_CFLAGS_OTHER}
         ${RSVG_CFLAGS} ${RSVG_CFLAGS_OTHER}
+        ${GSTREAMER_CFLAGS} ${GSTREAMER_CFLAGS_OTHER}
+        ${GSTINTERFACES_CFLAGS} ${GSTINTERFACES_CFLAGS_OTHER}
+        ${GSTVIDEO_CFLAGS} ${GSTVIDEO_CFLAGS_OTHER}
+        ${GDKX11_CFLAGS} ${GDKX11_CFLAGS_OTHER}
+        ${GEE_CFLAGS} ${GEE_CFLAGS_OTHER}
 )
 add_definitions(${CFLAGS})
 
@@ -26,6 +36,11 @@ set(LIBS
 	${GTK_LIBRARIES}
 	${GTHREAD_LIBRARIES}
         ${RSVG_LIBRARIES}
+        ${GSTREAMER_LIBRARIES}
+        ${GSTINTERFACES_LIBRARIES}
+        ${GSTVIDEO_LIBRARIES}
+        ${GDKX11_LIBRARIES}
+        ${GEE_LIBRARIES}
 )
 link_libraries(${LIBS})
 
@@ -37,12 +52,21 @@ set(LIB_PATHS
 	${GTK_LIBRARY_DIRS}
 	${GTHREAD_LIBRARY_DIRS}
         ${RSVG_LIBRARY_DIRS}
+        ${GSTREAMER_LIBRARY_DIRS}
+        ${GSTINTERFACES_LIBRARY_DIRS}
+        ${GSTVIDEO_LIBRARY_DIRS}
+        ${GDKX11_LIBRARY_DIRS}
+        ${GEE_LIBRARY_DIRS}
 )
 link_directories(${LIB_PATHS})
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_SOURCE_DIR}/paths.vala)
 
 file (GLOB_RECURSE VALA_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.vala)
+# Vala 0.14 (and presumably lower) doesn't have Poppler.AnnotFileAttachment
+if(${VALA_VERSION} VERSION_LESS "0.16.0")
+	set(VALA_SRC ${VALA_SRC} poppler-annot-file-attachment.vapi)
+endif(${VALA_VERSION} VERSION_LESS "0.16.0")
 
 vala_precompile(VALA_C
 	${VALA_SRC}
@@ -53,6 +77,11 @@ PACKAGES
 	gtk+-2.0
 	posix
         librsvg-2.0
+        gstreamer-0.10
+        gstreamer-interfaces-0.10
+	gstreamer-video-0.10
+        gdk-x11-2.0
+        gee-1.0
 OPTIONS 
 	--thread
 	--debug

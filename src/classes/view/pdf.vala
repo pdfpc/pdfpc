@@ -36,13 +36,15 @@ namespace pdfpc {
         /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
-        public Pdf( Renderer.Pdf renderer, bool allow_black_on_end, PresentationController presentation_controller ) {
+        public Pdf( Renderer.Pdf renderer, bool allow_black_on_end, bool clickable_links,
+                    PresentationController presentation_controller ) {
             base( renderer );
 
-            // Enable the PDFLink Behaviour by default on PDF Views
-            this.associate_behaviour( 
-                new View.Behaviour.PdfLink.Implementation( presentation_controller )
-            );
+            if ( clickable_links )
+                // Enable the PDFLink Behaviour by default on PDF Views
+                this.associate_behaviour( 
+                    new View.Behaviour.PdfLink()
+                );
         }
 
         /**
@@ -54,7 +56,8 @@ namespace pdfpc {
          * aspect ration. The scale rectangle is provided in the scale_rect
          * argument.
          */
-        public static View.Pdf from_metadata( Metadata.Pdf metadata, int width, int height, bool allow_black_on_end,
+        public static View.Pdf from_metadata( Metadata.Pdf metadata, int width, int height,
+                                              bool allow_black_on_end, bool clickable_links,
                                               PresentationController presentation_controller,
                                               out Rectangle scale_rect = null ) {
             var scaler = new Scaler( 
@@ -68,7 +71,7 @@ namespace pdfpc {
                 scale_rect.height
             );
             
-            return new View.Pdf( renderer, allow_black_on_end, presentation_controller );
+            return new View.Pdf( renderer, allow_black_on_end, clickable_links, presentation_controller );
         }
 
         /**
@@ -76,6 +79,31 @@ namespace pdfpc {
          */
         public new Renderer.Pdf get_renderer() {
             return this.renderer as Renderer.Pdf;
+        }
+
+        /**
+         * Convert an arbitrary Poppler.Rectangle struct into a Gdk.Rectangle
+         * struct taking into account the measurement differences between pdf
+         * space and screen space.
+         */
+        public Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle( Poppler.Rectangle poppler_rectangle ) {
+            Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
+
+            Gtk.Requisition requisition;
+            this.size_request( out requisition );
+
+            // We need the page dimensions for coordinate conversion between
+            // pdf coordinates and screen coordinates
+            var metadata = this.get_renderer().get_metadata() as Metadata.Pdf;
+            gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / metadata.get_page_width() ) * requisition.width );
+            gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / metadata.get_page_width() ) * requisition.width );
+
+            // Gdk has its coordinate origin in the upper left, while Poppler
+            // has its origin in the lower left.
+            gdk_rectangle.y = (int)Math.ceil( ( ( metadata.get_page_height() - poppler_rectangle.y2 ) / metadata.get_page_height() ) * requisition.height );
+            gdk_rectangle.height = (int)Math.floor( ( ( poppler_rectangle.y2 - poppler_rectangle.y1 ) / metadata.get_page_height() ) * requisition.height );
+
+            return gdk_rectangle;
         }
     }
 }
