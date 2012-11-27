@@ -200,7 +200,7 @@ namespace pdfpc.Window {
                 metadata,
                 (int)Math.floor(0.5*current_allocated_width),
                 (int)Math.floor(0.19*bottom_position) - 2,
-                Metadata.Area.NOTES,
+                Metadata.Area.CONTENT,
                 true,
                 false,
                 this.presentation_controller,
