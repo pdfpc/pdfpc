@@ -36,6 +36,11 @@ namespace pdfpc {
         protected double scaling_factor;
 
         /**
+         * The area of the pdf which shall be displayed
+         */
+        protected Metadata.Area area;
+
+        /**
          * Cache store to be used
          */
         protected Renderer.Cache.Base cache = null;
@@ -49,8 +54,10 @@ namespace pdfpc {
          * pdf document the renderspace is filled up completely cutting of a
          * part of the pdf document.
          */
-        public Pdf( Metadata.Pdf metadata, int width, int height ) {
+        public Pdf( Metadata.Pdf metadata, int width, int height, Metadata.Area area ) {
             base( metadata, width, height );
+
+            this.area = area;
 
             // Calculate the scaling factor needed.
             this.scaling_factor = Math.fmax( 
@@ -79,7 +86,7 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public override Gdk.Pixmap render_to_pixmap( int slide_number ) 
+        public override Gdk.Pixmap render_to_pixmap( int slide_number )
             throws Renderer.RenderError {
             
             var metadata = this.metadata as Metadata.Pdf;
@@ -112,6 +119,7 @@ namespace pdfpc {
             cr.fill();
 
             cr.scale(this.scaling_factor, this.scaling_factor);
+            cr.translate(-metadata.get_horizontal_offset(this.area), -metadata.get_vertical_offset(this.area));
             MutexLocks.poppler.lock();
             page.render(cr);
             MutexLocks.poppler.unlock();

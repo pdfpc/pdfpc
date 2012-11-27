@@ -74,6 +74,7 @@ namespace pdfpc {
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
+            { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
             { null }
         };
 
@@ -162,7 +163,8 @@ namespace pdfpc {
 
             stdout.printf( "Initializing rendering...\n" );
 
-            var metadata = new Metadata.Pdf( pdfFilename );
+            pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
+            var metadata = new Metadata.Pdf( pdfFilename, notes_position );
             if ( Options.duration != 987654321u )
                 metadata.set_duration(Options.duration);
 

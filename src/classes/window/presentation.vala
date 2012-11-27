@@ -67,6 +67,7 @@ namespace pdfpc.Window {
                 metadata,
                 this.screen_geometry.width, 
                 this.screen_geometry.height,
+                Metadata.Area.CONTENT,
                 Options.black_on_end,
                 true,
                 this.presentation_controller,

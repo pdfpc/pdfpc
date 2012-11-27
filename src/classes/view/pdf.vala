@@ -57,6 +57,7 @@ namespace pdfpc {
          * argument.
          */
         public static View.Pdf from_metadata( Metadata.Pdf metadata, int width, int height,
+                                              Metadata.Area area,
                                               bool allow_black_on_end, bool clickable_links,
                                               PresentationController presentation_controller,
                                               out Rectangle scale_rect = null ) {
@@ -68,7 +69,8 @@ namespace pdfpc {
             var renderer = new Renderer.Pdf( 
                 metadata,
                 scale_rect.width,
-                scale_rect.height
+                scale_rect.height,
+                area
             );
             
             return new View.Pdf( renderer, allow_black_on_end, clickable_links, presentation_controller );

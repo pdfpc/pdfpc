@@ -40,12 +40,17 @@ namespace pdfpc.Metadata {
         /**
          * Pdf page width
          */
-        protected double page_width;
+        protected double original_page_width;
 
         /**
          * Pdf page height
          */
-        protected double page_height;
+        protected double original_page_height;
+
+        /**
+         * Indicates if pages contains also notes and there position (e. g. when using latex beamer)
+         */
+        protected NotesPosition notes_position;
 
         /**
          * Number of pages in the pdf document
@@ -287,8 +292,10 @@ namespace pdfpc.Metadata {
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf( string fname ) {
+        public Pdf( string fname, NotesPosition notes_position ) {
             base( fname );
+
+            this.notes_position = notes_position;
 
             fill_path_info(fname);
             notes = new slides_notes();
@@ -303,8 +310,8 @@ namespace pdfpc.Metadata {
             MutexLocks.poppler.lock();
             this.page_count = this.document.get_n_pages();
             this.document.get_page( 0 ).get_size( 
-                out this.page_width,
-                out this.page_height
+                out this.original_page_width,
+                out this.original_page_height
             );
     
             if (!skips_by_user) {
@@ -430,21 +437,83 @@ namespace pdfpc.Metadata {
         /**
          * Return the width of the first page of the loaded pdf document.
          *
+         * If slides contains also notes, this method returns the width of the content part only
+         *
          * In presentations all pages will have the same size in most cases,
          * therefore this value is assumed to be useful.
          */
         public double get_page_width() {
-            return this.page_width;
+            if (    this.notes_position == NotesPosition.LEFT
+                 || this.notes_position == NotesPosition.RIGHT) {
+                 return this.original_page_width / 2;
+            } else {
+                return this.original_page_width;
+            }
         }
 
         /**
          * Return the height of the first page of the loaded pdf document.
          *
+         * If slides contains also notes, this method returns the height of the content part only
+         *
          * In presentations all pages will have the same size in most cases,
          * therefore this value is assumed to be useful.
          */
         public double get_page_height() {
-            return this.page_height;
+            if (    this.notes_position == NotesPosition.TOP
+                 || this.notes_position == NotesPosition.BOTTOM) {
+                 return this.original_page_height / 2;
+            } else {
+                return this.original_page_height;
+            }
+        }
+
+        /**
+         * Return the horizontal offset of the given area on the page
+         */
+        public double get_horizontal_offset(Area area) {
+            switch (area) {
+                case Area.CONTENT:
+                    switch (this.notes_position) {
+                        case NotesPosition.LEFT:
+                            return this.original_page_width / 2;
+                        default:
+                            return 0;
+                    }
+                case Area.NOTES:
+                    switch (this.notes_position) {
+                        case NotesPosition.RIGHT:
+                            return this.original_page_width / 2;
+                        default:
+                            return 0;
+                    }
+                default:
+                    return 0;
+            }
+        }
+
+        /**
+         * Return the vertical offset of the given area on the page
+         */
+        public double get_vertical_offset(Area area) {
+            switch (area) {
+                case Area.CONTENT:
+                    switch (this.notes_position) {
+                        case NotesPosition.TOP:
+                            return this.original_page_height / 2;
+                        default:
+                            return 0;
+                    }
+                case Area.NOTES:
+                    switch (this.notes_position) {
+                        case NotesPosition.BOTTOM:
+                            return this.original_page_height / 2;
+                        default:
+                            return 0;
+                    }
+                default:
+                    return 0;
+            }
         }
 
         /**
@@ -550,6 +619,45 @@ namespace pdfpc.Metadata {
                 this.mapping_page_num = page_num;
             }
             return this.action_mapping;
+        }
+    }
+
+    /**
+     * Defines an area on a pdf page
+     */
+    public enum Area {
+        FULL,
+        CONTENT,
+        NOTES;
+    }
+
+    /**
+     * Indicates if a pdf has also notes on the pages (and there position)
+     */
+    public enum NotesPosition {
+        NONE,
+        TOP,
+        BOTTOM,
+        RIGHT,
+        LEFT;
+
+        public static NotesPosition from_string(string? position) {
+            if (position == null) {
+                return NONE;
+            }
+
+            switch (position.down()) {
+                case "left":
+                    return LEFT;
+                case "right":
+                    return RIGHT;
+                case "top":
+                    return TOP;
+                case "bottom":
+                    return BOTTOM;
+                default:
+                    return NONE;
+            }
         }
     }
 }

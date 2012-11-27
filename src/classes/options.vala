@@ -99,5 +99,10 @@ namespace pdfpc {
          * Show the actions supported in the config file(s)
          */
         public static bool list_actions = false;
+
+        /**
+         * Position of notes on slides
+         */
+        public static string? notes_position = null;
     }
 }
