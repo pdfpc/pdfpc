@@ -483,17 +483,18 @@ namespace pdfpc.Metadata {
             
             Poppler.Document document = null;
 
-            MutexLocks.poppler.lock();
             try {
+                MutexLocks.poppler.lock();
                 document = new Poppler.Document.from_file( 
                     file.get_uri(),
                     null
                 );
+            } catch( GLib.Error e ) {
+                GLib.printerr( "Unable to open pdf file: %s\n", e.message );
+                Posix.exit(1);
+            } finally {
+                MutexLocks.poppler.unlock();
             }
-            catch( GLib.Error e ) {
-                error( "Unable to open pdf file: %s", e.message );
-            }            
-            MutexLocks.poppler.unlock();
 
             return document;
         }
