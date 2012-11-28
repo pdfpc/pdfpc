@@ -71,6 +71,9 @@ Force to use only one screen
 .BI "\-L, \-\-list\-actions"
 List actions supported in the config file(s)
 .TP
+.BI "\-n, \-\-notes"=P
+Position of notes on the pdf page. Position can be either left, right, top or bottom (Default none)
+.TP
 .BI "\-h, \-\-help"
 Shows the help
 
