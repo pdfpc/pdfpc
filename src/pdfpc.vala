@@ -139,9 +139,11 @@ namespace pdfpc {
 
             Gdk.threads_init();
             Gtk.init( ref args );
-            Gst.init( ref args );
 
             string pdfFilename = this.parse_command_line_options( args );
+
+            Gst.init( ref args );
+
             if (Options.list_actions) {
 				stdout.printf("Config file commands accepted by pdfpc:\n");
 				string[] actions = PresentationController.getActionDescriptions();
