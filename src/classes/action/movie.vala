@@ -127,17 +127,24 @@ namespace pdfpc {
         
         /**
          * Create a new Movie from an annotation mapping, if the annotation is a
-         * screen annotation with a video file.  Various options to modify the
-         * behavior of the playback are not yet supported, since they're missing
-         * from poppler.
+         * screen annotation with a video file or a movie annotation.  Various
+         * options to modify the behavior of the playback are not yet supported,
+         * since they're missing from poppler.
          * 
-         * In LaTeX, create such annotations with
+         * In LaTeX, create screen annotations with
          *      \usepackage{movie15}
          *      \includemovie[text=<placeholder content>]{}{}{<movie file>}
          * The movie size is determined by the size of the placeholder content, so
          * a frame from the movie is a good choice.  Note that the poster, autoplay,
          * and repeat options are not yet supported.  (Also note that movie15 is
          * deprecated, but it works as long as you run ps2pdf with the -dNOSAFER flag.)
+         * 
+         * In LaTeX, create movie annotations with
+         *      \usepackage{multimedia}
+         *      \movie[<options>]{<placeholder content>}{<movie file>}
+         * The movie size is determined from the size of the placeholder content or
+         * the width and height options.  Note that the autostart, loop/repeat, and
+         * poster options are not yet supported.
          */
         public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
@@ -179,6 +186,18 @@ namespace pdfpc {
                     uri = filename_to_uri(file, controller.get_pdf_url());
                     temp = false;
                 }
+                break;
+            case Poppler.AnnotType.MOVIE:
+                var movie = ((Poppler.AnnotMovie) annot).get_movie();
+                if (movie.need_poster())
+                    warning("Movie requests poster.  Not yet supported.");
+                string file = movie.get_filename();
+                if (file == null) {
+                    warning("Movie has no file name");
+                    return null;
+                }
+                uri = filename_to_uri(file, controller.get_pdf_url());
+                temp = false;
                 break;
             default:
                 return null;
