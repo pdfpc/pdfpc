@@ -27,6 +27,23 @@ using pdfpc;
 
 namespace pdfpc {
     /**
+     * An error in constructing a gstreamer pipeline.
+     */
+    public errordomain PipelineError {
+        ElementConstruction,
+        Linking
+    }
+    /**
+     * Make a non-NULL gstreamer element, or raise an error.
+     */
+    public Element gst_element_make(string factoryname, string? name) throws PipelineError {
+        var element = ElementFactory.make(factoryname, name);
+        if (element == null)
+            throw new PipelineError.ElementConstruction(@"Could not make element $name of type $factoryname.");
+        return element;
+    }
+    
+    /**
      * A movie with basic controls -- click to start and stop.
      */
     public class Movie: ActionMapping {
@@ -425,21 +442,28 @@ namespace pdfpc {
             
             this.rect = rect;
             
-            var scale = ElementFactory.make("videoscale", "scale");
-            var rate = ElementFactory.make("videorate", "rate");
-            var adaptor1 = ElementFactory.make("ffmpegcolorspace", "adaptor1");
-            var adaptor2 = ElementFactory.make("ffmpegcolorspace", "adaptor2");
-            dynamic Element overlay = ElementFactory.make("cairooverlay", "overlay");
-            var caps = Caps.from_string(
-                "video/x-raw-rgb," + // Same as cairooverlay; hope to minimize transformations
-                "framerate=[25/1,2147483647/1]," + // At least 25 fps
-                @"width=$(rect.width),height=$(rect.height)"
-            );
-            dynamic Element filter = ElementFactory.make("capsfilter", "filter");
-            filter.caps = caps;
-            bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
-            if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
-                stderr.printf("Gstreamer error in linking pipeline\n");
+            dynamic Element overlay;
+            Element adaptor2;
+            try {
+                var scale = gst_element_make("videoscale", "scale");
+                var rate = gst_element_make("videorate", "rate");
+                var adaptor1 = gst_element_make("ffmpegcolorspace", "adaptor1");
+                adaptor2 = gst_element_make("ffmpegcolorspace", "adaptor2");
+                overlay = gst_element_make("cairooverlay", "overlay");
+                var caps = Caps.from_string(
+                    "video/x-raw-rgb," + // Same as cairooverlay; hope to minimize transformations
+                    "framerate=[25/1,2147483647/1]," + // At least 25 fps
+                    @"width=$(rect.width),height=$(rect.height)"
+                );
+                dynamic Element filter = gst_element_make("capsfilter", "filter");
+                filter.caps = caps;
+                bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
+                if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
+                    throw new PipelineError.Linking("Could not link pipeline.");
+            } catch (PipelineError err) {
+                warning(@"Error creating control pipeline: $(err.message)");
+                return source;
+            }
             
             overlay.draw.connect(this.on_draw);
             overlay.caps_changed.connect(this.on_prepare);
