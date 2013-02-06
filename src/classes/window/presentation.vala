@@ -46,6 +46,7 @@ namespace pdfpc.Window {
          */
         public Presentation( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
             base( screen_num );
+            this.role = "presentation";
 
             this.destroy.connect( (source) => {
                 presentation_controller.quit();

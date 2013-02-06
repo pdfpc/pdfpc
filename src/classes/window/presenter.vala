@@ -139,6 +139,7 @@ namespace pdfpc.Window {
          */
         public Presenter( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
             base( screen_num );
+            this.role = "presenter";
 
             this.destroy.connect( (source) => {
                 presentation_controller.quit();
