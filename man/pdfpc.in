@@ -1,7 +1,7 @@
-.TH  pdfpc "1" "Jun 2012" 
+.TH  pdfpc "1" "May 2013"
 
 .SH NAME
-pdfpc \- pdf presentater console with multi-monitor support
+pdfpc \- pdf presenter console with multi-monitor support
 
 .SH SYNOPSIS
 .B pdfpc
@@ -28,7 +28,7 @@ pdfpc file.pdf
 By default the presenter view appears in the primary monitor and the
 presentation view in the second monitor (provided you have two
 monitors).
-If you want to swith displays, start with the \-s option (see below).
+If you want to switch displays, start with the \-s option (see below).
 
 .SH OPTIONS
 .TP
@@ -149,29 +149,29 @@ below if you want to customize the keybindings.
 
 .SH FEATURES
 
-.SS Caching / Prerendering
+.SS Caching / Pre-rendering
 
 To allow fast changes between the different slides of the presentation the pdf
-pages are prerendered to memory.  The progress bar on the bottom of the
+pages are pre-rendered to memory.  The progress bar on the bottom of the
 presenter screen indicates how many percent of the slides have been
 pre-rendered already.  During the initial rendering phase this will slow down
 slide changes, as most cpu power is used for the rendering process in the
 background.  After the cache is fully primed however the changing of slides
 should be much faster, as with normal pdf viewers.
 
-As the prerendering takes a lot of memory it can be disabled using the
+As the pre-rendering takes a lot of memory it can be disabled using the
 \-\-disable\-cache switch at the cost of speed.
 .SS Cache compression
 
-The prerendered and cached slides can be compressed in memory to save up some
+The pre-rendered and cached slides can be compressed in memory to save up some
 memory.  Without compression a set of about 100 pdf pages can easily grow up to
 about 1.5gb size.  Netbooks with only 1gb of memory would swap themselves to
-death if prerendering is enabled in such a situation.  The compression is
+death if pre-rendering is enabled in such a situation.  The compression is
 enabled by default as it does not harm rendering speed in a noticeable way on
-most systems.  It does however slows down prerendering by about a factor of 2.
+most systems.  It does however slows down pre-rendering by about a factor of 2.
 If you have got enough memory and want to ensure the fastest possible
-prerendering you can disable slide compression by using the \-z switch. But be
-warned using the uncompressed prerendering storage will use about 30 times the
+pre-rendering you can disable slide compression by using the \-z switch. But be
+warned using the uncompressed pre-rendering storage will use about 30 times the
 memory the new compressed storage utilizes (aka the 1.5gb become about 50mb)
 
 .SS Timer
@@ -217,7 +217,7 @@ enumerations where the single items are displayed one after another or rough
 "animations", where parts of a picture change from slide to slide.  Pdf
 Presenter Console includes facilities for dealing with such overlays.
 
-In this description, we will differentiation between slides (i.e.  pages in the
+In this description, we will differentiate between slides (i.e.  pages in the
 pdf document) and "user slides", that are the logical slides.  The standard
 forward movement command (page down, enter, etc.) moves through one slide at a
 time, as expected.  That means that every step in the overlay is traversed.
@@ -330,9 +330,9 @@ A list of all possible functions can be obtained
 via the \-L command line option.
 
 Under
-.I http://davvil.github.com/pdfpc#configs 
+.I http://davvil.github.com/pdfpc#configs
 you can find some configuration files for commonly used devices
-(wireles presenters, bluetooth headesets, ...). If your device is not
+(wireless presenters, bluetooth headsets, ...). If your device is not
 yet supported and you generated a working config file, please
 contribute it (see contact information below).
 
@@ -380,5 +380,5 @@ Comments and suggestion are welcome. Write an email to
 .I davvil@gmail.com
 
 .SH SEE ALSO
-pdfpc is a fork of pdf-presenter console, available at
+pdfpc is a fork of Pdf Presenter Console, available at
 .I http://westhoffswelt.de/projects/pdf_presenter_console.html
