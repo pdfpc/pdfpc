@@ -213,14 +213,10 @@ namespace pdfpc.Metadata {
                               + format_end_user_slide()
                               + format_notes();
             try {
-                if ( contents != "" ) {
+                var pdfpc_file = File.new_for_uri(this.pdfpc_url);
+                if (contents != "" || pdfpc_file.query_exists()) {
                     contents = "[file]\n" + this.pdf_fname + "\n" + contents;
-                    var pdfpc_file = File.new_for_uri(this.pdfpc_url);
-                    FileUtils.set_contents(pdfpc_file.get_path(), contents, contents.length-1);
-                } else { // We do not need to write anything. Delete the file if it exists
-                    var file = File.new_for_uri(this.pdfpc_url);
-                    if (file.query_exists())
-                        file.delete();
+                    pdfpc_file.replace_contents(contents.data, null, false, FileCreateFlags.NONE, null);
                 }
             } catch (Error e) {
                 error("%s", e.message);
