@@ -59,6 +59,13 @@ namespace pdfpc {
         protected bool loop;
 
         /**
+         * Time, in second from the start of the movie, at which the playback
+         * should start and stop (stop = 0 means 'to the end').
+         */
+        protected int starttime;
+        protected int stoptime;
+
+        /**
          * If the movie was attached to the PDF file, we store it in a temporary
          * file, whose name we store here.  If not, this will be the blank string.
          */
@@ -80,13 +87,23 @@ namespace pdfpc {
          */
         public virtual void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, bool temp=false) {
+                string uri, bool autostart, bool loop, int start = 0, int stop = 0, bool temp=false) {
             other.init(area, controller, document);
             var movie = other as Movie;
             movie.loop = loop;
+            movie.starttime = start;
+            movie.stoptime = stop;
             movie.temp = temp ? uri.substring(7) : "";
             GLib.Idle.add( () => {
                 movie.establish_pipeline(uri);
+
+                // initial seek to set the starting point. *Cause the video to
+                // be displayed on the page*.
+                movie.pipeline.set_state(Gst.State.PAUSED);
+                // waits until the pipeline is actually in PAUSED mode
+                movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
+                movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, movie.starttime * Gst.SECOND);
+
                 if (autostart)
                     movie.play();
                 return false;
@@ -124,6 +141,16 @@ namespace pdfpc {
             var queryarray = querystring.split("&");
             var autostart = "autostart" in queryarray;
             var loop = "loop" in queryarray;
+            var start = 0;
+            var stop = 0;
+            foreach (string param in queryarray) {
+                if (param.has_prefix("start")) {
+                    start = int.parse(param.split("=")[1]);
+                }
+                if (param.has_prefix("stop")) {
+                    stop = int.parse(param.split("=")[1]);
+                }
+            }
 
             string uri = filename_to_uri(file, controller.get_pdf_url());
             bool uncertain;
@@ -133,7 +160,7 @@ namespace pdfpc {
 
             var type = Type.from_instance(this);
             var new_obj = GLib.Object.new(type) as ActionMapping;
-            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop);
+            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, start, stop);
             return new_obj;
         }
 
@@ -217,7 +244,7 @@ namespace pdfpc {
 
             var type = Type.from_instance(this);
             var new_obj = GLib.Object.new(type) as ActionMapping;
-            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, temp);
+            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, 0, 0, temp);
             return new_obj;
         }
 
@@ -300,9 +327,11 @@ namespace pdfpc {
         public virtual void play() {
             if (this.eos) {
                 this.eos = false;
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0);
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
             }
+
             this.pipeline.set_state(Gst.State.PLAYING);
+
         }
 
         /**
@@ -347,11 +376,10 @@ namespace pdfpc {
          */
         public virtual void on_eos(Gst.Bus bus, Gst.Message message) {
             if (this.loop) {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0);
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
             } else {
                 // Can't seek to beginning w/o updating output, so mark to seek later
                 this.eos = true;
-                this.pause();
             }
         }
 
@@ -426,8 +454,8 @@ namespace pdfpc {
          * Movie.init_other that attempts to justify this ugliness.
          */
         public override void init_other(ActionMapping other, Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop, bool temp=false) {
-            base.init_other(other, area, controller, document, file, autostart, loop, temp);
+                PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop, int start = 0, int stop = 0, bool temp=false) {
+            base.init_other(other, area, controller, document, file, autostart, loop, start, stop, temp);
             var movie = other as ControlledMovie;
             controller.main_view.motion_notify_event.connect(movie.on_motion);
             controller.main_view.button_release_event.connect(movie.on_button_release);
@@ -498,10 +526,35 @@ namespace pdfpc {
             cr.scale(this.scalex, -this.scaley);
 
             this.draw_seek_bar(cr, timestamp);
-        }
 
+            // if a stop time is defined, stop there (but still let
+            // the user manually seek *after* this timestamp)
+            if (this.stoptime != 0 && 
+                this.stoptime * Gst.SECOND < timestamp &&
+                timestamp < (this.stoptime + 0.2) * Gst.SECOND) {
+                if (this.loop) {
+                    this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                } else {
+                    // Can't seek to beginning w/o updating output, so mark to seek later
+                    this.eos = true;
+                    this.pause();
+                }
+            }
+
+        }
+        
         private void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
+            double start = 1.0*this.starttime*Gst.SECOND / this.duration;
+            double stop = 1.0*this.stoptime*Gst.SECOND / this.duration;
+
+            // special case: only starttime is defined
+            if (this.starttime != 0 && this.stoptime == 0) stop = 1.0;
+
+            var start_bar = start * rect.width;
+            var stop_bar = stop * rect.width;
+
             double fraction = 1.0*timestamp / this.duration;
+
             if (this.in_seek_bar || this.mouse_drag) {
                 var bar_end = fraction * (rect.width - 2*this.seek_bar_padding);
                 cr.rectangle(0, 0, rect.width, this.seek_bar_height);
@@ -511,7 +564,10 @@ namespace pdfpc {
                             bar_end, this.seek_bar_height-4);
                 cr.set_source_rgba(1,1,1,0.8);
                 cr.fill();
-
+                cr.rectangle(start_bar, 0, stop_bar - start_bar, this.seek_bar_height);
+                cr.set_source_rgba(0,1,0,0.5);
+                cr.fill();
+                
                 var time_in_sec = (int)(timestamp / Gst.SECOND);
                 var timestring = "%i:%02i".printf(time_in_sec/60, time_in_sec%60);
                 var dur_in_sec = (int)(this.duration / Gst.SECOND);
@@ -554,7 +610,10 @@ namespace pdfpc {
                 cr.rectangle(1, 1, fraction * (rect.width - 2), 2);
                 cr.set_source_rgba(1,1,1,0.8);
                 cr.fill();
-            }
+                cr.rectangle(start_bar, 0, stop_bar - start_bar, 4);
+                cr.set_source_rgba(1,1,1,0.5);
+                cr.fill();
+             }
         }
 
         /**
@@ -688,8 +747,13 @@ namespace pdfpc {
          * Start the refresh timeout when we pause.
          */
         public override void pause() {
-            base.pause();
-            this.start_refresh();
+
+            if (this.eos)
+                this.play();
+            else {
+                base.pause();
+                this.start_refresh();
+            }
         }
     }
 }
