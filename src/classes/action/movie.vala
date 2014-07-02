@@ -60,6 +60,11 @@ namespace pdfpc {
          */
         protected bool loop;
 
+         /**
+         * A flag to indicate whether the audio should be played or not.
+         */
+        protected bool noaudio = false;
+
         /**
          * Time, in second from the start of the movie, at which the playback
          * should start and stop (stop = 0 means 'to the end').
@@ -89,10 +94,11 @@ namespace pdfpc {
          */
         public virtual void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, int start = 0, int stop = 0, bool temp=false) {
+                string uri, bool autostart, bool loop, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
             other.init(area, controller, document);
             Movie movie = (Movie) other;
             movie.loop = loop;
+            movie.noaudio = noaudio;
             movie.starttime = start;
             movie.stoptime = stop;
             movie.temp = temp ? uri.substring(7) : "";
@@ -142,6 +148,7 @@ namespace pdfpc {
                 querystring = splitfile[1];
             string[] queryarray = querystring.split("&");
             bool autostart = "autostart" in queryarray;
+	    bool noaudio = "noaudio" in queryarray;
             bool loop = "loop" in queryarray;
             var start = 0;
             var stop = 0;
@@ -161,7 +168,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, start, stop);
+            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, noaudio, start, stop);
             return new_obj;
         }
 
@@ -247,7 +254,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, 0, 0, temp);
+            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, false, 0, 0, temp);
             return new_obj;
         }
 
@@ -285,6 +292,7 @@ namespace pdfpc {
             this.pipeline.set("uri", uri);
             this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
             this.pipeline.set("video_sink", bin);
+            this.pipeline.set("mute", this.noaudio);
             Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
             bus.message["error"] += this.on_message;
@@ -458,8 +466,8 @@ namespace pdfpc {
          */
         public override void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document, string file,
-                bool autostart, bool loop, int start = 0, int stop = 0, bool temp=false) {
-            base.init_other(other, area, controller, document, file, autostart, loop, start, stop, temp);
+                bool autostart, bool loop, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
+            base.init_other(other, area, controller, document, file, autostart, loop, noaudio, start, stop, temp);
             ControlledMovie movie = (ControlledMovie) other;
             controller.main_view.motion_notify_event.connect(movie.on_motion);
             controller.main_view.button_release_event.connect(movie.on_button_release);
