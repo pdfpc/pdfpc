@@ -71,6 +71,12 @@ Force to use only one screen
 .BI "\-L, \-\-list\-actions"
 List actions supported in the config file(s)
 .TP
+.BI "\-w, \-\-windowed"
+Run in windowed mode
+.TP
+.BI "\-Z, \-\-size"
+Size of the presenter console in width:height format (forces windowed mode)
+.TP
 .BI "\-n, \-\-notes"=P
 Position of notes on the pdf page. Position can be either left, right, top or bottom (Default none)
 .TP
@@ -371,12 +377,12 @@ a frame of the movie will ensure the correct aspect ratio.
 There may be a small memory leak in the program. I am trying to solve it. It
 should not be too important for up to some hundreds of slides.
 
-Other bugs can be reported at 
+Other bugs can be reported at
 .I https://github.com/davvil/pdfpc/issues
 
 .SH CONTACT
 .PP
-Comments and suggestion are welcome. Write an email to 
+Comments and suggestion are welcome. Write an email to
 .I davvil@gmail.com
 
 .SH SEE ALSO

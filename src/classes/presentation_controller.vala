@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -134,7 +134,7 @@ namespace pdfpc {
                 var uintHashFunc = Functions.get_hash_func_for(Type.from_name("uint"));
                 return uintHashFunc(a.keycode | a.modMask); // | is probable the best combinator, but for this small application it should suffice
             }
-            
+
             public static bool equal(void *_a, void *_b) {
                 KeyDef a = (KeyDef) _a;
                 KeyDef b = (KeyDef) _b;
@@ -162,18 +162,18 @@ namespace pdfpc {
             // Calculate the countdown to display until the presentation has to
             // start
             time_t start_time = 0;
-            if ( Options.start_time != null ) 
+            if ( Options.start_time != null )
             {
-                start_time = this.parseTime( 
-                    Options.start_time 
+                start_time = this.parseTime(
+                    Options.start_time
                 );
             }
             // The same again for end_time
             time_t end_time = 0;
-            if ( Options.end_time != null ) 
+            if ( Options.end_time != null )
             {
-                end_time = this.parseTime( 
-                    Options.end_time 
+                end_time = this.parseTime(
+                    Options.end_time
                 );
                 Options.duration = 0;
                 this.metadata.set_duration(0);
@@ -183,10 +183,10 @@ namespace pdfpc {
             this.timer.reset();
 
             this.n_slides = (int)metadata.get_slide_count();
-            
+
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
-            
+
             // The standard hash function for classes is to use the pointer, so we have to provide our own
             this.keyBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
             this.mouseBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
@@ -245,29 +245,29 @@ namespace pdfpc {
          */
         public static string[] getActionDescriptions() {
             return {"next", "Go to next slide",
-					"next10", "Jump 10 slides forward",
-					"nextOverlay", "Jump forward outside of current overlay",
-					"prev", "Go to previous slide",
-					"prev10", "Jump 10 slides back",
-					"prevOverlay", "Jump back outside of current overlay",
-					"goto", "Ask for a page to jump to",
-					"gotoFirst", "Jump to first slide",
-					"gotoLast", "Jump to last slide",
-					"overview", "Show the overview mode",
-					"histBack", "Go back in history",
-					"start", "Start the timer",
-					"pause", "Pause the timer",
-					"resetTimer", "Reset the timer",
-					"reset", "Reset the presentation",
-					"blank", "Blank presentation screen",
-					"freeze", "Toggle freeze presentation screen",
-					"freezeOn", "Freeze presentation screen if unfrozen",
-					"overlay", "Mark current slide as overlay slide",
-					"note", "Edit note for current slide",
-					"endSlide", "Set current slide as end slide",
-					"exitState", "Exit \"special\" state (pause, freeze, blank)",
-					"quit", "Exit pdfpc"
-			};
+                "next10", "Jump 10 slides forward",
+                "nextOverlay", "Jump forward outside of current overlay",
+                "prev", "Go to previous slide",
+                "prev10", "Jump 10 slides back",
+                "prevOverlay", "Jump back outside of current overlay",
+                "goto", "Ask for a page to jump to",
+                "gotoFirst", "Jump to first slide",
+                "gotoLast", "Jump to last slide",
+                "overview", "Show the overview mode",
+                "histBack", "Go back in history",
+                "start", "Start the timer",
+                "pause", "Pause the timer",
+                "resetTimer", "Reset the timer",
+                "reset", "Reset the presentation",
+                "blank", "Blank presentation screen",
+                "freeze", "Toggle freeze presentation screen",
+                "freezeOn", "Freeze presentation screen if unfrozen",
+                "overlay", "Mark current slide as overlay slide",
+                "note", "Edit note for current slide",
+                "endSlide", "Set current slide as end slide",
+                "exitState", "Exit \"special\" state (pause, freeze, blank)",
+                "quit", "Exit pdfpc"
+            };
         }
 
         /**
@@ -361,14 +361,14 @@ namespace pdfpc {
             if ( !this.ignore_mouse_events ) {
                 switch( scroll.direction ) {
                     case Gdk.ScrollDirection.UP: /* Scroll up */
-                    case Gdk.ScrollDirection.LEFT: /* Scroll left */ 
+                    case Gdk.ScrollDirection.LEFT: /* Scroll left */
                         if ( (scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
                             this.back10();
                         else
                             this.previous_page();
                     break;
                     case Gdk.ScrollDirection.DOWN: /* Scroll down */
-                    case Gdk.ScrollDirection.RIGHT: /* Scroll right */ 
+                    case Gdk.ScrollDirection.RIGHT: /* Scroll right */
                         if ( (scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
                             this.jump10();
                         else
@@ -377,14 +377,14 @@ namespace pdfpc {
                 }
             }
         }
-        
+
         /**
          * Get the PDF URL
          */
         public string? get_pdf_url() {
             return this.metadata.pdf_url;
         }
-        
+
         /**
          * Get the current (real) slide number
          */
@@ -398,7 +398,7 @@ namespace pdfpc {
         public int get_current_user_slide_number() {
             return current_user_slide_number;
         }
-    
+
         /**
          * Was the previous slide a skip one?
          */
@@ -437,7 +437,7 @@ namespace pdfpc {
         public int get_end_user_slide() {
             return this.metadata.get_end_user_slide();
         }
-    
+
         /**
          * Set the last slide as defined by the user
          */
@@ -493,7 +493,7 @@ namespace pdfpc {
         }
 
         /**
-         * Register a new Controllable instance on this controller. 
+         * Register a new Controllable instance on this controller.
          *
          * On success true is returned, in case the controllable has already been
          * registered false is returned.
@@ -508,7 +508,7 @@ namespace pdfpc {
             this.controllables.append( controllable );
             if (this.main_view == null)
                 this.main_view = controllable.get_main_view();
-            
+
             return true;
         }
 
@@ -662,7 +662,7 @@ namespace pdfpc {
             this.timer.start();
             if (this.current_user_slide_number != page_number - 1)
                 this.slide2history();
-            
+
             this.controllables_hide_overview();
             int destination = page_number-1;
             int n_user_slides = this.metadata.get_user_slide_count();
@@ -797,7 +797,7 @@ namespace pdfpc {
         public bool is_frozen() {
             return this.frozen;
         }
-        
+
         /**
          * Toggle skip for current slide
          */
@@ -821,7 +821,7 @@ namespace pdfpc {
             this.timer.start();
             this.controllables_update();
         }
-        
+
         /**
          * Pause the timer
          */
@@ -852,13 +852,13 @@ namespace pdfpc {
         /**
          * Parse the given time string to a Time object
          */
-        private time_t parseTime( string t ) 
+        private time_t parseTime( string t )
         {
             var tm = Time.local( time_t() );
             tm.strptime( t + ":00", "%H:%M:%S" );
             return tm.mktime();
         }
-        
+
         /**
          * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
          * controllable's main view.  Also, return the XID for the view's window,

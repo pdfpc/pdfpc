@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -60,7 +60,7 @@ namespace pdfpc {
             this.area = area;
 
             // Calculate the scaling factor needed.
-            this.scaling_factor = Math.fmax( 
+            this.scaling_factor = Math.fmax(
                 width / metadata.get_page_width(),
                 height / metadata.get_page_height()
             );
@@ -88,7 +88,7 @@ namespace pdfpc {
          */
         public override Gdk.Pixmap render_to_pixmap( int slide_number )
             throws Renderer.RenderError {
-            
+
             var metadata = this.metadata as Metadata.Pdf;
 
             // Check if a valid page is requested, before locking anything.
@@ -141,7 +141,7 @@ namespace pdfpc {
             cr.fill();
 
             cr.scale(this.scaling_factor, this.scaling_factor);
-            
+
             return pixmap;
         }
     }
