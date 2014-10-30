@@ -289,9 +289,7 @@ namespace pdfpc {
             this.pipeline.video_sink = bin;
             this.pipeline.mute = this.noaudio;
             var bus = this.pipeline.get_bus();
-            bus.add_signal_watch();
-            bus.message["error"] += this.on_message;
-            bus.message["eos"] += this.on_eos;
+            bus.add_watch(this.bus_callback);
         }
 
         /**
@@ -367,15 +365,33 @@ namespace pdfpc {
             else
                 this.play();
         }
+        
+        private bool bus_callback (Gst.Bus bus, Gst.Message message) {
+            switch (message.type) {
+                case Gst.MessageType.ERROR:
+                    GLib.Error err;
+                    string debug;
+                    message.parse_error (out err, out debug);
+                    stdout.printf ("Gstreamer error: %s\n", err.message);
+                    break;
+                case Gst.MessageType.EOS:
+                    this.on_eos(bus, message);
+                    break;
+                case Gst.MessageType.STATE_CHANGED:
+                    //Gst.State oldstate;
+                    //Gst.State newstate;
+                    //Gst.State pending;
+                    //message.parse_state_changed (out oldstate, out newstate,
+                    //        out pending);
+                    //stdout.printf ("state changed: %s->%s:%s (msg id:%" + uint32.FORMAT +")\n",
+                    //        oldstate.to_string (), newstate.to_string (),
+                    //        pending.to_string (), message.get_seqnum());
+                    break;
+                default:
+                    break;
+            }
 
-        /**
-         * Basic printout of error messages on the pipeline.
-         */
-        public virtual void on_message(Gst.Bus bus, Gst.Message message) {
-            GLib.Error err;
-            string debug;
-            message.parse_error(out err, out debug);
-            stderr.printf("Gstreamer error %s\n", err.message);
+            return true;
         }
 
         /**
