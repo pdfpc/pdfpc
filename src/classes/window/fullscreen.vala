@@ -53,7 +53,7 @@ namespace pdfpc.Window {
          */
         protected bool frozen = false;
 
-        public Fullscreen( int screen_num ) {
+        public Fullscreen( int screen_num, int width = -1, int height = -1 ) {
             Gdk.Screen screen;
 
             if ( screen_num >= 0 ) {
@@ -84,9 +84,15 @@ namespace pdfpc.Window {
                 this.configure_event.connect( this.on_configure );
             }
             else {
-                this.screen_geometry.width /= 2;
-                this.screen_geometry.height /= 2;
+                if (width > 0 && height > 0) {
+                        this.screen_geometry.width = width;
+                        this.screen_geometry.height = height;
+                } else {
+                        this.screen_geometry.width /= 2;
+                        this.screen_geometry.height /= 2;
+                }
                 this.resizable = false;
+
             }
 
             this.add_events(EventMask.POINTER_MOTION_MASK);

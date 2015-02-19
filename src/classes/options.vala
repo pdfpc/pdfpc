@@ -104,5 +104,10 @@ namespace pdfpc {
          * Position of notes on slides
          */
         public static string? notes_position = null;
+        
+        /**
+         * Size of the presenter window
+         */
+        public static string? size = null;
     }
 }

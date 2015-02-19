@@ -74,6 +74,7 @@ namespace pdfpc {
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
+            { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presenter console in width:height format (forces windowed mode)", null},
             { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
             { null }
         };
@@ -93,8 +94,8 @@ namespace pdfpc {
                 context.parse( ref args );
             }
             catch( OptionError e ) {
-                stderr.printf( "\n%s\n\n", e.message );
-                stderr.printf( "%s", context.get_help( true, null ) );
+                warning("\n%s\n\n", e.message);
+                warning("%s", context.get_help( true, null ));
                 Posix.exit( 1 );
             }
             if ( args.length < 2 ) {
@@ -120,8 +121,8 @@ namespace pdfpc {
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation_window( Metadata.Pdf metadata, int monitor ) {
-            var presentation_window = new Window.Presentation( metadata, monitor, this.controller );
+        private Window.Presentation create_presentation_window( Metadata.Pdf metadata, int monitor, int width = -1, int height = -1 ) {
+            var presentation_window = new Window.Presentation( metadata, monitor, this.controller, width, height );
             //controller.register_controllable( presentation_window );
             presentation_window.set_cache_observer( this.cache_status );
 
@@ -145,19 +146,38 @@ namespace pdfpc {
             Gst.init( ref args );
 
             if (Options.list_actions) {
-            stdout.printf("Config file commands accepted by pdfpc:\n");
-            string[] actions = PresentationController.getActionDescriptions();
-            for (int i = 0; i < actions.length; i+=2) {
-                string tabAlignment = "\t";
-                if (actions[i].length < 8)
-                    tabAlignment += "\t";
-                stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
-            }
+                stdout.printf("Config file commands accepted by pdfpc:\n");
+                string[] actions = PresentationController.getActionDescriptions();
+                for (int i = 0; i < actions.length; i+=2) {
+                    string tabAlignment = "\t";
+                    if (actions[i].length < 8)
+                        tabAlignment += "\t";
+                    stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+                }
                 return;
             }
             if (pdfFilename == null) {
-                stderr.printf( "Error: No pdf file given\n");
+                warning("Error: No pdf file given\n");
                 Posix.exit(1);
+            }
+
+            // parse size option
+            // should be in the width:height format
+
+            int width = -1, height = -1;
+            if (Options.size != null) {
+                int colonIndex = Options.size.index_of(":");
+
+                width = int.parse(Options.size.substring(0, colonIndex));
+                height = int.parse(Options.size.substring(colonIndex + 1));
+
+                if (width < 1 || height < 1) {
+                    warning("Error: Failed to parse size\n");
+                    Posix.exit(1);
+
+                }
+
+                Options.windowed = true;
             }
 
             // Initialize the application wide mutex objects
@@ -169,6 +189,7 @@ namespace pdfpc {
             var metadata = new Metadata.Pdf( pdfFilename, notes_position );
             if ( Options.duration != 987654321u )
                 metadata.set_duration(Options.duration);
+
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
@@ -190,19 +211,19 @@ namespace pdfpc {
                 this.presenter_window =
                     this.create_presenter_window( metadata, presenter_monitor );
                 this.presentation_window =
-                    this.create_presentation_window( metadata, presentation_monitor );
+                    this.create_presentation_window( metadata, presentation_monitor, width, height );
             } else if (Options.windowed && !Options.single_screen) {
                 this.presenter_window =
                     this.create_presenter_window( metadata, -1 );
                 this.presentation_window =
-                    this.create_presentation_window( metadata, -1 );
+                    this.create_presentation_window( metadata, -1, width, height );
             } else {
                     if ( !Options.display_switch)
                         this.presenter_window =
                             this.create_presenter_window( metadata, -1 );
                     else
                         this.presentation_window =
-                            this.create_presentation_window( metadata, -1 );
+                            this.create_presentation_window( metadata, -1, width, height );
             }
 
             // The windows are always displayed at last to be sure all caches have

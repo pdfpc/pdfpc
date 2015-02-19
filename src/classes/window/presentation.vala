@@ -44,8 +44,8 @@ namespace pdfpc.Window {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public Presentation( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
-            base( screen_num );
+        public Presentation( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller, int width = -1, int height = -1 ) {
+            base( screen_num, width, height );
             this.role = "presentation";
 
             this.destroy.connect( (source) => {
@@ -64,10 +64,18 @@ namespace pdfpc.Window {
 
             Rectangle scale_rect;
 
+            if (width < 0) {
+                width = this.screen_geometry.width;
+            }
+
+            if (height < 0) {
+                height = this.screen_geometry.height;
+            }
+
             this.view = View.Pdf.from_metadata(
                 metadata,
-                this.screen_geometry.width,
-                this.screen_geometry.height,
+                width,
+                height,
                 Metadata.Area.CONTENT,
                 Options.black_on_end,
                 true,
