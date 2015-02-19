@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -35,7 +35,7 @@ namespace pdfpc {
          * The currently displayed slide
          */
         protected int current_slide_number;
-        
+
         /**
          * The pixmap containing the currently shown slide
          */
@@ -67,7 +67,7 @@ namespace pdfpc {
 
            this.n_slides = (int)renderer.get_metadata().get_slide_count();
            this.slide_limit = this.n_slides + 1;
-        
+
            // Render the initial page on first realization.
            this.add_events( Gdk.EventMask.STRUCTURE_MASK );
            this.realize.connect( () => {
@@ -86,7 +86,7 @@ namespace pdfpc {
                 // impossible.
                 var caching_renderer = this.renderer as Renderer.Caching;
                 if ( caching_renderer != null
-                  && caching_renderer.get_cache() != null 
+                  && caching_renderer.get_cache() != null
                   && caching_renderer.get_cache().allows_prerendering()) {
                     this.register_prerendering();
                 }
@@ -107,7 +107,7 @@ namespace pdfpc {
             // The page_count will be transfered into the lamda function as
             // well.
             var page_count = this.get_renderer().get_metadata().get_slide_count();
-                
+
             this.prerendering_started();
 
             Idle.add(() => {
@@ -126,10 +126,10 @@ namespace pdfpc {
                 catch( Renderer.RenderError e ) {
                     error( "Could not render page '%i' while pre-rendering: %s", *i, e.message );
                 }
-                
+
                 // Inform possible observers about the cached slide
                 this.slide_prerendered();
-                
+
                 // Increment one slide for each call and stop the loop if we
                 // have reached the last slide
                 *i = *i + 1;
@@ -159,7 +159,7 @@ namespace pdfpc {
                 error( "Behaviour association failure: %s", e.message );
             }
         }
-        
+
         /**
          * Display a specific slide number
          *

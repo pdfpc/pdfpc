@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -67,14 +67,14 @@ namespace pdfpc.Renderer.Cache {
             // the return value of this function. If a new pixbuf is created by
             // the function directly it will have a refcount of 2 afterwards
             // and thereby will not be freed.
-            var pixbuf = new Pixbuf( 
+            var pixbuf = new Pixbuf(
                 Colorspace.RGB,
                 false,
                 8,
                 pixmap_width,
                 pixmap_height
             );
-            pixbuf_get_from_drawable( 
+            pixbuf_get_from_drawable(
                 pixbuf,
                 pixmap,
                 null,
@@ -86,14 +86,14 @@ namespace pdfpc.Renderer.Cache {
             uint8[] buffer;
 
             try {
-                pixbuf.save_to_buffer( out buffer, "png", "compression", "1", null );           
+                pixbuf.save_to_buffer( out buffer, "png", "compression", "1", null );
             }
             catch( Error e ) {
                 error( "Could not generate PNG cache image for slide %u: %s", index, e.message );
             }
 
             var item = new PNG.Item( buffer );
-            
+
             this.mutex.lock();
             this.storage[index] = item;
             this.mutex.unlock();
@@ -121,8 +121,8 @@ namespace pdfpc.Renderer.Cache {
 
             var pixbuf = loader.get_pixbuf();
 
-            var pixmap = new Gdk.Pixmap( 
-                null, 
+            var pixmap = new Gdk.Pixmap(
+                null,
                 pixbuf.get_width(),
                 pixbuf.get_height(),
                 24

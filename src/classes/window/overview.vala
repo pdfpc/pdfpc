@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -207,20 +207,20 @@ namespace pdfpc.Window {
         protected void fill_structure() {
             if (this.max_width == -1)
                 return;
-            
+
             this.slides_view.set_margin(0);
 
             var margin = this.slides_view.get_margin();
             var padding = this.slides_view.get_item_padding() + 1; // Additional mystery pixel
             var row_spacing = this.slides_view.get_row_spacing();
             var col_spacing = this.slides_view.get_column_spacing();
-            
+
             var eff_max_width = this.max_width - 2 * margin;
             var eff_max_height = this.max_height - 2 * margin;
             int cols = eff_max_width / (Options.min_overview_width + 2 * padding + col_spacing);
             int widthx, widthy, min_width, rows;
             int tc = 0;
-            
+
             // Search for the layout with the widest icons.  We do this by considering
             // layouts with different numbers of columns, and figuring the maximum
             // width for the icon so that all the icons fit both horizontally and
@@ -237,7 +237,7 @@ namespace pdfpc.Window {
                                                                 // doesn't increase height
                 if (widthy < Options.min_overview_width)
                     break;
-                
+
                 min_width = widthx < widthy ? widthx : widthy;
                 if (min_width >= this.target_width) {  // If two layouts give the same width
                     this.target_width = min_width;     // (which happens when they're limited
@@ -288,7 +288,7 @@ namespace pdfpc.Window {
             this.next_undone_preview = 0;
             this.idle_id = GLib.Idle.add(this._fill_previews);
         }
-        
+
         protected bool _fill_previews() {
             if (this.cache == null || this.next_undone_preview >= this.n_slides)
                 return false;
@@ -319,7 +319,7 @@ namespace pdfpc.Window {
             this.cache = cache;
             this.fill_previews();
         }
-        
+
         /**
          * Set the number of slides. If it is different to what we know, it
          * triggers a rebuilding of the widget.
@@ -373,7 +373,7 @@ namespace pdfpc.Window {
                     this.presentation_controller.goto_user_page(this.current_slide + 1);
                     break;
             }
-                    
+
             return handled;
         }
 
@@ -404,7 +404,7 @@ namespace pdfpc.Window {
      * Render a pixbuf that is slightly shaded, unless it is the selected one.
      */
     public class CellRendererHighlight: CellRendererPixbuf {
-        
+
         public override void render(Gdk.Window window, Widget widget,
                                     Rectangle background_area, Rectangle cell_area,
                                     Rectangle expose_area, CellRendererState flags) {
@@ -413,7 +413,7 @@ namespace pdfpc.Window {
                 var cr = Gdk.cairo_create(window);
                 Gdk.cairo_rectangle(cr, expose_area);
                 cr.clip();
-                
+
                 Gdk.cairo_rectangle(cr, cell_area);
                 cr.set_source_rgba(0,0,0,0.2);
                 cr.fill();
