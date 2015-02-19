@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -94,7 +94,7 @@ namespace pdfpc {
          * Start the timer
          */
         public virtual void start() {
-            if ( this.timeout != 0 && this.time < 0 ) { 
+            if ( this.timeout != 0 && this.time < 0 ) {
                 // We are in pretalk, with timeout already running.
                 // Jump to talk mode
                 this.time = 0;
@@ -161,7 +161,7 @@ namespace pdfpc {
          * Calculate and return the countdown time in (negative) seconds until
          * the talk begins.
          */
-        protected int calculate_countdown() 
+        protected int calculate_countdown()
         {
             time_t now = Time.local( time_t() ).mktime();
             return (int)( now - this.start_time );
@@ -190,8 +190,8 @@ namespace pdfpc {
             hours = timeInSecs / 60 / 60;
             minutes = timeInSecs / 60 % 60;
             seconds = timeInSecs % 60 % 60;
-            
-            this.set_text( 
+
+            this.set_text(
                 "%s%.2u:%.2u:%.2u".printf(
                     prefix,
                     hours,
@@ -221,7 +221,7 @@ namespace pdfpc {
          * Color.parse directly on it.
          */
         public Color last_minutes_color;
-        
+
         /**
          * Color used to represent negative number (time is over)
          *
@@ -256,8 +256,8 @@ namespace pdfpc {
             {
                 prefix = "-";
                 timeInSecs = -this.time;
-                this.modify_fg( 
-                    StateType.NORMAL, 
+                this.modify_fg(
+                    StateType.NORMAL,
                     this.pretalk_color
                 );
             } else {
@@ -265,23 +265,23 @@ namespace pdfpc {
                     timeInSecs = duration - this.time;
                     // Still on presentation time
                     if ( timeInSecs < this.last_minutes * 60 ) {
-                        this.modify_fg( 
-                            StateType.NORMAL, 
+                        this.modify_fg(
+                            StateType.NORMAL,
                             this.last_minutes_color
                         );
                     }
                     else {
-                        this.modify_fg( 
-                            StateType.NORMAL, 
+                        this.modify_fg(
+                            StateType.NORMAL,
                             this.normal_color
                         );
                     }
-                    
+
                 }
                 else {
                     // Time is over!
-                    this.modify_fg( 
-                        StateType.NORMAL, 
+                    this.modify_fg(
+                        StateType.NORMAL,
                         this.negative_color
                     );
                     timeInSecs = this.time - duration;
@@ -297,7 +297,7 @@ namespace pdfpc {
 
     public class EndTimeTimer : CountdownTimer {
 
-        protected time_t end_time;        
+        protected time_t end_time;
         protected Time end_time_object;
 
         public EndTimeTimer( time_t end_time, uint last_minutes, time_t start_time = 0 ) {
@@ -354,14 +354,14 @@ namespace pdfpc {
             {
                 prefix = "-";
                 timeInSecs = -this.time;
-                this.modify_fg( 
-                               StateType.NORMAL, 
+                this.modify_fg(
+                               StateType.NORMAL,
                                this.pretalk_color
                               );
             } else {
                 timeInSecs = this.time;
-                this.modify_fg( 
-                               StateType.NORMAL, 
+                this.modify_fg(
+                               StateType.NORMAL,
                                this.normal_color
                               );
             }

@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -42,7 +42,7 @@ namespace pdfpc {
 
             if ( clickable_links )
                 // Enable the PDFLink Behaviour by default on PDF Views
-                this.associate_behaviour( 
+                this.associate_behaviour(
                     new View.Behaviour.PdfLink()
                 );
         }
@@ -61,18 +61,18 @@ namespace pdfpc {
                                               bool allow_black_on_end, bool clickable_links,
                                               PresentationController presentation_controller,
                                               out Rectangle scale_rect = null ) {
-            var scaler = new Scaler( 
+            var scaler = new Scaler(
                 metadata.get_page_width(),
                 metadata.get_page_height()
             );
             scale_rect = scaler.scale_to( width, height );
-            var renderer = new Renderer.Pdf( 
+            var renderer = new Renderer.Pdf(
                 metadata,
                 scale_rect.width,
                 scale_rect.height,
                 area
             );
-            
+
             return new View.Pdf( renderer, allow_black_on_end, clickable_links, presentation_controller );
         }
 

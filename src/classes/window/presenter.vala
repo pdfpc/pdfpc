@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -146,7 +146,7 @@ namespace pdfpc.Window {
             } );
 
             this.presentation_controller = presentation_controller;
-            
+
             this.metadata = metadata;
 
             Color.parse( "black", out this.black );
@@ -165,10 +165,10 @@ namespace pdfpc.Window {
             // the screen, as we need a place to display the timer and slide
             // count.
             Rectangle current_scale_rect;
-            int current_allocated_width = (int)Math.floor( 
-                this.screen_geometry.width * Options.current_size / (double)100 
+            int current_allocated_width = (int)Math.floor(
+                this.screen_geometry.width * Options.current_size / (double)100
             );
-            this.current_view = View.Pdf.from_metadata( 
+            this.current_view = View.Pdf.from_metadata(
                 metadata,
                 current_allocated_width,
                 (int)Math.floor(0.8*bottom_position),
@@ -186,7 +186,7 @@ namespace pdfpc.Window {
             //current_allocated_width = cv_requisition.width;
             Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
-            this.next_view = View.Pdf.from_metadata( 
+            this.next_view = View.Pdf.from_metadata(
                 metadata,
                 next_allocated_width,
                 (int)Math.floor(0.7*bottom_position),
@@ -220,14 +220,14 @@ namespace pdfpc.Window {
 
             // TextView for notes in the slides
             var notes_font = Pango.FontDescription.from_string( "Verdana" );
-            notes_font.set_size( 
+            notes_font.set_size(
                 (int)Math.floor( 20 * 0.75 ) * Pango.SCALE
             );
             this.notes_view = new TextView();
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = WrapMode.WORD;
-            this.notes_view.modify_font(notes_font); 
+            this.notes_view.modify_font(notes_font);
             this.notes_view.modify_base(StateType.NORMAL, black);
             this.notes_view.modify_text(StateType.NORMAL, white);
             this.notes_view.buffer.text = "";
@@ -236,7 +236,7 @@ namespace pdfpc.Window {
             // Initial font needed for the labels
             // We approximate the point size using pt = px * .75
             var font = Pango.FontDescription.from_string( "Verdana" );
-            font.set_size( 
+            font.set_size(
                 (int)Math.floor( bottom_height * 0.8 * 0.75 ) * Pango.SCALE
             );
 
@@ -258,7 +258,7 @@ namespace pdfpc.Window {
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect( this.on_key_press_slide_progress );
             this.slide_progress.inner_border = new Border();
-    
+
             this.prerender_progress = new ProgressBar();
             this.prerender_progress.text = "Prerendering...";
             this.prerender_progress.modify_font( notes_font );
@@ -315,24 +315,24 @@ namespace pdfpc.Window {
             this.presentation_controller.register_controllable( this );
 
             // Enable the render caching if it hasn't been forcefully disabled.
-            if ( !Options.disable_caching ) {               
-                ((Renderer.Caching)this.current_view.get_renderer()).set_cache( 
-                    Renderer.Cache.OptionFactory.create( 
+            if ( !Options.disable_caching ) {
+                ((Renderer.Caching)this.current_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(
                         metadata
                     )
                 );
-                ((Renderer.Caching)this.next_view.get_renderer()).set_cache( 
-                    Renderer.Cache.OptionFactory.create( 
+                ((Renderer.Caching)this.next_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(
                         metadata
                     )
                 );
-                ((Renderer.Caching)this.strict_next_view.get_renderer()).set_cache( 
-                    Renderer.Cache.OptionFactory.create( 
+                ((Renderer.Caching)this.strict_next_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(
                         metadata
                     )
                 );
-                ((Renderer.Caching)this.strict_prev_view.get_renderer()).set_cache( 
-                    Renderer.Cache.OptionFactory.create( 
+                ((Renderer.Caching)this.strict_prev_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(
                         metadata
                     )
                 );
@@ -404,7 +404,7 @@ namespace pdfpc.Window {
             this.fullLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
             this.fullLayout.pack_start( this.slideViews, true, true, 0 );
             this.fullLayout.pack_end( bottomRow, false, false, 0 );
-            
+
             this.add( fullLayout );
 
             this.centered_overview = new Alignment(0.5f, 0.5f, 0, 0);
@@ -514,7 +514,7 @@ namespace pdfpc.Window {
         public void goto_page( int page_number ) {
             try {
                 this.current_view.display( page_number );
-                this.next_view.display( 
+                this.next_view.display(
                     page_number + 1
                 );
             }
@@ -584,7 +584,7 @@ namespace pdfpc.Window {
                 return false;
             }
         }
-        
+
         /**
          * Update the text of the current note
          */
@@ -608,7 +608,7 @@ namespace pdfpc.Window {
             this.slideViews.show();
         }
 
-        /** 
+        /**
          * Take a cache observer and register it with all prerendering Views
          * shown on the window.
          *
@@ -624,7 +624,7 @@ namespace pdfpc.Window {
             if( next_prerendering_view != null ) {
                 observer.monitor_view( next_prerendering_view );
             }
-            
+
             //observer.register_entry( this.slide_progress );
             //observer.register_update( this.prerender_progress.set_fraction, () => this.prerender_progress.hide() );
             observer.register_update( this.prerender_progress.set_fraction, this.prerender_finished );

@@ -4,17 +4,17 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -82,13 +82,13 @@ namespace pdfpc {
          * Parse the commandline and apply all found options to there according
          * static class members.
          *
-		 * Returns the name of the pdf file to open (or null if not present)
+         * Returns the name of the pdf file to open (or null if not present)
          */
         protected string? parse_command_line_options( ref unowned string[] args ) {
             var context = new OptionContext( "<pdf-file>" );
 
             context.add_main_entries( options, null );
-            
+
             try {
                 context.parse( ref args );
             }
@@ -98,10 +98,10 @@ namespace pdfpc {
                 Posix.exit( 1 );
             }
             if ( args.length < 2 ) {
-				return null;
+                return null;
             } else {
-				return args[1];
-			}
+                return args[1];
+            }
         }
 
         /**
@@ -145,20 +145,20 @@ namespace pdfpc {
             Gst.init( ref args );
 
             if (Options.list_actions) {
-				stdout.printf("Config file commands accepted by pdfpc:\n");
-				string[] actions = PresentationController.getActionDescriptions();
-				for (int i = 0; i < actions.length; i+=2) {
-					string tabAlignment = "\t";
-					if (actions[i].length < 8)
-						tabAlignment += "\t";
-					stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
-				}
+            stdout.printf("Config file commands accepted by pdfpc:\n");
+            string[] actions = PresentationController.getActionDescriptions();
+            for (int i = 0; i < actions.length; i+=2) {
+                string tabAlignment = "\t";
+                if (actions[i].length < 8)
+                    tabAlignment += "\t";
+                stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+            }
                 return;
             }
-			if (pdfFilename == null) {
-				stderr.printf( "Error: No pdf file given\n");
-				Posix.exit(1);
-			}
+            if (pdfFilename == null) {
+                stderr.printf( "Error: No pdf file given\n");
+                Posix.exit(1);
+            }
 
             // Initialize the application wide mutex objects
             MutexLocks.init();
@@ -187,9 +187,9 @@ namespace pdfpc {
                 else
                     presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
                 presentation_monitor = (presenter_monitor + 1) % 2;
-                this.presenter_window = 
+                this.presenter_window =
                     this.create_presenter_window( metadata, presenter_monitor );
-                this.presentation_window = 
+                this.presentation_window =
                     this.create_presentation_window( metadata, presentation_monitor );
             } else if (Options.windowed && !Options.single_screen) {
                 this.presenter_window =
@@ -211,7 +211,7 @@ namespace pdfpc {
                 this.presentation_window.show_all();
                 this.presentation_window.update();
             }
-            
+
             if ( this.presenter_window != null ) {
                 this.presenter_window.show_all();
                 this.presenter_window.update();
