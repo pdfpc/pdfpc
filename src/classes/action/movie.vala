@@ -180,7 +180,7 @@ namespace pdfpc {
                     string tmp_fn;
                     int fh;
                     try {
-                        fh = FileUtils.open_tmp(null, out tmp_fn);
+                        fh = FileUtils.open_tmp("pdfpc-XXXXXX", out tmp_fn);
                     } catch (FileError e) {
                         warning("Could not create temp file: %s", e.message);
                         return null;
@@ -283,7 +283,12 @@ namespace pdfpc {
          * Utility function for converting filenames to uris.
          */
         public string filename_to_uri(string file, string pdf_url) {
-            var uriRE = new Regex("^[a-z]*://");
+            Regex uriRE = null;
+            try {
+                uriRE = new Regex("^[a-z]*://");
+            } catch (Error error) {
+                // Won't happen
+            }
             if (uriRE.match(file))
                 return file;
             if (GLib.Path.is_absolute(file))
