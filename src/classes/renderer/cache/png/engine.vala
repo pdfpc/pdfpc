@@ -50,33 +50,11 @@ namespace pdfpc.Renderer.Cache {
         }
 
         /**
-         * Store a pixmap in the cache using the given index as identifier
+         * Store a surface in the cache using the given index as identifier
          */
-        public override void store( uint index, Gdk.Pixmap pixmap ) {
-            int pixmap_width, pixmap_height;
-            pixmap.get_size( out pixmap_width, out pixmap_height );
-
-            // The pixbuf has to be created before being handed over to the
-            // pixbuf_get_from_drawable, because Vala hightens the refcount of
-            // the return value of this function. If a new pixbuf is created by
-            // the function directly it will have a refcount of 2 afterwards
-            // and thereby will not be freed.
-            var pixbuf = new Gdk.Pixbuf(
-                Gdk.Colorspace.RGB,
-                false,
-                8,
-                pixmap_width,
-                pixmap_height
-            );
-            Gdk.pixbuf_get_from_drawable(
-                pixbuf,
-                pixmap,
-                null,
-                0, 0,
-                0, 0,
-                pixmap_width, pixmap_height
-            );
-
+        public override void store( uint index, Cairo.ImageSurface surface ) {
+            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
+                surface.get_height());
             uint8[] buffer;
 
             try {
@@ -94,11 +72,11 @@ namespace pdfpc.Renderer.Cache {
         }
 
         /**
-         * Retrieve a stored pixmap from the cache.
+         * Retrieve a stored surface from the cache.
          *
          * If no item with the given index is available null is returned
          */
-        public override Gdk.Pixmap? retrieve( uint index ) {
+        public override Cairo.ImageSurface? retrieve( uint index ) {
             var item = this.storage[index];
             if ( item == null ) {
                 return null;
@@ -114,25 +92,15 @@ namespace pdfpc.Renderer.Cache {
             }
 
             var pixbuf = loader.get_pixbuf();
-
-            var pixmap = new Gdk.Pixmap(
-                null,
-                pixbuf.get_width(),
-                pixbuf.get_height(),
-                24
-            );
-
-            Cairo.Context cr = Gdk.cairo_create( pixmap );
-            Gdk.cairo_set_source_pixbuf( cr, pixbuf, 0, 0 );
-            cr.rectangle(
-                0,
-                0,
-                pixbuf.get_width(),
-                pixbuf.get_height()
-            );
+            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.ARGB32,
+                pixbuf.get_width(), pixbuf.get_height());
+            Cairo.Context cr = new Cairo.Context(surface);
+            Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
             cr.fill();
 
-            return pixmap;
+            return surface;
         }
     }
 }
+

@@ -51,15 +51,15 @@ namespace pdfpc {
         }
 
         /**
-         * Store a pixmap in the cache using the given index as identifier
+         * Store a surface in the cache using the given index as identifier
          */
-        public abstract void store( uint index, Gdk.Pixmap pixmap );
+        public abstract void store( uint index, Cairo.ImageSurface surface );
 
         /**
-         * Retrieve a stored pixmap from the cache.
+         * Retrieve a stored surface from the cache.
          *
          * If no item with the given index is available null is returned
          */
-        public abstract Gdk.Pixmap? retrieve( uint index );
+        public abstract Cairo.ImageSurface? retrieve( uint index );
     }
 }

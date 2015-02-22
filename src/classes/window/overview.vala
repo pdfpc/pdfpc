@@ -291,12 +291,13 @@ namespace pdfpc.Window {
 
             // We get the dimensions from the first button and first slide,
             // should be the same for all
-            int pixmap_width, pixmap_height;
-            this.cache.retrieve(0).get_size(out pixmap_width, out pixmap_height);
-            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, pixmap_width, pixmap_height);
-            Gdk.pixbuf_get_from_drawable(pixbuf,
-                this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview)),
-                null, 0, 0, 0, 0, pixmap_width, pixmap_height);
+            int surface_width, surface_height;
+            var firstSlide = this.cache.retrieve(0);
+            surface_width = firstSlide.get_width();
+            surface_height = firstSlide.get_height();
+
+            var slideToFill = this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview));
+            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(slideToFill, 0, 0, surface_width, surface_height);
             var pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
                                                     Gdk.InterpType.BILINEAR);
 
@@ -401,15 +402,11 @@ namespace pdfpc.Window {
      */
     public class CellRendererHighlight: Gtk.CellRendererPixbuf {
 
-        public override void render(Gdk.Window window, Gtk.Widget widget,
+        public override void render(Cairo.Context cr, Gtk.Widget widget,
                                     Gdk.Rectangle background_area, Gdk.Rectangle cell_area,
-                                    Gdk.Rectangle expose_area, Gtk.CellRendererState flags) {
-            base.render(window, widget, background_area, cell_area, expose_area, flags);
+                                    Gtk.CellRendererState flags) {
+            base.render(cr, widget, background_area, cell_area, flags);
             if (flags != Gtk.CellRendererState.SELECTED) {
-                var cr = Gdk.cairo_create(window);
-                Gdk.cairo_rectangle(cr, expose_area);
-                cr.clip();
-
                 Gdk.cairo_rectangle(cr, cell_area);
                 cr.set_source_rgba(0,0,0,0.2);
                 cr.fill();

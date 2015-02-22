@@ -26,9 +26,9 @@ namespace pdfpc.Renderer.Cache {
      */
     public class Simple.Engine: Renderer.Cache.Base {
         /**
-         * In memory storage for all the given pixmaps
+         * In memory storage for all the given surfaces
          */
-        protected Gdk.Pixmap[] storage = null;
+        protected Cairo.ImageSurface[] storage = null;
 
         /**
          * Mutex used to limit access to storage array to one thread at a time.
@@ -44,16 +44,16 @@ namespace pdfpc.Renderer.Cache {
             base( metadata );
 
             this.mutex.lock();
-            this.storage = new Gdk.Pixmap[this.metadata.get_slide_count()];
+            this.storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
             this.mutex.unlock();
         }
 
         /**
-         * Store a pixmap in the cache using the given index as identifier
+         * Store a surface in the cache using the given index as identifier
          */
-        public override void store( uint index, Gdk.Pixmap pixmap ) {
+        public override void store( uint index, Cairo.ImageSurface surface ) {
             this.mutex.lock();
-            this.storage[index] = pixmap;
+            this.storage[index] = surface;
             this.mutex.unlock();
         }
 
@@ -62,7 +62,7 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Gdk.Pixmap? retrieve( uint index ) {
+        public override Cairo.ImageSurface? retrieve( uint index ) {
             return this.storage[index];
         }
     }

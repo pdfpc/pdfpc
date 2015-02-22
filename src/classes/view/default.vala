@@ -33,9 +33,9 @@ namespace pdfpc {
         protected int current_slide_number;
 
         /**
-         * The pixmap containing the currently shown slide
+         * The surface containing the currently shown slide
          */
-        protected Gdk.Pixmap current_slide;
+        protected Cairo.ImageSurface current_slide;
 
         /**
          * The number of slides in the presentation
@@ -117,7 +117,7 @@ namespace pdfpc {
                 // pixmap in the cache if it is enabled. This
                 // is exactly what we want.
                 try {
-                    this.get_renderer().render_to_pixmap( *i );
+                    this.get_renderer().render_to_surface( *i );
                 }
                 catch( Renderer.RenderError e ) {
                     error( "Could not render page '%i' while pre-rendering: %s", *i, e.message );
@@ -186,7 +186,7 @@ namespace pdfpc {
             // Render the requested slide
             // An exception is thrown here, if the slide can not be rendered.
             if (slide_number < this.n_slides)
-                this.current_slide = this.renderer.render_to_pixmap( slide_number );
+                this.current_slide = this.renderer.render_to_surface( slide_number );
             else
                 this.current_slide = this.renderer.fade_to_black();
             this.current_slide_number = slide_number;
@@ -225,19 +225,13 @@ namespace pdfpc {
          * The implementation does a simple blit from the internal pixmap to
          * the window surface.
          */
-        public override bool expose_event ( Gdk.EventExpose event ) {
-            Cairo.Context cr = Gdk.cairo_create( this.window );
-            Gdk.cairo_set_source_pixmap(
-                cr,
-                this.current_slide,
-                event.area.x,
-                event.area.y
-            );
+        public override bool draw ( Cairo.Context cr ) {
+            cr.set_source_surface(this.current_slide, 0, 0);
             cr.rectangle(
-                event.area.x,
-                event.area.y,
-                event.area.width,
-                event.area.height
+                0,
+                0,
+                this.current_slide.get_width(),
+                this.current_slide.get_height()
             );
             cr.fill();
 

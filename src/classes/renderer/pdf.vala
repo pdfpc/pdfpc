@@ -77,12 +77,12 @@ namespace pdfpc {
         }
 
         /**
-         * Render the given slide_number to a Gdk.Pixmap and return it.
+         * Render the given slide_number to a Cairo.ImageSurface and return it.
          *
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public override Gdk.Pixmap render_to_pixmap( int slide_number )
+        public override Cairo.ImageSurface render_to_surface( int slide_number )
             throws Renderer.RenderError {
 
             var metadata = this.metadata as Metadata.Pdf;
@@ -94,7 +94,7 @@ namespace pdfpc {
 
             // If caching is enabled check for the page in the cache
             if ( this.cache != null ) {
-                Gdk.Pixmap cache_content;
+                Cairo.ImageSurface cache_content;
                 if ( ( cache_content = this.cache.retrieve( slide_number ) ) != null ) {
                     return cache_content;
                 }
@@ -107,8 +107,8 @@ namespace pdfpc {
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
-            Gdk.Pixmap pixmap = new Gdk.Pixmap( null, this.width, this.height, 24 );
-            Cairo.Context cr = Gdk.cairo_create( pixmap );
+            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width, this.height);
+            Cairo.Context cr = new Cairo.Context(surface);
 
             cr.set_source_rgb( 255, 255, 255 );
             cr.rectangle( 0, 0, this.width, this.height );
@@ -122,15 +122,15 @@ namespace pdfpc {
 
             // If the cache is enabled store the newly rendered pixmap
             if ( this.cache != null ) {
-                this.cache.store( slide_number, pixmap );
+                this.cache.store( slide_number, surface );
             }
 
-            return pixmap;
+            return surface;
         }
 
-      public override Gdk.Pixmap fade_to_black() {
-            Gdk.Pixmap pixmap = new Gdk.Pixmap( null, this.width, this.height, 24 );
-            Cairo.Context cr = Gdk.cairo_create( pixmap );
+        public override Cairo.ImageSurface fade_to_black() {
+            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width, this.height);
+            Cairo.Context cr = new Cairo.Context(surface);
 
             cr.set_source_rgb( 0, 0, 0 );
             cr.rectangle( 0, 0, this.width, this.height );
@@ -138,7 +138,7 @@ namespace pdfpc {
 
             cr.scale(this.scaling_factor, this.scaling_factor);
 
-            return pixmap;
+            return surface;
         }
     }
 }

@@ -97,7 +97,7 @@ namespace pdfpc {
                 this.time = 0;
             } else if ( this.timeout == 0 ) {
                 // Start the timer if it is not running
-                this.timeout = Timeout.add( 1000, this.on_timeout );
+                this.timeout = GLib.Timeout.add( 1000, this.on_timeout );
             }
         }
 

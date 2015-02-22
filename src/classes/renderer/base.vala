@@ -73,19 +73,19 @@ namespace pdfpc {
         }
 
         /**
-         * Render the given slide_number to a Gdk.Pixmap and return it.
+         * Render the given slide_number to a Cairo.ImageSurface and return it.
          *
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
          */
-        public abstract Gdk.Pixmap render_to_pixmap( int slide_number )
+        public abstract Cairo.ImageSurface render_to_surface( int slide_number )
             throws RenderError;
 
         /**
          * Fill the display with black. Useful for last "slide" or for fading
          * to black at certain points in the presentation.
          */
-        public abstract Gdk.Pixmap fade_to_black();
+        public abstract Cairo.ImageSurface fade_to_black();
     }
 
     /**

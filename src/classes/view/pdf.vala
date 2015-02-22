@@ -89,7 +89,8 @@ namespace pdfpc {
             Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
 
             Gtk.Requisition requisition;
-            this.size_request( out requisition );
+            Gtk.Requisition min_requisition;
+            this.get_preferred_size( out min_requisition, out requisition);
 
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates

@@ -338,8 +338,10 @@ namespace pdfpc.Window {
 
         public override void show() {
             base.show();
-            this.overview.set_available_space(this.allocation.width,
-                                              (int)Math.floor(this.allocation.height * 0.9));
+            Gtk.Allocation allocation;
+            this.get_allocation(out allocation);
+            this.overview.set_available_space(allocation.width,
+                                              (int)Math.floor(allocation.height * 0.9));
         }
 
         protected void build_layout() {

@@ -114,8 +114,8 @@ namespace pdfpc.Window {
          * movement commands before the window has been displayed for the first
          * time.
          */
-        protected void on_size_allocate( Gtk.Widget source, Gdk.Rectangle r ) {
-            if ( this.is_mapped() ) {
+        protected void on_size_allocate( Gtk.Allocation allocation ) {
+            if ( this.get_mapped() ) {
                 // We are only interested to handle this event AFTER the window has
                 // been mapped.
 
@@ -152,7 +152,7 @@ namespace pdfpc.Window {
          */
         public bool on_mouse_move( Gtk.Widget source, Gdk.EventMotion event ) {
             // Restore the mouse cursor to its default value
-            this.window.set_cursor( null );
+            this.get_window().set_cursor( null );
 
             this.restart_hide_cursor_timer();
 
@@ -181,8 +181,8 @@ namespace pdfpc.Window {
             this.hide_cursor_timeout = 0;
 
             // Window might be null in case it has not been mapped
-            if ( this.window != null ) {
-                this.window.set_cursor(
+            if ( this.get_window() != null ) {
+                this.get_window().set_cursor(
                     new Gdk.Cursor(
                         Gdk.CursorType.BLANK_CURSOR
                     )
