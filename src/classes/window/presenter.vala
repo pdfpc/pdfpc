@@ -239,6 +239,7 @@ namespace pdfpc.Window {
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
+
             this.blank_icon = this.load_icon("blank.svg", icon_height);
             this.frozen_icon = this.load_icon("snow.svg", icon_height);
             this.pause_icon = this.load_icon("pause.svg", icon_height);
@@ -295,6 +296,15 @@ namespace pdfpc.Window {
         }
 
         protected Gtk.Image load_icon(string filename, int icon_height) {
+
+            // attempt to load from a local path (if the user hasn't installed)
+            // if that fails, attempt to load from the global path
+            string load_icon_path = source_path + "/icons/" + filename;
+            File icon_file = File.new_for_path(load_icon_path);
+            if (!icon_file.query_exists()) {
+                load_icon_path = icon_path + filename;
+            }
+
             Gtk.Image icon;
             try {
                 Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(icon_path + filename,

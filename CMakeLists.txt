@@ -8,6 +8,8 @@ include(${VALA_USE_FILE})
 
 set(SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/etc" CACHE FILEPATH "sysconfdir")
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(src)
 add_subdirectory(icons)
 add_subdirectory(man)
