@@ -20,9 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using Gtk;
-using Gdk;
-
 namespace pdfpc {
 
     /**
@@ -65,7 +62,7 @@ namespace pdfpc {
          * This property is public and not accesed using a setter to be able to use
          * Color.parse directly on it.
          */
-        public Color normal_color;
+        public Gdk.Color normal_color;
 
         /**
          * Color used for pre-talk timer rendering
@@ -73,7 +70,7 @@ namespace pdfpc {
          * This property is public and not accesed using a setter to be able to use
          * Color.parse directly on it.
          */
-        public Color pretalk_color;
+        public Gdk.Color pretalk_color;
 
         /**
          * Default constructor taking the initial time as argument, as well as
@@ -86,8 +83,8 @@ namespace pdfpc {
         public TimerLabel( time_t start_time = 0 ) {
             this.start_time = start_time;
 
-            Color.parse( "white", out this.normal_color );
-            Color.parse( "green", out this.pretalk_color );
+            Gdk.Color.parse( "white", out this.normal_color );
+            Gdk.Color.parse( "green", out this.pretalk_color );
         }
 
         /**
@@ -220,7 +217,7 @@ namespace pdfpc {
          * This property is public and not accesed using a setter to be able to use
          * Color.parse directly on it.
          */
-        public Color last_minutes_color;
+        public Gdk.Color last_minutes_color;
 
         /**
          * Color used to represent negative number (time is over)
@@ -228,15 +225,15 @@ namespace pdfpc {
          * This property is public and not accesed using a setter to be able to use
          * Color.parse directly on it.
          */
-        public Color negative_color;
+        public Gdk.Color negative_color;
 
         public CountdownTimer( int duration, uint last_minutes, time_t start_time = 0 ) {
             base(start_time);
             this.duration = duration;
             this.last_minutes = last_minutes;
 
-            Color.parse( "orange", out this.last_minutes_color );
-            Color.parse( "red", out this.negative_color );
+            Gdk.Color.parse( "orange", out this.last_minutes_color );
+            Gdk.Color.parse( "red", out this.negative_color );
         }
 
         /**
@@ -257,7 +254,7 @@ namespace pdfpc {
                 prefix = "-";
                 timeInSecs = -this.time;
                 this.modify_fg(
-                    StateType.NORMAL,
+                    Gtk.StateType.NORMAL,
                     this.pretalk_color
                 );
             } else {
@@ -266,13 +263,13 @@ namespace pdfpc {
                     // Still on presentation time
                     if ( timeInSecs < this.last_minutes * 60 ) {
                         this.modify_fg(
-                            StateType.NORMAL,
+                            Gtk.StateType.NORMAL,
                             this.last_minutes_color
                         );
                     }
                     else {
                         this.modify_fg(
-                            StateType.NORMAL,
+                            Gtk.StateType.NORMAL,
                             this.normal_color
                         );
                     }
@@ -281,7 +278,7 @@ namespace pdfpc {
                 else {
                     // Time is over!
                     this.modify_fg(
-                        StateType.NORMAL,
+                        Gtk.StateType.NORMAL,
                         this.negative_color
                     );
                     timeInSecs = this.time - duration;
@@ -355,13 +352,13 @@ namespace pdfpc {
                 prefix = "-";
                 timeInSecs = -this.time;
                 this.modify_fg(
-                               StateType.NORMAL,
+                               Gtk.StateType.NORMAL,
                                this.pretalk_color
                               );
             } else {
                 timeInSecs = this.time;
                 this.modify_fg(
-                               StateType.NORMAL,
+                               Gtk.StateType.NORMAL,
                                this.normal_color
                               );
             }

@@ -20,8 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-
 namespace pdfpc {
     /**
      * Renderer base class needed to be extended by every slide renderer.

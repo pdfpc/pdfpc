@@ -20,10 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Cairo;
-using Gdk;
-
 namespace pdfpc {
     /**
      * Basic view class which is usable with any renderer.
@@ -230,7 +226,7 @@ namespace pdfpc {
          * the window surface.
          */
         public override bool expose_event ( Gdk.EventExpose event ) {
-            Context cr = Gdk.cairo_create( this.window );
+            Cairo.Context cr = Gdk.cairo_create( this.window );
             Gdk.cairo_set_source_pixmap(
                 cr,
                 this.current_slide,

@@ -20,11 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using Gtk;
-using Gdk;
-
-using pdfpc;
-
 namespace pdfpc.Window {
     /**
      * Window showing the currently active and next slide.
@@ -63,9 +58,9 @@ namespace pdfpc.Window {
         /**
          * Slide progress label ( eg. "23/42" )
          */
-        protected Entry slide_progress;
+        protected Gtk.Entry slide_progress;
 
-        protected ProgressBar prerender_progress;
+        protected Gtk.ProgressBar prerender_progress;
 
         /**
          * Indication that the slide is blanked (faded to black)
@@ -85,12 +80,12 @@ namespace pdfpc.Window {
         /**
          * Text box for displaying notes for the slides
          */
-        protected TextView notes_view;
+        protected Gtk.TextView notes_view;
 
         /**
          * The views of the slides + notes
          */
-        protected HBox slideViews = null;
+        protected Gtk.HBox slideViews = null;
 
         /**
          * The overview of slides
@@ -101,7 +96,7 @@ namespace pdfpc.Window {
          * The container that shows the overview. This is the one that has to
          * be shown or hidden
          */
-        protected Alignment centered_overview = null;
+        protected Gtk.Alignment centered_overview = null;
 
         /**
          * There may be problems in some configurations if adding the overview
@@ -113,7 +108,7 @@ namespace pdfpc.Window {
          * We will also need to store the layout where we have to add the
          * overview (see the comment above)
          */
-        protected VBox fullLayout = null;
+        protected Gtk.VBox fullLayout = null;
 
         /**
          * Number of slides inside the presentation
@@ -131,8 +126,8 @@ namespace pdfpc.Window {
         /**
          * Useful colors
          */
-        protected Color black;
-        protected Color white;
+        protected Gdk.Color black;
+        protected Gdk.Color white;
 
         /**
          * Base constructor instantiating a new presenter window
@@ -149,10 +144,10 @@ namespace pdfpc.Window {
 
             this.metadata = metadata;
 
-            Color.parse( "black", out this.black );
-            Color.parse( "white", out this.white );
+            Gdk.Color.parse( "black", out this.black );
+            Gdk.Color.parse( "white", out this.white );
 
-            this.modify_bg( StateType.NORMAL, this.black );
+            this.modify_bg( Gtk.StateType.NORMAL, this.black );
 
             // We need the value of 90% height a lot of times. Therefore store it
             // in advance
@@ -164,7 +159,7 @@ namespace pdfpc.Window {
             // should use as a percentage value. The maximal height is 90% of
             // the screen, as we need a place to display the timer and slide
             // count.
-            Rectangle current_scale_rect;
+            Gdk.Rectangle current_scale_rect;
             int current_allocated_width = (int)Math.floor(
                 this.screen_geometry.width * Options.current_size / (double)100
             );
@@ -184,7 +179,7 @@ namespace pdfpc.Window {
             //Requisition cv_requisition;
             //this.current_view.size_request(out cv_requisition);
             //current_allocated_width = cv_requisition.width;
-            Rectangle next_scale_rect;
+            Gdk.Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_metadata(
                 metadata,
@@ -223,13 +218,13 @@ namespace pdfpc.Window {
             notes_font.set_size(
                 (int)Math.floor( 20 * 0.75 ) * Pango.SCALE
             );
-            this.notes_view = new TextView();
+            this.notes_view = new Gtk.TextView();
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
-            this.notes_view.wrap_mode = WrapMode.WORD;
+            this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
             this.notes_view.modify_font(notes_font);
-            this.notes_view.modify_base(StateType.NORMAL, black);
-            this.notes_view.modify_text(StateType.NORMAL, white);
+            this.notes_view.modify_base(Gtk.StateType.NORMAL, black);
+            this.notes_view.modify_text(Gtk.StateType.NORMAL, white);
             this.notes_view.buffer.text = "";
             this.notes_view.key_press_event.connect( this.on_key_press_notes_view );
 
@@ -243,29 +238,29 @@ namespace pdfpc.Window {
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
             this.timer = this.presentation_controller.getTimer();
-            this.timer.set_justify( Justification.CENTER );
+            this.timer.set_justify( Gtk.Justification.CENTER );
             this.timer.modify_font( font );
 
 
             // The slide counter is centered in the 90% bottom part of the screen
             // It takes 1/4 of the available width on the right
-            this.slide_progress = new Entry();
+            this.slide_progress = new Gtk.Entry();
             this.slide_progress.set_alignment(1f);
-            this.slide_progress.modify_base(StateType.NORMAL, this.black);
-            this.slide_progress.modify_text(StateType.NORMAL, this.white);
+            this.slide_progress.modify_base(Gtk.StateType.NORMAL, this.black);
+            this.slide_progress.modify_text(Gtk.StateType.NORMAL, this.white);
             this.slide_progress.modify_font( font );
             this.slide_progress.editable = false;
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect( this.on_key_press_slide_progress );
-            this.slide_progress.inner_border = new Border();
+            this.slide_progress.inner_border = new Gtk.Border();
 
-            this.prerender_progress = new ProgressBar();
+            this.prerender_progress = new Gtk.ProgressBar();
             this.prerender_progress.text = "Prerendering...";
             this.prerender_progress.modify_font( notes_font );
-            this.prerender_progress.modify_bg( StateType.NORMAL, this.black );
-            this.prerender_progress.modify_bg( StateType.PRELIGHT, this.white );
-            this.prerender_progress.modify_fg( StateType.NORMAL, this.white );
-            this.prerender_progress.modify_fg( StateType.PRELIGHT, this.black );
+            this.prerender_progress.modify_bg( Gtk.StateType.NORMAL, this.black );
+            this.prerender_progress.modify_bg( Gtk.StateType.PRELIGHT, this.white );
+            this.prerender_progress.modify_fg( Gtk.StateType.NORMAL, this.white );
+            this.prerender_progress.modify_fg( Gtk.StateType.PRELIGHT, this.black );
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
@@ -298,9 +293,9 @@ namespace pdfpc.Window {
                 this.pause_icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
             }
 
-            this.add_events(EventMask.KEY_PRESS_MASK);
-            this.add_events(EventMask.BUTTON_PRESS_MASK);
-            this.add_events(EventMask.SCROLL_MASK);
+            this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
+            this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
+            this.add_events(Gdk.EventMask.SCROLL_MASK);
 
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
@@ -348,50 +343,50 @@ namespace pdfpc.Window {
         }
 
         protected void build_layout() {
-            this.slideViews = new HBox(false, 4);
+            this.slideViews = new Gtk.HBox(false, 4);
 
-            var strict_views = new HBox(false, 0);
+            var strict_views = new Gtk.HBox(false, 0);
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
-            var center_current_view = new Alignment(0.5f, 0.5f, 0, 0);
+            var center_current_view = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
             center_current_view.add(this.current_view);
 
-            var current_view_and_stricts = new VBox(false, 2);
+            var current_view_and_stricts = new Gtk.VBox(false, 2);
             current_view_and_stricts.pack_start(center_current_view, false, false, 2);
             current_view_and_stricts.pack_start(strict_views, false, false, 2);
 
 
             this.slideViews.add( current_view_and_stricts );
 
-            var nextViewWithNotes = new VBox(false, 0);
-            var center_next_view = new Alignment(0.5f, 0.5f, 0, 0);
+            var nextViewWithNotes = new Gtk.VBox(false, 0);
+            var center_next_view = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
             center_next_view.add(this.next_view);
             nextViewWithNotes.pack_start( center_next_view, false, false, 0 );
-            var notes_sw = new ScrolledWindow(null, null);
-            Scrollbar notes_scrollbar = (Gtk.Scrollbar) notes_sw.get_vscrollbar();
-            notes_scrollbar.modify_bg(StateType.NORMAL, white);
-            notes_scrollbar.modify_bg(StateType.ACTIVE, black);
-            notes_scrollbar.modify_bg(StateType.PRELIGHT, white);
+            var notes_sw = new Gtk.ScrolledWindow(null, null);
+            Gtk.Scrollbar notes_scrollbar = (Gtk.Scrollbar) notes_sw.get_vscrollbar();
+            notes_scrollbar.modify_bg(Gtk.StateType.NORMAL, white);
+            notes_scrollbar.modify_bg(Gtk.StateType.ACTIVE, black);
+            notes_scrollbar.modify_bg(Gtk.StateType.PRELIGHT, white);
             notes_sw.add( this.notes_view );
-            notes_sw.set_policy( PolicyType.AUTOMATIC, PolicyType.AUTOMATIC );
+            notes_sw.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC );
             nextViewWithNotes.pack_start( notes_sw, true, true, 5 );
             this.slideViews.add(nextViewWithNotes);
 
-            var bottomRow = new HBox(true, 0);
+            var bottomRow = new Gtk.HBox(true, 0);
 
-            var status = new HBox(false, 2);
+            var status = new Gtk.HBox(false, 2);
             //blank_label_alignment.add( this.blank_label );
             status.pack_start( this.blank_icon, false, false, 0 );
             status.pack_start( this.frozen_icon, false, false, 0 );
             status.pack_start( this.pause_icon, false, false, 0 );
 
-            var timer_alignment = new Alignment(0.5f, 0.5f, 0, 0);
+            var timer_alignment = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
             timer_alignment.add( this.timer );
 
-            var progress_alignment = new HBox(false, 0);
+            var progress_alignment = new Gtk.HBox(false, 0);
             progress_alignment.pack_end(this.slide_progress);
-            var prerender_alignment = new Alignment(0, 0.5f, 1, 0);
+            var prerender_alignment = new Gtk.Alignment(0, 0.5f, 1, 0);
             prerender_alignment.add(this.prerender_progress);
             progress_alignment.pack_start(prerender_alignment);
 
@@ -400,14 +395,14 @@ namespace pdfpc.Window {
             bottomRow.pack_end( progress_alignment, true, true, 0);
 
             //var fullLayout = new VBox(false, 0);
-            this.fullLayout = new VBox(false, 0);
+            this.fullLayout = new Gtk.VBox(false, 0);
             this.fullLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
             this.fullLayout.pack_start( this.slideViews, true, true, 0 );
             this.fullLayout.pack_end( bottomRow, false, false, 0 );
 
             this.add( fullLayout );
 
-            this.centered_overview = new Alignment(0.5f, 0.5f, 0, 0);
+            this.centered_overview = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
             this.centered_overview.add(this.overview);
         }
 
@@ -415,7 +410,7 @@ namespace pdfpc.Window {
          * Handle keypress events on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( Gtk.Widget source, EventKey key ) {
+        protected bool on_key_pressed( Gtk.Widget source, Gdk.EventKey key ) {
             if ( this.presentation_controller != null ) {
                 return this.presentation_controller.key_press( key );
             } else {
@@ -428,7 +423,7 @@ namespace pdfpc.Window {
          * Handle mouse button events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_button_press( Gtk.Widget source, EventButton button ) {
+        protected bool on_button_press( Gtk.Widget source, Gdk.EventButton button ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
             }
@@ -439,7 +434,7 @@ namespace pdfpc.Window {
          * Handle mouse scrolling events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_scroll( Gtk.Widget source, EventScroll scroll ) {
+        protected bool on_scroll( Gtk.Widget source, Gdk.EventScroll scroll ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.scroll( scroll );
             }
@@ -542,7 +537,7 @@ namespace pdfpc.Window {
         /**
          * Handle key events for the slide_progress entry field
          */
-        protected bool on_key_press_slide_progress( Gtk.Widget source, EventKey key ) {
+        protected bool on_key_press_slide_progress( Gtk.Widget source, Gdk.EventKey key ) {
             if ( key.keyval == 0xff0d ) {
                 // Try to parse the input
                string input_text = this.slide_progress.text;
@@ -573,7 +568,7 @@ namespace pdfpc.Window {
         /**
          * Handle key presses when editing a note
          */
-        protected bool on_key_press_notes_view( Gtk.Widget source, EventKey key ) {
+        protected bool on_key_press_notes_view( Gtk.Widget source, Gdk.EventKey key ) {
             if ( key.keyval == 0xff1b) { /* Escape */
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;

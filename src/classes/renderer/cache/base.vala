@@ -20,9 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Gdk;
-
 namespace pdfpc {
     /**
      * Base Cache store interface which needs to be implemented by every
@@ -56,13 +53,13 @@ namespace pdfpc {
         /**
          * Store a pixmap in the cache using the given index as identifier
          */
-        public abstract void store( uint index, Pixmap pixmap );
+        public abstract void store( uint index, Gdk.Pixmap pixmap );
 
         /**
          * Retrieve a stored pixmap from the cache.
          *
          * If no item with the given index is available null is returned
          */
-        public abstract Pixmap? retrieve( uint index );
+        public abstract Gdk.Pixmap? retrieve( uint index );
     }
 }

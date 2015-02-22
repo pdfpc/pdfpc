@@ -20,10 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using Gtk;
-using Gdk;
-using Cairo;
-
 namespace pdfpc {
     /**
      * Interface for showing the fill status of all registered pdf image caches

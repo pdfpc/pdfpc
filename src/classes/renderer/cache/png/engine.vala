@@ -20,12 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Gdk;
-using Cairo;
-
-using pdfpc;
-
 namespace pdfpc.Renderer.Cache {
     /**
      * Cache store which holds all given items in memory as compressed png
@@ -58,7 +52,7 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Store a pixmap in the cache using the given index as identifier
          */
-        public override void store( uint index, Pixmap pixmap ) {
+        public override void store( uint index, Gdk.Pixmap pixmap ) {
             int pixmap_width, pixmap_height;
             pixmap.get_size( out pixmap_width, out pixmap_height );
 
@@ -67,14 +61,14 @@ namespace pdfpc.Renderer.Cache {
             // the return value of this function. If a new pixbuf is created by
             // the function directly it will have a refcount of 2 afterwards
             // and thereby will not be freed.
-            var pixbuf = new Pixbuf(
-                Colorspace.RGB,
+            var pixbuf = new Gdk.Pixbuf(
+                Gdk.Colorspace.RGB,
                 false,
                 8,
                 pixmap_width,
                 pixmap_height
             );
-            pixbuf_get_from_drawable(
+            Gdk.pixbuf_get_from_drawable(
                 pixbuf,
                 pixmap,
                 null,
@@ -104,13 +98,13 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Pixmap? retrieve( uint index ) {
+        public override Gdk.Pixmap? retrieve( uint index ) {
             var item = this.storage[index];
             if ( item == null ) {
                 return null;
             }
 
-            var loader = new PixbufLoader();
+            var loader = new Gdk.PixbufLoader();
             try {
                 loader.write( item.get_png_data() );
                 loader.close();
@@ -128,7 +122,7 @@ namespace pdfpc.Renderer.Cache {
                 24
             );
 
-            Context cr = Gdk.cairo_create( pixmap );
+            Cairo.Context cr = Gdk.cairo_create( pixmap );
             Gdk.cairo_set_source_pixbuf( cr, pixbuf, 0, 0 );
             cr.rectangle(
                 0,
