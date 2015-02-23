@@ -101,9 +101,7 @@ namespace pdfpc {
             }
 
             // Retrieve the Poppler.Page for the page to render
-            MutexLocks.poppler.lock();
             var page = metadata.get_document().get_page( slide_number );
-            MutexLocks.poppler.unlock();
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
@@ -116,9 +114,7 @@ namespace pdfpc {
 
             cr.scale(this.scaling_factor, this.scaling_factor);
             cr.translate(-metadata.get_horizontal_offset(this.area), -metadata.get_vertical_offset(this.area));
-            MutexLocks.poppler.lock();
             page.render(cr);
-            MutexLocks.poppler.unlock();
 
             // If the cache is enabled store the newly rendered pixmap
             if ( this.cache != null ) {

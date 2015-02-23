@@ -32,21 +32,11 @@ namespace pdfpc.Renderer.Cache {
         protected PNG.Item[] storage = null;
 
         /**
-         * Mutex used to limit access to storage array to one thread at a time.
-         *
-         * Unfortunately the vala lock statement does not work here.
-         */
-        protected Mutex mutex = new Mutex();
-
-        /**
          * Initialize the cache store
          */
         public Engine( Metadata.Base metadata ) {
             base( metadata );
-
-            this.mutex.lock();
             this.storage = new PNG.Item[this.metadata.get_slide_count()];
-            this.mutex.unlock();
         }
 
         /**
@@ -65,10 +55,7 @@ namespace pdfpc.Renderer.Cache {
             }
 
             var item = new PNG.Item( buffer );
-
-            this.mutex.lock();
             this.storage[index] = item;
-            this.mutex.unlock();
         }
 
         /**

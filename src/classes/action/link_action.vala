@@ -70,10 +70,8 @@ namespace pdfpc {
                 return false;
 
             unowned Poppler.ActionGotoDest* action = (Poppler.ActionGotoDest*)this.action;
-            MutexLocks.poppler.lock();
             Poppler.Dest destination;
             destination = this.document.find_dest(action.dest.named_dest);
-            MutexLocks.poppler.unlock();
 
             this.controller.page_change_request((int)(destination.page_num - 1));
             return true;
