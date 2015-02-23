@@ -49,10 +49,6 @@ namespace pdfpc.Window {
 
             this.presentation_controller = presentation_controller;
 
-            Gdk.Color black;
-            Gdk.Color.parse( "black", out black );
-            this.modify_bg( Gtk.StateType.NORMAL, black );
-
             var fixedLayout = new Gtk.Fixed();
             fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
             this.add( fixedLayout );

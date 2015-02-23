@@ -124,12 +124,6 @@ namespace pdfpc.Window {
         protected Metadata.Pdf metadata;
 
         /**
-         * Useful colors
-         */
-        protected Gdk.Color black;
-        protected Gdk.Color white;
-
-        /**
          * Base constructor instantiating a new presenter window
          */
         public Presenter( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
@@ -143,11 +137,6 @@ namespace pdfpc.Window {
             this.presentation_controller = presentation_controller;
 
             this.metadata = metadata;
-
-            Gdk.Color.parse( "black", out this.black );
-            Gdk.Color.parse( "white", out this.white );
-
-            this.modify_bg( Gtk.StateType.NORMAL, this.black );
 
             // We need the value of 90% height a lot of times. Therefore store it
             // in advance
@@ -223,8 +212,6 @@ namespace pdfpc.Window {
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
             this.notes_view.modify_font(notes_font);
-            this.notes_view.modify_base(Gtk.StateType.NORMAL, black);
-            this.notes_view.modify_text(Gtk.StateType.NORMAL, white);
             this.notes_view.buffer.text = "";
             this.notes_view.key_press_event.connect( this.on_key_press_notes_view );
 
@@ -246,21 +233,16 @@ namespace pdfpc.Window {
             // It takes 1/4 of the available width on the right
             this.slide_progress = new Gtk.Entry();
             this.slide_progress.set_alignment(1f);
-            this.slide_progress.modify_base(Gtk.StateType.NORMAL, this.black);
-            this.slide_progress.modify_text(Gtk.StateType.NORMAL, this.white);
             this.slide_progress.modify_font( font );
-            this.slide_progress.editable = false;
+            this.slide_progress.sensitive = false;
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect( this.on_key_press_slide_progress );
             this.slide_progress.inner_border = new Gtk.Border();
 
             this.prerender_progress = new Gtk.ProgressBar();
+            this.prerender_progress.show_text = true;
             this.prerender_progress.text = "Prerendering...";
             this.prerender_progress.modify_font( notes_font );
-            this.prerender_progress.modify_bg( Gtk.StateType.NORMAL, this.black );
-            this.prerender_progress.modify_bg( Gtk.StateType.PRELIGHT, this.white );
-            this.prerender_progress.modify_fg( Gtk.StateType.NORMAL, this.white );
-            this.prerender_progress.modify_fg( Gtk.StateType.PRELIGHT, this.black );
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
@@ -366,10 +348,6 @@ namespace pdfpc.Window {
             center_next_view.add(this.next_view);
             nextViewWithNotes.pack_start( center_next_view, false, false, 0 );
             var notes_sw = new Gtk.ScrolledWindow(null, null);
-            Gtk.Scrollbar notes_scrollbar = (Gtk.Scrollbar) notes_sw.get_vscrollbar();
-            notes_scrollbar.modify_bg(Gtk.StateType.NORMAL, white);
-            notes_scrollbar.modify_bg(Gtk.StateType.ACTIVE, black);
-            notes_scrollbar.modify_bg(Gtk.StateType.PRELIGHT, white);
             notes_sw.add( this.notes_view );
             notes_sw.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC );
             nextViewWithNotes.pack_start( notes_sw, true, true, 5 );
@@ -529,8 +507,7 @@ namespace pdfpc.Window {
          */
         public void ask_goto_page() {
            this.slide_progress.set_text("/%u".printf(this.presentation_controller.get_user_n_slides()));
-           this.slide_progress.modify_cursor(white, null);
-           this.slide_progress.editable = true;
+           this.slide_progress.sensitive = true;
            this.slide_progress.grab_focus();
            this.slide_progress.set_position(0);
            this.presentation_controller.set_ignore_input_events( true );
@@ -544,8 +521,7 @@ namespace pdfpc.Window {
                 // Try to parse the input
                string input_text = this.slide_progress.text;
                int destination = int.parse(input_text.substring(0, input_text.index_of("/")));
-               this.slide_progress.modify_cursor(black, null);
-               this.slide_progress.editable = false;
+               this.slide_progress.sensitive = false;
                this.presentation_controller.set_ignore_input_events( false );
                if ( destination != 0 )
                   this.presentation_controller.goto_user_page(destination);
