@@ -104,6 +104,46 @@ namespace pdfpc {
         }
 
         /**
+         * Set the CSS styling for GTK.
+         */
+        private void set_styling() {
+            Gtk.CssProvider provider = new Gtk.CssProvider();
+            Gtk.StyleContext.add_provider_for_screen(Gdk.Display.get_default().get_default_screen(),
+                provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            string css = """
+                * {
+                    background-color: black;
+                    background-image: none;
+                    color: white;
+                }
+                /* .slider and .trough are parts of scrollbar */
+                .slider, .progressbar {
+                    border: none;
+                    background-color: white;
+                    color: black;
+                }
+                .trough {
+                    border: none;
+                }
+                pdfpcTimerLabel.pretalk {
+                    color: green;
+                }
+                pdfpcTimerLabel.last-minutes {
+                    color: orange;
+                }
+                pdfpcTimerLabel.overtime {
+                    color: red;
+                }
+            """;
+
+            try {
+                provider.load_from_data(css, -1);
+            } catch (Error error) {
+                warning("Could not load styling from data: %s", error.message);
+            }
+        }
+
+        /**
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
@@ -197,6 +237,8 @@ namespace pdfpc {
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
             configFileReader.readConfig(etc_path + "/pdfpcrc");
             configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
+            
+            set_styling();
 
             var screen = Gdk.Screen.get_default();
             if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
