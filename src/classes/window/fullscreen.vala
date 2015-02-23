@@ -59,9 +59,9 @@ namespace pdfpc.Window {
                 screen.get_monitor_geometry( screen_num, out this.screen_geometry );
             } else {
                 // Start in the monitor the cursor is in
-                var display = Gdk.Display.get_default();
+                var display = Gdk.Display.get_default().get_device_manager().get_client_pointer();
                 int pointerx, pointery;
-                display.get_pointer(out screen, out pointerx, out pointery, null);
+                display.get_position(out screen, out pointerx, out pointery);
                 int current_screen = screen.get_monitor_at_point(pointerx, pointery);
                 screen.get_monitor_geometry( current_screen, out this.screen_geometry );
             }
