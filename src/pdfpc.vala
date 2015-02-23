@@ -176,7 +176,6 @@ namespace pdfpc {
                            + "(C) 2012 David Vilar\n"
                            + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
-            Gdk.threads_init();
             Gtk.init( ref args );
 
             string pdfFilename = this.parse_command_line_options( ref args );
@@ -217,9 +216,6 @@ namespace pdfpc {
 
                 Options.windowed = true;
             }
-
-            // Initialize the application wide mutex objects
-            MutexLocks.init();
 
             stdout.printf( "Initializing rendering...\n" );
 
@@ -280,9 +276,7 @@ namespace pdfpc {
 
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
-            Gdk.threads_enter();
             Gtk.main();
-            Gdk.threads_leave();
         }
 
         /**

@@ -31,30 +31,18 @@ namespace pdfpc.Renderer.Cache {
         protected Cairo.ImageSurface[] storage = null;
 
         /**
-         * Mutex used to limit access to storage array to one thread at a time.
-         *
-         * Unfortunately the vala lock statement does not work here.
-         */
-        protected Mutex mutex = new Mutex();
-
-        /**
          * Initialize the cache store
          */
         public Engine( Metadata.Base metadata ) {
             base( metadata );
-
-            this.mutex.lock();
             this.storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
-            this.mutex.unlock();
         }
 
         /**
          * Store a surface in the cache using the given index as identifier
          */
         public override void store( uint index, Cairo.ImageSurface surface ) {
-            this.mutex.lock();
             this.storage[index] = surface;
-            this.mutex.unlock();
         }
 
         /**
