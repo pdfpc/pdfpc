@@ -37,24 +37,14 @@ namespace pdfpc {
         protected int max_value = 0;
 
         /**
-         * The function for updating the display with the current progress
+         * The signal for updating the display with the current progress
          */
-        public delegate void UpdateFunction(double progress);
-        UpdateFunction? update_function = null;
+        public signal void update_progress(double progress);
 
         /**
-         * The function to notify that we are finished
+         * The signal to notify that we are finished
          */
-        public delegate void UpdateComplete();
-        UpdateComplete? update_complete = null;
-
-        /**
-         * Register the functions for updating
-         */
-        public void register_update(UpdateFunction update, UpdateComplete complete) {
-            this.update_function = update;
-            this.update_complete = complete;
-        }
+        public signal void update_complete();
 
         /**
          * Draw the current state to the widgets surface
@@ -62,11 +52,9 @@ namespace pdfpc {
         public void update() {
             // Only draw if the widget is actually added to some parent
             if (this.current_value == this.max_value) {
-                if (update_complete != null)
-                    update_complete();
+                update_complete();
             } else {
-                if (update_function != null)
-                    update_function((double)this.current_value / this.max_value);
+                update_progress((double)this.current_value / this.max_value);
             }
         }
 

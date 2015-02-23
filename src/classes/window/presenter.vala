@@ -597,9 +597,8 @@ namespace pdfpc.Window {
                 observer.monitor_view( next_prerendering_view );
             }
 
-            //observer.register_entry( this.slide_progress );
-            //observer.register_update( this.prerender_progress.set_fraction, () => this.prerender_progress.hide() );
-            observer.register_update( this.prerender_progress.set_fraction, this.prerender_finished );
+            observer.update_progress.connect(this.prerender_progress.set_fraction);
+            observer.update_complete.connect(this.prerender_finished);
             this.prerender_progress.show();
         }
 
