@@ -111,21 +111,9 @@ namespace pdfpc {
          */
         protected TimerLabel timer;
 
-        /**
-         * The key bindings as a map from keycodes to actions
-         *
-         * Vala doesn't allow for delegates as the values in a HashMap (yet?). See
-         * http://stackoverflow.com/questions/6145635/gee-hashmap-containing-methods-as-values
-         * for this solution.
-         */
-        protected class KeyAction {
-            public delegate void KeyActionDelegate();
-            public KeyActionDelegate d;
-            public KeyAction(KeyActionDelegate d) {
-                this.d = d;
-            }
-        }
-        protected Gee.HashMap<string, KeyAction> actionNames;
+        protected delegate void callback();
+        protected SimpleActionGroup action_group = new SimpleActionGroup();
+
         protected class KeyDef : GLib.Object, Gee.Hashable<KeyDef> {
             public uint keycode { get; set; }
             public uint modMask { get; set; }
@@ -144,8 +132,9 @@ namespace pdfpc {
                 return this.keycode == other.keycode && this.modMask == other.modMask;
             }
         }
-        protected Gee.HashMap<KeyDef, KeyAction> keyBindings;
-        protected Gee.HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
+        protected Gee.HashMap<KeyDef, Action> keyBindings = new Gee.HashMap<KeyDef, Action>();
+        // We abuse the KeyDef structure
+        protected Gee.HashMap<KeyDef, Action> mouseBindings = new Gee.HashMap<KeyDef, Action>();
 
         /*
          * "Main" view of current slide
@@ -184,12 +173,7 @@ namespace pdfpc {
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
 
-            // The standard hash function for classes is to use the pointer, so we have to provide our own
-            this.keyBindings = new Gee.HashMap<KeyDef, KeyAction>();
-            //this.keyBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
-            this.mouseBindings = new Gee.HashMap<KeyDef, KeyAction>();
-            //this.mouseBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
-            this.fillActionNames();
+            this.add_actions();
         }
 
         /*
@@ -204,36 +188,44 @@ namespace pdfpc {
             this.overview = o;
         }
 
-        protected void fillActionNames() {
-            this.actionNames = new Gee.HashMap<string, KeyAction>();
-            this.actionNames.set("next", new KeyAction(this.next_page));
-            this.actionNames.set("next10", new KeyAction(this.jump10));
-            this.actionNames.set("nextOverlay", new KeyAction(this.next_user_page));
-            this.actionNames.set("prev", new KeyAction(this.previous_page));
-            this.actionNames.set("prev10", new KeyAction(this.back10));
-            this.actionNames.set("prevOverlay", new KeyAction(this.previous_user_page));
+        protected void add_actions() {
+            add_action("next", this.next_page);
+            add_action("next10", this.jump10);
+            add_action("nextOverlay", this.next_user_page);
+            add_action("prev", this.previous_page);
+            add_action("prev10", this.back10);
+            add_action("prevOverlay", this.previous_user_page);
 
-            this.actionNames.set("goto", new KeyAction(this.controllables_ask_goto_page));
-            this.actionNames.set("gotoFirst", new KeyAction(this.goto_first));
-            this.actionNames.set("gotoLast", new KeyAction(this.goto_last));
-            this.actionNames.set("overview", new KeyAction(this.toggle_overview));
-            this.actionNames.set("histBack", new KeyAction(this.history_back));
+            add_action("goto", this.controllables_ask_goto_page);
+            add_action("gotoFirst", this.goto_first);
+            add_action("gotoLast", this.goto_last);
+            add_action("overview", this.toggle_overview);
+            add_action("histBack", this.history_back);
 
-            this.actionNames.set("start", new KeyAction(this.start));
-            this.actionNames.set("pause", new KeyAction(this.toggle_pause));
-            this.actionNames.set("resetTimer", new KeyAction(this.reset_timer));
-            this.actionNames.set("reset", new KeyAction(this.controllables_reset));
+            add_action("start", this.start);
+            add_action("pause", this.toggle_pause);
+            add_action("resetTimer", this.reset_timer);
+            add_action("reset", this.controllables_reset);
 
-            this.actionNames.set("blank", new KeyAction(this.fade_to_black));
-            this.actionNames.set("freeze", new KeyAction(this.toggle_freeze));
-            this.actionNames.set("freezeOn", new KeyAction(() => {if (!this.frozen) this.toggle_freeze();}));
+            add_action("blank", this.fade_to_black);
+            add_action("freeze", this.toggle_freeze);
+            add_action("freezeOn", () => {
+                if (!this.frozen)
+                    this.toggle_freeze();
+                });
 
-            this.actionNames.set("overlay", new KeyAction(this.toggle_skip));
-            this.actionNames.set("note", new KeyAction(this.controllables_edit_note));
-            this.actionNames.set("endSlide", new KeyAction(this.set_end_user_slide));
+            add_action("overlay", this.toggle_skip);
+            add_action("note", this.controllables_edit_note);
+            add_action("endSlide", this.set_end_user_slide);
 
-            this.actionNames.set("exitState", new KeyAction(this.exit_state));
-            this.actionNames.set("quit", new KeyAction(this.quit));
+            add_action("exitState", this.exit_state);
+            add_action("quit", this.quit);
+        }
+
+        protected void add_action(string name, callback func) {
+            SimpleAction action = new SimpleAction(name, null);
+            action.activate.connect(() => func());  // Trying to connect func directly causes error.
+            this.action_group.add_action(action);
         }
 
         /**
@@ -272,11 +264,12 @@ namespace pdfpc {
         /**
          * Bind the (user-defined) keys
          */
-        public void bind(uint keycode, uint modMask, string function) {
-            if (this.actionNames.has_key(function))
-                this.keyBindings.set(new KeyDef(keycode, modMask), this.actionNames[function]);
+        public void bind(uint keycode, uint modMask, string action_name) {
+            Action? action = this.action_group.lookup_action(action_name);
+            if (action != null)
+                this.keyBindings.set(new KeyDef(keycode, modMask), action);
             else
-                warning("Unknown function %s", function);
+                warning("Unknown action %s", action_name);
         }
 
         /**
@@ -296,11 +289,12 @@ namespace pdfpc {
         /**
          * Bind the (user-defined) keys
          */
-        public void bindMouse(uint button, uint modMask, string function) {
-            if (this.actionNames.has_key(function))
-                this.mouseBindings.set(new KeyDef(button, modMask), this.actionNames[function]);
+        public void bindMouse(uint button, uint modMask, string action_name) {
+            Action? action = this.action_group.lookup_action(action_name);
+            if (action != null)
+                this.mouseBindings.set(new KeyDef(button, modMask), action);
             else
-                warning("Unknown function %s", function);
+                warning("Unknown action %s", action_name);
         }
 
         /**
@@ -330,7 +324,7 @@ namespace pdfpc {
                 var action = this.keyBindings.get(new KeyDef(key.keyval,
                     key.state & this.accepted_key_mods));
                 if (action != null)
-                    action.d();
+                    action.activate(null);
                 return true;
             } else {
                 return false;
@@ -347,7 +341,7 @@ namespace pdfpc {
                 var action = this.mouseBindings.get(new KeyDef(button.button,
                     button.state & this.accepted_key_mods));
                 if (action != null)
-                    action.d();
+                    action.activate(null);
                 return true;
             } else {
                 return false;
