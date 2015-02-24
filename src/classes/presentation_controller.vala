@@ -24,7 +24,7 @@ namespace pdfpc {
     /**
      * Controller handling all the triggered events/signals
      */
-    public class PresentationController: Object {
+    public class PresentationController : Object {
 
         /**
          * The currently displayed slide
@@ -146,7 +146,7 @@ namespace pdfpc {
         /**
          * Instantiate a new controller
          */
-        public PresentationController( Metadata.Pdf metadata, bool allow_black_on_end ) {
+        public PresentationController(Metadata.Pdf metadata, bool allow_black_on_end) {
             this.metadata = metadata;
             this.metadata.controller = this;
             this.black_on_end = allow_black_on_end;
@@ -156,27 +156,21 @@ namespace pdfpc {
             // Calculate the countdown to display until the presentation has to
             // start
             time_t start_time = 0;
-            if ( Options.start_time != null )
-            {
-                start_time = this.parseTime(
-                    Options.start_time
-                );
+            if (Options.start_time != null) {
+                start_time = this.parseTime(Options.start_time);
             }
             // The same again for end_time
             time_t end_time = 0;
-            if ( Options.end_time != null )
-            {
-                end_time = this.parseTime(
-                    Options.end_time
-                );
+            if (Options.end_time != null) {
+                end_time = this.parseTime(Options.end_time);
                 Options.duration = 0;
                 this.metadata.set_duration(0);
             }
-            this.timer = getTimerLabel( (int)this.metadata.get_duration() * 60,
-                                        end_time, Options.last_minutes, start_time );
+            this.timer = getTimerLabel((int) this.metadata.get_duration() * 60,
+                end_time, Options.last_minutes, start_time);
             this.timer.reset();
 
-            this.n_slides = (int)metadata.get_slide_count();
+            this.n_slides = (int) this.metadata.get_slide_count();
 
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
@@ -270,10 +264,10 @@ namespace pdfpc {
          * Bind the (user-defined) keys
          */
         public void bind(uint keycode, uint modMask, string function) {
-            if (this.actionNames.has_key(function)) {
+            if (this.actionNames.has_key(function))
                 this.keyBindings.set(new KeyDef(keycode, modMask), this.actionNames[function]);
-            } else
-                stderr.printf("Warning: Unknown function %s\n", function);
+            else
+                warning("Unknown function %s", function);
         }
 
         /**
@@ -294,10 +288,10 @@ namespace pdfpc {
          * Bind the (user-defined) keys
          */
         public void bindMouse(uint button, uint modMask, string function) {
-            if (this.actionNames.has_key(function)) {
+            if (this.actionNames.has_key(function))
                 this.mouseBindings.set(new KeyDef(button, modMask), this.actionNames[function]);
-            } else
-                stderr.printf("Warning: Unknown function %s\n", function);
+            else
+                warning("Unknown function %s", function);
         }
 
         /**
@@ -321,10 +315,11 @@ namespace pdfpc {
          * window have implications on the behaviour of both of them. Therefore
          * this controller is needed to take care of the needed actions.
          */
-        public bool key_press( Gdk.EventKey key ) {
+        public bool key_press(Gdk.EventKey key) {
             if (key.time != last_key_event && !ignore_keyboard_events ) {
                 last_key_event = key.time;
-                var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
+                var action = this.keyBindings.get(new KeyDef(key.keyval,
+                    key.state & this.accepted_key_mods));
                 if (action != null)
                     action.d();
                 return true;
@@ -336,12 +331,12 @@ namespace pdfpc {
         /**
          * Handle mouse clicks to each of the controllables
          */
-        public bool button_press( Gdk.EventButton button ) {
-            if ( !ignore_mouse_events && button.type ==
-                    Gdk.EventType.BUTTON_PRESS ) {
+        public bool button_press(Gdk.EventButton button) {
+            if (!ignore_mouse_events && button.type == Gdk.EventType.BUTTON_PRESS ) {
                 // Prevent double or triple clicks from triggering additional
                 // click events
-                var action = this.mouseBindings.get(new KeyDef(button.button,button.state & this.accepted_key_mods));
+                var action = this.mouseBindings.get(new KeyDef(button.button,
+                    button.state & this.accepted_key_mods));
                 if (action != null)
                     action.d();
                 return true;
@@ -353,19 +348,20 @@ namespace pdfpc {
         /**
          * Notify each of the controllables of mouse scrolling
          */
-        public void scroll( Gdk.EventScroll scroll ) {
-            if ( !this.ignore_mouse_events ) {
-                switch( scroll.direction ) {
-                    case Gdk.ScrollDirection.UP: /* Scroll up */
-                    case Gdk.ScrollDirection.LEFT: /* Scroll left */
-                        if ( (scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+        public void scroll(Gdk.EventScroll scroll) {
+            if (!this.ignore_mouse_events) {
+                switch (scroll.direction) {
+                    case Gdk.ScrollDirection.UP:
+                    case Gdk.ScrollDirection.LEFT:
+                        if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0)
                             this.back10();
                         else
                             this.previous_page();
                     break;
-                    case Gdk.ScrollDirection.DOWN: /* Scroll down */
-                    case Gdk.ScrollDirection.RIGHT: /* Scroll right */
-                        if ( (scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0 )
+
+                    case Gdk.ScrollDirection.DOWN:
+                    case Gdk.ScrollDirection.RIGHT:
+                        if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0)
                             this.jump10();
                         else
                             this.next_page();
@@ -399,7 +395,8 @@ namespace pdfpc {
          * Was the previous slide a skip one?
          */
         public bool skip_previous() {
-            return this.current_slide_number > this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            return this.current_slide_number > this.metadata.user_slide_to_real_slide(
+                this.current_user_slide_number);
         }
 
         /**
@@ -407,10 +404,9 @@ namespace pdfpc {
          */
         public bool skip_next() {
             return (this.current_user_slide_number >= this.metadata.get_user_slide_count() - 1
-                    &&
-                    this.current_slide_number < this.n_slides)
-                   ||
-                   (this.current_slide_number+1 < this.metadata.user_slide_to_real_slide(this.current_user_slide_number+1));
+                && this.current_slide_number < this.n_slides)
+                || (this.current_slide_number + 1 < this.metadata.user_slide_to_real_slide(
+                this.current_user_slide_number + 1));
         }
 
         /**
@@ -424,7 +420,7 @@ namespace pdfpc {
          * Get the user total number of slides
          */
         public int get_user_n_slides() {
-            return this.metadata.get_user_slide_count();;
+            return this.metadata.get_user_slide_count();
         }
 
         /**
@@ -453,18 +449,19 @@ namespace pdfpc {
         /**
          * Register the current slide in the history
          */
-        void slide2history() {
+        void push_history() {
             this.history += this.current_slide_number;
         }
 
         /**
          * A request to change the page has been issued
          */
-        public void page_change_request( int page_number ) {
+        public void page_change_request(int page_number) {
             if (page_number != this.current_slide_number)
-                this.slide2history();
+                this.push_history();
             this.current_slide_number = page_number;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(
+                this.current_slide_number);
             this.timer.start();
             this.controllables_update();
         }
@@ -472,7 +469,7 @@ namespace pdfpc {
         /**
          * Set the state of ignote_input_events
          */
-        public void set_ignore_input_events( bool v ) {
+        public void set_ignore_input_events(bool v) {
             this.ignore_keyboard_events = v;
             this.ignore_mouse_events = v;
         }
@@ -494,14 +491,14 @@ namespace pdfpc {
          * On success true is returned, in case the controllable has already been
          * registered false is returned.
          */
-        public bool register_controllable( Controllable controllable ) {
-            if ( this.controllables.find( controllable ) != null ) {
+        public bool register_controllable(Controllable controllable) {
+            if (this.controllables.find(controllable) != null) {
                 // The controllable has already been added.
                 return false;
             }
 
             //controllable.set_controller( this );
-            this.controllables.append( controllable );
+            this.controllables.append(controllable);
             if (this.main_view == null)
                 this.main_view = controllable.get_main_view();
 
@@ -514,10 +511,12 @@ namespace pdfpc {
         public void next_page() {
             if (overview_shown)
                 return;
+
             this.timer.start();
-            if ( this.current_slide_number < this.n_slides - 1 ) {
+            if (this.current_slide_number < this.n_slides - 1) {
                 ++this.current_slide_number;
-                if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1))
+                if (this.current_slide_number == this.metadata.user_slide_to_real_slide(
+                    this.current_user_slide_number + 1))
                     ++this.current_user_slide_number;
                 if (!this.frozen)
                     this.faded_to_black = false;
@@ -533,12 +532,13 @@ namespace pdfpc {
         public void next_user_page() {
             this.timer.start();
             bool needs_update; // Did we change anything?
-            if ( this.current_user_slide_number < this.metadata.get_user_slide_count()-1 ) {
+            if (this.current_user_slide_number < this.metadata.get_user_slide_count()-1) {
                 ++this.current_user_slide_number;
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                    this.current_user_slide_number);
                 needs_update = true;
             } else {
-                if ( this.current_slide_number == this.n_slides - 1) {
+                if (this.current_slide_number == this.n_slides - 1) {
                     needs_update = false;
                     if (this.black_on_end && !this.is_faded_to_black())
                         this.fade_to_black();
@@ -560,12 +560,14 @@ namespace pdfpc {
          */
         public void previous_page() {
             this.timer.start();
-            if ( this.current_slide_number > 0) {
-                if (this.current_slide_number != this.metadata.user_slide_to_real_slide(this.current_user_slide_number)) {
+            if (this.current_slide_number > 0) {
+                if (this.current_slide_number != this.metadata.user_slide_to_real_slide(
+                    this.current_user_slide_number)) {
                     --this.current_slide_number;
                 } else {
                     --this.current_user_slide_number;
-                    this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+                    this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                        this.current_user_slide_number);
                 }
                 if (!this.frozen)
                     this.faded_to_black = false;
@@ -578,9 +580,10 @@ namespace pdfpc {
          */
         public void previous_user_page() {
             this.timer.start();
-            if ( this.current_user_slide_number > 0 ) {
+            if (this.current_user_slide_number > 0) {
                 --this.current_user_slide_number;
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                    this.current_user_slide_number);
             } else {
                 this.current_user_slide_number = 0;
                 this.current_slide_number = 0;
@@ -596,7 +599,7 @@ namespace pdfpc {
         public void goto_first() {
             this.timer.start();
             if (this.current_slide_number != 0)
-                this.slide2history();
+                this.push_history();
             this.current_slide_number = 0;
             this.current_user_slide_number = 0;
             if (!this.frozen)
@@ -610,9 +613,10 @@ namespace pdfpc {
         public void goto_last() {
             this.timer.start();
             if (this.current_user_slide_number != this.metadata.get_end_user_slide() - 1)
-                this.slide2history();
+                this.push_history();
             this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                this.current_user_slide_number);
             if (!this.frozen)
                 this.faded_to_black = false;
             this.controllables_update();
@@ -624,12 +628,14 @@ namespace pdfpc {
         public void jump10() {
             if (this.overview_shown)
                 return;
+
             this.timer.start();
             this.current_user_slide_number += 10;
             int max_user_slide = this.metadata.get_user_slide_count();
-            if ( this.current_user_slide_number >= max_user_slide )
+            if (this.current_user_slide_number >= max_user_slide)
                 this.current_user_slide_number = max_user_slide - 1;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                this.current_user_slide_number);
             if (!this.frozen)
                 this.faded_to_black = false;
             this.controllables_update();
@@ -641,11 +647,13 @@ namespace pdfpc {
         public void back10() {
             if (this.overview_shown)
                 return;
+
             this.timer.start();
             this.current_user_slide_number -= 10;
-            if ( this.current_user_slide_number < 0 )
+            if (this.current_user_slide_number < 0)
                 this.current_user_slide_number = 0;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                this.current_user_slide_number);
             if (!this.frozen)
                 this.faded_to_black = false;
             this.controllables_update();
@@ -657,20 +665,21 @@ namespace pdfpc {
         public void goto_user_page(int page_number) {
             this.timer.start();
             if (this.current_user_slide_number != page_number - 1)
-                this.slide2history();
+                this.push_history();
 
             this.controllables_hide_overview();
-            int destination = page_number-1;
+            int destination = page_number - 1;
             int n_user_slides = this.metadata.get_user_slide_count();
             if (page_number < 1)
                 destination = 0;
             else if (page_number >= n_user_slides)
                 destination = n_user_slides - 1;
             this.current_user_slide_number = destination;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(
+                this.current_user_slide_number);
             if (!this.frozen)
                 this.faded_to_black = false;
-            this.set_ignore_input_events( false );
+            this.set_ignore_input_events(false);
             this.controllables_update();
         }
 
@@ -680,12 +689,14 @@ namespace pdfpc {
         public void history_back() {
             if (this.overview_shown)
                 return;
+
             int history_length = this.history.length;
             if (history_length == 0) {
                 this.goto_first();
             } else {
                 this.current_slide_number = this.history[history_length - 1];
-                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
+                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(
+                    this.current_slide_number);
                 this.history.resize(history_length - 1);
                 if (!this.frozen)
                     this.faded_to_black = false;
@@ -697,7 +708,7 @@ namespace pdfpc {
          * Notify the controllables that they have to update the view
          */
         protected void controllables_update() {
-            foreach( Controllable c in this.controllables )
+            foreach (Controllable c in this.controllables)
                 c.update();
         }
 
@@ -735,7 +746,7 @@ namespace pdfpc {
             if (this.current_user_slide_number >= this.get_user_n_slides())
                 this.goto_last();
             this.overview_shown = false;
-            foreach( Controllable c in this.controllables )
+            foreach (Controllable c in this.controllables)
                 c.hide_overview();
             this.controllables_update();
         }
@@ -761,7 +772,7 @@ namespace pdfpc {
         protected void controllables_edit_note() {
             if (this.overview_shown)
                 return;
-            foreach( Controllable c in this.controllables ) {
+            foreach (Controllable c in this.controllables) {
                 c.edit_note();
             }
         }
@@ -772,7 +783,7 @@ namespace pdfpc {
         protected void controllables_ask_goto_page() {
             if (this.overview_shown)
                 return;
-            foreach( Controllable c in this.controllables ) {
+            foreach (Controllable c in this.controllables) {
                 c.ask_goto_page();
             }
         }
@@ -801,10 +812,11 @@ namespace pdfpc {
             if (overview_shown) {
                 int user_selected = this.overview.current_slide;
                 int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
-                if (this.metadata.toggle_skip( slide_number, user_selected ) != 0)
-                    this.overview.remove_current( this.get_user_n_slides() );
+                if (this.metadata.toggle_skip(slide_number, user_selected) != 0)
+                    this.overview.remove_current(this.get_user_n_slides());
             } else {
-                this.current_user_slide_number += this.metadata.toggle_skip( this.current_slide_number, this.current_user_slide_number);
+                this.current_user_slide_number += this.metadata.toggle_skip(
+                    this.current_slide_number, this.current_user_slide_number);
                 this.overview.set_n_slides(this.get_user_n_slides());
                 this.controllables_update();
             }
@@ -848,10 +860,9 @@ namespace pdfpc {
         /**
          * Parse the given time string to a Time object
          */
-        private time_t parseTime( string t )
-        {
-            var tm = Time.local( time_t() );
-            tm.strptime( t + ":00", "%H:%M:%S" );
+        private time_t parseTime(string t) {
+            var tm = Time.local(time_t());
+            tm.strptime(t + ":00", "%H:%M:%S");
             return tm.mktime();
         }
 
@@ -872,7 +883,7 @@ namespace pdfpc {
                 return 0;
             }
             rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
-            return (uint)((Gdk.X11.Window) view.get_window()).get_xid ();
+            return (uint) ((Gdk.X11.Window) view.get_window()).get_xid ();
         }
     }
 }
