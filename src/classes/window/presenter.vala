@@ -255,7 +255,7 @@ namespace pdfpc.Window {
             this.slide_count = metadata.get_slide_count();
 
             this.overview = new Overview( this.metadata, this.presentation_controller, this );
-            this.overview.set_n_slides( this.presentation_controller.get_user_n_slides() );
+            this.overview.set_n_slides( this.presentation_controller.user_n_slides );
             this.presentation_controller.set_overview(this.overview);
             this.presentation_controller.register_controllable( this );
 
@@ -408,7 +408,7 @@ namespace pdfpc.Window {
          */
         protected void update_slide_count() {
             this.custom_slide_count(
-                    this.presentation_controller.get_current_user_slide_number() + 1
+                    this.presentation_controller.current_user_slide_number + 1
             );
         }
 
@@ -425,8 +425,8 @@ namespace pdfpc.Window {
         }
 
         public void update() {
-            int current_slide_number = this.presentation_controller.get_current_slide_number();
-            int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
+            int current_slide_number = this.presentation_controller.current_slide_number;
+            int current_user_slide_number = this.presentation_controller.current_user_slide_number;
             try {
                 this.current_view.display(current_slide_number);
                 this.next_view.display(this.metadata.user_slide_to_real_slide(current_user_slide_number + 1));
@@ -450,11 +450,11 @@ namespace pdfpc.Window {
                 this.pause_icon.show();
             else
                 this.pause_icon.hide();
-            if (this.presentation_controller.is_faded_to_black())
+            if (this.presentation_controller.faded_to_black)
                 this.blank_icon.show();
             else
                 this.blank_icon.hide();
-            if (this.presentation_controller.is_frozen())
+            if (this.presentation_controller.frozen)
                 this.frozen_icon.show();
             else
                 this.frozen_icon.hide();
@@ -484,7 +484,7 @@ namespace pdfpc.Window {
          * Ask for the page to jump to
          */
         public void ask_goto_page() {
-           this.slide_progress.set_text("/%u".printf(this.presentation_controller.get_user_n_slides()));
+           this.slide_progress.set_text("/%u".printf(this.presentation_controller.user_n_slides));
            this.slide_progress.sensitive = true;
            this.slide_progress.grab_focus();
            this.slide_progress.set_position(0);
@@ -528,7 +528,7 @@ namespace pdfpc.Window {
             if ( key.keyval == 0xff1b) { /* Escape */
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;
-                this.metadata.get_notes().set_note( this.notes_view.buffer.text, this.presentation_controller.get_current_user_slide_number() );
+                this.metadata.get_notes().set_note( this.notes_view.buffer.text, this.presentation_controller.current_user_slide_number );
                 this.presentation_controller.set_ignore_input_events( false );
                 return true;
             } else {
@@ -540,7 +540,7 @@ namespace pdfpc.Window {
          * Update the text of the current note
          */
         protected void update_note() {
-            string this_note = this.metadata.get_notes().get_note_for_slide(this.presentation_controller.get_current_user_slide_number());
+            string this_note = this.metadata.get_notes().get_note_for_slide(this.presentation_controller.current_user_slide_number);
             this.notes_view.buffer.text = this_note;
         }
 
@@ -551,7 +551,7 @@ namespace pdfpc.Window {
                 overview_added = true;
             }
             this.overview.show();
-            this.overview.current_slide = this.presentation_controller.get_current_user_slide_number();
+            this.overview.current_slide = this.presentation_controller.current_user_slide_number;
         }
 
         public void hide_overview() {

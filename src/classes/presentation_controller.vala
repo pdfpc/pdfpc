@@ -29,39 +29,36 @@ namespace pdfpc {
         /**
          * The currently displayed slide
          */
-        protected int current_slide_number;
+        public int current_slide_number { get; protected set; }
 
         /**
          * The current slide in "user indexes"
          */
-        protected int current_user_slide_number;
+        public int current_user_slide_number { get; protected set; }
 
         /**
          * Stores if the view is faded to black
          */
-        protected bool faded_to_black = false;
+        public bool faded_to_black { get; protected set; default = false; }
 
         /**
          * Stores if the view is frozen
          */
-        protected bool frozen = false;
-
-        /**
-         * A flag signaling if we allow for a black slide at the end. Tis is
-         * useful for the next view and (for some presenters) also for the main
-         * view.
-         */
-        protected bool black_on_end;
+        public bool frozen { get; protected set; default = false; }
 
         /**
          * The number of slides in the presentation
          */
-        protected int n_slides;
+        public int n_slides { get; protected set; }
 
         /**
-         * Controllables which are registered with this presentation controller.
+         * The number of user slides
          */
-        protected GLib.List<Controllable> controllables;
+        public int user_n_slides {
+            get {
+                return this.metadata.get_user_slide_count();
+            }
+        }
 
         /**
          * Key modifiers that we support
@@ -71,8 +68,20 @@ namespace pdfpc {
         /**
          * Ignore input events. Useful e.g. for editing notes.
          */
-        protected bool ignore_keyboard_events = false;
-        protected bool ignore_mouse_events = false;
+        public bool ignore_keyboard_events { get; protected set; default = false; }
+        public bool ignore_mouse_events { get; protected set; default = false; }
+
+        /**
+         * A flag signaling if we allow for a black slide at the end. Tis is
+         * useful for the next view and (for some presenters) also for the main
+         * view.
+         */
+        protected bool black_on_end;
+
+        /**
+         * Controllables which are registered with this presentation controller.
+         */
+        protected GLib.List<Controllable> controllables;
 
         /**
          * The metadata of the presentation
@@ -84,7 +93,7 @@ namespace pdfpc {
          * skips
          */
         protected Window.Overview overview;
-        public bool overview_shown = false;
+        protected bool overview_shown = false;
 
         /**
          * Disables processing of multiple Keypresses at the same time (debounce)
@@ -378,20 +387,6 @@ namespace pdfpc {
         }
 
         /**
-         * Get the current (real) slide number
-         */
-        public int get_current_slide_number() {
-            return current_slide_number;
-        }
-
-        /**
-         * Get the current (user) slide number
-         */
-        public int get_current_user_slide_number() {
-            return current_user_slide_number;
-        }
-
-        /**
          * Was the previous slide a skip one?
          */
         public bool skip_previous() {
@@ -407,20 +402,6 @@ namespace pdfpc {
                 && this.current_slide_number < this.n_slides)
                 || (this.current_slide_number + 1 < this.metadata.user_slide_to_real_slide(
                 this.current_user_slide_number + 1));
-        }
-
-        /**
-         * Get the real total number of slides
-         */
-        public int get_n_slide() {
-            return this.n_slides;
-        }
-
-        /**
-         * Get the user total number of slides
-         */
-        public int get_user_n_slides() {
-            return this.metadata.get_user_slide_count();
         }
 
         /**
@@ -474,10 +455,6 @@ namespace pdfpc {
             this.ignore_mouse_events = v;
         }
 
-        public void set_ignore_mouse_events( bool v ) {
-            this.ignore_mouse_events = v;
-        }
-
         /**
          * Get the timer
          */
@@ -521,7 +498,7 @@ namespace pdfpc {
                 if (!this.frozen)
                     this.faded_to_black = false;
                 this.controllables_update();
-            } else if (this.black_on_end && !this.is_faded_to_black()) {
+            } else if (this.black_on_end && !this.faded_to_black) {
                 this.fade_to_black();
             }
         }
@@ -540,7 +517,7 @@ namespace pdfpc {
             } else {
                 if (this.current_slide_number == this.n_slides - 1) {
                     needs_update = false;
-                    if (this.black_on_end && !this.is_faded_to_black())
+                    if (this.black_on_end && !this.faded_to_black)
                         this.fade_to_black();
                 } else {
                     this.current_user_slide_number = this.metadata.get_user_slide_count() - 1;
@@ -731,7 +708,7 @@ namespace pdfpc {
 
         protected void controllables_show_overview() {
             if (this.overview != null) {
-                this.set_ignore_mouse_events(true);
+                this.ignore_mouse_events = true;
                 foreach( Controllable c in this.controllables )
                     c.show_overview();
                 this.overview_shown = true;
@@ -739,11 +716,11 @@ namespace pdfpc {
         }
 
         protected void controllables_hide_overview() {
-            this.set_ignore_mouse_events(false);
+            this.ignore_mouse_events = false;
             // It may happen that in overview mode, the number of (user) slides
             // has changed due to overlay changes. We may need to correct our
             // position
-            if (this.current_user_slide_number >= this.get_user_n_slides())
+            if (this.current_user_slide_number >= this.user_n_slides)
                 this.goto_last();
             this.overview_shown = false;
             foreach (Controllable c in this.controllables)
@@ -757,13 +734,6 @@ namespace pdfpc {
         protected void fade_to_black() {
             this.faded_to_black = !this.faded_to_black;
             this.controllables_update();
-        }
-
-        /**
-         * Is the presentation blanked?
-         */
-        public bool is_faded_to_black() {
-            return this.faded_to_black;
         }
 
         /**
@@ -799,13 +769,6 @@ namespace pdfpc {
         }
 
         /**
-         * Is the presentation frozen?
-         */
-        public bool is_frozen() {
-            return this.frozen;
-        }
-
-        /**
          * Toggle skip for current slide
          */
         protected void toggle_skip() {
@@ -813,11 +776,11 @@ namespace pdfpc {
                 int user_selected = this.overview.current_slide;
                 int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
                 if (this.metadata.toggle_skip(slide_number, user_selected) != 0)
-                    this.overview.remove_current(this.get_user_n_slides());
+                    this.overview.remove_current(this.user_n_slides);
             } else {
                 this.current_user_slide_number += this.metadata.toggle_skip(
                     this.current_slide_number, this.current_user_slide_number);
-                this.overview.set_n_slides(this.get_user_n_slides());
+                this.overview.set_n_slides(this.user_n_slides);
                 this.controllables_update();
             }
         }
