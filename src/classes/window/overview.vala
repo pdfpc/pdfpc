@@ -20,11 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using Gtk;
-using Gdk;
-
-using pdfpc;
-
 namespace pdfpc.Window {
     /**
      * An overview of all the slides in the form of a table
@@ -34,11 +29,11 @@ namespace pdfpc.Window {
         /*
          * The store of all the slides.
          */
-        protected ListStore slides;
+        protected Gtk.ListStore slides;
         /*
          * The view of the above.
          */
-        protected IconView slides_view;
+        protected Gtk.IconView slides_view;
 
         /**
          * We will need the metadata mainly for converting from user slides to
@@ -102,7 +97,7 @@ namespace pdfpc.Window {
         private int _current_slide = 0;
         public int current_slide {
             get { return _current_slide; }
-            set { var path = new TreePath.from_indices(value);
+            set { var path = new Gtk.TreePath.from_indices(value);
                   this.slides_view.select_path(path);
                   // _current_slide set in on_selection_changed, below
                   this.slides_view.set_cursor(path, null, false);
@@ -131,9 +126,9 @@ namespace pdfpc.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
-            this.slides = new ListStore(1, typeof(Pixbuf));
-            this.slides_view = new IconView.with_model(this.slides);
-            this.slides_view.selection_mode = SelectionMode.SINGLE;
+            this.slides = new Gtk.ListStore(1, typeof(Gdk.Pixbuf));
+            this.slides_view = new Gtk.IconView.with_model(this.slides);
+            this.slides_view.selection_mode = Gtk.SelectionMode.SINGLE;
             var renderer = new CellRendererHighlight();
             this.slides_view.pack_start(renderer, true);
             this.slides_view.add_attribute(renderer, "pixbuf", 0);
@@ -141,15 +136,15 @@ namespace pdfpc.Window {
             this.add(this.slides_view);
             this.show_all();
 
-            Color black;
-            Color white;
-            Color.parse("black", out black);
-            Color.parse("white", out white);
-            this.slides_view.modify_base(StateType.NORMAL, black);
+            Gdk.Color black;
+            Gdk.Color white;
+            Gdk.Color.parse("black", out black);
+            Gdk.Color.parse("white", out white);
+            this.slides_view.modify_base(Gtk.StateType.NORMAL, black);
             Gtk.Scrollbar vscrollbar = (Gtk.Scrollbar) this.get_vscrollbar();
-            vscrollbar.modify_bg(StateType.NORMAL, white);
-            vscrollbar.modify_bg(StateType.ACTIVE, black);
-            vscrollbar.modify_bg(StateType.PRELIGHT, white);
+            vscrollbar.modify_bg(Gtk.StateType.NORMAL, white);
+            vscrollbar.modify_bg(Gtk.StateType.ACTIVE, black);
+            vscrollbar.modify_bg(Gtk.StateType.PRELIGHT, white);
 
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
@@ -178,7 +173,7 @@ namespace pdfpc.Window {
          * handler.  Note that if the Overview is reparented, it will still be
          * connected to signals from its old parent.  So don't do that.
          */
-        public void on_parent_set(Widget? old_parent) {
+        public void on_parent_set(Gtk.Widget? old_parent) {
             if (this.parent != null) {
                 this.parent.show.connect( this.on_show );
                 this.parent.hide.connect( this.on_hide );
@@ -252,7 +247,7 @@ namespace pdfpc.Window {
             } else {
                 this.slides_view.columns = tc;
             }
-            this.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+            this.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
             this.target_height = (int)Math.round(this.target_width / this.aspect_ratio);
             rows = (int)Math.ceil((float)this.n_slides / this.slides_view.columns);
             int full_height = rows*(this.target_height + 2*padding + 2*row_spacing) + 2*margin;
@@ -263,9 +258,10 @@ namespace pdfpc.Window {
             this.last_structure_n_slides = this.n_slides;
 
             this.slides.clear();
-            var pixbuf = new Pixbuf(Colorspace.RGB, true, 8, this.target_width, this.target_height);
+            var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, this.target_width,
+                this.target_height);
             pixbuf.fill(0x7f7f7fff);
-            var iter = TreeIter();
+            var iter = Gtk.TreeIter();
             for (int i=0; i<this.n_slides; i++) {
                 this.slides.append(out iter);
                 this.slides.set_value(iter, 0, pixbuf);
@@ -304,7 +300,7 @@ namespace pdfpc.Window {
             var pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
                                                     Gdk.InterpType.BILINEAR);
 
-            var iter = TreeIter();
+            var iter = Gtk.TreeIter();
             this.slides.get_iter_from_string(out iter, @"$(this.next_undone_preview)");
             this.slides.set_value(iter, 0, pixbuf_scaled);
 
@@ -342,7 +338,7 @@ namespace pdfpc.Window {
          */
         public void remove_current(int newn) {
             this.n_slides = newn;
-            var iter = TreeIter();
+            var iter = Gtk.TreeIter();
             this.slides.get_iter_from_string(out iter, @"$(this.current_slide)");
             this.slides.remove(iter);
             if (this.current_slide >= this.n_slides)
@@ -354,7 +350,7 @@ namespace pdfpc.Window {
          * the standard IconView controls, the rest are passed back to the
          * PresentationController.
          */
-        public bool on_key_press(Gtk.Widget source, EventKey key) {
+        public bool on_key_press(Gtk.Widget source, Gdk.EventKey key) {
             bool handled = false;
             switch ( key.keyval ) {
                 case 0xff51: /* Cursor left */
@@ -380,8 +376,8 @@ namespace pdfpc.Window {
         /*
          * Update the selection when the mouse moves over a new slides.
          */
-        public bool on_mouse_move(Gtk.Widget source, EventMotion event) {
-            TreePath path;
+        public bool on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
+            Gtk.TreePath path;
             path = this.slides_view.get_path_at_pos((int)event.x, (int)event.y);
             if (path != null && path.get_indices()[0] != this.current_slide)
                 this.current_slide = path.get_indices()[0];
@@ -393,7 +389,7 @@ namespace pdfpc.Window {
          * click, the button_press event will have set the current slide.  On
          * a drag, the current slide will have been updated by the motion.
          */
-        public bool on_mouse_release(EventButton event) {
+        public bool on_mouse_release(Gdk.EventButton event) {
             if (event.button == 1)
                 this.presentation_controller.goto_user_page(this.current_slide + 1);
             return false;
@@ -403,13 +399,13 @@ namespace pdfpc.Window {
     /*
      * Render a pixbuf that is slightly shaded, unless it is the selected one.
      */
-    public class CellRendererHighlight: CellRendererPixbuf {
+    public class CellRendererHighlight: Gtk.CellRendererPixbuf {
 
-        public override void render(Gdk.Window window, Widget widget,
-                                    Rectangle background_area, Rectangle cell_area,
-                                    Rectangle expose_area, CellRendererState flags) {
+        public override void render(Gdk.Window window, Gtk.Widget widget,
+                                    Gdk.Rectangle background_area, Gdk.Rectangle cell_area,
+                                    Gdk.Rectangle expose_area, Gtk.CellRendererState flags) {
             base.render(window, widget, background_area, cell_area, expose_area, flags);
-            if (flags != CellRendererState.SELECTED) {
+            if (flags != Gtk.CellRendererState.SELECTED) {
                 var cr = Gdk.cairo_create(window);
                 Gdk.cairo_rectangle(cr, expose_area);
                 cr.clip();

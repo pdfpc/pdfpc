@@ -20,8 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-
 namespace pdfpc.Renderer.Cache {
     /**
      * PNG picture data stored by the PNG cache engine.

@@ -20,9 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using Gtk;
-using Gdk;
-
 namespace pdfpc.Window {
     /**
      * Window extension implementing all the needed functionality, to be
@@ -35,7 +32,7 @@ namespace pdfpc.Window {
         /**
          * The geometry data of the screen this window is on
          */
-        protected Rectangle screen_geometry;
+        protected Gdk.Rectangle screen_geometry;
 
         /**
          * Timer id which monitors mouse motion to hide the cursor after 5
@@ -58,7 +55,7 @@ namespace pdfpc.Window {
 
             if ( screen_num >= 0 ) {
                 // Start in the given monitor
-                screen = Screen.get_default();
+                screen = Gdk.Screen.get_default();
                 screen.get_monitor_geometry( screen_num, out this.screen_geometry );
             } else {
                 // Start in the monitor the cursor is in
@@ -95,7 +92,7 @@ namespace pdfpc.Window {
 
             }
 
-            this.add_events(EventMask.POINTER_MOTION_MASK);
+            this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect( this.on_mouse_move );
 
             // Start the 5 seconds timeout after which the mouse curosr is
@@ -117,7 +114,7 @@ namespace pdfpc.Window {
          * movement commands before the window has been displayed for the first
          * time.
          */
-        protected void on_size_allocate( Gtk.Widget source, Rectangle r ) {
+        protected void on_size_allocate( Gtk.Widget source, Gdk.Rectangle r ) {
             if ( this.is_mapped() ) {
                 // We are only interested to handle this event AFTER the window has
                 // been mapped.
@@ -153,7 +150,7 @@ namespace pdfpc.Window {
         /**
          * Called every time the mouse cursor is moved
          */
-        public bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
+        public bool on_mouse_move( Gtk.Widget source, Gdk.EventMotion event ) {
             // Restore the mouse cursor to its default value
             this.window.set_cursor( null );
 

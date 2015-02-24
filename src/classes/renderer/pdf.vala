@@ -20,10 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Gdk;
-using Cairo;
-
 namespace pdfpc {
     /**
      * Pdf slide renderer
@@ -111,8 +107,8 @@ namespace pdfpc {
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
-            Pixmap pixmap = new Pixmap( null, this.width, this.height, 24 );
-            Context cr = Gdk.cairo_create( pixmap );
+            Gdk.Pixmap pixmap = new Gdk.Pixmap( null, this.width, this.height, 24 );
+            Cairo.Context cr = Gdk.cairo_create( pixmap );
 
             cr.set_source_rgb( 255, 255, 255 );
             cr.rectangle( 0, 0, this.width, this.height );
@@ -133,8 +129,8 @@ namespace pdfpc {
         }
 
       public override Gdk.Pixmap fade_to_black() {
-            Pixmap pixmap = new Pixmap( null, this.width, this.height, 24 );
-            Context cr = Gdk.cairo_create( pixmap );
+            Gdk.Pixmap pixmap = new Gdk.Pixmap( null, this.width, this.height, 24 );
+            Cairo.Context cr = Gdk.cairo_create( pixmap );
 
             cr.set_source_rgb( 0, 0, 0 );
             cr.rectangle( 0, 0, this.width, this.height );

@@ -20,9 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Gee;
-
 namespace pdfpc {
     /**
      * Controller handling all the triggered events/signals
@@ -119,7 +116,7 @@ namespace pdfpc {
                 this.d = d;
             }
         }
-        protected HashMap<string, KeyAction> actionNames;
+        protected Gee.HashMap<string, KeyAction> actionNames;
         protected class KeyDef {
             public uint keycode { get; set; }
             public uint modMask { get; set; }
@@ -131,7 +128,7 @@ namespace pdfpc {
 
             public static uint hash(void *_a) {
                 KeyDef a = (KeyDef)_a;
-                var uintHashFunc = Functions.get_hash_func_for(Type.from_name("uint"));
+                var uintHashFunc = Gee.Functions.get_hash_func_for(Type.from_name("uint"));
                 return uintHashFunc(a.keycode | a.modMask); // | is probable the best combinator, but for this small application it should suffice
             }
 
@@ -141,8 +138,8 @@ namespace pdfpc {
                 return a.keycode == b.keycode && a.modMask == b.modMask;
             }
         }
-        protected HashMap<KeyDef, KeyAction> keyBindings;
-        protected HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
+        protected Gee.HashMap<KeyDef, KeyAction> keyBindings;
+        protected Gee.HashMap<KeyDef, KeyAction> mouseBindings; // We abuse the KeyDef structure
 
         /*
          * "Main" view of current slide
@@ -188,8 +185,8 @@ namespace pdfpc {
             this.current_user_slide_number = 0;
 
             // The standard hash function for classes is to use the pointer, so we have to provide our own
-            this.keyBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
-            this.mouseBindings = new HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
+            this.keyBindings = new Gee.HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
+            this.mouseBindings = new Gee.HashMap<KeyDef, KeyAction>(KeyDef.hash, KeyDef.equal);
             this.fillActionNames();
         }
 
@@ -206,7 +203,7 @@ namespace pdfpc {
         }
 
         protected void fillActionNames() {
-            this.actionNames = new HashMap<string, KeyAction>();
+            this.actionNames = new Gee.HashMap<string, KeyAction>();
             this.actionNames.set("next", new KeyAction(this.next_page));
             this.actionNames.set("next10", new KeyAction(this.jump10));
             this.actionNames.set("nextOverlay", new KeyAction(this.next_user_page));

@@ -20,10 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-
-using pdfpc;
-
 namespace pdfpc.Renderer {
     /**
      * Creates cache engines based on the global commandline options

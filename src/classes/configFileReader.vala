@@ -125,10 +125,10 @@ namespace pdfpc {
 
         public void readConfig(string fname) {
             var file = File.new_for_path(fname);
-            var splitRegex = new Regex("\\s\\s*");
-            var commentRegex = new Regex("\\s*#.*$");
             uint8[] raw_datau8;
             try {
+                var splitRegex = new Regex("\\s\\s*");
+                var commentRegex = new Regex("\\s*#.*$");
                 file.load_contents(null, out raw_datau8, null);
                 string[] lines = ((string) raw_datau8).split("\n");
                 for (int i=0; i<lines.length; ++i) {

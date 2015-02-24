@@ -20,11 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using Gtk;
-using Gdk;
-
-using pdfpc;
-
 namespace pdfpc.Window {
     /**
      * Window showing the currently active slide to be presented on a beamer
@@ -54,15 +49,15 @@ namespace pdfpc.Window {
 
             this.presentation_controller = presentation_controller;
 
-            Color black;
-            Color.parse( "black", out black );
-            this.modify_bg( StateType.NORMAL, black );
+            Gdk.Color black;
+            Gdk.Color.parse( "black", out black );
+            this.modify_bg( Gtk.StateType.NORMAL, black );
 
-            var fixedLayout = new Fixed();
+            var fixedLayout = new Gtk.Fixed();
             fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
             this.add( fixedLayout );
 
-            Rectangle scale_rect;
+            Gdk.Rectangle scale_rect;
 
             if (width < 0) {
                 width = this.screen_geometry.width;
@@ -99,9 +94,9 @@ namespace pdfpc.Window {
                 scale_rect.y
             );
 
-            this.add_events(EventMask.KEY_PRESS_MASK);
-            this.add_events(EventMask.BUTTON_PRESS_MASK);
-            this.add_events(EventMask.SCROLL_MASK);
+            this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
+            this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
+            this.add_events(Gdk.EventMask.SCROLL_MASK);
 
             this.key_press_event.connect( this.on_key_pressed );
             this.button_press_event.connect( this.on_button_press );
@@ -114,7 +109,7 @@ namespace pdfpc.Window {
          * Handle keypress vents on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( EventKey key ) {
+        protected bool on_key_pressed( Gdk.EventKey key ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.key_press( key );
             }
@@ -125,7 +120,7 @@ namespace pdfpc.Window {
          * Handle mouse button events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_button_press( EventButton button ) {
+        protected bool on_button_press( Gdk.EventButton button ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.button_press( button );
             }
@@ -136,7 +131,7 @@ namespace pdfpc.Window {
          * Handle mouse scrolling events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_scroll( Gtk.Widget source, EventScroll scroll ) {
+        protected bool on_scroll( Gtk.Widget source, Gdk.EventScroll scroll ) {
             if ( this.presentation_controller != null ) {
                 this.presentation_controller.scroll( scroll );
             }

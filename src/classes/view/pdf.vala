@@ -20,9 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Gdk;
-
 namespace pdfpc {
     /**
      * View spezialized to work with Pdf renderers.
@@ -60,7 +57,7 @@ namespace pdfpc {
                                               Metadata.Area area,
                                               bool allow_black_on_end, bool clickable_links,
                                               PresentationController presentation_controller,
-                                              out Rectangle scale_rect = null ) {
+                                              out Gdk.Rectangle scale_rect = null ) {
             var scaler = new Scaler(
                 metadata.get_page_width(),
                 metadata.get_page_height()

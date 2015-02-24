@@ -20,11 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-using Gdk;
-
-using pdfpc;
-
 namespace pdfpc.Renderer.Cache {
     /**
      * Cache store which simply holds all given items in memory.
@@ -33,7 +28,7 @@ namespace pdfpc.Renderer.Cache {
         /**
          * In memory storage for all the given pixmaps
          */
-        protected Pixmap[] storage = null;
+        protected Gdk.Pixmap[] storage = null;
 
         /**
          * Mutex used to limit access to storage array to one thread at a time.
@@ -49,14 +44,14 @@ namespace pdfpc.Renderer.Cache {
             base( metadata );
 
             this.mutex.lock();
-            this.storage = new Pixmap[this.metadata.get_slide_count()];
+            this.storage = new Gdk.Pixmap[this.metadata.get_slide_count()];
             this.mutex.unlock();
         }
 
         /**
          * Store a pixmap in the cache using the given index as identifier
          */
-        public override void store( uint index, Pixmap pixmap ) {
+        public override void store( uint index, Gdk.Pixmap pixmap ) {
             this.mutex.lock();
             this.storage[index] = pixmap;
             this.mutex.unlock();
@@ -67,7 +62,7 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Pixmap? retrieve( uint index ) {
+        public override Gdk.Pixmap? retrieve( uint index ) {
             return this.storage[index];
         }
     }

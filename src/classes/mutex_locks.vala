@@ -20,8 +20,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-
 namespace pdfpc {
     /**
      * Static property container holding all mutex locks, which are needed
