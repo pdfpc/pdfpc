@@ -234,9 +234,10 @@ namespace pdfpc {
 
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
 
-            configFileReader.readConfig(source_path + "/rc/pdfpcrc");
-            configFileReader.readConfig(etc_path + "/pdfpcrc");
-            configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
+            configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
+            configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
+            configFileReader.readConfig(Path.build_filename(Environment.get_home_dir(),
+                ".pdfpcrc"));
 
             set_styling();
 
