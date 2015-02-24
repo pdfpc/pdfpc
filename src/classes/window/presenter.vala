@@ -93,12 +93,6 @@ namespace pdfpc.Window {
         protected Overview overview = null;
 
         /**
-         * The container that shows the overview. This is the one that has to
-         * be shown or hidden
-         */
-        protected Gtk.Alignment centered_overview = null;
-
-        /**
          * There may be problems in some configurations if adding the overview
          * from the beginning, therefore we delay it until it is first shown.
          */
@@ -322,20 +316,20 @@ namespace pdfpc.Window {
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
-            var center_current_view = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
-            center_current_view.add(this.current_view);
+            this.current_view.halign = Gtk.Align.CENTER;
+            this.current_view.valign = Gtk.Align.CENTER;
 
             var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
-            current_view_and_stricts.pack_start(center_current_view, false, false, 2);
+            current_view_and_stricts.pack_start(current_view, false, false, 2);
             current_view_and_stricts.pack_start(strict_views, false, false, 2);
 
 
             this.slideViews.pack_start(current_view_and_stricts, true, true, 0);
 
             var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            var center_next_view = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
-            center_next_view.add(this.next_view);
-            nextViewWithNotes.pack_start( center_next_view, false, false, 0 );
+            this.next_view.halign = Gtk.Align.CENTER;
+            this.next_view.valign = Gtk.Align.CENTER;
+            nextViewWithNotes.pack_start( next_view, false, false, 0 );
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.add( this.notes_view );
             notes_sw.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC );
@@ -346,22 +340,21 @@ namespace pdfpc.Window {
             bottomRow.homogeneous = true;
 
             var status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
-            //blank_label_alignment.add( this.blank_label );
             status.pack_start( this.blank_icon, false, false, 0 );
             status.pack_start( this.frozen_icon, false, false, 0 );
             status.pack_start( this.pause_icon, false, false, 0 );
 
-            var timer_alignment = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
-            timer_alignment.add( this.timer );
+            this.timer.halign = Gtk.Align.CENTER;
+            this.timer.valign = Gtk.Align.CENTER;
 
             var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             progress_alignment.pack_end(this.slide_progress);
-            var prerender_alignment = new Gtk.Alignment(0, 0.5f, 1, 0);
-            prerender_alignment.add(this.prerender_progress);
-            progress_alignment.pack_start(prerender_alignment);
+            this.prerender_progress.vexpand = false;
+            this.prerender_progress.valign = Gtk.Align.CENTER;
+            progress_alignment.pack_start(this.prerender_progress, true, true, 0);
 
             bottomRow.pack_start( status, true, true, 0);
-            bottomRow.pack_start( timer_alignment, true, true, 0 );
+            bottomRow.pack_start( this.timer, true, true, 0 );
             bottomRow.pack_end( progress_alignment, true, true, 0);
 
             this.fullLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -371,8 +364,8 @@ namespace pdfpc.Window {
 
             this.add( fullLayout );
 
-            this.centered_overview = new Gtk.Alignment(0.5f, 0.5f, 0, 0);
-            this.centered_overview.add(this.overview);
+            this.overview.halign = Gtk.Align.CENTER;
+            this.overview.valign = Gtk.Align.CENTER;
         }
 
         /**
@@ -432,10 +425,6 @@ namespace pdfpc.Window {
         }
 
         public void update() {
-            //if (this.overview != null) {
-            //    this.centered_overview.hide();
-            //    this.slideViews.show();
-            //}
             int current_slide_number = this.presentation_controller.get_current_slide_number();
             int current_user_slide_number = this.presentation_controller.get_current_user_slide_number();
             try {
@@ -558,15 +547,15 @@ namespace pdfpc.Window {
         public void show_overview() {
             this.slideViews.hide();
             if (!overview_added) {
-                this.fullLayout.pack_start( this.centered_overview, true, true, 0 );
+                this.fullLayout.pack_start( this.overview, true, true, 0 );
                 overview_added = true;
             }
-            this.centered_overview.show();
+            this.overview.show();
             this.overview.current_slide = this.presentation_controller.get_current_user_slide_number();
         }
 
         public void hide_overview() {
-            this.centered_overview.hide();
+            this.overview.hide();
             this.slideViews.show();
         }
 
