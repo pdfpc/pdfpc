@@ -245,34 +245,9 @@ namespace pdfpc.Window {
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
-            try {
-                var blank_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "blank.svg", (int)Math.floor(1.06*icon_height), icon_height);
-                this.blank_icon = new Gtk.Image.from_pixbuf(blank_pixbuf);
-                this.blank_icon.no_show_all = true;
-            } catch (Error e) {
-                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "blank.svg", e.message);
-                this.blank_icon = new Gtk.Image.from_icon_name("image-missing",
-                                                                Gtk.IconSize.LARGE_TOOLBAR);
-
-            }
-            try {
-                var frozen_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "snow.svg", icon_height, icon_height);
-                this.frozen_icon = new Gtk.Image.from_pixbuf(frozen_pixbuf);
-                this.frozen_icon.no_show_all = true;
-            } catch (Error e) {
-                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "snow.svg", e.message);
-                this.frozen_icon = new Gtk.Image.from_icon_name("image-missing",
-                                                                Gtk.IconSize.LARGE_TOOLBAR);
-
-            }
-            try {
-                var pause_pixbuf = Rsvg.pixbuf_from_file_at_size(icon_path + "pause.svg", icon_height, icon_height);
-                this.pause_icon = new Gtk.Image.from_pixbuf(pause_pixbuf);
-                this.pause_icon.no_show_all = true;
-            } catch (Error e) {
-                stderr.printf("Warning: Could not load icon %s (%s)\n", icon_path + "pause.svg", e.message);
-                this.pause_icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
-            }
+            this.blank_icon = this.load_icon("blank.svg", icon_height);
+            this.frozen_icon = this.load_icon("snow.svg", icon_height);
+            this.pause_icon = this.load_icon("pause.svg", icon_height);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
@@ -323,6 +298,21 @@ namespace pdfpc.Window {
             this.get_allocation(out allocation);
             this.overview.set_available_space(allocation.width,
                                               (int)Math.floor(allocation.height * 0.9));
+        }
+
+        protected Gtk.Image load_icon(string filename, int icon_height) {
+            Gtk.Image icon;
+            try {
+                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(icon_path + filename,
+                    (int)Math.floor(1.06*icon_height), icon_height);
+                icon = new Gtk.Image.from_pixbuf(pixbuf);
+                icon.no_show_all = true;
+            } catch (Error e) {
+                stderr.printf("Warning: Could not load icon %s (%s)\n",
+                    icon_path + "blank.svg", e.message);
+                icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
+            }
+            return icon;
         }
 
         protected void build_layout() {
