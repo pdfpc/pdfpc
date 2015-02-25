@@ -349,12 +349,9 @@ namespace pdfpc.Window {
 
             var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             progress_alignment.pack_end(this.slide_progress);
-
+            this.prerender_progress.vexpand = false;
             this.prerender_progress.valign = Gtk.Align.CENTER;
-            this.prerender_progress.halign = Gtk.Align.START;
-            this.prerender_progress.hexpand = true;
-
-            progress_alignment.pack_start(this.prerender_progress);
+            progress_alignment.pack_start(this.prerender_progress, true, true, 0);
 
             bottomRow.pack_start( status, true, true, 0);
             bottomRow.pack_start( this.timer, true, true, 0 );
