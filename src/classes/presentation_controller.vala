@@ -324,6 +324,9 @@ namespace pdfpc {
         public bool key_press( Gdk.EventKey key ) {
             if (key.time != last_key_event && !ignore_keyboard_events ) {
                 last_key_event = key.time;
+                if (this.overview_shown && this.overview.key_press_event(key))
+                    return true;
+
                 var action = this.keyBindings.get(new KeyDef(key.keyval,key.state & this.accepted_key_mods));
                 if (action != null)
                     action.d();

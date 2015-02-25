@@ -133,8 +133,8 @@ namespace pdfpc.Window {
             this.slides_view.pack_start(renderer, true);
             this.slides_view.add_attribute(renderer, "pixbuf", 0);
             this.slides_view.set_item_padding(0);
+            this.slides_view.show();
             this.add(this.slides_view);
-            this.show_all();
 
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
@@ -145,7 +145,9 @@ namespace pdfpc.Window {
             this.slides_view.button_release_event.connect( this.on_mouse_release );
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
-            this.parent_set.connect( this.on_parent_set );
+            this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
+            this.show.connect(this.on_show);
+            this.hide.connect(this.on_hide);
 
             this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
@@ -156,24 +158,13 @@ namespace pdfpc.Window {
             this.fill_structure();
         }
 
-        /*
-         * Due to a change, the Overview is no longer shown or hidden; instead, its
-         * parent is.  So we need to connect to its parent's show and hide signals.
-         * But we can't do that until the parent has been set.  Thus this signal
-         * handler.  Note that if the Overview is reparented, it will still be
-         * connected to signals from its old parent.  So don't do that.
-         */
-        public void on_parent_set(Gtk.Widget? old_parent) {
-            if (this.parent != null) {
-                this.parent.show.connect( this.on_show );
-                this.parent.hide.connect( this.on_hide );
-            }
-        }
-
         /**
-         * Get keyboard focus.
+         * Get keyboard focus.  This requires that the window has focus.
          */
         public void on_show() {
+            Gtk.Window top = this.get_toplevel() as Gtk.Window;
+            if (top != null)
+                top.present();
             this.slides_view.grab_focus();
         }
 
