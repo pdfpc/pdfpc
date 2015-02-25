@@ -582,7 +582,7 @@ namespace pdfpc.Window {
         }
 
         public void prerender_finished() {
-            this.prerender_progress.hide();
+            this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
             this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
         }
 
