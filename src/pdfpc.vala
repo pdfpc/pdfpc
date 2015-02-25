@@ -120,7 +120,9 @@ namespace pdfpc {
                 .slider, .progressbar {
                     border: none;
                     background-color: white;
-                    color: black;
+                }
+                GtkProgressBar {
+                    color: gray;
                 }
                 .trough {
                     border: none;
