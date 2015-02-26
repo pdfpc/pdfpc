@@ -70,7 +70,7 @@ namespace pdfpc.Window {
                 height = this.screen_geometry.height;
             }
 
-            this.view = View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
+            this.view = new View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
                 Options.black_on_end, true, this.presentation_controller, out scale_rect);
 
             if (!Options.disable_caching) {

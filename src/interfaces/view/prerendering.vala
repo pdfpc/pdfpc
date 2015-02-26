@@ -27,7 +27,7 @@ namespace pdfpc.View {
      * view, which does not implement the Renderer.Caching interface the
      * prerender functionallity can't be used.
      */
-    public interface Prerendering: GLib.Object {
+    public interface Prerendering : GLib.Object {
         /**
          * Signal emitted every time a precached slide has been created
          *
@@ -47,3 +47,4 @@ namespace pdfpc.View {
         public signal void prerendering_started();
     }
 }
+

@@ -152,7 +152,7 @@ namespace pdfpc.Window {
             Gdk.Rectangle current_scale_rect;
             int current_allocated_width = (int) Math.floor(
                 this.screen_geometry.width * Options.current_size / (double) 100);
-            this.current_view = View.Pdf.from_metadata(
+            this.current_view = new View.Pdf.from_metadata(
                 metadata,
                 current_allocated_width,
                 (int) Math.floor(0.8 * bottom_position),
@@ -171,7 +171,7 @@ namespace pdfpc.Window {
             Gdk.Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width - 4;
             // We leave a bit of margin between the two views
-            this.next_view = View.Pdf.from_metadata(
+            this.next_view = new View.Pdf.from_metadata(
                 metadata,
                 next_allocated_width,
                 (int) Math.floor(0.7 * bottom_position),
@@ -182,7 +182,7 @@ namespace pdfpc.Window {
                 out next_scale_rect
             );
 
-            this.strict_next_view = View.Pdf.from_metadata(
+            this.strict_next_view = new View.Pdf.from_metadata(
                 metadata,
                 (int) Math.floor(0.5 * current_allocated_width),
                 (int) Math.floor(0.19 * bottom_position) - 2,
@@ -192,7 +192,7 @@ namespace pdfpc.Window {
                 this.presentation_controller,
                 out next_scale_rect
             );
-            this.strict_prev_view = View.Pdf.from_metadata(
+            this.strict_prev_view = new View.Pdf.from_metadata(
                 metadata,
                 (int) Math.floor(0.5 * current_allocated_width),
                 (int) Math.floor(0.19 * bottom_position) - 2,

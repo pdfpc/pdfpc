@@ -34,6 +34,7 @@ namespace pdfpc.View {
          * The implementation needs to support an arbitrary amount of different
          * behaviours.
          */
-        public abstract void associate_behaviour( Behaviour.Base behaviour );
+        public abstract void associate_behaviour(Behaviour.Base behaviour);
     }
 }
+

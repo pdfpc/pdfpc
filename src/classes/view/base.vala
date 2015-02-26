@@ -24,16 +24,16 @@ namespace pdfpc {
     /**
      * Base class for every slide view
      */
-    public abstract class View.Base: Gtk.DrawingArea {
+    public abstract class View.Base : Gtk.DrawingArea {
         /**
          * Signal fired every time a slide is about to be left
          */
-        public signal void leaving_slide( int from, int to );
+        public signal void leaving_slide(int from, int to);
 
         /**
          * Signal fired every time a slide is entered
          */
-        public signal void entering_slide( int slide_number );
+        public signal void entering_slide(int slide_number);
 
         /**
          * Renderer to be used for rendering the slides
@@ -45,10 +45,7 @@ namespace pdfpc {
          */
         protected Base( Renderer.Base renderer ) {
             this.renderer = renderer;
-            this.set_size_request(
-                renderer.width,
-                renderer.height
-            );
+            this.set_size_request(renderer.width, renderer.height);
         }
 
         /**
@@ -63,7 +60,7 @@ namespace pdfpc {
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public abstract void display( int slide_number, bool force_redraw=false )
+        public abstract void display(int slide_number, bool force_redraw=false)
             throws Renderer.RenderError;
 
         /**
@@ -82,3 +79,4 @@ namespace pdfpc {
         public abstract int get_current_slide_number();
     }
 }
+
