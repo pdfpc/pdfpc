@@ -88,6 +88,9 @@ namespace pdfpc {
          */
         protected Metadata.Pdf metadata;
 
+        public Renderer.Pdf slide_renderer { get; protected set; }
+        public Renderer.Pdf notes_renderer { get; protected set; }
+
         /**
          * The presenters overview. We need to communicate with it for toggling
          * skips
@@ -144,10 +147,13 @@ namespace pdfpc {
         /**
          * Instantiate a new controller
          */
-        public PresentationController(Metadata.Pdf metadata, bool allow_black_on_end) {
+        public PresentationController(Metadata.Pdf metadata, Renderer.Pdf slide_renderer,
+            Renderer.Pdf notes_renderer) {
             this.metadata = metadata;
+            this.slide_renderer = slide_renderer;
+            this.notes_renderer = notes_renderer;
             this.metadata.controller = this;
-            this.black_on_end = allow_black_on_end;
+            this.black_on_end = Options.black_on_end;
 
             this.controllables = new GLib.List<Controllable>();
 

@@ -38,7 +38,7 @@ namespace pdfpc {
         /**
          * Cache store to be used
          */
-        public Renderer.Cache.Base? cache { get; set; default = null; }
+        public Renderer.Cache.Base? cache { get; protected set; default = null; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -55,8 +55,11 @@ namespace pdfpc {
             this.area = area;
 
             // Calculate the scaling factor needed.
-            this.scaling_factor = Math.fmax(width / metadata.get_page_width(),
+            this.scaling_factor = Math.fmin(width / metadata.get_page_width(),
                 height / metadata.get_page_height());
+
+            if (!Options.disable_caching)
+                cache = Renderer.Cache.create(metadata);
         }
 
         /**
@@ -104,7 +107,7 @@ namespace pdfpc {
 
             // If the cache is enabled store the newly rendered pixmap
             if (this.cache != null) {
-                this.cache.store( slide_number, surface );
+                this.cache.store(slide_number, surface);
             }
 
             return surface;

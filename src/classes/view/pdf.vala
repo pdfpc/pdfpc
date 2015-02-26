@@ -56,7 +56,8 @@ namespace pdfpc {
             PresentationController presentation_controller, out Gdk.Rectangle scale_rect = null) {
             var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
             scale_rect = scaler.scale_to(width, height);
-            var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
+            Renderer.Pdf renderer = (area == Metadata.Area.NOTES) ?
+                presentation_controller.notes_renderer : presentation_controller.slide_renderer;
 
             this(renderer, allow_black_on_end, clickable_links, presentation_controller);
         }

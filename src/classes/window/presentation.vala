@@ -73,11 +73,6 @@ namespace pdfpc.Window {
             this.view = new View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
                 Options.black_on_end, true, this.presentation_controller, out scale_rect);
 
-            if (!Options.disable_caching) {
-                ((Renderer.Caching) this.view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
-            }
-
             // Center the scaled pdf on the monitor
             // In most cases it will however fill the full screen
             fixedLayout.put(this.view, scale_rect.x, scale_rect.y);
