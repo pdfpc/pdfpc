@@ -268,13 +268,13 @@ namespace pdfpc.Window {
             // Enable the render caching if it hasn't been forcefully disabled.
             if (!Options.disable_caching) {
                 ((Renderer.Caching) this.current_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(metadata));
+                    Renderer.Cache.create(metadata));
                 ((Renderer.Caching) this.next_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(metadata));
+                    Renderer.Cache.create(metadata));
                 ((Renderer.Caching) this.strict_next_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(metadata));
+                    Renderer.Cache.create(metadata));
                 ((Renderer.Caching)this.strict_prev_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(metadata));
+                    Renderer.Cache.create(metadata));
             }
 
             this.build_layout();
