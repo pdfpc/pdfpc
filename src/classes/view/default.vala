@@ -61,7 +61,7 @@ namespace pdfpc {
 
            this.current_slide_number = 0;
 
-           this.n_slides = (int)renderer.get_metadata().get_slide_count();
+           this.n_slides = (int)renderer.metadata.get_slide_count();
            this.slide_limit = this.n_slides + 1;
 
            // Render the initial page on first realization.
@@ -82,8 +82,8 @@ namespace pdfpc {
                 // impossible.
                 var caching_renderer = this.renderer as Renderer.Caching;
                 if ( caching_renderer != null
-                  && caching_renderer.get_cache() != null
-                  && caching_renderer.get_cache().allows_prerendering()) {
+                  && caching_renderer.cache != null
+                  && caching_renderer.cache.allows_prerendering()) {
                     this.register_prerendering();
                 }
            });
@@ -102,7 +102,7 @@ namespace pdfpc {
             int* i = null;
             // The page_count will be transfered into the lamda function as
             // well.
-            var page_count = this.get_renderer().get_metadata().get_slide_count();
+            var page_count = this.get_renderer().metadata.get_slide_count();
 
             this.prerendering_started();
 
@@ -192,7 +192,7 @@ namespace pdfpc {
             this.current_slide_number = slide_number;
 
             // Have Gtk update the widget
-            this.queue_draw_area( 0, 0, this.renderer.get_width(), this.renderer.get_height() );
+            this.queue_draw_area( 0, 0, this.renderer.width, this.renderer.height );
 
             this.entering_slide( this.current_slide_number );
         }
@@ -202,7 +202,7 @@ namespace pdfpc {
          */
         public override void fade_to_black() {
             this.current_slide = this.renderer.fade_to_black();
-            this.queue_draw_area( 0, 0, this.renderer.get_width(), this.renderer.get_height() );
+            this.queue_draw_area( 0, 0, this.renderer.width, this.renderer.height );
         }
 
         /**

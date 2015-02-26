@@ -267,14 +267,14 @@ namespace pdfpc.Window {
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if (!Options.disable_caching) {
-                ((Renderer.Caching) this.current_view.get_renderer()).set_cache(
-                    Renderer.Cache.create(metadata));
-                ((Renderer.Caching) this.next_view.get_renderer()).set_cache(
-                    Renderer.Cache.create(metadata));
-                ((Renderer.Caching) this.strict_next_view.get_renderer()).set_cache(
-                    Renderer.Cache.create(metadata));
-                ((Renderer.Caching)this.strict_prev_view.get_renderer()).set_cache(
-                    Renderer.Cache.create(metadata));
+                ((Renderer.Caching) this.current_view.get_renderer()).cache =
+                    Renderer.Cache.create(metadata);
+                ((Renderer.Caching) this.next_view.get_renderer()).cache =
+                    Renderer.Cache.create(metadata);
+                ((Renderer.Caching) this.strict_next_view.get_renderer()).cache =
+                    Renderer.Cache.create(metadata);
+                ((Renderer.Caching)this.strict_prev_view.get_renderer()).cache =
+                    Renderer.Cache.create(metadata);
             }
 
             this.build_layout();
@@ -543,7 +543,7 @@ namespace pdfpc.Window {
 
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
-            this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).get_cache());
+            this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).cache);
         }
     }
 }

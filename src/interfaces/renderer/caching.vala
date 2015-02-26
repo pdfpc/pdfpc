@@ -27,15 +27,8 @@ namespace pdfpc.Renderer {
      */
     public interface Caching: GLib.Object {
         /**
-         * Set a Cache store to be used for caching
+         * A Cache store to be used for caching
          */
-        public abstract void set_cache( Cache.Base cache );
-
-        /**
-         * Retrieve the currently used cache store
-         *
-         * If no cache store is set null will be returned.
-         */
-        public abstract Cache.Base get_cache();
+        public abstract Cache.Base? cache { get; set; }
     }
 }

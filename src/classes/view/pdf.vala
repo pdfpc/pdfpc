@@ -94,7 +94,7 @@ namespace pdfpc {
 
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates
-            var metadata = this.get_renderer().get_metadata() as Metadata.Pdf;
+            var metadata = this.get_renderer().metadata as Metadata.Pdf;
             gdk_rectangle.x = (int)Math.ceil( ( poppler_rectangle.x1 / metadata.get_page_width() ) * requisition.width );
             gdk_rectangle.width = (int)Math.floor( ( ( poppler_rectangle.x2 - poppler_rectangle.x1 ) / metadata.get_page_width() ) * requisition.width );
 

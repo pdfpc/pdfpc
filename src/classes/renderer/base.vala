@@ -29,17 +29,17 @@ namespace pdfpc {
         /**
          * Metadata object to render slides for
          */
-        protected Metadata.Base metadata;
+        public Metadata.Base metadata { get; protected set; }
 
         /**
          * Width to render to
          */
-        protected int width;
+        public int width { get; protected set; }
 
         /**
          * Height to render to
          */
-        protected int height;
+        public int height { get; protected set; }
 
         /**
          * Base constructor taking a metadata object as well as the desired
@@ -49,27 +49,6 @@ namespace pdfpc {
             this.metadata = metadata;
             this.width = width;
             this.height = height;
-        }
-
-        /**
-         * Return the registered metadata object
-         */
-        public Metadata.Base get_metadata() {
-            return this.metadata;
-        }
-
-        /**
-         * Return the desired render width
-         */
-        public int get_width() {
-            return this.width;
-        }
-
-        /**
-         * Return the desired render height
-         */
-        public int get_height() {
-            return this.height;
         }
 
         /**

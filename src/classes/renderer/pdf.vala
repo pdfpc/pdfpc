@@ -39,7 +39,7 @@ namespace pdfpc {
         /**
          * Cache store to be used
          */
-        protected Renderer.Cache.Base cache = null;
+        public Renderer.Cache.Base? cache { get; set; default = null; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -60,20 +60,6 @@ namespace pdfpc {
                 width / metadata.get_page_width(),
                 height / metadata.get_page_height()
             );
-        }
-
-        /**
-         * Set cache store to use
-         */
-        public void set_cache( Renderer.Cache.Base cache ) {
-            this.cache = cache;
-        }
-
-        /**
-         * Retrieve the currently used cache engine
-         */
-        public Renderer.Cache.Base get_cache() {
-            return this.cache;
         }
 
         /**
