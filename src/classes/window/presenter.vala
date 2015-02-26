@@ -251,9 +251,9 @@ namespace pdfpc.Window {
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.add_events(Gdk.EventMask.SCROLL_MASK);
 
-            this.key_press_event.connect(this.on_key_pressed);
-            this.button_press_event.connect(this.on_button_press);
-            this.scroll_event.connect(this.on_scroll);
+            this.key_press_event.connect(this.presentation_controller.key_press);
+            this.button_press_event.connect(this.presentation_controller.button_press);
+            this.scroll_event.connect(this.presentation_controller.scroll);
 
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
@@ -370,41 +370,6 @@ namespace pdfpc.Window {
 
             this.overview.halign = Gtk.Align.CENTER;
             this.overview.valign = Gtk.Align.CENTER;
-        }
-
-        /**
-         * Handle keypress events on the window and, if neccessary send them to the
-         * presentation controller
-         */
-        protected bool on_key_pressed(Gtk.Widget source, Gdk.EventKey key) {
-            if (this.presentation_controller != null) {
-                return this.presentation_controller.key_press(key);
-            } else {
-                // Can this happen?
-                return false;
-            }
-        }
-
-        /**
-         * Handle mouse button events on the window and, if neccessary send
-         * them to the presentation controller
-         */
-        protected bool on_button_press(Gtk.Widget source, Gdk.EventButton button) {
-            if (this.presentation_controller != null) {
-                this.presentation_controller.button_press(button);
-            }
-            return false;
-        }
-
-        /**
-         * Handle mouse scrolling events on the window and, if neccessary send
-         * them to the presentation controller
-         */
-        protected bool on_scroll(Gtk.Widget source, Gdk.EventScroll scroll) {
-            if (this.presentation_controller != null) {
-                this.presentation_controller.scroll(scroll);
-            }
-            return false;
         }
 
         /**

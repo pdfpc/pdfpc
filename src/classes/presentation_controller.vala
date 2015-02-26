@@ -355,7 +355,7 @@ namespace pdfpc {
         /**
          * Notify each of the controllables of mouse scrolling
          */
-        public void scroll(Gdk.EventScroll scroll) {
+        public bool scroll(Gdk.EventScroll scroll) {
             if (!this.ignore_mouse_events) {
                 switch (scroll.direction) {
                     case Gdk.ScrollDirection.UP:
@@ -374,7 +374,9 @@ namespace pdfpc {
                             this.next_page();
                     break;
                 }
+                return true;
             }
+            return false;
         }
 
         /**
