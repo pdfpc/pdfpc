@@ -146,8 +146,6 @@ namespace pdfpc.Window {
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
             this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
-            this.show.connect(this.on_show);
-            this.hide.connect(this.on_hide);
 
             this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
@@ -161,7 +159,7 @@ namespace pdfpc.Window {
         /**
          * Get keyboard focus.  This requires that the window has focus.
          */
-        public void on_show() {
+        public void ensure_focus() {
             Gtk.Window top = this.get_toplevel() as Gtk.Window;
             if (top != null)
                 top.present();
@@ -171,7 +169,7 @@ namespace pdfpc.Window {
         /*
          * Recalculate the structure, if needed.
          */
-        public void on_hide() {
+        public void ensure_structure() {
             if (this.n_slides != this.last_structure_n_slides)
                 this.fill_structure();
         }

@@ -91,26 +91,14 @@ namespace pdfpc.Window {
         protected Gtk.TextView notes_view;
 
         /**
-         * The views of the slides + notes
-         */
-        protected Gtk.Box slide_views = null;
-
-        /**
          * The overview of slides
          */
         protected Overview overview = null;
 
         /**
-         * There may be problems in some configurations if adding the overview
-         * from the beginning, therefore we delay it until it is first shown.
+         * The Stack containing the slides view and the overview.
          */
-        protected bool overview_added = false;
-
-        /**
-         * We will also need to store the layout where we have to add the
-         * overview (see the comment above)
-         */
-        protected Gtk.Box full_layout = null;
+        protected Gtk.Stack slide_stack;
 
         /**
          * Number of slides inside the presentation
@@ -310,7 +298,7 @@ namespace pdfpc.Window {
         }
 
         protected void build_layout() {
-            this.slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
+            Gtk.Box slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
@@ -324,7 +312,7 @@ namespace pdfpc.Window {
             current_view_and_stricts.pack_start(strict_views, false, false, 2);
 
 
-            this.slide_views.pack_start(current_view_and_stricts, true, true, 0);
+            slide_views.pack_start(current_view_and_stricts, true, true, 0);
 
             var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             this.next_view.halign = Gtk.Align.CENTER;
@@ -334,7 +322,15 @@ namespace pdfpc.Window {
             notes_sw.add(this.notes_view);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
             nextViewWithNotes.pack_start(notes_sw, true, true, 5);
-            this.slide_views.pack_start(nextViewWithNotes, true, true, 0);
+            slide_views.pack_start(nextViewWithNotes, true, true, 0);
+
+            this.overview.halign = Gtk.Align.CENTER;
+            this.overview.valign = Gtk.Align.CENTER;
+
+            this.slide_stack = new Gtk.Stack();
+            this.slide_stack.add_named(slide_views, "slides");
+            this.slide_stack.add_named(this.overview, "overview");
+            this.slide_stack.homogeneous = true;
 
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             bottom_row.homogeneous = true;
@@ -357,16 +353,12 @@ namespace pdfpc.Window {
             bottom_row.pack_start(this.timer, true, true, 0);
             bottom_row.pack_end(progress_alignment, true, true, 0);
 
-            this.full_layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            this.full_layout.set_size_request(this.screen_geometry.width,
-                this.screen_geometry.height);
-            this.full_layout.pack_start(this.slide_views, true, true, 0);
-            this.full_layout.pack_end(bottom_row, false, false, 0);
+            Gtk.Box full_layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            full_layout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
+            full_layout.pack_start(this.slide_stack, true, true, 0);
+            full_layout.pack_end(bottom_row, false, false, 0);
 
-            this.add(this.full_layout);
-
-            this.overview.halign = Gtk.Align.CENTER;
-            this.overview.valign = Gtk.Align.CENTER;
+            this.add(full_layout);
         }
 
         /**
@@ -502,18 +494,14 @@ namespace pdfpc.Window {
         }
 
         public void show_overview() {
-            this.slide_views.hide();
-            if (!overview_added) {
-                this.full_layout.pack_start(this.overview, true, true, 0);
-                overview_added = true;
-            }
-            this.overview.show();
+            this.slide_stack.set_visible_child_name("overview");
+            this.overview.ensure_focus();
             this.overview.current_slide = this.presentation_controller.current_user_slide_number;
         }
 
         public void hide_overview() {
-            this.overview.hide();
-            this.slide_views.show();
+            this.slide_stack.set_visible_child_name("slides");
+            this.overview.ensure_structure();
         }
 
         /**
