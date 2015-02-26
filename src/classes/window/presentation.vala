@@ -24,7 +24,7 @@ namespace pdfpc.Window {
     /**
      * Window showing the currently active slide to be presented on a beamer
      */
-    public class Presentation: Fullscreen, Controllable {
+    public class Presentation : Fullscreen, Controllable {
         /**
          * Controller handling all the events which might happen. Furthermore it is
          * responsible to update all the needed visual stuff if needed
@@ -39,19 +39,18 @@ namespace pdfpc.Window {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public Presentation( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller, int width = -1, int height = -1 ) {
-            base( screen_num, width, height );
+        public Presentation(Metadata.Pdf metadata, int screen_num,
+            PresentationController presentation_controller, int width = -1, int height = -1) {
+            base(screen_num, width, height);
             this.role = "presentation";
 
-            this.destroy.connect( (source) => {
-                presentation_controller.quit();
-            } );
+            this.destroy.connect((source) => presentation_controller.quit());
 
             this.presentation_controller = presentation_controller;
 
             var fixedLayout = new Gtk.Fixed();
             fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
-            this.add( fixedLayout );
+            this.add(fixedLayout);
 
             Gdk.Rectangle scale_rect;
 
@@ -63,51 +62,36 @@ namespace pdfpc.Window {
                 height = this.screen_geometry.height;
             }
 
-            this.view = View.Pdf.from_metadata(
-                metadata,
-                width,
-                height,
-                Metadata.Area.CONTENT,
-                Options.black_on_end,
-                true,
-                this.presentation_controller,
-                out scale_rect
-            );
+            this.view = View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
+                Options.black_on_end, true, this.presentation_controller, out scale_rect);
 
-            if ( !Options.disable_caching ) {
-                ((Renderer.Caching)this.view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(
-                        metadata
-                    )
-                );
+            if (!Options.disable_caching) {
+                ((Renderer.Caching) this.view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(metadata));
             }
 
             // Center the scaled pdf on the monitor
             // In most cases it will however fill the full screen
-            fixedLayout.put(
-                this.view,
-                scale_rect.x,
-                scale_rect.y
-            );
+            fixedLayout.put(this.view, scale_rect.x, scale_rect.y);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.add_events(Gdk.EventMask.SCROLL_MASK);
 
-            this.key_press_event.connect( this.on_key_pressed );
-            this.button_press_event.connect( this.on_button_press );
-            this.scroll_event.connect( this.on_scroll );
+            this.key_press_event.connect(this.on_key_pressed);
+            this.button_press_event.connect(this.on_button_press);
+            this.scroll_event.connect(this.on_scroll);
 
-            this.presentation_controller.register_controllable( this );
+            this.presentation_controller.register_controllable(this);
         }
 
         /**
          * Handle keypress vents on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( Gdk.EventKey key ) {
-            if ( this.presentation_controller != null ) {
-                this.presentation_controller.key_press( key );
+        protected bool on_key_pressed(Gdk.EventKey key) {
+            if (this.presentation_controller != null) {
+                this.presentation_controller.key_press(key);
             }
             return false;
         }
@@ -116,9 +100,9 @@ namespace pdfpc.Window {
          * Handle mouse button events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_button_press( Gdk.EventButton button ) {
-            if ( this.presentation_controller != null ) {
-                this.presentation_controller.button_press( button );
+        protected bool on_button_press(Gdk.EventButton button) {
+            if (this.presentation_controller != null) {
+                this.presentation_controller.button_press(button);
             }
             return false;
         }
@@ -127,8 +111,8 @@ namespace pdfpc.Window {
          * Handle mouse scrolling events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_scroll( Gtk.Widget source, Gdk.EventScroll scroll ) {
-            if ( this.presentation_controller != null ) {
+        protected bool on_scroll(Gtk.Widget source, Gdk.EventScroll scroll) {
+            if (this.presentation_controller != null) {
                 this.presentation_controller.scroll( scroll );
             }
             return false;
@@ -138,7 +122,7 @@ namespace pdfpc.Window {
          * Set the presentation controller which is notified of keypresses and
          * other observed events
          */
-        public void set_controller( PresentationController controller ) {
+        public void set_controller(PresentationController controller) {
             this.presentation_controller = controller;
         }
 
@@ -159,11 +143,12 @@ namespace pdfpc.Window {
             }
             if (this.presentation_controller.frozen)
                 return;
+
             try {
                 this.view.display(this.presentation_controller.current_slide_number, true);
-            }
-            catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page %d could not be rendered: %s", this.presentation_controller.current_slide_number, e.message );
+            } catch (Renderer.RenderError e) {
+                error("The pdf page %d could not be rendered: %s",
+                    this.presentation_controller.current_slide_number, e.message );
             }
         }
 
@@ -198,10 +183,10 @@ namespace pdfpc.Window {
          * this window correctly with the CacheStatus object to provide acurate
          * cache status measurements.
          */
-        public void set_cache_observer( CacheStatus observer ) {
+        public void set_cache_observer(CacheStatus observer) {
             var prerendering_view = this.view as View.Prerendering;
-            if( prerendering_view != null ) {
-                observer.monitor_view( prerendering_view );
+            if (prerendering_view != null) {
+                observer.monitor_view(prerendering_view);
             }
         }
 
@@ -213,3 +198,4 @@ namespace pdfpc.Window {
         }
     }
 }
+

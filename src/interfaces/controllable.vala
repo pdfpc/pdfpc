@@ -25,7 +25,7 @@ namespace pdfpc {
      * Every window or object which wants to be controlled by the
      * PresentationController needs to implement this interface.
      */
-    public interface Controllable: GLib.Object {
+    public interface Controllable : GLib.Object {
         /**
          * Set the presentation controller which needs to be informed of key
          * presses and such.
@@ -68,3 +68,4 @@ namespace pdfpc {
         public abstract View.Pdf? get_main_view();
     }
 }
+
