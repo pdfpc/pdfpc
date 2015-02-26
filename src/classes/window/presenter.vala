@@ -29,10 +29,18 @@ namespace pdfpc.Window {
      */
     public class Presenter : Fullscreen, Controllable {
         /**
-         * Controller handling all the events which might happen. Furthermore it is
-         * responsible to update all the needed visual stuff if needed
+         * The registered PresentationController
          */
-        protected PresentationController presentation_controller = null;
+        public PresentationController presentation_controller { get; protected set; }
+
+        /**
+         * Only handle links and annotations on the current_view
+         */
+        public View.Pdf main_view {
+            get {
+                return this.current_view as View.Pdf;
+            }
+        }
 
         /**
          * View showing the current slide
@@ -411,13 +419,6 @@ namespace pdfpc.Window {
             this.slide_progress.set_text("%d/%u".printf(current, total));
         }
 
-        /**
-         * Return the registered PresentationController
-         */
-        public PresentationController? get_controller() {
-            return this.presentation_controller;
-        }
-
         public void update() {
             int current_slide_number = this.presentation_controller.current_slide_number;
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
@@ -578,13 +579,6 @@ namespace pdfpc.Window {
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
             this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).get_cache());
-        }
-
-        /**
-         * Only handle links and annotations on the current_view
-         */
-        public View.Pdf? get_main_view() {
-            return this.current_view as View.Pdf;
         }
     }
 }

@@ -27,15 +27,14 @@ namespace pdfpc {
      */
     public interface Controllable : GLib.Object {
         /**
-         * Set the presentation controller which needs to be informed of key
-         * presses and such.
+         * The registered PresentationController
          */
-        //public abstract void set_controller( PresentationController controller ) ;
+        public abstract PresentationController presentation_controller { get; protected set; }
 
         /**
-         * Return the registered PresentationController
+         * The view on which links and annotations should be handled.
          */
-        public abstract PresentationController? get_controller();
+        public abstract View.Pdf main_view { get; }
 
         /**
          * Update the display
@@ -45,27 +44,22 @@ namespace pdfpc {
         /**
          * Edit note for current slide
          */
-        public abstract void edit_note();
+        public virtual void edit_note() {}
 
         /**
          * Ask for the page to jump to
          */
-        public abstract void ask_goto_page();
+        public virtual void ask_goto_page() {}
 
         /**
          * Show an overview of all slides
          */
-        public abstract void show_overview();
+        public virtual void show_overview() {}
 
         /**
          * Hide the overview
          */
-        public abstract void hide_overview();
-
-        /**
-         * Return the view on which links and annotations should be handled.
-         */
-        public abstract View.Pdf? get_main_view();
+        public virtual void hide_overview() {}
     }
 }
 

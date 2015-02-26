@@ -26,10 +26,18 @@ namespace pdfpc.Window {
      */
     public class Presentation : Fullscreen, Controllable {
         /**
-         * Controller handling all the events which might happen. Furthermore it is
-         * responsible to update all the needed visual stuff if needed
+         * The registered PresentationController
          */
-        protected PresentationController presentation_controller = null;
+        public PresentationController presentation_controller { get; protected set; }
+
+        /**
+         * The only view is the main view.
+         */
+        public View.Pdf main_view {
+            get {
+                return this.view as View.Pdf;
+            }
+        }
 
         /**
          * View containing the slide to show
@@ -127,13 +135,6 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Return the PresentationController
-         */
-        public PresentationController? get_controller() {
-            return this.presentation_controller;
-        }
-
-        /**
          * Update the display
          */
         public void update() {
@@ -153,30 +154,6 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Edit note for current slide. We don't do anything.
-         */
-        public void edit_note() {
-        }
-
-        /**
-         * Ask for the page to jump to. We don't do anything
-         */
-        public void ask_goto_page() {
-        }
-
-        /**
-         * Show an overview. We don't do anything (yet?)
-         */
-        public void show_overview() {
-        }
-
-        /**
-         * Hide the overview. We don't do anything
-         */
-        public void hide_overview() {
-        }
-
-        /**
          * Set the cache observer for the Views on this window
          *
          * This method takes care of registering all Prerendering Views used by
@@ -188,13 +165,6 @@ namespace pdfpc.Window {
             if (prerendering_view != null) {
                 observer.monitor_view(prerendering_view);
             }
-        }
-
-        /**
-         * The only view is the main view.
-         */
-        public View.Pdf? get_main_view() {
-            return this.view as View.Pdf;
         }
     }
 }
