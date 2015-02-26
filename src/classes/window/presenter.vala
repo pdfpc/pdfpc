@@ -27,7 +27,7 @@ namespace pdfpc.Window {
      * Other useful information like time slide count, ... can be displayed here as
      * well.
      */
-    public class Presenter: Fullscreen, Controllable {
+    public class Presenter : Fullscreen, Controllable {
         /**
          * Controller handling all the events which might happen. Furthermore it is
          * responsible to update all the needed visual stuff if needed
@@ -85,7 +85,7 @@ namespace pdfpc.Window {
         /**
          * The views of the slides + notes
          */
-        protected Gtk.Box slideViews = null;
+        protected Gtk.Box slide_views = null;
 
         /**
          * The overview of slides
@@ -102,7 +102,7 @@ namespace pdfpc.Window {
          * We will also need to store the layout where we have to add the
          * overview (see the comment above)
          */
-        protected Gtk.Box fullLayout = null;
+        protected Gtk.Box full_layout = null;
 
         /**
          * Number of slides inside the presentation
@@ -120,13 +120,12 @@ namespace pdfpc.Window {
         /**
          * Base constructor instantiating a new presenter window
          */
-        public Presenter( Metadata.Pdf metadata, int screen_num, PresentationController presentation_controller ) {
-            base( screen_num );
+        public Presenter(Metadata.Pdf metadata, int screen_num,
+            PresentationController presentation_controller) {
+            base(screen_num);
             this.role = "presenter";
 
-            this.destroy.connect( (source) => {
-                presentation_controller.quit();
-            } );
+            this.destroy.connect((source) => presentation_controller.quit());
 
             this.presentation_controller = presentation_controller;
 
@@ -134,7 +133,7 @@ namespace pdfpc.Window {
 
             // We need the value of 90% height a lot of times. Therefore store it
             // in advance
-            var bottom_position = (int)Math.floor( this.screen_geometry.height * 0.9 );
+            var bottom_position = (int) Math.floor(this.screen_geometry.height * 0.9);
             var bottom_height = this.screen_geometry.height - bottom_position;
 
             // In most scenarios the current slide is displayed bigger than the
@@ -143,13 +142,12 @@ namespace pdfpc.Window {
             // the screen, as we need a place to display the timer and slide
             // count.
             Gdk.Rectangle current_scale_rect;
-            int current_allocated_width = (int)Math.floor(
-                this.screen_geometry.width * Options.current_size / (double)100
-            );
+            int current_allocated_width = (int) Math.floor(
+                this.screen_geometry.width * Options.current_size / (double) 100);
             this.current_view = View.Pdf.from_metadata(
                 metadata,
                 current_allocated_width,
-                (int)Math.floor(0.8*bottom_position),
+                (int) Math.floor(0.8 * bottom_position),
                 Metadata.Area.NOTES,
                 Options.black_on_end,
                 true,
@@ -163,11 +161,12 @@ namespace pdfpc.Window {
             //this.current_view.size_request(out cv_requisition);
             //current_allocated_width = cv_requisition.width;
             Gdk.Rectangle next_scale_rect;
-            var next_allocated_width = this.screen_geometry.width - current_allocated_width-4; // We leave a bit of margin between the two views
+            var next_allocated_width = this.screen_geometry.width - current_allocated_width - 4;
+            // We leave a bit of margin between the two views
             this.next_view = View.Pdf.from_metadata(
                 metadata,
                 next_allocated_width,
-                (int)Math.floor(0.7*bottom_position),
+                (int) Math.floor(0.7 * bottom_position),
                 Metadata.Area.CONTENT,
                 true,
                 false,
@@ -177,8 +176,8 @@ namespace pdfpc.Window {
 
             this.strict_next_view = View.Pdf.from_metadata(
                 metadata,
-                (int)Math.floor(0.5*current_allocated_width),
-                (int)Math.floor(0.19*bottom_position) - 2,
+                (int) Math.floor(0.5 * current_allocated_width),
+                (int) Math.floor(0.19 * bottom_position) - 2,
                 Metadata.Area.CONTENT,
                 true,
                 false,
@@ -187,8 +186,8 @@ namespace pdfpc.Window {
             );
             this.strict_prev_view = View.Pdf.from_metadata(
                 metadata,
-                (int)Math.floor(0.5*current_allocated_width),
-                (int)Math.floor(0.19*bottom_position) - 2,
+                (int) Math.floor(0.5 * current_allocated_width),
+                (int) Math.floor(0.19 * bottom_position) - 2,
                 Metadata.Area.CONTENT,
                 true,
                 false,
@@ -197,45 +196,41 @@ namespace pdfpc.Window {
             );
 
             // TextView for notes in the slides
-            var notes_font = Pango.FontDescription.from_string( "Verdana" );
-            notes_font.set_size(
-                (int)Math.floor( 20 * 0.75 ) * Pango.SCALE
-            );
+            var notes_font = Pango.FontDescription.from_string("Verdana");
+            notes_font.set_size((int) Math.floor(20 * 0.75) * Pango.SCALE);
             this.notes_view = new Gtk.TextView();
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
             this.notes_view.override_font(notes_font);
             this.notes_view.buffer.text = "";
-            this.notes_view.key_press_event.connect( this.on_key_press_notes_view );
+            this.notes_view.key_press_event.connect(this.on_key_press_notes_view);
 
             // Initial font needed for the labels
             // We approximate the point size using pt = px * .75
-            var font = Pango.FontDescription.from_string( "Verdana" );
-            font.set_size(
-                (int)Math.floor( bottom_height * 0.8 * 0.75 ) * Pango.SCALE
-            );
+            var font = Pango.FontDescription.from_string("Verdana");
+            font.set_size((int) Math.floor(bottom_height * 0.8 * 0.75) * Pango.SCALE);
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
             this.timer = this.presentation_controller.getTimer();
-            this.timer.set_justify( Gtk.Justification.CENTER );
-            this.timer.override_font( font );
+            this.timer.set_justify(Gtk.Justification.CENTER);
+            this.timer.override_font(font);
 
 
             // The slide counter is centered in the 90% bottom part of the screen
             // It takes 1/4 of the available width on the right
             this.slide_progress = new Gtk.Entry();
             this.slide_progress.set_alignment(1f);
-            this.slide_progress.override_font( font );
+            this.slide_progress.override_font(font);
             this.slide_progress.sensitive = false;
             this.slide_progress.has_frame = false;
-            this.slide_progress.key_press_event.connect( this.on_key_press_slide_progress );
+            this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);
 
             this.prerender_progress = new Gtk.ProgressBar();
             this.prerender_progress.show_text = true;
             this.prerender_progress.text = "Prerendering...";
-            this.prerender_progress.override_font( notes_font );
+            this.prerender_progress.override_font(notes_font);
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
@@ -248,40 +243,30 @@ namespace pdfpc.Window {
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.add_events(Gdk.EventMask.SCROLL_MASK);
 
-            this.key_press_event.connect( this.on_key_pressed );
-            this.button_press_event.connect( this.on_button_press );
-            this.scroll_event.connect( this.on_scroll );
+            this.key_press_event.connect(this.on_key_pressed);
+            this.button_press_event.connect(this.on_button_press);
+            this.scroll_event.connect(this.on_scroll);
 
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
 
             this.overview = new Overview( this.metadata, this.presentation_controller, this );
             this.overview.set_n_slides( this.presentation_controller.user_n_slides );
+            this.overview = new Overview(this.metadata, this.presentation_controller, this);
+            this.overview.set_n_slides(this.presentation_controller.user_n_slides);
             this.presentation_controller.set_overview(this.overview);
-            this.presentation_controller.register_controllable( this );
+            this.presentation_controller.register_controllable(this);
 
             // Enable the render caching if it hasn't been forcefully disabled.
-            if ( !Options.disable_caching ) {
-                ((Renderer.Caching)this.current_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(
-                        metadata
-                    )
-                );
-                ((Renderer.Caching)this.next_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(
-                        metadata
-                    )
-                );
-                ((Renderer.Caching)this.strict_next_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(
-                        metadata
-                    )
-                );
+            if (!Options.disable_caching) {
+                ((Renderer.Caching) this.current_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(metadata));
+                ((Renderer.Caching) this.next_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(metadata));
+                ((Renderer.Caching) this.strict_next_view.get_renderer()).set_cache(
+                    Renderer.Cache.OptionFactory.create(metadata));
                 ((Renderer.Caching)this.strict_prev_view.get_renderer()).set_cache(
-                    Renderer.Cache.OptionFactory.create(
-                        metadata
-                    )
-                );
+                    Renderer.Cache.OptionFactory.create(metadata));
             }
 
             this.build_layout();
@@ -292,7 +277,7 @@ namespace pdfpc.Window {
             Gtk.Allocation allocation;
             this.get_allocation(out allocation);
             this.overview.set_available_space(allocation.width,
-                                              (int)Math.floor(allocation.height * 0.9));
+                (int) Math.floor(allocation.height * 0.9));
         }
 
         protected Gtk.Image load_icon(string filename, int icon_height) {
@@ -308,7 +293,7 @@ namespace pdfpc.Window {
             Gtk.Image icon;
             try {
                 Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(icon_path + filename,
-                    (int)Math.floor(1.06*icon_height), icon_height);
+                    (int) Math.floor(1.06 * icon_height), icon_height);
                 icon = new Gtk.Image.from_pixbuf(pixbuf);
                 icon.no_show_all = true;
             } catch (Error e) {
@@ -320,7 +305,7 @@ namespace pdfpc.Window {
         }
 
         protected void build_layout() {
-            this.slideViews = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
+            this.slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
@@ -334,25 +319,25 @@ namespace pdfpc.Window {
             current_view_and_stricts.pack_start(strict_views, false, false, 2);
 
 
-            this.slideViews.pack_start(current_view_and_stricts, true, true, 0);
+            this.slide_views.pack_start(current_view_and_stricts, true, true, 0);
 
             var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             this.next_view.halign = Gtk.Align.CENTER;
             this.next_view.valign = Gtk.Align.CENTER;
-            nextViewWithNotes.pack_start( next_view, false, false, 0 );
+            nextViewWithNotes.pack_start(next_view, false, false, 0);
             var notes_sw = new Gtk.ScrolledWindow(null, null);
-            notes_sw.add( this.notes_view );
-            notes_sw.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC );
-            nextViewWithNotes.pack_start( notes_sw, true, true, 5 );
-            this.slideViews.pack_start(nextViewWithNotes, true, true, 0);
+            notes_sw.add(this.notes_view);
+            notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+            nextViewWithNotes.pack_start(notes_sw, true, true, 5);
+            this.slide_views.pack_start(nextViewWithNotes, true, true, 0);
 
-            var bottomRow = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            bottomRow.homogeneous = true;
+            var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            bottom_row.homogeneous = true;
 
             var status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
-            status.pack_start( this.blank_icon, false, false, 0 );
-            status.pack_start( this.frozen_icon, false, false, 0 );
-            status.pack_start( this.pause_icon, false, false, 0 );
+            status.pack_start(this.blank_icon, false, false, 0);
+            status.pack_start(this.frozen_icon, false, false, 0);
+            status.pack_start(this.pause_icon, false, false, 0);
 
             this.timer.halign = Gtk.Align.CENTER;
             this.timer.valign = Gtk.Align.CENTER;
@@ -363,16 +348,17 @@ namespace pdfpc.Window {
             this.prerender_progress.valign = Gtk.Align.CENTER;
             progress_alignment.pack_start(this.prerender_progress, true, true, 0);
 
-            bottomRow.pack_start( status, true, true, 0);
-            bottomRow.pack_start( this.timer, true, true, 0 );
-            bottomRow.pack_end( progress_alignment, true, true, 0);
+            bottom_row.pack_start(status, true, true, 0);
+            bottom_row.pack_start(this.timer, true, true, 0);
+            bottom_row.pack_end(progress_alignment, true, true, 0);
 
-            this.fullLayout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            this.fullLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
-            this.fullLayout.pack_start( this.slideViews, true, true, 0 );
-            this.fullLayout.pack_end( bottomRow, false, false, 0 );
+            this.full_layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            this.full_layout.set_size_request(this.screen_geometry.width,
+                this.screen_geometry.height);
+            this.full_layout.pack_start(this.slide_views, true, true, 0);
+            this.full_layout.pack_end(bottom_row, false, false, 0);
 
-            this.add( fullLayout );
+            this.add(this.full_layout);
 
             this.overview.halign = Gtk.Align.CENTER;
             this.overview.valign = Gtk.Align.CENTER;
@@ -382,9 +368,9 @@ namespace pdfpc.Window {
          * Handle keypress events on the window and, if neccessary send them to the
          * presentation controller
          */
-        protected bool on_key_pressed( Gtk.Widget source, Gdk.EventKey key ) {
-            if ( this.presentation_controller != null ) {
-                return this.presentation_controller.key_press( key );
+        protected bool on_key_pressed(Gtk.Widget source, Gdk.EventKey key) {
+            if (this.presentation_controller != null) {
+                return this.presentation_controller.key_press(key);
             } else {
                 // Can this happen?
                 return false;
@@ -395,9 +381,9 @@ namespace pdfpc.Window {
          * Handle mouse button events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_button_press( Gtk.Widget source, Gdk.EventButton button ) {
-            if ( this.presentation_controller != null ) {
-                this.presentation_controller.button_press( button );
+        protected bool on_button_press(Gtk.Widget source, Gdk.EventButton button) {
+            if (this.presentation_controller != null) {
+                this.presentation_controller.button_press(button);
             }
             return false;
         }
@@ -406,9 +392,9 @@ namespace pdfpc.Window {
          * Handle mouse scrolling events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_scroll( Gtk.Widget source, Gdk.EventScroll scroll ) {
-            if ( this.presentation_controller != null ) {
-                this.presentation_controller.scroll( scroll );
+        protected bool on_scroll(Gtk.Widget source, Gdk.EventScroll scroll) {
+            if (this.presentation_controller != null) {
+                this.presentation_controller.scroll(scroll);
             }
             return false;
         }
@@ -417,14 +403,12 @@ namespace pdfpc.Window {
          * Update the slide count view
          */
         protected void update_slide_count() {
-            this.custom_slide_count(
-                    this.presentation_controller.current_user_slide_number + 1
-            );
+            this.custom_slide_count(this.presentation_controller.current_user_slide_number + 1);
         }
 
         public void custom_slide_count(int current) {
             int total = this.presentation_controller.get_end_user_slide();
-            this.slide_progress.set_text( "%d/%u".printf(current, total) );
+            this.slide_progress.set_text("%d/%u".printf(current, total));
         }
 
         /**
@@ -439,7 +423,8 @@ namespace pdfpc.Window {
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
             try {
                 this.current_view.display(current_slide_number);
-                this.next_view.display(this.metadata.user_slide_to_real_slide(current_user_slide_number + 1));
+                this.next_view.display(this.metadata.user_slide_to_real_slide(
+                    current_user_slide_number + 1));
                 if (this.presentation_controller.skip_next()) {
                     this.strict_next_view.display(current_slide_number + 1, true);
                 } else {
@@ -452,7 +437,7 @@ namespace pdfpc.Window {
                 }
             }
             catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page %d could not be rendered: %s", current_slide_number, e.message );
+                error("The pdf page %d could not be rendered: %s", current_slide_number, e.message);
             }
             this.update_slide_count();
             this.update_note();
@@ -474,15 +459,12 @@ namespace pdfpc.Window {
         /**
          * Display a specific page
          */
-        public void goto_page( int page_number ) {
+        public void goto_page(int page_number) {
             try {
-                this.current_view.display( page_number );
-                this.next_view.display(
-                    page_number + 1
-                );
-            }
-            catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page %d could not be rendered: %s", page_number, e.message );
+                this.current_view.display(page_number);
+                this.next_view.display(page_number + 1);
+            } catch( Renderer.RenderError e ) {
+                error("The pdf page %d could not be rendered: %s", page_number, e.message);
             }
 
             this.update_slide_count();
@@ -494,30 +476,30 @@ namespace pdfpc.Window {
          * Ask for the page to jump to
          */
         public void ask_goto_page() {
-           this.slide_progress.set_text("/%u".printf(this.presentation_controller.user_n_slides));
-           this.slide_progress.sensitive = true;
-           this.slide_progress.grab_focus();
-           this.slide_progress.set_position(0);
-           this.presentation_controller.set_ignore_input_events( true );
+            this.slide_progress.set_text("/%u".printf(this.presentation_controller.user_n_slides));
+            this.slide_progress.sensitive = true;
+            this.slide_progress.grab_focus();
+            this.slide_progress.set_position(0);
+            this.presentation_controller.set_ignore_input_events(true);
         }
 
         /**
          * Handle key events for the slide_progress entry field
          */
-        protected bool on_key_press_slide_progress( Gtk.Widget source, Gdk.EventKey key ) {
-            if ( key.keyval == 0xff0d ) {
+        protected bool on_key_press_slide_progress(Gtk.Widget source, Gdk.EventKey key) {
+            if (key.keyval == Gdk.Key.Return) {
                 // Try to parse the input
-               string input_text = this.slide_progress.text;
-               int destination = int.parse(input_text.substring(0, input_text.index_of("/")));
-               this.slide_progress.sensitive = false;
-               this.presentation_controller.set_ignore_input_events( false );
-               if ( destination != 0 )
-                  this.presentation_controller.goto_user_page(destination);
-               else
-                  this.update_slide_count(); // Reset the display we had before
-               return true;
+                string input_text = this.slide_progress.text;
+                int destination = int.parse(input_text.substring(0, input_text.index_of("/")));
+                this.slide_progress.sensitive = false;
+                this.presentation_controller.set_ignore_input_events(false);
+                if (destination != 0)
+                    this.presentation_controller.goto_user_page(destination);
+                else
+                    this.update_slide_count(); // Reset the display we had before
+                return true;
             } else {
-               return false;
+                return false;
             }
         }
 
@@ -528,18 +510,19 @@ namespace pdfpc.Window {
             this.notes_view.editable = true;
             this.notes_view.cursor_visible = true;
             this.notes_view.grab_focus();
-            this.presentation_controller.set_ignore_input_events( true );
+            this.presentation_controller.set_ignore_input_events(true);
         }
 
         /**
          * Handle key presses when editing a note
          */
-        protected bool on_key_press_notes_view( Gtk.Widget source, Gdk.EventKey key ) {
-            if ( key.keyval == 0xff1b) { /* Escape */
+        protected bool on_key_press_notes_view(Gtk.Widget source, Gdk.EventKey key) {
+            if (key.keyval == Gdk.Key.Escape) { /* Escape */
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;
-                this.metadata.get_notes().set_note( this.notes_view.buffer.text, this.presentation_controller.current_user_slide_number );
-                this.presentation_controller.set_ignore_input_events( false );
+                this.metadata.get_notes().set_note(this.notes_view.buffer.text,
+                    this.presentation_controller.current_user_slide_number);
+                this.presentation_controller.set_ignore_input_events(false);
                 return true;
             } else {
                 return false;
@@ -550,14 +533,15 @@ namespace pdfpc.Window {
          * Update the text of the current note
          */
         protected void update_note() {
-            string this_note = this.metadata.get_notes().get_note_for_slide(this.presentation_controller.current_user_slide_number);
+            string this_note = this.metadata.get_notes().get_note_for_slide(
+                this.presentation_controller.current_user_slide_number);
             this.notes_view.buffer.text = this_note;
         }
 
         public void show_overview() {
-            this.slideViews.hide();
+            this.slide_views.hide();
             if (!overview_added) {
-                this.fullLayout.pack_start( this.overview, true, true, 0 );
+                this.full_layout.pack_start(this.overview, true, true, 0);
                 overview_added = true;
             }
             this.overview.show();
@@ -566,7 +550,7 @@ namespace pdfpc.Window {
 
         public void hide_overview() {
             this.overview.hide();
-            this.slideViews.show();
+            this.slide_views.show();
         }
 
         /**
@@ -576,14 +560,14 @@ namespace pdfpc.Window {
          * Furthermore it is taken care of to add the cache observer to this window
          * for display, as it is a Image widget after all.
          */
-        public void set_cache_observer( CacheStatus observer ) {
+        public void set_cache_observer(CacheStatus observer) {
             var current_prerendering_view = this.current_view as View.Prerendering;
-            if( current_prerendering_view != null ) {
-                observer.monitor_view( current_prerendering_view );
+            if (current_prerendering_view != null) {
+                observer.monitor_view(current_prerendering_view);
             }
             var next_prerendering_view = this.next_view as View.Prerendering;
-            if( next_prerendering_view != null ) {
-                observer.monitor_view( next_prerendering_view );
+            if (next_prerendering_view != null) {
+                observer.monitor_view(next_prerendering_view);
             }
 
             observer.update_progress.connect(this.prerender_progress.set_fraction);
@@ -593,7 +577,7 @@ namespace pdfpc.Window {
 
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
-            this.overview.set_cache(((Renderer.Caching)this.next_view.get_renderer()).get_cache());
+            this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).get_cache());
         }
 
         /**
