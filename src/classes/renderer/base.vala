@@ -24,8 +24,7 @@ namespace pdfpc {
     /**
      * Renderer base class needed to be extended by every slide renderer.
      */
-    public abstract class Renderer.Base: Object
-    {
+    public abstract class Renderer.Base : Object {
         /**
          * Metadata object to render slides for
          */
@@ -45,7 +44,7 @@ namespace pdfpc {
          * Base constructor taking a metadata object as well as the desired
          * render width and height as parameters.
          */
-        public Base( Metadata.Base metadata, int width, int height ) {
+        public Base(Metadata.Base metadata, int width, int height) {
             this.metadata = metadata;
             this.width = width;
             this.height = height;
@@ -57,7 +56,7 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
          */
-        public abstract Cairo.ImageSurface render_to_surface( int slide_number )
+        public abstract Cairo.ImageSurface render_to_surface(int slide_number)
             throws RenderError;
 
         /**
@@ -74,3 +73,4 @@ namespace pdfpc {
         SLIDE_DOES_NOT_EXIST;
     }
 }
+

@@ -25,10 +25,11 @@ namespace pdfpc.Renderer {
      * Every renderer may decide to implement the Caching interface to improve
      * rendering speed.
      */
-    public interface Caching: GLib.Object {
+    public interface Caching : GLib.Object {
         /**
          * A Cache store to be used for caching
          */
         public abstract Cache.Base? cache { get; set; }
     }
 }
+
