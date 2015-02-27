@@ -73,26 +73,27 @@ namespace pdfpc {
          */
         public Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle(
             Poppler.Rectangle poppler_rectangle) {
+            Metadata.Pdf metadata = this.get_renderer().metadata as Metadata.Pdf;
+            int width = this.get_allocated_width();
+            int height = this.get_allocated_height();
+            double page_width = metadata.get_page_width();
+            double page_height = metadata.get_page_height();
+            double scale = double.min(width / page_width, height / page_height);
             Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
-
-            Gtk.Requisition requisition;
-            Gtk.Requisition min_requisition;
-            this.get_preferred_size(out min_requisition, out requisition);
 
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates
-            var metadata = this.get_renderer().metadata as Metadata.Pdf;
-            gdk_rectangle.x = (int) Math.ceil((poppler_rectangle.x1 / metadata.get_page_width()) *
-                requisition.width );
-            gdk_rectangle.width = (int) Math.floor(((poppler_rectangle.x2 - poppler_rectangle.x1 ) /
-                metadata.get_page_width()) * requisition.width);
+            gdk_rectangle.x = (int) Math.ceil(poppler_rectangle.x1 * scale +
+                (width - page_width * scale) / 2);
+            gdk_rectangle.width = (int) Math.floor((poppler_rectangle.x2 - poppler_rectangle.x1 ) *
+                scale);
 
             // Gdk has its coordinate origin in the upper left, while Poppler
             // has its origin in the lower left.
-            gdk_rectangle.y = (int) Math.ceil(((metadata.get_page_height() - poppler_rectangle.y2) /
-                metadata.get_page_height()) * requisition.height);
-            gdk_rectangle.height = (int) Math.floor(((poppler_rectangle.y2 - poppler_rectangle.y1) /
-                metadata.get_page_height()) * requisition.height);
+            gdk_rectangle.y = (int) Math.ceil((page_height - poppler_rectangle.y2) * scale +
+                (height - page_height * scale) / 2);
+            gdk_rectangle.height = (int) Math.floor((poppler_rectangle.y2 - poppler_rectangle.y1) *
+                scale);
 
             return gdk_rectangle;
         }
