@@ -153,17 +153,17 @@ namespace pdfpc.Window {
          * Update the display
          */
         public void update() {
-            if (this.presentation_controller.is_faded_to_black()) {
+            if (this.presentation_controller.faded_to_black) {
                 this.view.fade_to_black();
                 return;
             }
-            if (this.presentation_controller.is_frozen())
+            if (this.presentation_controller.frozen)
                 return;
             try {
-                this.view.display(this.presentation_controller.get_current_slide_number(), true);
+                this.view.display(this.presentation_controller.current_slide_number, true);
             }
             catch( Renderer.RenderError e ) {
-                GLib.error( "The pdf page %d could not be rendered: %s", this.presentation_controller.get_current_slide_number(), e.message );
+                GLib.error( "The pdf page %d could not be rendered: %s", this.presentation_controller.current_slide_number, e.message );
             }
         }
 
