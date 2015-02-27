@@ -233,9 +233,11 @@ namespace pdfpc {
             this.cache_status = new CacheStatus();
 
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
+
+            configFileReader.readConfig(source_path + "/rc/pdfpcrc");
             configFileReader.readConfig(etc_path + "/pdfpcrc");
             configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
-            
+
             set_styling();
 
             var screen = Gdk.Screen.get_default();
