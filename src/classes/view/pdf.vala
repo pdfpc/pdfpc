@@ -84,14 +84,14 @@ namespace pdfpc {
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates
             gdk_rectangle.x = (int) Math.ceil(poppler_rectangle.x1 * scale +
-                (width - page_width * scale) / 2);
+                this.horizontal_align * (width - page_width * scale) / 2);
             gdk_rectangle.width = (int) Math.floor((poppler_rectangle.x2 - poppler_rectangle.x1 ) *
                 scale);
 
             // Gdk has its coordinate origin in the upper left, while Poppler
             // has its origin in the lower left.
             gdk_rectangle.y = (int) Math.ceil((page_height - poppler_rectangle.y2) * scale +
-                (height - page_height * scale) / 2);
+                this.vertical_align * (height - page_height * scale) / 2);
             gdk_rectangle.height = (int) Math.floor((poppler_rectangle.y2 - poppler_rectangle.y1) *
                 scale);
 

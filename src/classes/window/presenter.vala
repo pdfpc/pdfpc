@@ -258,7 +258,11 @@ namespace pdfpc.Window {
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             strict_views.pack_start(this.strict_prev_view, true, true, 0);
+            ((View.Default) this.strict_prev_view).horizontal_align =
+                View.Default.Alignment.START;
             strict_views.pack_start(this.strict_next_view, true, true, 0);
+            ((View.Default) this.strict_next_view).horizontal_align =
+                View.Default.Alignment.END;
 
             var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
             current_view_and_stricts.pack1(current_view, true, true);

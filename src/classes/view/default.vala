@@ -25,6 +25,15 @@ namespace pdfpc {
      * Basic view class which is usable with any renderer.
      */
     public class View.Default : View.Base, View.Behaviour.Decoratable {
+        public enum Alignment {
+            START = 0,
+            CENTER = 1,
+            END = 2
+        }
+
+        public Alignment horizontal_align = Alignment.CENTER;
+        public Alignment vertical_align = Alignment.CENTER;
+
         /**
          * The currently displayed slide
          */
@@ -171,7 +180,8 @@ namespace pdfpc {
             cr.rectangle(0, 0, width, height);
             cr.fill();
 
-            cr.translate((width - slide_width * scale) / 2, (height - slide_height * scale) / 2);
+            cr.translate(this.horizontal_align * (width - slide_width * scale) / 2,
+                this.vertical_align * (height - slide_height * scale) / 2);
             cr.scale(scale, scale);
             cr.set_source_surface(this.current_slide, 0, 0);
             cr.get_source().set_filter(Cairo.Filter.BEST);
