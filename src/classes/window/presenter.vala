@@ -254,25 +254,30 @@ namespace pdfpc.Window {
         }
 
         protected void build_layout() {
-            Gtk.Box slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
+            Gtk.Paned slide_views = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             strict_views.pack_start(this.strict_prev_view, true, true, 0);
             strict_views.pack_start(this.strict_next_view, true, true, 0);
 
-            var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
-            current_view_and_stricts.pack_start(current_view, true, true, 2);
-            current_view_and_stricts.pack_start(strict_views, true, true, 2);
+            var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            current_view_and_stricts.pack1(current_view, true, true);
+            current_view_and_stricts.pack2(strict_views, true, true);
+            current_view_and_stricts.position = (int) (this.screen_geometry.height * 0.75);
 
-            slide_views.pack_start(current_view_and_stricts, true, true, 0);
+            slide_views.pack1(current_view_and_stricts, true, true);
 
-            var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            nextViewWithNotes.pack_start(next_view, true, true, 0);
+            Gtk.Paned next_view_with_notes = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            next_view_with_notes.pack1(next_view, true, true);
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.add(this.notes_view);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-            nextViewWithNotes.pack_start(notes_sw, true, true, 5);
-            slide_views.pack_start(nextViewWithNotes, true, true, 0);
+            next_view_with_notes.pack2(notes_sw, true, true);
+            next_view_with_notes.position = this.screen_geometry.height *
+                (int) Options.current_size / 100;
+
+            slide_views.pack2(next_view_with_notes, true, true);
+            slide_views.position = this.screen_geometry.width * (int) Options.current_size / 100;
 
             this.overview.halign = Gtk.Align.CENTER;
             this.overview.valign = Gtk.Align.CENTER;

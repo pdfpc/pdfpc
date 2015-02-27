@@ -127,6 +127,9 @@ namespace pdfpc {
                 .trough {
                     border: none;
                 }
+                .pane-separator:hover {
+                    background-color: gray;
+                }
                 pdfpcTimerLabel.pretalk {
                     color: green;
                 }

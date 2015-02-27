@@ -167,6 +167,10 @@ namespace pdfpc {
                 slide_height = this.current_slide.get_height();
             double scale = double.min((double) width / slide_width, (double) height / slide_height);
 
+            cr.set_source_rgb(0, 0, 0);
+            cr.rectangle(0, 0, width, height);
+            cr.fill();
+
             cr.translate((width - slide_width * scale) / 2, (height - slide_height * scale) / 2);
             cr.scale(scale, scale);
             cr.set_source_surface(this.current_slide, 0, 0);
