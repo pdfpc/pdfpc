@@ -56,12 +56,6 @@ namespace pdfpc.Window {
 
             this.presentation_controller = presentation_controller;
 
-            var fixedLayout = new Gtk.Fixed();
-            fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
-            this.add(fixedLayout);
-
-            Gdk.Rectangle scale_rect;
-
             if (width < 0) {
                 width = this.screen_geometry.width;
             }
@@ -70,12 +64,9 @@ namespace pdfpc.Window {
                 height = this.screen_geometry.height;
             }
 
-            this.view = new View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
-                Options.black_on_end, true, this.presentation_controller, out scale_rect);
-
-            // Center the scaled pdf on the monitor
-            // In most cases it will however fill the full screen
-            fixedLayout.put(this.view, scale_rect.x, scale_rect.y);
+            this.view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                Options.black_on_end, true, this.presentation_controller);
+            this.add(this.view);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
@@ -122,12 +113,7 @@ namespace pdfpc.Window {
          * this window correctly with the CacheStatus object to provide acurate
          * cache status measurements.
          */
-        public void set_cache_observer(CacheStatus observer) {
-            var prerendering_view = this.view as View.Prerendering;
-            if (prerendering_view != null) {
-                observer.monitor_view(prerendering_view);
-            }
-        }
+        public void set_cache_observer(CacheStatus observer) {}
     }
 }
 

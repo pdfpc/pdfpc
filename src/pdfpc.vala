@@ -53,7 +53,7 @@ namespace pdfpc {
          * cached slides to provide a visual feedback to the user about the
          * rendering state
          */
-        private CacheStatus cache_status;
+        private CacheStatus cache_status = new CacheStatus();
 
         /**
          * Commandline option parser entry definitions
@@ -236,17 +236,19 @@ namespace pdfpc {
             }
             Renderer.Pdf slide_renderer = new Renderer.Pdf(metadata, max_width, max_height,
                 Metadata.Area.CONTENT);
+            this.cache_status.monitor_renderer(slide_renderer);
             Renderer.Pdf notes_renderer;
-            if (notes_position == Metadata.NotesPosition.NONE)
+            if (notes_position == Metadata.NotesPosition.NONE) {
                 notes_renderer = slide_renderer;
-            else
+            } else {
                 notes_renderer = new Renderer.Pdf(metadata, max_width, max_height,
                     Metadata.Area.NOTES);
+                this.cache_status.monitor_renderer(notes_renderer);
+            }
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
             this.controller = new PresentationController(metadata, slide_renderer, notes_renderer);
-            this.cache_status = new CacheStatus();
 
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
 

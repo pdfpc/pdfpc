@@ -45,7 +45,6 @@ namespace pdfpc {
          */
         protected Base( Renderer.Base renderer ) {
             this.renderer = renderer;
-            this.set_size_request(renderer.width, renderer.height);
         }
 
         /**

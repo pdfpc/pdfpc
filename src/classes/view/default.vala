@@ -24,7 +24,7 @@ namespace pdfpc {
     /**
      * Basic view class which is usable with any renderer.
      */
-    public class View.Default : View.Base, View.Prerendering, View.Behaviour.Decoratable {
+    public class View.Default : View.Base, View.Behaviour.Decoratable {
         /**
          * The currently displayed slide
          */
@@ -72,67 +72,7 @@ namespace pdfpc {
                     error("Could not render initial page %d: %s",
                         this.current_slide_number, e.message);
                 }
-
-                // Start the prerender cycle if the renderer supports caching
-                // and the used cache engine allows prerendering.
-                // Executing the cycle here to ensure it is executed within the
-                // Gtk event loop. If it is not proper Gdk thread handling is
-                // impossible.
-                var caching_renderer = this.renderer as Renderer.Caching;
-                if (caching_renderer != null && caching_renderer.cache != null &&
-                    caching_renderer.cache.allows_prerendering()) {
-                    this.register_prerendering();
-                }
            });
-        }
-
-        /**
-         * Start a thread to prerender all slides this view might display at
-         * some time.
-         *
-         * This method may only be called from within the Gtk event loop, as
-         * thread handling is borked otherwise.
-         */
-        protected void register_prerendering() {
-            // The pointer is needed to keep track of the slide progress inside
-            // the prerender function
-            int* i = null;
-            // The page_count will be transfered into the lamda function as
-            // well.
-            var page_count = this.get_renderer().metadata.get_slide_count();
-
-            this.prerendering_started();
-
-            Idle.add(() => {
-                if (i == null) {
-                    i = malloc(sizeof(int));
-                    *i = 0;
-                }
-
-                // We do not care about the result, as the
-                // rendering function stores the rendered
-                // pixmap in the cache if it is enabled. This
-                // is exactly what we want.
-                try {
-                    this.get_renderer().render_to_surface(*i);
-                } catch(Renderer.RenderError e) {
-                    error("Could not render page '%i' while pre-rendering: %s", *i, e.message);
-                }
-
-                // Inform possible observers about the cached slide
-                this.slide_prerendered();
-
-                // Increment one slide for each call and stop the loop if we
-                // have reached the last slide
-                *i = *i + 1;
-                if (*i >= page_count) {
-                    this.prerendering_completed();
-                    free(i);
-                    return false;
-                } else {
-                    return true;
-                }
-            });
         }
 
         /**
@@ -187,7 +127,7 @@ namespace pdfpc {
             this.current_slide_number = slide_number;
 
             // Have Gtk update the widget
-            this.queue_draw_area(0, 0, this.renderer.width, this.renderer.height);
+            this.queue_draw();
 
             this.entering_slide(this.current_slide_number);
         }
@@ -221,8 +161,17 @@ namespace pdfpc {
          * the window surface.
          */
         public override bool draw(Cairo.Context cr) {
+            int width = this.get_allocated_width(),
+                height = this.get_allocated_height(),
+                slide_width = this.current_slide.get_width(),
+                slide_height = this.current_slide.get_height();
+            double scale = double.min((double) width / slide_width, (double) height / slide_height);
+
+            cr.translate((width - slide_width * scale) / 2, (height - slide_height * scale) / 2);
+            cr.scale(scale, scale);
             cr.set_source_surface(this.current_slide, 0, 0);
-            cr.rectangle(0, 0, this.current_slide.get_width(), this.current_slide.get_height());
+            cr.get_source().set_filter(Cairo.Filter.BEST);
+            cr.rectangle(0, 0, slide_width, slide_height);
             cr.fill();
 
             // We are the only ones drawing on this context skip everything

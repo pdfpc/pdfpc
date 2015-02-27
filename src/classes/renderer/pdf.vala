@@ -26,6 +26,24 @@ namespace pdfpc {
      */
     public class Renderer.Pdf : Renderer.Base, Renderer.Caching {
         /**
+         * Signal emitted every time a precached slide has been created
+         *
+         * This signal should be emitted slide_count number of times during a
+         * precaching cylce.
+         */
+        public signal void slide_prerendered();
+
+        /**
+         * Signal emitted when the precaching cycle is complete
+         */
+        public signal void prerendering_completed();
+
+        /**
+         * Signal emitted when the precaching cycle just started
+         */
+        public signal void prerendering_started();
+
+        /**
          * The scaling factor needed to render the pdf page to the desired size.
          */
         protected double scaling_factor;
@@ -57,9 +75,14 @@ namespace pdfpc {
             // Calculate the scaling factor needed.
             this.scaling_factor = Math.fmin(width / metadata.get_page_width(),
                 height / metadata.get_page_height());
+            this.width = (int) (metadata.get_page_width() * this.scaling_factor);
+            this.height = (int) (metadata.get_page_height() * this.scaling_factor);
 
-            if (!Options.disable_caching)
-                cache = Renderer.Cache.create(metadata);
+            if (!Options.disable_caching) {
+                this.cache = Renderer.Cache.create(metadata);
+                if (this.cache.allows_prerendering())
+                    this.prerender();
+            }
         }
 
         /**
@@ -125,6 +148,39 @@ namespace pdfpc {
             cr.scale(this.scaling_factor, this.scaling_factor);
 
             return surface;
+        }
+
+        public void prerender() {
+            int i = 0;
+            var page_count = this.metadata.get_slide_count();
+
+            Idle.add(() => {
+                if (i == 0)
+                    this.prerendering_started();
+
+                // We do not care about the result, as the
+                // rendering function stores the rendered
+                // pixmap in the cache if it is enabled. This
+                // is exactly what we want.
+                try {
+                    this.render_to_surface(i);
+                } catch(Renderer.RenderError e) {
+                    error("Could not render page '%i' while pre-rendering: %s", i, e.message);
+                }
+
+                // Inform possible observers about the cached slide
+                this.slide_prerendered();
+
+                // Increment one slide for each call and stop the loop if we
+                // have reached the last slide
+                i += 1;
+                if (i >= page_count) {
+                    this.prerendering_completed();
+                    return false;
+                } else {
+                    return true;
+                }
+            });
         }
     }
 }

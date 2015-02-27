@@ -137,18 +137,12 @@ namespace pdfpc.Window {
             // should use as a percentage value. The maximal height is 90% of
             // the screen, as we need a place to display the timer and slide
             // count.
-            Gdk.Rectangle current_scale_rect;
-            int current_allocated_width = (int) Math.floor(
-                this.screen_geometry.width * Options.current_size / (double) 100);
             this.current_view = new View.Pdf.from_metadata(
                 metadata,
-                current_allocated_width,
-                (int) Math.floor(0.8 * bottom_position),
                 Metadata.Area.NOTES,
                 Options.black_on_end,
                 true,
-                this.presentation_controller,
-                out current_scale_rect
+                this.presentation_controller
             );
 
             // The next slide is right to the current one and takes up the
@@ -156,40 +150,14 @@ namespace pdfpc.Window {
             //Requisition cv_requisition;
             //this.current_view.size_request(out cv_requisition);
             //current_allocated_width = cv_requisition.width;
-            Gdk.Rectangle next_scale_rect;
-            var next_allocated_width = this.screen_geometry.width - current_allocated_width - 4;
             // We leave a bit of margin between the two views
-            this.next_view = new View.Pdf.from_metadata(
-                metadata,
-                next_allocated_width,
-                (int) Math.floor(0.7 * bottom_position),
-                Metadata.Area.CONTENT,
-                true,
-                false,
-                this.presentation_controller,
-                out next_scale_rect
-            );
+            this.next_view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                true, false, this.presentation_controller);
 
-            this.strict_next_view = new View.Pdf.from_metadata(
-                metadata,
-                (int) Math.floor(0.5 * current_allocated_width),
-                (int) Math.floor(0.19 * bottom_position) - 2,
-                Metadata.Area.CONTENT,
-                true,
-                false,
-                this.presentation_controller,
-                out next_scale_rect
-            );
-            this.strict_prev_view = new View.Pdf.from_metadata(
-                metadata,
-                (int) Math.floor(0.5 * current_allocated_width),
-                (int) Math.floor(0.19 * bottom_position) - 2,
-                Metadata.Area.CONTENT,
-                true,
-                false,
-                this.presentation_controller,
-                out next_scale_rect
-            );
+            this.strict_next_view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                true, false, this.presentation_controller);
+            this.strict_prev_view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                true, false, this.presentation_controller);
 
             // TextView for notes in the slides
             var notes_font = Pango.FontDescription.from_string("Verdana");
@@ -289,23 +257,17 @@ namespace pdfpc.Window {
             Gtk.Box slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            strict_views.pack_start(this.strict_prev_view, false, false, 0);
-            strict_views.pack_end(this.strict_next_view, false, false, 0);
-
-            this.current_view.halign = Gtk.Align.CENTER;
-            this.current_view.valign = Gtk.Align.CENTER;
+            strict_views.pack_start(this.strict_prev_view, true, true, 0);
+            strict_views.pack_start(this.strict_next_view, true, true, 0);
 
             var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
-            current_view_and_stricts.pack_start(current_view, false, false, 2);
-            current_view_and_stricts.pack_start(strict_views, false, false, 2);
-
+            current_view_and_stricts.pack_start(current_view, true, true, 2);
+            current_view_and_stricts.pack_start(strict_views, true, true, 2);
 
             slide_views.pack_start(current_view_and_stricts, true, true, 0);
 
             var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            this.next_view.halign = Gtk.Align.CENTER;
-            this.next_view.valign = Gtk.Align.CENTER;
-            nextViewWithNotes.pack_start(next_view, false, false, 0);
+            nextViewWithNotes.pack_start(next_view, true, true, 0);
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.add(this.notes_view);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
@@ -500,15 +462,6 @@ namespace pdfpc.Window {
          * for display, as it is a Image widget after all.
          */
         public void set_cache_observer(CacheStatus observer) {
-            var current_prerendering_view = this.current_view as View.Prerendering;
-            if (current_prerendering_view != null) {
-                observer.monitor_view(current_prerendering_view);
-            }
-            var next_prerendering_view = this.next_view as View.Prerendering;
-            if (next_prerendering_view != null) {
-                observer.monitor_view(next_prerendering_view);
-            }
-
             observer.update_progress.connect(this.prerender_progress.set_fraction);
             observer.update_complete.connect(this.prerender_finished);
             this.prerender_progress.show();

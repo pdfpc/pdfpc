@@ -51,11 +51,8 @@ namespace pdfpc {
          * aspect ration. The scale rectangle is provided in the scale_rect
          * argument.
          */
-        public Pdf.from_metadata(Metadata.Pdf metadata, int width, int height,
-            Metadata.Area area, bool allow_black_on_end, bool clickable_links,
-            PresentationController presentation_controller, out Gdk.Rectangle scale_rect = null) {
-            var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
-            scale_rect = scaler.scale_to(width, height);
+        public Pdf.from_metadata(Metadata.Pdf metadata, Metadata.Area area, bool allow_black_on_end,
+            bool clickable_links, PresentationController presentation_controller) {
             Renderer.Pdf renderer = (area == Metadata.Area.NOTES) ?
                 presentation_controller.notes_renderer : presentation_controller.slide_renderer;
 
