@@ -24,52 +24,30 @@ namespace pdfpc {
     /**
      * Renderer base class needed to be extended by every slide renderer.
      */
-    public abstract class Renderer.Base: Object
-    {
+    public abstract class Renderer.Base : Object {
         /**
          * Metadata object to render slides for
          */
-        protected Metadata.Base metadata;
+        public Metadata.Base metadata { get; protected set; }
 
         /**
          * Width to render to
          */
-        protected int width;
+        public int width { get; protected set; }
 
         /**
          * Height to render to
          */
-        protected int height;
+        public int height { get; protected set; }
 
         /**
          * Base constructor taking a metadata object as well as the desired
          * render width and height as parameters.
          */
-        public Base( Metadata.Base metadata, int width, int height ) {
+        public Base(Metadata.Base metadata, int width, int height) {
             this.metadata = metadata;
             this.width = width;
             this.height = height;
-        }
-
-        /**
-         * Return the registered metadata object
-         */
-        public Metadata.Base get_metadata() {
-            return this.metadata;
-        }
-
-        /**
-         * Return the desired render width
-         */
-        public int get_width() {
-            return this.width;
-        }
-
-        /**
-         * Return the desired render height
-         */
-        public int get_height() {
-            return this.height;
         }
 
         /**
@@ -78,7 +56,7 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
          */
-        public abstract Cairo.ImageSurface render_to_surface( int slide_number )
+        public abstract Cairo.ImageSurface render_to_surface(int slide_number)
             throws RenderError;
 
         /**
@@ -95,3 +73,4 @@ namespace pdfpc {
         SLIDE_DOES_NOT_EXIST;
     }
 }
+

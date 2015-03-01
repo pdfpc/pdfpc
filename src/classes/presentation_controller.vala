@@ -355,7 +355,7 @@ namespace pdfpc {
         /**
          * Notify each of the controllables of mouse scrolling
          */
-        public void scroll(Gdk.EventScroll scroll) {
+        public bool scroll(Gdk.EventScroll scroll) {
             if (!this.ignore_mouse_events) {
                 switch (scroll.direction) {
                     case Gdk.ScrollDirection.UP:
@@ -374,7 +374,9 @@ namespace pdfpc {
                             this.next_page();
                     break;
                 }
+                return true;
             }
+            return false;
         }
 
         /**
@@ -475,7 +477,7 @@ namespace pdfpc {
             //controllable.set_controller( this );
             this.controllables.append(controllable);
             if (this.main_view == null)
-                this.main_view = controllable.get_main_view();
+                this.main_view = controllable.main_view;
 
             return true;
         }
@@ -838,7 +840,7 @@ namespace pdfpc {
                 rect = Gdk.Rectangle();
                 return 0;
             }
-            View.Pdf view = c.get_main_view();
+            View.Pdf view = c.main_view;
             if (view == null) {
                 rect = Gdk.Rectangle();
                 return 0;

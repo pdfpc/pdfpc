@@ -20,12 +20,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace pdfpc {
+namespace pdfpc.Renderer.Cache {
     /**
      * Base Cache store interface which needs to be implemented by every
      * working cache.
      */
-    public abstract class Renderer.Cache.Base: Object {
+    public abstract class Base : Object {
         /**
          * Metadata object to provide caching for
          */
@@ -34,7 +34,7 @@ namespace pdfpc {
         /**
          * Initialize the cache store
          */
-        public Base( Metadata.Base metadata ) {
+        public Base(Metadata.Base metadata) {
             this.metadata = metadata;
         }
 
@@ -53,13 +53,23 @@ namespace pdfpc {
         /**
          * Store a surface in the cache using the given index as identifier
          */
-        public abstract void store( uint index, Cairo.ImageSurface surface );
+        public abstract void store(uint index, Cairo.ImageSurface surface);
 
         /**
          * Retrieve a stored surface from the cache.
          *
          * If no item with the given index is available null is returned
          */
-        public abstract Cairo.ImageSurface? retrieve( uint index );
+        public abstract Cairo.ImageSurface? retrieve(uint index);
+    }
+
+    /**
+     * Creates cache engines based on the global commandline options
+     */
+    public Base create(Metadata.Base metadata) {
+        if (!Options.disable_cache_compression)
+            return new PNG.Engine(metadata);
+
+        return new Simple.Engine(metadata);
     }
 }

@@ -24,8 +24,7 @@ namespace pdfpc {
     /**
      * Pdf slide renderer
      */
-    public class Renderer.Pdf: Renderer.Base, Renderer.Caching
-    {
+    public class Renderer.Pdf : Renderer.Base, Renderer.Caching {
         /**
          * The scaling factor needed to render the pdf page to the desired size.
          */
@@ -39,7 +38,7 @@ namespace pdfpc {
         /**
          * Cache store to be used
          */
-        protected Renderer.Cache.Base cache = null;
+        public Renderer.Cache.Base? cache { get; set; default = null; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -50,30 +49,14 @@ namespace pdfpc {
          * pdf document the renderspace is filled up completely cutting of a
          * part of the pdf document.
          */
-        public Pdf( Metadata.Pdf metadata, int width, int height, Metadata.Area area ) {
-            base( metadata, width, height );
+        public Pdf(Metadata.Pdf metadata, int width, int height, Metadata.Area area) {
+            base(metadata, width, height);
 
             this.area = area;
 
             // Calculate the scaling factor needed.
-            this.scaling_factor = Math.fmax(
-                width / metadata.get_page_width(),
-                height / metadata.get_page_height()
-            );
-        }
-
-        /**
-         * Set cache store to use
-         */
-        public void set_cache( Renderer.Cache.Base cache ) {
-            this.cache = cache;
-        }
-
-        /**
-         * Retrieve the currently used cache engine
-         */
-        public Renderer.Cache.Base get_cache() {
-            return this.cache;
+            this.scaling_factor = Math.fmax(width / metadata.get_page_width(),
+                height / metadata.get_page_height());
         }
 
         /**
@@ -82,42 +65,45 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public override Cairo.ImageSurface render_to_surface( int slide_number )
+        public override Cairo.ImageSurface render_to_surface(int slide_number)
             throws Renderer.RenderError {
 
             var metadata = this.metadata as Metadata.Pdf;
 
             // Check if a valid page is requested, before locking anything.
-            if ( slide_number < 0 || slide_number >= metadata.get_slide_count() ) {
-                throw new Renderer.RenderError.SLIDE_DOES_NOT_EXIST( "The requested slide '%i' does not exist.", slide_number );
+            if (slide_number < 0 || slide_number >= metadata.get_slide_count()) {
+                throw new Renderer.RenderError.SLIDE_DOES_NOT_EXIST(
+                    "The requested slide '%i' does not exist.", slide_number);
             }
 
             // If caching is enabled check for the page in the cache
-            if ( this.cache != null ) {
+            if (this.cache != null) {
                 Cairo.ImageSurface cache_content;
-                if ( ( cache_content = this.cache.retrieve( slide_number ) ) != null ) {
+                if ((cache_content = this.cache.retrieve(slide_number)) != null) {
                     return cache_content;
                 }
             }
 
             // Retrieve the Poppler.Page for the page to render
-            var page = metadata.get_document().get_page( slide_number );
+            var page = metadata.get_document().get_page(slide_number);
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width, this.height);
+            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
+                this.height);
             Cairo.Context cr = new Cairo.Context(surface);
 
-            cr.set_source_rgb( 255, 255, 255 );
-            cr.rectangle( 0, 0, this.width, this.height );
+            cr.set_source_rgb(255, 255, 255);
+            cr.rectangle(0, 0, this.width, this.height);
             cr.fill();
 
             cr.scale(this.scaling_factor, this.scaling_factor);
-            cr.translate(-metadata.get_horizontal_offset(this.area), -metadata.get_vertical_offset(this.area));
+            cr.translate(-metadata.get_horizontal_offset(this.area),
+                -metadata.get_vertical_offset(this.area));
             page.render(cr);
 
             // If the cache is enabled store the newly rendered pixmap
-            if ( this.cache != null ) {
+            if (this.cache != null) {
                 this.cache.store( slide_number, surface );
             }
 
@@ -125,11 +111,12 @@ namespace pdfpc {
         }
 
         public override Cairo.ImageSurface fade_to_black() {
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width, this.height);
+            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
+                this.height);
             Cairo.Context cr = new Cairo.Context(surface);
 
-            cr.set_source_rgb( 0, 0, 0 );
-            cr.rectangle( 0, 0, this.width, this.height );
+            cr.set_source_rgb(0, 0, 0);
+            cr.rectangle(0, 0, this.width, this.height);
             cr.fill();
 
             cr.scale(this.scaling_factor, this.scaling_factor);
@@ -138,3 +125,4 @@ namespace pdfpc {
         }
     }
 }
+
