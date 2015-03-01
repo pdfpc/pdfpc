@@ -180,12 +180,12 @@ namespace pdfpc {
             cr.rectangle(0, 0, width, height);
             cr.fill();
 
-            cr.translate(this.horizontal_align * (width - slide_width * scale) / 2,
-                this.vertical_align * (height - slide_height * scale) / 2);
-            cr.scale(scale, scale);
-            cr.set_source_surface(this.current_slide, 0, 0);
-            cr.get_source().set_filter(Cairo.Filter.BEST);
-            cr.rectangle(0, 0, slide_width, slide_height);
+            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(this.current_slide, 0, 0, slide_width,
+                slide_height);
+            Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple((int) (slide_width * scale),
+                (int) (slide_height * scale), Gdk.InterpType.BILINEAR);
+            Gdk.cairo_set_source_pixbuf(cr, pixbuf_scaled, 0, 0);
+            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
             cr.fill();
 
             // We are the only ones drawing on this context skip everything
