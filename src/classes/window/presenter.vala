@@ -258,8 +258,6 @@ namespace pdfpc.Window {
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
 
-            this.overview = new Overview( this.metadata, this.presentation_controller, this );
-            this.overview.set_n_slides( this.presentation_controller.user_n_slides );
             this.overview = new Overview(this.metadata, this.presentation_controller, this);
             this.overview.set_n_slides(this.presentation_controller.user_n_slides);
             this.presentation_controller.set_overview(this.overview);
