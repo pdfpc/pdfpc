@@ -335,23 +335,19 @@ namespace pdfpc.Window {
         public void update() {
             int current_slide_number = this.presentation_controller.current_slide_number;
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
-            try {
-                this.current_view.display(current_slide_number);
-                this.next_view.display(this.metadata.user_slide_to_real_slide(
-                    current_user_slide_number + 1));
-                if (this.presentation_controller.skip_next()) {
-                    this.strict_next_view.display(current_slide_number + 1, true);
-                } else {
-                    this.strict_next_view.fade_to_black();
-                }
-                if (this.presentation_controller.skip_previous()) {
-                    this.strict_prev_view.display(current_slide_number - 1, true);
-                } else {
-                    this.strict_prev_view.fade_to_black();
-                }
+
+            this.current_view.display(current_slide_number);
+            this.next_view.display(this.metadata.user_slide_to_real_slide(
+                current_user_slide_number + 1));
+            if (this.presentation_controller.skip_next()) {
+                this.strict_next_view.display(current_slide_number + 1, true);
+            } else {
+                this.strict_next_view.fade_to_black();
             }
-            catch( Renderer.RenderError e ) {
-                error("The pdf page %d could not be rendered: %s", current_slide_number, e.message);
+            if (this.presentation_controller.skip_previous()) {
+                this.strict_prev_view.display(current_slide_number - 1, true);
+            } else {
+                this.strict_prev_view.fade_to_black();
             }
             this.update_slide_count();
             this.update_note();
@@ -374,12 +370,8 @@ namespace pdfpc.Window {
          * Display a specific page
          */
         public void goto_page(int page_number) {
-            try {
-                this.current_view.display(page_number);
-                this.next_view.display(page_number + 1);
-            } catch( Renderer.RenderError e ) {
-                error("The pdf page %d could not be rendered: %s", page_number, e.message);
-            }
+            this.current_view.display(page_number);
+            this.next_view.display(page_number + 1);
 
             this.update_slide_count();
             this.update_note();

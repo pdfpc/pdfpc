@@ -98,12 +98,7 @@ namespace pdfpc.Window {
             if (this.presentation_controller.frozen)
                 return;
 
-            try {
-                this.view.display(this.presentation_controller.current_slide_number, true);
-            } catch (Renderer.RenderError e) {
-                error("The pdf page %d could not be rendered: %s",
-                    this.presentation_controller.current_slide_number, e.message );
-            }
+            this.view.display(this.presentation_controller.current_slide_number, true);
         }
 
         /**

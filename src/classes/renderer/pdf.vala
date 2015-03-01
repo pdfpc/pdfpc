@@ -86,12 +86,13 @@ namespace pdfpc {
         }
 
         /**
-         * Render the given slide_number to a Cairo.ImageSurface and return it.
+         * Render the given slide_number to a Cairo.Context and return it.
          *
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public override Cairo.ImageSurface render_to_surface(int slide_number)
+        public override void render(Cairo.Context? context, int slide_number, int display_width = 0,
+            int display_height = 0)
             throws Renderer.RenderError {
 
             var metadata = this.metadata as Metadata.Pdf;
@@ -102,52 +103,45 @@ namespace pdfpc {
                     "The requested slide '%i' does not exist.", slide_number);
             }
 
+            Cairo.ImageSurface? current_slide = null;
             // If caching is enabled check for the page in the cache
-            if (this.cache != null) {
-                Cairo.ImageSurface cache_content;
-                if ((cache_content = this.cache.retrieve(slide_number)) != null) {
-                    return cache_content;
+            if (this.cache != null)
+                current_slide = this.cache.retrieve(slide_number);
+            
+            if (current_slide == null) {
+                // Retrieve the Poppler.Page for the page to render
+                var page = metadata.get_document().get_page(slide_number);
+
+                // A lot of Pdfs have transparent backgrounds defined. We render
+                // every page before a white background because of this.
+                current_slide = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width, this.height);
+                Cairo.Context cr = new Cairo.Context(current_slide);
+
+                cr.set_source_rgb(255, 255, 255);
+                cr.rectangle(0, 0, this.width, this.height);
+                cr.fill();
+
+                cr.scale(this.scaling_factor, this.scaling_factor);
+                cr.translate(-metadata.get_horizontal_offset(this.area),
+                    -metadata.get_vertical_offset(this.area));
+                page.render(cr);
+
+                // If the cache is enabled store the newly rendered pixmap
+                if (this.cache != null) {
+                    this.cache.store(slide_number, current_slide);
                 }
             }
 
-            // Retrieve the Poppler.Page for the page to render
-            var page = metadata.get_document().get_page(slide_number);
+            if (context == null)
+                return;
 
-            // A lot of Pdfs have transparent backgrounds defined. We render
-            // every page before a white background because of this.
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
+            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(current_slide, 0, 0, this.width,
                 this.height);
-            Cairo.Context cr = new Cairo.Context(surface);
-
-            cr.set_source_rgb(255, 255, 255);
-            cr.rectangle(0, 0, this.width, this.height);
-            cr.fill();
-
-            cr.scale(this.scaling_factor, this.scaling_factor);
-            cr.translate(-metadata.get_horizontal_offset(this.area),
-                -metadata.get_vertical_offset(this.area));
-            page.render(cr);
-
-            // If the cache is enabled store the newly rendered pixmap
-            if (this.cache != null) {
-                this.cache.store(slide_number, surface);
-            }
-
-            return surface;
-        }
-
-        public override Cairo.ImageSurface fade_to_black() {
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
-                this.height);
-            Cairo.Context cr = new Cairo.Context(surface);
-
-            cr.set_source_rgb(0, 0, 0);
-            cr.rectangle(0, 0, this.width, this.height);
-            cr.fill();
-
-            cr.scale(this.scaling_factor, this.scaling_factor);
-
-            return surface;
+            Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple(display_width, display_height,
+                Gdk.InterpType.BILINEAR);
+            Gdk.cairo_set_source_pixbuf(context, pixbuf_scaled, 0, 0);
+            context.rectangle(0, 0, pixbuf_scaled.get_width(), pixbuf_scaled.get_height());
+            context.fill();
         }
 
         public void prerender() {
@@ -163,7 +157,7 @@ namespace pdfpc {
                 // pixmap in the cache if it is enabled. This
                 // is exactly what we want.
                 try {
-                    this.render_to_surface(i);
+                    this.render(null, i);
                 } catch(Renderer.RenderError e) {
                     error("Could not render page '%i' while pre-rendering: %s", i, e.message);
                 }

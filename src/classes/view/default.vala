@@ -40,16 +40,13 @@ namespace pdfpc {
         protected int current_slide_number;
 
         /**
-         * The surface containing the currently shown slide
-         */
-        protected Cairo.ImageSurface current_slide;
-
-        /**
          * The number of slides in the presentation
          */
         protected int n_slides;
 
         protected int slide_limit;
+
+        protected bool black = false;
 
         /**
          * List to store all associated behaviours
@@ -74,13 +71,7 @@ namespace pdfpc {
            // Render the initial page on first realization.
            this.add_events(Gdk.EventMask.STRUCTURE_MASK);
            this.realize.connect(() => {
-                try {
-                    this.display( this.current_slide_number );
-                } catch( Renderer.RenderError e ) {
-                    // There should always be a page 0 but you never know.
-                    error("Could not render initial page %d: %s",
-                        this.current_slide_number, e.message);
-                }
+                this.display( this.current_slide_number );
            });
         }
 
@@ -105,9 +96,8 @@ namespace pdfpc {
          * If the slide number does not exist a
          * RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public override void display(int slide_number, bool force_redraw=false)
-            throws Renderer.RenderError {
-
+        public override void display(int slide_number, bool force_redraw=false) {
+            this.black = false;
             // If the slide is out of bounds render the outer most slide on
             // each side of the document.
             if (slide_number < 0) {
@@ -117,8 +107,7 @@ namespace pdfpc {
                 slide_number = this.slide_limit - 1;
             }
 
-            if (!force_redraw && slide_number == this.current_slide_number &&
-                this.current_slide != null) {
+            if (!force_redraw && slide_number == this.current_slide_number) {
                 // The slide does not need to be changed, as the correct one is
                 // already shown.
                 return;
@@ -127,12 +116,6 @@ namespace pdfpc {
             // Notify all listeners
             this.leaving_slide(this.current_slide_number, slide_number);
 
-            // Render the requested slide
-            // An exception is thrown here, if the slide can not be rendered.
-            if (slide_number < this.n_slides)
-                this.current_slide = this.renderer.render_to_surface(slide_number);
-            else
-                this.current_slide = this.renderer.fade_to_black();
             this.current_slide_number = slide_number;
 
             // Have Gtk update the widget
@@ -145,8 +128,8 @@ namespace pdfpc {
          * Fill everything with black
          */
         public override void fade_to_black() {
-            this.current_slide = this.renderer.fade_to_black();
-            this.queue_draw_area(0, 0, this.renderer.width, this.renderer.height);
+            this.black = true;
+            this.queue_draw();
         }
 
         /**
@@ -172,21 +155,25 @@ namespace pdfpc {
         public override bool draw(Cairo.Context cr) {
             int width = this.get_allocated_width(),
                 height = this.get_allocated_height(),
-                slide_width = this.current_slide.get_width(),
-                slide_height = this.current_slide.get_height();
+                slide_width = this.renderer.width,
+                slide_height = this.renderer.height;
             double scale = double.min((double) width / slide_width, (double) height / slide_height);
 
             cr.set_source_rgb(0, 0, 0);
             cr.rectangle(0, 0, width, height);
             cr.fill();
+            if (this.black)
+                return true;
 
-            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(this.current_slide, 0, 0, slide_width,
-                slide_height);
-            Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple((int) (slide_width * scale),
-                (int) (slide_height * scale), Gdk.InterpType.BILINEAR);
-            Gdk.cairo_set_source_pixbuf(cr, pixbuf_scaled, 0, 0);
-            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
-            cr.fill();
+            cr.translate(this.horizontal_align * (width - slide_width * scale) / 2,
+                this.vertical_align * (height - slide_height * scale) / 2);
+            try {
+                this.renderer.render(cr, this.current_slide_number, (int) (slide_width * scale),
+                    (int) (slide_height * scale));
+            } catch( Renderer.RenderError e ) {
+                error("The pdf page %d could not be rendered: %s", this.current_slide_number,
+                    e.message);
+            }
 
             // We are the only ones drawing on this context skip everything
             // else.
