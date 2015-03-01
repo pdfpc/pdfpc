@@ -290,21 +290,20 @@ namespace pdfpc.Window {
 
             // attempt to load from a local path (if the user hasn't installed)
             // if that fails, attempt to load from the global path
-            string load_icon_path = source_path + "/icons/" + filename;
+            string load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons", filename);
             File icon_file = File.new_for_path(load_icon_path);
             if (!icon_file.query_exists()) {
-                load_icon_path = icon_path + filename;
+                load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
             }
 
             Gtk.Image icon;
             try {
-                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(icon_path + filename,
+                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(load_icon_path,
                     (int) Math.floor(1.06 * icon_height), icon_height);
                 icon = new Gtk.Image.from_pixbuf(pixbuf);
                 icon.no_show_all = true;
             } catch (Error e) {
-                stderr.printf("Warning: Could not load icon %s (%s)\n",
-                    icon_path + "blank.svg", e.message);
+                stderr.printf("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
                 icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
             }
             return icon;
