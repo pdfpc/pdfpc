@@ -103,18 +103,19 @@ namespace pdfpc {
                     "The requested slide '%i' does not exist.", slide_number);
             }
 
-            Cairo.ImageSurface? current_slide = null;
+            Gdk.Pixbuf? pixbuf = null;
             // If caching is enabled check for the page in the cache
             if (this.cache != null)
-                current_slide = this.cache.retrieve(slide_number);
+                pixbuf = this.cache.retrieve(slide_number);
             
-            if (current_slide == null) {
+            if (pixbuf == null) {
                 // Retrieve the Poppler.Page for the page to render
                 var page = metadata.get_document().get_page(slide_number);
 
                 // A lot of Pdfs have transparent backgrounds defined. We render
                 // every page before a white background because of this.
-                current_slide = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width, this.height);
+                Cairo.ImageSurface current_slide = new Cairo.ImageSurface(Cairo.Format.RGB24,
+                    this.width, this.height);
                 Cairo.Context cr = new Cairo.Context(current_slide);
 
                 cr.set_source_rgb(255, 255, 255);
@@ -126,17 +127,16 @@ namespace pdfpc {
                     -metadata.get_vertical_offset(this.area));
                 page.render(cr);
 
+                pixbuf = Gdk.pixbuf_get_from_surface(current_slide, 0, 0, this.width, this.height);
                 // If the cache is enabled store the newly rendered pixmap
                 if (this.cache != null) {
-                    this.cache.store(slide_number, current_slide);
+                    this.cache.store(slide_number, pixbuf);
                 }
             }
 
             if (context == null)
                 return;
 
-            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(current_slide, 0, 0, this.width,
-                this.height);
             Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple(display_width, display_height,
                 Gdk.InterpType.BILINEAR);
             Gdk.cairo_set_source_pixbuf(context, pixbuf_scaled, 0, 0);

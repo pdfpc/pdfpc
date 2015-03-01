@@ -275,8 +275,8 @@ namespace pdfpc.Window {
             surface_width = firstSlide.get_width();
             surface_height = firstSlide.get_height();
 
-            var slideToFill = this.cache.retrieve(metadata.user_slide_to_real_slide(this.next_undone_preview));
-            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(slideToFill, 0, 0, surface_width, surface_height);
+            Gdk.Pixbuf pixbuf = this.cache.retrieve(metadata.user_slide_to_real_slide(
+                this.next_undone_preview));
             var pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
                                                     Gdk.InterpType.BILINEAR);
 

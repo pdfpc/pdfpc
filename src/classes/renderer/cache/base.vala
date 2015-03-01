@@ -53,14 +53,14 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Store a surface in the cache using the given index as identifier
          */
-        public abstract void store(uint index, Cairo.ImageSurface surface);
+        public abstract void store(uint index, Gdk.Pixbuf pixbuf);
 
         /**
          * Retrieve a stored surface from the cache.
          *
          * If no item with the given index is available null is returned
          */
-        public abstract Cairo.ImageSurface? retrieve(uint index);
+        public abstract Gdk.Pixbuf? retrieve(uint index);
     }
 
     /**
