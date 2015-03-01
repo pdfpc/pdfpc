@@ -81,7 +81,7 @@ namespace pdfpc {
             if (!Options.disable_caching) {
                 this.cache = Renderer.Cache.create(metadata);
                 if (this.cache.allows_prerendering())
-                    this.prerender();
+                    this.prerender.begin();
             }
         }
 
@@ -144,11 +144,12 @@ namespace pdfpc {
             context.fill();
         }
 
-        public void prerender() {
-            int i = 0;
-            var page_count = this.metadata.get_slide_count();
+        public async void prerender() {
+            uint page_count = this.metadata.get_slide_count();
+            for (int i = 0; i < page_count; i++) {
+                Idle.add(this.prerender.callback);
+                yield;
 
-            Idle.add(() => {
                 if (i == 0)
                     this.prerendering_started();
 
@@ -164,17 +165,8 @@ namespace pdfpc {
 
                 // Inform possible observers about the cached slide
                 this.slide_prerendered();
-
-                // Increment one slide for each call and stop the loop if we
-                // have reached the last slide
-                i += 1;
-                if (i >= page_count) {
-                    this.prerendering_completed();
-                    return false;
-                } else {
-                    return true;
-                }
-            });
+            }
+            this.prerendering_completed();
         }
     }
 }
