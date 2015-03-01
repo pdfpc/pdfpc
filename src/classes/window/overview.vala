@@ -56,17 +56,12 @@ namespace pdfpc.Window {
         protected int target_height;
 
         /**
-         * We render the previews one at a time in idle times.
-         */
-        protected int next_undone_preview = 0;
-        protected uint idle_id = 0;
-
-        /**
          * The cache we get the images from. It is a reference because the user
          * can deactivate the cache on the command line. In this case we show
          * just slide numbers, which is not really so much useful.
          */
         protected Renderer.Cache.Base? cache = null;
+        protected bool cache_ready = false;
 
         /**
          * The presentation controller
@@ -126,7 +121,7 @@ namespace pdfpc.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
-            this.slides = new Gtk.ListStore(1, typeof(Gdk.Pixbuf));
+            this.slides = new Gtk.ListStore(2, typeof(Gdk.Pixbuf), typeof(bool));
             this.slides_view = new Gtk.IconView.with_model(this.slides);
             this.slides_view.selection_mode = Gtk.SelectionMode.SINGLE;
             var renderer = new CellRendererHighlight();
@@ -139,6 +134,7 @@ namespace pdfpc.Window {
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
+            this.cache = this.presentation_controller.slide_renderer.cache;
 
             this.slides_view.motion_notify_event.connect( this.presenter.on_mouse_move );
             this.slides_view.motion_notify_event.connect( this.on_mouse_move );
@@ -146,6 +142,11 @@ namespace pdfpc.Window {
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
             this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
+
+            this.presentation_controller.slide_renderer.slide_prerendered.connect(
+                this.fill_preview);
+            this.presentation_controller.slide_renderer.prerendering_completed.connect(
+                this.on_cache_ready);
 
             this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
@@ -243,10 +244,10 @@ namespace pdfpc.Window {
             var iter = Gtk.TreeIter();
             for (int i=0; i<this.n_slides; i++) {
                 this.slides.append(out iter);
-                this.slides.set_value(iter, 0, pixbuf);
+                this.slides.set(iter, 0, pixbuf, 1, false);
             }
 
-            this.fill_previews();
+            this.fill_previews.begin();
         }
 
         /**
@@ -257,43 +258,50 @@ namespace pdfpc.Window {
          * all the slides in one go to provide some progress feedback to the
          * user.
          */
-        protected void fill_previews() {
-            if (this.idle_id != 0)
-                Source.remove(idle_id);
-            this.next_undone_preview = 0;
-            this.idle_id = GLib.Idle.add(this._fill_previews);
+        protected async void fill_previews() {
+            if (!this.cache_ready)
+                return;
+
+            for (int i = 0; i < this.n_slides; i++) {
+                Idle.add(this.fill_previews.callback);
+                yield;
+
+                this._fill_preview(i);
+            }
         }
 
-        protected bool _fill_previews() {
-            if (this.cache == null || this.next_undone_preview >= this.n_slides)
+        protected void fill_preview(int real_slide) {
+            int user_slide = this.metadata.real_slide_to_user_slide(real_slide);
+            if (this.metadata.user_slide_to_real_slide(user_slide) != real_slide)
+                return;
+
+            Idle.add(() => {
+                this._fill_preview(user_slide);
                 return false;
-
-            // We get the dimensions from the first button and first slide,
-            // should be the same for all
-            int surface_width, surface_height;
-            var firstSlide = this.cache.retrieve(0);
-            surface_width = firstSlide.get_width();
-            surface_height = firstSlide.get_height();
-
-            Gdk.Pixbuf pixbuf = this.cache.retrieve(metadata.user_slide_to_real_slide(
-                this.next_undone_preview));
-            var pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
-                                                    Gdk.InterpType.BILINEAR);
-
-            var iter = Gtk.TreeIter();
-            this.slides.get_iter_from_string(out iter, @"$(this.next_undone_preview)");
-            this.slides.set_value(iter, 0, pixbuf_scaled);
-
-            return (++this.next_undone_preview < this.n_slides);
+            });
         }
 
-        /**
-         * Gives the cache to retrieve the images from. The caching process
-         * itself should already be finished.
-         */
-        public void set_cache(Renderer.Cache.Base cache) {
-            this.cache = cache;
-            this.fill_previews();
+        protected void _fill_preview(int user_slide) {
+            Gtk.TreeIter iter = Gtk.TreeIter();
+            bool rendered;
+            this.slides.get_iter_from_string(out iter, @"$user_slide");
+            this.slides.get(iter, 1, out rendered);
+            if (rendered)
+                return;
+
+            int real_slide = this.metadata.user_slide_to_real_slide(user_slide);
+            Gdk.Pixbuf? pixbuf = this.cache.retrieve(real_slide);
+            if (pixbuf == null)
+                return;
+
+            Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
+                Gdk.InterpType.BILINEAR);
+            this.slides.set(iter, 0, pixbuf_scaled, 1, true);
+        }
+
+        protected void on_cache_ready() {
+            this.cache_ready = true;
+            this.fill_previews.begin();
         }
 
         /**

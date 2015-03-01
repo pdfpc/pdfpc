@@ -31,7 +31,7 @@ namespace pdfpc {
          * This signal should be emitted slide_count number of times during a
          * precaching cylce.
          */
-        public signal void slide_prerendered();
+        public signal void slide_prerendered(int i);
 
         /**
          * Signal emitted when the precaching cycle is complete
@@ -164,7 +164,7 @@ namespace pdfpc {
                 }
 
                 // Inform possible observers about the cached slide
-                this.slide_prerendered();
+                this.slide_prerendered(i);
             }
             this.prerendering_completed();
         }
