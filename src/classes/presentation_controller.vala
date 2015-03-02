@@ -180,6 +180,18 @@ namespace pdfpc {
             this.current_user_slide_number = 0;
 
             this.add_actions();
+
+            // Once everything's set up, make sure that prerendering gets started
+            Idle.add(() => {
+                if (Options.disable_caching)
+                    return false;
+
+                if (this.overview == null)
+                    this.trigger_prerender();
+                else
+                    this.overview.previews_ready.connect(this.trigger_prerender);
+                return false;
+            });
         }
 
         /*
@@ -192,6 +204,13 @@ namespace pdfpc {
 
         public void set_overview(Window.Overview o) {
             this.overview = o;
+        }
+
+        protected void trigger_prerender() {
+            this.slide_renderer.finish_prerender.begin();
+            this.notes_renderer.finish_prerender.begin();
+            if (this.overview != null)
+                this.overview.previews_ready.disconnect(this.trigger_prerender);
         }
 
         protected void add_actions() {

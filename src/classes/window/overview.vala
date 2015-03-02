@@ -25,6 +25,7 @@ namespace pdfpc.Window {
      * An overview of all the slides in the form of a table
      */
     public class Overview: Gtk.ScrolledWindow {
+        public signal void previews_ready();
 
         /*
          * The store of all the slides.
@@ -54,14 +55,6 @@ namespace pdfpc.Window {
          */
         protected int target_width;
         protected int target_height;
-
-        /**
-         * The cache we get the images from. It is a reference because the user
-         * can deactivate the cache on the command line. In this case we show
-         * just slide numbers, which is not really so much useful.
-         */
-        protected Renderer.Cache.Base? cache = null;
-        protected bool cache_ready = false;
 
         /**
          * The presentation controller
@@ -134,7 +127,6 @@ namespace pdfpc.Window {
             this.metadata = metadata;
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
-            this.cache = this.presentation_controller.slide_renderer.cache;
 
             this.slides_view.motion_notify_event.connect( this.presenter.on_mouse_move );
             this.slides_view.motion_notify_event.connect( this.on_mouse_move );
@@ -142,11 +134,6 @@ namespace pdfpc.Window {
             this.slides_view.key_press_event.connect( this.on_key_press );
             this.slides_view.selection_changed.connect( this.on_selection_changed );
             this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
-
-            this.presentation_controller.slide_renderer.slide_prerendered.connect(
-                this.fill_preview);
-            this.presentation_controller.slide_renderer.prerendering_completed.connect(
-                this.on_cache_ready);
 
             this.aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
         }
@@ -251,34 +238,20 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Fill the previews (only if we have a cache and we are displayed).
-         * The size of the icons should be known already
+         * Fill the previews. The size of the icons should be known already.
          *
          * This is done in a progressive way (one slide at a time) instead of
          * all the slides in one go to provide some progress feedback to the
          * user.
          */
         protected async void fill_previews() {
-            if (!this.cache_ready)
-                return;
-
             for (int i = 0; i < this.n_slides; i++) {
                 Idle.add(this.fill_previews.callback);
                 yield;
 
                 this._fill_preview(i);
             }
-        }
-
-        protected void fill_preview(int real_slide) {
-            int user_slide = this.metadata.real_slide_to_user_slide(real_slide);
-            if (this.metadata.user_slide_to_real_slide(user_slide) != real_slide)
-                return;
-
-            Idle.add(() => {
-                this._fill_preview(user_slide);
-                return false;
-            });
+            this.previews_ready();
         }
 
         protected void _fill_preview(int user_slide) {
@@ -290,18 +263,13 @@ namespace pdfpc.Window {
                 return;
 
             int real_slide = this.metadata.user_slide_to_real_slide(user_slide);
-            Gdk.Pixbuf? pixbuf = this.cache.retrieve(real_slide);
-            if (pixbuf == null)
-                return;
-
-            Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple(this.target_width, this.target_height,
-                Gdk.InterpType.BILINEAR);
-            this.slides.set(iter, 0, pixbuf_scaled, 1, true);
-        }
-
-        protected void on_cache_ready() {
-            this.cache_ready = true;
-            this.fill_previews.begin();
+            try {
+                Gdk.Pixbuf pixbuf = this.presentation_controller.slide_renderer.render_pixbuf(
+                    real_slide, this.target_width, this.target_height);
+                this.slides.set(iter, 0, pixbuf, 1, true);
+            } catch (Error e) {
+                error("Rendering problem!");
+            }
         }
 
         /**

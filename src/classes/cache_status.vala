@@ -62,9 +62,7 @@ namespace pdfpc {
          * Monitor a new view for prerendering information
          */
         public void monitor_renderer(Renderer.Pdf renderer) {
-            renderer.prerendering_started.connect((v) => {
-                this.max_value += (int) renderer.metadata.get_slide_count();
-            });
+            this.max_value += (int) renderer.metadata.get_slide_count();
             renderer.slide_prerendered.connect(() => {
                 ++this.current_value;
                 this.update();

@@ -463,9 +463,11 @@ namespace pdfpc.Window {
          * for display, as it is a Image widget after all.
          */
         public void set_cache_observer(CacheStatus observer) {
-            observer.update_progress.connect(this.prerender_progress.set_fraction);
-            observer.update_complete.connect(this.prerender_finished);
-            this.prerender_progress.show();
+            if (!Options.disable_caching) {
+                observer.update_progress.connect(this.prerender_progress.set_fraction);
+                observer.update_complete.connect(this.prerender_finished);
+                this.prerender_progress.show();
+            }
         }
 
         public void prerender_finished() {

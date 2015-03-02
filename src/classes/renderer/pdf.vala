@@ -24,7 +24,9 @@ namespace pdfpc {
     /**
      * Pdf slide renderer
      */
-    public class Renderer.Pdf : Renderer.Base, Renderer.Caching {
+    public class Renderer.Pdf : Renderer.Base {
+        public const int FAST_RENDER_TIME = 15000; // microseconds
+
         /**
          * Signal emitted every time a precached slide has been created
          *
@@ -37,11 +39,6 @@ namespace pdfpc {
          * Signal emitted when the precaching cycle is complete
          */
         public signal void prerendering_completed();
-
-        /**
-         * Signal emitted when the precaching cycle just started
-         */
-        public signal void prerendering_started();
 
         /**
          * The scaling factor needed to render the pdf page to the desired size.
@@ -58,6 +55,10 @@ namespace pdfpc {
          */
         public Renderer.Cache.Base? cache { get; protected set; default = null; }
 
+        protected bool[] fast_slide;
+
+        protected bool prerendering = false;
+
         /**
          * Base constructor taking a pdf metadata object as well as the desired
          * render width and height as parameters.
@@ -71,6 +72,9 @@ namespace pdfpc {
             base(metadata, width, height);
 
             this.area = area;
+            this.fast_slide = new bool[metadata.get_slide_count()];
+            for (int i = 0; i < metadata.get_slide_count(); i++)
+                this.fast_slide[i] = false;
 
             // Calculate the scaling factor needed.
             this.scaling_factor = Math.fmin(width / metadata.get_page_width(),
@@ -80,8 +84,6 @@ namespace pdfpc {
 
             if (!Options.disable_caching) {
                 this.cache = Renderer.Cache.create(metadata);
-                if (this.cache.allows_prerendering())
-                    this.prerender.begin();
             }
         }
 
@@ -91,10 +93,16 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public override void render(Cairo.Context? context, int slide_number, int display_width = 0,
-            int display_height = 0)
+        public override void render(Cairo.Context context, int slide_number, int display_width,
+            int display_height)
             throws Renderer.RenderError {
-
+            
+            // Each slide may be in one of three states, indicated by the combination of
+            // the fast_slide array and the cache:
+            // 1) Never been rendered -- fast_slide = false, cache = null
+            // 2) Rendered, judged fast -- fast_slide = true, cache = null
+            // 3) Rendered, judged slow -- fast_slide = false, cache != null
+            
             var metadata = this.metadata as Metadata.Pdf;
 
             // Check if a valid page is requested, before locking anything.
@@ -102,69 +110,98 @@ namespace pdfpc {
                 throw new Renderer.RenderError.SLIDE_DOES_NOT_EXIST(
                     "The requested slide '%i' does not exist.", slide_number);
             }
-
-            Gdk.Pixbuf? pixbuf = null;
-            // If caching is enabled check for the page in the cache
-            if (this.cache != null)
-                pixbuf = this.cache.retrieve(slide_number);
-            
-            if (pixbuf == null) {
-                // Retrieve the Poppler.Page for the page to render
-                var page = metadata.get_document().get_page(slide_number);
-
-                // A lot of Pdfs have transparent backgrounds defined. We render
-                // every page before a white background because of this.
-                Cairo.ImageSurface current_slide = new Cairo.ImageSurface(Cairo.Format.RGB24,
-                    this.width, this.height);
-                Cairo.Context cr = new Cairo.Context(current_slide);
-
-                cr.set_source_rgb(255, 255, 255);
-                cr.rectangle(0, 0, this.width, this.height);
-                cr.fill();
-
-                cr.scale(this.scaling_factor, this.scaling_factor);
-                cr.translate(-metadata.get_horizontal_offset(this.area),
-                    -metadata.get_vertical_offset(this.area));
-                page.render(cr);
-
-                pixbuf = Gdk.pixbuf_get_from_surface(current_slide, 0, 0, this.width, this.height);
-                // If the cache is enabled store the newly rendered pixmap
-                if (this.cache != null) {
-                    this.cache.store(slide_number, pixbuf);
-                }
+            if (this.cache == null || this.fast_slide[slide_number]) {
+                render_direct(context, slide_number, display_width, display_height);
+                return;
             }
 
-            if (context == null)
-                return;
-
-            Gdk.Pixbuf pixbuf_scaled = pixbuf.scale_simple(display_width, display_height,
-                Gdk.InterpType.BILINEAR);
+            Gdk.Pixbuf pixbuf_scaled = render_pixbuf(slide_number, display_width, display_height);
             Gdk.cairo_set_source_pixbuf(context, pixbuf_scaled, 0, 0);
-            context.rectangle(0, 0, pixbuf_scaled.get_width(), pixbuf_scaled.get_height());
+            context.rectangle(0, 0, display_width, display_height);
             context.fill();
         }
+        
+        public Gdk.Pixbuf? render_pixbuf(int slide_number, int display_width, int display_height)
+            throws Renderer.RenderError {
+            Metadata.Pdf metadata = this.metadata as Metadata.Pdf;
 
-        public async void prerender() {
+            // Check if a valid page is requested, before locking anything.
+            if (slide_number < 0 || slide_number >= metadata.get_slide_count()) {
+                throw new Renderer.RenderError.SLIDE_DOES_NOT_EXIST(
+                    "The requested slide '%i' does not exist.", slide_number);
+            }
+            Gdk.Pixbuf? pixbuf = (this.cache != null) ? this.cache.retrieve(slide_number) : null;
+            
+            if (pixbuf == null) {
+                bool needs_cache = !this.fast_slide[slide_number];
+                if (!needs_cache && (display_width == 0 || display_height == 0))
+                    return null;
+
+                int render_width = needs_cache ? this.width : display_width;
+                int render_height = needs_cache ? this.height : display_height;
+                Cairo.ImageSurface current_slide = new Cairo.ImageSurface(Cairo.Format.RGB24,
+                    render_width, render_height);
+                Cairo.Context cr = new Cairo.Context(current_slide);
+
+                int64 start = get_monotonic_time();
+                this.render_direct(cr, slide_number, render_width, render_height);
+                if (get_monotonic_time() - start < FAST_RENDER_TIME)
+                    this.fast_slide[slide_number] = true;
+
+                pixbuf = Gdk.pixbuf_get_from_surface(current_slide, 0, 0, render_width,
+                    render_height);
+                if (!needs_cache)
+                    return pixbuf;
+                // We will only end up here the first time a slide has been rendered.
+                this.slide_prerendered(slide_number);
+                if (!this.fast_slide[slide_number])
+                    this.cache.store(slide_number, pixbuf);
+            }
+
+            if (display_width == 0 || display_height == 0)
+                return null;
+
+            return pixbuf.scale_simple(display_width, display_height, Gdk.InterpType.BILINEAR);
+        }
+
+        private void render_direct(Cairo.Context? context, int slide_number, int display_width,
+            int display_height) {
+            Metadata.Pdf metadata = this.metadata as Metadata.Pdf;
+            double scale = double.min(display_width / metadata.get_page_width(),
+                display_height / metadata.get_page_height());
+            Poppler.Page page = metadata.get_document().get_page(slide_number);
+            
+            // A lot of Pdfs have transparent backgrounds defined. We render
+            // every page before a white background because of this.
+            context.set_source_rgb(255, 255, 255);
+            context.rectangle(0, 0, display_width, display_height);
+            context.fill();
+
+            context.scale(scale, scale);
+            context.translate(-metadata.get_horizontal_offset(this.area),
+                -metadata.get_vertical_offset(this.area));
+            page.render(context);
+        }
+
+        public async void finish_prerender() {
+            if (this.prerendering)
+                return;
+            this.prerendering = true;
+
             uint page_count = this.metadata.get_slide_count();
             for (int i = 0; i < page_count; i++) {
-                Idle.add(this.prerender.callback);
+                Idle.add(this.finish_prerender.callback);
                 yield;
-
-                if (i == 0)
-                    this.prerendering_started();
-
+                
                 // We do not care about the result, as the
                 // rendering function stores the rendered
                 // pixmap in the cache if it is enabled. This
                 // is exactly what we want.
                 try {
-                    this.render(null, i);
+                    this.render_pixbuf(i, 0, 0);
                 } catch(Renderer.RenderError e) {
                     error("Could not render page '%i' while pre-rendering: %s", i, e.message);
                 }
-
-                // Inform possible observers about the cached slide
-                this.slide_prerendered(i);
             }
             this.prerendering_completed();
         }
