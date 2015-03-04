@@ -198,6 +198,9 @@ namespace pdfpc {
             if (pdfFilename == null) {
                 warning("Error: No pdf file given\n");
                 Posix.exit(1);
+            } else if (!GLib.FileUtils.test(pdfFilename, (GLib.FileTest.IS_REGULAR))) {
+                warning("Error: pdf file not found\n");
+                Posix.exit(1);
             }
 
             // parse size option
