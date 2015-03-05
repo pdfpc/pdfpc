@@ -161,7 +161,7 @@ namespace pdfpc.Window {
          */
         public void ensure_focus() {
             Gtk.Window top = this.get_toplevel() as Gtk.Window;
-            if (top != null)
+            if (top != null && !top.has_toplevel_focus)
                 top.present();
             this.slides_view.grab_focus();
         }
