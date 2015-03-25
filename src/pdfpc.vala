@@ -170,6 +170,18 @@ namespace pdfpc {
         }
 
         /**
+         * Reset screensaver (callback)
+         */
+        private bool resetScreensaver() {
+            try {
+                return Process.spawn_command_line_sync("xdg-screensaver reset");
+            } catch (SpawnError error) {
+                warning("Failed to spawn xdg-screensaver: %s", error.message);
+                return false;
+            }
+        }
+
+        /**
          * Main application function, which instantiates the windows and
          * initializes the Gtk system.
          */
@@ -281,6 +293,9 @@ namespace pdfpc {
                 this.presenter_window.show_all();
                 this.presenter_window.update();
             }
+
+            // Start inhibition of the screensaver.
+            Timeout.add(30000, resetScreensaver);
 
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
