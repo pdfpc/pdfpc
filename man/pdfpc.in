@@ -1,4 +1,8 @@
 .TH  pdfpc "1" "May 2013"
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
 
 .SH NAME
 pdfpc \- pdf presenter console with multi-monitor support
@@ -335,10 +339,10 @@ bind S+Next    next10
 A list of all possible functions can be obtained
 via the \-L command line option.
 
-Under
-.I http://davvil.github.com/pdfpc#configs
-you can find some configuration files for commonly used devices
-(wireless presenters, bluetooth headsets, ...). If your device is not
+Some configuration files for commonly used devices
+(wireless presenters, bluetooth headsets, ...)
+.URL http://davvil.github.com/pdfpc#configs "are available" .
+If your device is not
 yet supported and you generated a working config file, please
 contribute it (see contact information below).
 
@@ -378,13 +382,13 @@ There may be a small memory leak in the program. I am trying to solve it. It
 should not be too important for up to some hundreds of slides.
 
 Other bugs can be reported at
-.I https://github.com/davvil/pdfpc/issues
+.URL https://github.com/davvil/pdfpc/issues "the issue tracker" .
 
 .SH CONTACT
 .PP
 Comments and suggestion are welcome. Write an email to
-.I davvil@gmail.com
+.URL mailto:davvil@gmail.com "David Vilar" .
 
 .SH SEE ALSO
-pdfpc is a fork of Pdf Presenter Console, available at
-.I http://westhoffswelt.de/projects/pdf_presenter_console.html
+pdfpc is a fork of Pdf Presenter Console, available
+.URL http://westhoffswelt.de/projects/pdf_presenter_console.html "online" .
