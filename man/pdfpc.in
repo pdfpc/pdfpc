@@ -355,7 +355,7 @@ Movies may be included in PDF files as "screen annotations".  pdfpc does
 not yet support options that modify the playback of these movies.  In LaTeX,
 such movies may be added to a presentation with the "movie15" package.
 Note that the poster, autoplay, and repeat options are not yet supported.
-(Also, run ps2pdf with the -dNOSAFER flag.)
+(Also, run ps2pdf with the \-dNOSAFER flag.)
 
 As a perhaps simpler option, pdfpc will play back movies linked from a
 hyperlink of type "launch".  A query string may be added to the URL of the
