@@ -2,6 +2,7 @@
     background-color: black;
     background-image: none;
     color: white;
+    font-family: Verdana;
 }
 
 /* .slider and .trough are parts of scrollbar */
@@ -30,3 +31,10 @@ pdfpcTimerLabel.overtime {
     color: red;
 }
 
+#notesView {
+    font-size: 20px;
+}
+
+#prerenderProgress {
+    font-size: 20px;
+}

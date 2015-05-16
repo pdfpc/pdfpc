@@ -134,6 +134,8 @@ namespace pdfpc.Window {
             this.presentation_controller.ask_goto_page_request.connect(this.ask_goto_page);
             this.presentation_controller.show_overview_request.connect(this.show_overview);
             this.presentation_controller.hide_overview_request.connect(this.hide_overview);
+            this.presentation_controller.increase_font_size_request.connect(this.increase_font_size);
+            this.presentation_controller.decrease_font_size_request.connect(this.decrease_font_size);
 
             this.metadata = metadata;
 
@@ -202,13 +204,11 @@ namespace pdfpc.Window {
             );
 
             // TextView for notes in the slides
-            var notes_font = Pango.FontDescription.from_string("Verdana");
-            notes_font.set_size((int) Math.floor(20 * 0.75) * Pango.SCALE);
             this.notes_view = new Gtk.TextView();
+            this.notes_view.name = "notesView";
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
-            this.notes_view.override_font(notes_font);
             this.notes_view.buffer.text = "";
             this.notes_view.key_press_event.connect(this.on_key_press_notes_view);
 
@@ -234,9 +234,9 @@ namespace pdfpc.Window {
             this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);
 
             this.prerender_progress = new Gtk.ProgressBar();
+            this.prerender_progress.name = "prerenderProgress";
             this.prerender_progress.show_text = true;
             this.prerender_progress.text = "Prerendering...";
-            this.prerender_progress.override_font(notes_font);
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
@@ -539,6 +539,28 @@ namespace pdfpc.Window {
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
             this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).cache);
+        }
+
+        /**
+         * Increase font sizes for Widgets
+         */
+        public void increase_font_size() {
+            var styleContext = this.notes_view.get_style_context();
+            Pango.FontDescription fontDesc;
+            styleContext.get(styleContext.get_state(), "font", out fontDesc, null);
+            fontDesc.set_size((int)(fontDesc.get_size()*1.1));
+            this.notes_view.override_font(fontDesc);
+        }
+
+        /**
+         * Decrease font sizes for Widgets
+         */
+        public void decrease_font_size() {
+            var styleContext = this.notes_view.get_style_context();
+            Pango.FontDescription fontDesc;
+            styleContext.get(styleContext.get_state(), "font", out fontDesc, null);
+            fontDesc.set_size((int)(fontDesc.get_size()/1.1));
+            this.notes_view.override_font(fontDesc);
         }
     }
 }

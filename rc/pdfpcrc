@@ -47,6 +47,15 @@ bind n         note
 bind o         overlay
 bind e         endSlide
 
+# Font scaling
+bind plus      increaseFontSize
+bind equal     increaseFontSize
+bind KP_Add    increaseFontSize
+bind bracketleft increaseFontSize
+bind minus     decreaseFontSize
+bind KP_Subtract decreaseFontSize
+bind bracketright decreaseFontSize
+
 #### Mouse bindings
 mouse 1        next
 mouse S+1      next10
