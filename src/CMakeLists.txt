@@ -55,10 +55,6 @@ link_directories(${LIB_PATHS})
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_SOURCE_DIR}/paths.vala)
 
 file (GLOB_RECURSE VALA_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.vala)
-# Vala 0.14 (and presumably lower) doesn't have Poppler.AnnotFileAttachment
-if(${VALA_VERSION} VERSION_LESS "0.16.0")
-    set(VALA_SRC ${VALA_SRC} poppler-annot-file-attachment.vapi)
-endif(${VALA_VERSION} VERSION_LESS "0.16.0")
 
 vala_precompile(VALA_C
     ${VALA_SRC}
