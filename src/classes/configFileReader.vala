@@ -4,17 +4,17 @@
  * This file is part of pdfpc
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -26,7 +26,7 @@ namespace pdfpc {
 
         public ConfigFileReader(PresentationController controller) {
             this.presentation_controller = controller;
-            uint supportedModifiers = Gdk.ModifierType.SHIFT_MASK 
+            uint supportedModifiers = Gdk.ModifierType.SHIFT_MASK
                                       | Gdk.ModifierType.CONTROL_MASK
                                       | Gdk.ModifierType.META_MASK
                                     ;
@@ -77,7 +77,7 @@ namespace pdfpc {
                 this.presentation_controller.bind(keycode, modMask, fields[2]);
             }
         }
-        
+
         private void unbindKey(string wholeLine, string[] fields) {
             if (fields.length != 2) {
                 stderr.printf("Bad unbind specification: %s\n", wholeLine);
@@ -125,10 +125,10 @@ namespace pdfpc {
 
         public void readConfig(string fname) {
             var file = File.new_for_path(fname);
-            var splitRegex = new Regex("\\s\\s*");
-            var commentRegex = new Regex("\\s*#.*$");
             uint8[] raw_datau8;
             try {
+                var splitRegex = new Regex("\\s\\s*");
+                var commentRegex = new Regex("\\s*#.*$");
                 file.load_contents(null, out raw_datau8, null);
                 string[] lines = ((string) raw_datau8).split("\n");
                 for (int i=0; i<lines.length; ++i) {

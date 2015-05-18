@@ -4,24 +4,21 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-using Gtk;
-using Gdk;
 
 namespace pdfpc {
 
@@ -60,22 +57,6 @@ namespace pdfpc {
         protected uint timeout = 0;
 
         /**
-         * Color used for normal timer rendering
-         *
-         * This property is public and not accesed using a setter to be able to use
-         * Color.parse directly on it.
-         */
-        public Color normal_color;
-
-        /**
-         * Color used for pre-talk timer rendering
-         *
-         * This property is public and not accesed using a setter to be able to use
-         * Color.parse directly on it.
-         */
-        public Color pretalk_color;
-
-        /**
          * Default constructor taking the initial time as argument, as well as
          * the time to countdown until the talk actually starts.
          *
@@ -85,23 +66,20 @@ namespace pdfpc {
          */
         public TimerLabel( time_t start_time = 0 ) {
             this.start_time = start_time;
-
-            Color.parse( "white", out this.normal_color );
-            Color.parse( "green", out this.pretalk_color );
         }
 
         /**
          * Start the timer
          */
         public virtual void start() {
-            if ( this.timeout != 0 && this.time < 0 ) { 
+            if ( this.timeout != 0 && this.time < 0 ) {
                 // We are in pretalk, with timeout already running.
                 // Jump to talk mode
                 this.start_time = Time.local( time_t() ).mktime(); // now
             } else if ( this.timeout == 0 ) {
                 // Start the timer if it is not running
                 this.start_time = Time.local( time_t() - this.time ).mktime();
-                this.timeout = Timeout.add( 1000, this.on_timeout );
+                this.timeout = GLib.Timeout.add( 1000, this.on_timeout );
             }
             this.update_time();
         }
@@ -164,8 +142,7 @@ namespace pdfpc {
          *
          * Time can be negative if the talk begins in future.
          */
-        protected void update_time()
-        {
+        protected void update_time() {
             time_t now = Time.local( time_t() ).mktime();
             this.time =  (int)( now - this.start_time );
         }
@@ -193,8 +170,8 @@ namespace pdfpc {
             hours = timeInSecs / 60 / 60;
             minutes = timeInSecs / 60 % 60;
             seconds = timeInSecs % 60 % 60;
-            
-            this.set_text( 
+
+            this.set_text(
                 "%s%.2u:%.2u:%.2u".printf(
                     prefix,
                     hours,
@@ -217,29 +194,10 @@ namespace pdfpc {
          */
         protected uint last_minutes = 5;
 
-        /**
-         * Color used if last_minutes have been reached
-         *
-         * This property is public and not accesed using a setter to be able to use
-         * Color.parse directly on it.
-         */
-        public Color last_minutes_color;
-        
-        /**
-         * Color used to represent negative number (time is over)
-         *
-         * This property is public and not accesed using a setter to be able to use
-         * Color.parse directly on it.
-         */
-        public Color negative_color;
-
         public CountdownTimer( int duration, uint last_minutes, time_t start_time = 0 ) {
             base(start_time);
             this.duration = duration;
             this.last_minutes = last_minutes;
-
-            Color.parse( "orange", out this.last_minutes_color );
-            Color.parse( "red", out this.negative_color );
         }
 
         /**
@@ -255,38 +213,23 @@ namespace pdfpc {
             // Normally the default is a positive number. Therefore a negative
             // sign is not needed and the prefix is just an empty string.
             string prefix = "";
+            Gtk.StyleContext context = this.get_style_context();
             if ( this.time < 0 ) // pretalk
             {
                 prefix = "-";
                 timeInSecs = -this.time;
-                this.modify_fg( 
-                    StateType.NORMAL, 
-                    this.pretalk_color
-                );
+                context.add_class("pretalk");
             } else {
+                context.remove_class("pretalk");
                 if ( this.time < this.duration ) {
                     timeInSecs = duration - this.time;
                     // Still on presentation time
-                    if ( timeInSecs < this.last_minutes * 60 ) {
-                        this.modify_fg( 
-                            StateType.NORMAL, 
-                            this.last_minutes_color
-                        );
-                    }
-                    else {
-                        this.modify_fg( 
-                            StateType.NORMAL, 
-                            this.normal_color
-                        );
-                    }
-                    
-                }
-                else {
+                    if ( timeInSecs < this.last_minutes * 60 )
+                        context.add_class("last-minutes");
+                } else {
                     // Time is over!
-                    this.modify_fg( 
-                        StateType.NORMAL, 
-                        this.negative_color
-                    );
+                    context.remove_class("last-minutes");
+                    context.add_class("overtime");
                     timeInSecs = this.time - duration;
 
                     // The prefix used for negative time values is a simple minus sign.
@@ -300,7 +243,7 @@ namespace pdfpc {
 
     public class EndTimeTimer : CountdownTimer {
 
-        protected time_t end_time;        
+        protected time_t end_time;
         protected Time end_time_object;
 
         public EndTimeTimer( time_t end_time, uint last_minutes, time_t start_time = 0 ) {
@@ -344,20 +287,15 @@ namespace pdfpc {
             // Normally the default is a positive number. Therefore a negative
             // sign is not needed and the prefix is just an empty string.
             string prefix = "";
+            Gtk.StyleContext context = this.get_style_context();
             if ( this.time < 0 ) // pretalk
             {
                 prefix = "-";
                 timeInSecs = -this.time;
-                this.modify_fg( 
-                               StateType.NORMAL, 
-                               this.pretalk_color
-                              );
+                context.add_class("pretalk");
             } else {
                 timeInSecs = this.time;
-                this.modify_fg( 
-                               StateType.NORMAL, 
-                               this.normal_color
-                              );
+                context.remove_class("pretalk");
             }
             this.show_time(timeInSecs, prefix);
         }

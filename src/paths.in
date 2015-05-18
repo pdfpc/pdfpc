@@ -1,2 +1,6 @@
-const string icon_path = "@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/";
-const string etc_path = "@SYSCONFDIR@";
+namespace pdfpc.Paths {
+    public const string ICON_PATH = "@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/";
+    public const string SOURCE_PATH = "@CMAKE_SOURCE_DIR@";
+    public const string CONF_PATH = "@SYSCONFDIR@";
+}
+

@@ -4,23 +4,21 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-using GLib;
 
 namespace pdfpc.Metadata {
     /**
@@ -182,7 +180,7 @@ namespace pdfpc.Metadata {
             var file = File.new_for_commandline_arg(fname);
 
             if (fname.length < 6 || fname[l-6:l] != ".pdfpc") {
-                this.pdf_fname = file.get_basename(); 
+                this.pdf_fname = file.get_basename();
                 this.pdf_url = file.get_uri();
                 string pdf_basefname = file.get_basename();
                 int extension_index = pdf_basefname.last_index_of(".");
@@ -191,7 +189,7 @@ namespace pdfpc.Metadata {
                 this.pdfpc_url = pdfpc_file.get_uri();
             } else {
                 this.pdfpc_url = file.get_uri();
-            } 
+            }
         }
 
         /**
@@ -254,7 +252,7 @@ namespace pdfpc.Metadata {
          */
         protected string format_notes() {
             string contents = "";
-            if ( this.notes.has_notes() ) 
+            if ( this.notes.has_notes() )
                 contents += ("[notes]\n" + this.notes.format_to_save());
             return contents;
         }
@@ -300,16 +298,15 @@ namespace pdfpc.Metadata {
             if (File.new_for_uri(this.pdfpc_url).query_exists())
                 parse_pdfpc_file(out skip_line);
             this.document = this.open_pdf_document( this.pdf_url );
-            
+
             // Cache some often used values to minimize thread locking in the
             // future.
-            MutexLocks.poppler.lock();
             this.page_count = this.document.get_n_pages();
-            this.document.get_page( 0 ).get_size( 
+            this.document.get_page( 0 ).get_size(
                 out this.original_page_width,
                 out this.original_page_height
             );
-    
+
             if (!skips_by_user) {
                 // Auto-detect which pages to skip
                 string previous_label = null;
@@ -328,10 +325,8 @@ namespace pdfpc.Metadata {
 
             // Prepopulate notes from annotations
             notes_from_document();
-
-            MutexLocks.poppler.unlock();
         }
-    
+
         /**
          * Return the number of pages in the pdf document
          */
@@ -545,20 +540,17 @@ namespace pdfpc.Metadata {
          */
         protected Poppler.Document open_pdf_document( string url ) {
             var file = File.new_for_uri( url );
-            
+
             Poppler.Document document = null;
 
             try {
-                MutexLocks.poppler.lock();
-                document = new Poppler.Document.from_file( 
+                document = new Poppler.Document.from_file(
                     file.get_uri(),
                     null
                 );
             } catch( GLib.Error e ) {
                 GLib.printerr( "Unable to open pdf file: %s\n", e.message );
                 Posix.exit(1);
-            } finally {
-                MutexLocks.poppler.unlock();
             }
 
             return document;

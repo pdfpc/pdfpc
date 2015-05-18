@@ -4,26 +4,21 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2012 Robert Schroll <rschroll@gmail.com>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-using Gst;
-using Cairo;
-
-using pdfpc;
 
 namespace pdfpc {
     /**
@@ -36,13 +31,13 @@ namespace pdfpc {
     /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
-    public Element gst_element_make(string factoryname, string? name) throws PipelineError {
-        var element = ElementFactory.make(factoryname, name);
+    public Gst.Element gst_element_make(string factoryname, string? name) throws PipelineError {
+        var element = Gst.ElementFactory.make(factoryname, name);
         if (element == null)
             throw new PipelineError.ElementConstruction(@"Could not make element $name of type $factoryname.");
         return element;
     }
-    
+
     /**
      * A movie with basic controls -- click to start and stop.
      */
@@ -50,32 +45,32 @@ namespace pdfpc {
         /**
          * The gstreamer pipeline for playback.
          */
-        public dynamic Element pipeline;
-        
+        public dynamic Gst.Element pipeline;
+
         /**
          * A flag to indicate when we've reached the End Of Stream, so we
          * know whether to restart on the next click.
          */
         protected bool eos = false;
-        
+
         /**
          * A flag to indicated whether the movie should be played in a loop.
          */
         protected bool loop;
-        
+
         /**
          * If the movie was attached to the PDF file, we store it in a temporary
          * file, whose name we store here.  If not, this will be the blank string.
          */
         protected string temp;
-        
+
         /**
          * Base constructor does nothing.
          */
         public Movie() {
             base();
         }
-        
+
         /**
          * This initializer is odd -- it's called from an other object from the
          * one your are initializing.  This is so subclasses can override this
@@ -97,7 +92,7 @@ namespace pdfpc {
                 return false;
             } );
         }
-        
+
         /**
          * Create a new Movie from a link mapping, if the link of type "LAUNCH"
          * and points to a file that looks like a video file.  The video is
@@ -107,7 +102,7 @@ namespace pdfpc {
          * filename can activate the autostart and loop properties.  (E.g., link
          * to movie.avi?autostart&loop to make movie.avi start playing with the
          * page is entered and loop back to the beginning when it reaches the end.)
-         * 
+         *
          * In LaTeX, create such links with
          *      \usepackage{hyperref}
          *      \href{run:<movie file>}{<placeholder content>}
@@ -119,7 +114,7 @@ namespace pdfpc {
                 PresentationController controller, Poppler.Document document) {
             if (mapping.action.type != Poppler.ActionType.LAUNCH)
                 return null;
-            
+
             var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
             var splitfile = file.split("?", 2);
             file = splitfile[0];
@@ -129,25 +124,25 @@ namespace pdfpc {
             var queryarray = querystring.split("&");
             var autostart = "autostart" in queryarray;
             var loop = "loop" in queryarray;
-            
+
             string uri = filename_to_uri(file, controller.get_pdf_url());
             bool uncertain;
             var ctype = GLib.ContentType.guess(uri, null, out uncertain);
             if (!("video" in ctype))
                 return null;
-            
+
             var type = Type.from_instance(this);
             var new_obj = GLib.Object.new(type) as ActionMapping;
             this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop);
             return new_obj;
         }
-        
+
         /**
          * Create a new Movie from an annotation mapping, if the annotation is a
          * screen annotation with a video file or a movie annotation.  Various
          * options to modify the behavior of the playback are not yet supported,
          * since they're missing from poppler.
-         * 
+         *
          * In LaTeX, create screen annotations with
          *      \usepackage{movie15}
          *      \includemovie[text=<placeholder content>]{}{}{<movie file>}
@@ -155,7 +150,7 @@ namespace pdfpc {
          * a frame from the movie is a good choice.  Note that the poster, autoplay,
          * and repeat options are not yet supported.  (Also note that movie15 is
          * deprecated, but it works as long as you run ps2pdf with the -dNOSAFER flag.)
-         * 
+         *
          * In LaTeX, create movie annotations with
          *      \usepackage{multimedia}
          *      \movie[<options>]{<placeholder content>}{<movie file>}
@@ -172,15 +167,15 @@ namespace pdfpc {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents()))
                     return null;
-                
+
                 var action = ((Poppler.AnnotScreen) annot).get_action();
                 var movie = (Poppler.Media) action.movie.movie;
-                
+
                 if (movie.is_embedded()) {
                     string tmp_fn;
                     int fh;
                     try {
-                        fh = FileUtils.open_tmp(null, out tmp_fn);
+                        fh = FileUtils.open_tmp("pdfpc-XXXXXX", out tmp_fn);
                     } catch (FileError e) {
                         warning("Could not create temp file: %s", e.message);
                         return null;
@@ -219,21 +214,21 @@ namespace pdfpc {
             default:
                 return null;
             }
-            
+
             var type = Type.from_instance(this);
             var new_obj = GLib.Object.new(type) as ActionMapping;
             this.init_other(new_obj, mapping.area, controller, document, uri, false, false, temp);
             return new_obj;
         }
-        
+
         /**
          * Set up the gstreamer pipeline.
          */
         protected void establish_pipeline(string uri) {
-            var bin = new Bin("bin");
-            var tee = ElementFactory.make("tee", "tee");
+            var bin = new Gst.Bin("bin");
+            var tee = Gst.ElementFactory.make("tee", "tee");
             bin.add_many(tee);
-            bin.add_pad(new GhostPad("sink", tee.get_pad("sink")));
+            bin.add_pad(new Gst.GhostPad("sink", tee.get_pad("sink")));
             Gdk.Rectangle rect;
             int n = 0;
             uint xid;
@@ -241,21 +236,21 @@ namespace pdfpc {
                 xid = this.controller.overlay_pos(n, this.area, out rect);
                 if (xid == 0)
                     break;
-                var sink = ElementFactory.make("xvimagesink", @"sink$n");
-                var queue = ElementFactory.make("queue", @"queue$n");
+                var sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
+                var queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
                 tee.link(queue);
                 var ad_element = this.link_additional(n, queue, bin, rect);
                 ad_element.link(sink);
-                
-                var xoverlay = sink as XOverlay;
+
+                var xoverlay = sink as Gst.XOverlay;
                 xoverlay.set_window_handle(xid);
                 xoverlay.handle_events(false);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
                 n++;
             }
-            
-            this.pipeline = ElementFactory.make("playbin2", "playbin");
+
+            this.pipeline = Gst.ElementFactory.make("playbin2", "playbin");
             this.pipeline.uri = uri;
             this.pipeline.video_sink = bin;
             var bus = this.pipeline.get_bus();
@@ -263,7 +258,7 @@ namespace pdfpc {
             bus.message["error"] += this.on_message;
             bus.message["eos"] += this.on_eos;
         }
-        
+
         /**
          * Provides a place for subclasses to hook additional elements into
          * the pipeline.  n is which output we're dealing with; 0 is where
@@ -271,19 +266,24 @@ namespace pdfpc {
          * be added to bin and linked from source.  The last element linked
          * should be returned, so that the tail end of the pipeline can be
          * attached.
-         * 
+         *
          * This stub does nothing.
          */
-        protected virtual Element link_additional(int n, Element source, Bin bin,
-                                                  Gdk.Rectangle rect) {
+        protected virtual Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
+                                                      Gdk.Rectangle rect) {
             return source;
         }
-        
+
         /**
          * Utility function for converting filenames to uris.
          */
         public string filename_to_uri(string file, string pdf_url) {
-            var uriRE = new Regex("^[a-z]*://");
+            Regex uriRE = null;
+            try {
+                uriRE = new Regex("^[a-z]*://");
+            } catch (Error error) {
+                // Won't happen
+            }
             if (uriRE.match(file))
                 return file;
             if (GLib.Path.is_absolute(file))
@@ -291,7 +291,7 @@ namespace pdfpc {
             var dirname = GLib.Path.get_dirname(pdf_url);
             return GLib.Path.build_filename(dirname, file);
         }
-        
+
         /**
          * Play the movie, rewinding to the beginning if we had reached the
          * end.
@@ -299,61 +299,61 @@ namespace pdfpc {
         public virtual void play() {
             if (this.eos) {
                 this.eos = false;
-                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, 0);
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0);
             }
-            this.pipeline.set_state(State.PLAYING);
+            this.pipeline.set_state(Gst.State.PLAYING);
         }
-        
+
         /**
          * Pause playback.
          */
         public virtual void pause() {
-            this.pipeline.set_state(State.PAUSED);
+            this.pipeline.set_state(Gst.State.PAUSED);
         }
-        
+
         /**
          * Stop playback.
          */
         public virtual void stop() {
-            this.pipeline.set_state(State.NULL);
+            this.pipeline.set_state(Gst.State.NULL);
         }
-        
+
         /**
          * Pause if playing, as vice versa.
          */
         public virtual void toggle_play() {
-            State state;
-            ClockTime time = util_get_timestamp();
+            Gst.State state;
+            Gst.ClockTime time = Gst.util_get_timestamp();
             this.pipeline.get_state(out state, null, time);
-            if (state == State.PLAYING)
+            if (state == Gst.State.PLAYING)
                 this.pause();
             else
                 this.play();
         }
-        
+
         /**
          * Basic printout of error messages on the pipeline.
          */
-        public virtual void on_message(Gst.Bus bus, Message message) {
+        public virtual void on_message(Gst.Bus bus, Gst.Message message) {
             GLib.Error err;
             string debug;
             message.parse_error(out err, out debug);
             stderr.printf("Gstreamer error %s\n", err.message);
         }
-        
+
         /**
          * Mark reaching the end of stream, and set state to paused.
          */
-        public virtual void on_eos(Gst.Bus bus, Message message) {
+        public virtual void on_eos(Gst.Bus bus, Gst.Message message) {
             if (this.loop) {
-                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, 0);
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, 0);
             } else {
                 // Can't seek to beginning w/o updating output, so mark to seek later
                 this.eos = true;
                 this.pause();
             }
         }
-        
+
         /**
          * Play and pause on mouse clicks.
          */
@@ -361,7 +361,7 @@ namespace pdfpc {
             this.toggle_play();
             return true;
         }
-        
+
         /**
          * When we leave the page, stop the movie and delete any temporary files.
          */
@@ -372,7 +372,7 @@ namespace pdfpc {
                     warning("Problem deleting temp file %s", this.temp);
         }
     }
-    
+
     /**
      * A Movie with overlaid controls; specifically a draggable progress bar.
      */
@@ -381,45 +381,45 @@ namespace pdfpc {
          * The screen rectangle associated with the movie.
          */
         protected Gdk.Rectangle rect;
-        
+
         /**
          * Data on how the movie playback must fit on the page.
          */
         protected double scalex;
         protected double scaley;
         protected int vheight;
-        
+
         /**
          * The length of the movie, in nanoseconds (!).
          */
         protected int64 duration;
-        
+
         /**
          * Settings for the appearance of the progress bar.
          */
         protected double seek_bar_height = 20;
         protected double seek_bar_padding = 2;
-        
+
         /**
          * A timeout signal is used to update the GUI when the movie is paused,
          * since we won't get new frames.
          */
         protected uint refresh_timeout = 0;
-        
+
         /**
          * Flags about the current state of mouse interaction.
          */
         protected bool in_seek_bar = false;
         protected bool mouse_drag = false;
         protected bool drag_was_playing;
-        
+
         /**
          * Basic constructor does nothing.
          */
         public ControlledMovie() {
             base();
         }
-        
+
         /**
          * The initialization unique to this class.  See the documentation for
          * Movie.init_other that attempts to justify this ugliness.
@@ -431,31 +431,31 @@ namespace pdfpc {
             controller.main_view.motion_notify_event.connect(movie.on_motion);
             controller.main_view.button_release_event.connect(movie.on_button_release);
         }
-        
+
         /**
          * Hook up the elements to draw the controls to the first output leg.
          */
-        protected override Element link_additional(int n, Element source, Bin bin,
-                                                   Gdk.Rectangle rect) {
+        protected override Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
+                                                       Gdk.Rectangle rect) {
             if (n != 0)
                 return source;
-            
+
             this.rect = rect;
-            
-            dynamic Element overlay;
-            Element adaptor2;
+
+            dynamic Gst.Element overlay;
+            Gst.Element adaptor2;
             try {
                 var scale = gst_element_make("videoscale", "scale");
                 var rate = gst_element_make("videorate", "rate");
                 var adaptor1 = gst_element_make("ffmpegcolorspace", "adaptor1");
                 adaptor2 = gst_element_make("ffmpegcolorspace", "adaptor2");
                 overlay = gst_element_make("cairooverlay", "overlay");
-                var caps = Caps.from_string(
+                var caps = Gst.Caps.from_string(
                     "video/x-raw-rgb," + // Same as cairooverlay; hope to minimize transformations
                     "framerate=[25/1,2147483647/1]," + // At least 25 fps
                     @"width=$(rect.width),height=$(rect.height)"
                 );
-                dynamic Element filter = gst_element_make("capsfilter", "filter");
+                dynamic Gst.Element filter = gst_element_make("capsfilter", "filter");
                 filter.caps = caps;
                 bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
                 if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
@@ -464,42 +464,42 @@ namespace pdfpc {
                 warning(@"Error creating control pipeline: $(err.message)");
                 return source;
             }
-            
+
             overlay.draw.connect(this.on_draw);
             overlay.caps_changed.connect(this.on_prepare);
-            
+
             return adaptor2;
         }
-        
+
         /**
          * When we find out the properties of the movie, we can work out how it
          * needs to be scaled to fit in the alloted area.  (This is only important
          * for the view with the controls.)
          */
-        public void on_prepare(Element overlay, Caps caps){
+        public void on_prepare(Gst.Element overlay, Gst.Caps caps){
             int width = -1, height = -1;
-            VideoFormat format = VideoFormat.UNKNOWN;
+            Gst.VideoFormat format = Gst.VideoFormat.UNKNOWN;
             Gst.video_format_parse_caps(caps, ref format, ref width, ref height);
             scalex = 1.0*width / rect.width;
             scaley = 1.0*height / rect.height;
             vheight = height;
-            
+
             var tformat = Gst.Format.TIME;
             overlay.query_duration(ref tformat, out duration);
         }
-        
+
         /**
          * Everytime we get a new frame, update the progress bar.
          */
-        public void on_draw(Element overlay, Context cr, uint64 timestamp, uint64 duration) {
+        public void on_draw(Gst.Element overlay, Cairo.Context cr, uint64 timestamp, uint64 duration) {
             // Transform to work from bottom left, in screen coordinates
             cr.translate(0, this.vheight);
             cr.scale(this.scalex, -this.scaley);
-            
+
             this.draw_seek_bar(cr, timestamp);
         }
-        
-        private void draw_seek_bar(Context cr, uint64 timestamp) {
+
+        private void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
             double fraction = 1.0*timestamp / this.duration;
             if (this.in_seek_bar || this.mouse_drag) {
                 var bar_end = fraction * (rect.width - 2*this.seek_bar_padding);
@@ -510,18 +510,18 @@ namespace pdfpc {
                             bar_end, this.seek_bar_height-4);
                 cr.set_source_rgba(1,1,1,0.8);
                 cr.fill();
-                
-                var time_in_sec = (int)(timestamp / SECOND);
+
+                var time_in_sec = (int)(timestamp / Gst.SECOND);
                 var timestring = "%i:%02i".printf(time_in_sec/60, time_in_sec%60);
-                var dur_in_sec = (int)(this.duration / SECOND);
+                var dur_in_sec = (int)(this.duration / Gst.SECOND);
                 var durstring = "%i:%02i".printf(dur_in_sec/60, dur_in_sec%60);
-                TextExtents te;
-                FontOptions fo = new FontOptions();
-                fo.set_antialias(Antialias.GRAY);
+                Cairo.TextExtents te;
+                Cairo.FontOptions fo = new Cairo.FontOptions();
+                fo.set_antialias(Cairo.Antialias.GRAY);
                 cr.set_font_options(fo);
-                cr.select_font_face("sans", FontSlant.NORMAL, FontWeight.NORMAL);
+                cr.select_font_face("sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
                 cr.set_font_size(this.seek_bar_height - 2*seek_bar_padding);
-                
+
                 cr.text_extents(durstring, out te);
                 if ((bar_end + te.width + 4*this.seek_bar_padding) < rect.width) {
                     cr.move_to(rect.width - te.width - 2*this.seek_bar_padding,
@@ -532,7 +532,7 @@ namespace pdfpc {
                     cr.show_text(durstring);
                     cr.restore();
                 }
-                
+
                 cr.text_extents(timestring, out te);
                 if (bar_end > te.width) {
                     cr.move_to(bar_end - te.width, this.seek_bar_height/2 - te.height/2);
@@ -545,7 +545,7 @@ namespace pdfpc {
                 cr.scale(1,-1);
                 cr.show_text(timestring);
                 cr.restore();
-                
+
             } else {
                 cr.rectangle(0, 0, rect.width, 4);
                 cr.set_source_rgba(0,0,0,0.8);
@@ -555,7 +555,7 @@ namespace pdfpc {
                 cr.fill();
             }
         }
-        
+
         /**
          * Set a flag about whether the mouse is currently in the progress bar.
          */
@@ -564,7 +564,7 @@ namespace pdfpc {
             y = rect.y + rect.height - my;
             this.in_seek_bar = (x > 0 && x < rect.width && y > 0 && y < seek_bar_height);
         }
-        
+
         /**
          * Seek to the time indicated by the mouse's position on the progress bar.
          */
@@ -573,10 +573,10 @@ namespace pdfpc {
             if (seek_fraction < 0) seek_fraction = 0;
             if (seek_fraction > 1) seek_fraction = 1;
             var seek_time = (int64)(seek_fraction * this.duration);
-            this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, seek_time);
+            this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
             return seek_time;
         }
-        
+
         /**
          * Seek if we're dragging the progress bar.
          */
@@ -587,35 +587,35 @@ namespace pdfpc {
                 this.mouse_seek(x, y);
             return false;
         }
-        
+
         /**
          * If we click outside of the progress bar, toggle the playing state.
          * Inside the progress bar, pause or stop the timeout, and start the
          * drag state.
          */
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
-            State state;
-            ClockTime time = util_get_timestamp();
+            Gst.State state;
+            Gst.ClockTime time = Gst.util_get_timestamp();
             this.pipeline.get_state(out state, null, time);
-            if (state == State.NULL || widget != this.controller.main_view) {
+            if (state == Gst.State.NULL || widget != this.controller.main_view) {
                 this.toggle_play();
                 return true;
             }
-            
+
             double x, y;
             this.set_mouse_in(event.x, event.y, out x, out y);
             if (!this.in_seek_bar)
                 this.toggle_play();
             else {
                 this.mouse_drag = true;
-                this.drag_was_playing = (this.pipeline.current_state == State.PLAYING);
+                this.drag_was_playing = (this.pipeline.current_state == Gst.State.PLAYING);
                 this.pause();
                 this.mouse_seek(x, y);
                 this.stop_refresh();
             }
             return true;
         }
-        
+
         /**
          * Stop the drag state and restart either playback or the timeout,
          * depending on the previous state.
@@ -635,7 +635,7 @@ namespace pdfpc {
             this.mouse_drag = false;
             return false;
         }
-        
+
         /**
          * Start a timeout event to refresh the GUI every 50ms.  To be used when
          * the movie is paused, so that the controls can still be updated.
@@ -648,7 +648,7 @@ namespace pdfpc {
             this.pipeline.query_position(ref tformat, out curr_time);
             this.start_refresh_time(curr_time);
         }
-        
+
         /**
          * In the timeout, we seek to the current time, which is enough to force
          * gstreamer to redraw the current frame.
@@ -660,11 +660,11 @@ namespace pdfpc {
             if (this.refresh_timeout != 0)
                 Source.remove(this.refresh_timeout);
             this.refresh_timeout = Timeout.add(50, () => {
-                this.pipeline.seek_simple(Gst.Format.TIME, SeekFlags.FLUSH, curr_time);
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, curr_time);
                 return true;
             } );
         }
-        
+
         /**
          * Stop the refresh timeout.
          */
@@ -674,7 +674,7 @@ namespace pdfpc {
             Source.remove(this.refresh_timeout);
             this.refresh_timeout = 0;
         }
-        
+
         /**
          * Stop the refresh timeout when we start playing.
          */
@@ -682,7 +682,7 @@ namespace pdfpc {
             this.stop_refresh();
             base.play();
         }
-        
+
         /**
          * Start the refresh timeout when we pause.
          */

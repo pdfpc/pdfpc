@@ -4,24 +4,21 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-using Gtk;
-using Gdk;
 
 namespace pdfpc.Window {
     /**
@@ -31,11 +28,11 @@ namespace pdfpc.Window {
      * Methods to specify the monitor to be displayed on in a multi-head setup
      * are provided as well.
      */
-    public class Fullscreen: Gtk.Window {
+    public class Fullscreen : Gtk.Window {
         /**
          * The geometry data of the screen this window is on
          */
-        protected Rectangle screen_geometry;
+        protected Gdk.Rectangle screen_geometry;
 
         /**
          * Timer id which monitors mouse motion to hide the cursor after 5
@@ -53,44 +50,48 @@ namespace pdfpc.Window {
          */
         protected bool frozen = false;
 
-        public Fullscreen( int screen_num ) {
+        public Fullscreen(int screen_num, int width = -1, int height = -1) {
             Gdk.Screen screen;
 
-            if ( screen_num >= 0 ) {
+            if (screen_num >= 0) {
                 // Start in the given monitor
-                screen = Screen.get_default();
-                screen.get_monitor_geometry( screen_num, out this.screen_geometry );
+                screen = Gdk.Screen.get_default();
+                screen.get_monitor_geometry(screen_num, out this.screen_geometry);
             } else {
                 // Start in the monitor the cursor is in
-                var display = Gdk.Display.get_default();
+                var display = Gdk.Display.get_default().get_device_manager().get_client_pointer();
                 int pointerx, pointery;
-                display.get_pointer(out screen, out pointerx, out pointery, null);
+                display.get_position(out screen, out pointerx, out pointery);
                 int current_screen = screen.get_monitor_at_point(pointerx, pointery);
-                screen.get_monitor_geometry( current_screen, out this.screen_geometry );
+                screen.get_monitor_geometry(current_screen, out this.screen_geometry);
             }
 
-            if ( !Options.windowed ) {
+            if (!Options.windowed) {
                 // Move to the correct monitor
                 // This movement is done here and after mapping, to minimize flickering
                 // with window managers, which correctly handle the movement command,
                 // before the window is mapped.
-                this.move( this.screen_geometry.x, this.screen_geometry.y );
-                //this.fullscreen();
+                this.move(this.screen_geometry.x, this.screen_geometry.y);
 
                 // As certain window-managers like Xfwm4 ignore movement request
                 // before the window is initially moved and set up we need to
                 // listen to this event.
-                this.size_allocate.connect( this.on_size_allocate );
-                this.configure_event.connect( this.on_configure );
+                this.size_allocate.connect(this.on_size_allocate);
+                this.configure_event.connect(this.on_configure);
             }
             else {
-                this.screen_geometry.width /= 2;
-                this.screen_geometry.height /= 2;
+                if (width > 0 && height > 0) {
+                        this.screen_geometry.width = width;
+                        this.screen_geometry.height = height;
+                } else {
+                        this.screen_geometry.width /= 2;
+                        this.screen_geometry.height /= 2;
+                }
                 this.resizable = false;
             }
 
-            this.add_events(EventMask.POINTER_MOTION_MASK);
-            this.motion_notify_event.connect( this.on_mouse_move );
+            this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
+            this.motion_notify_event.connect(this.on_mouse_move);
 
             // Start the 5 seconds timeout after which the mouse curosr is
             // hidden
@@ -98,7 +99,7 @@ namespace pdfpc.Window {
         }
 
         // We got to fullscreen once we have moved
-        protected bool on_configure( Gdk.EventConfigure e) {
+        protected bool on_configure(Gdk.EventConfigure e) {
             this.fullscreen();
             this.configure_event.disconnect(this.on_configure);
             return false;
@@ -111,34 +112,27 @@ namespace pdfpc.Window {
          * movement commands before the window has been displayed for the first
          * time.
          */
-        protected void on_size_allocate( Gtk.Widget source, Rectangle r ) {
-            if ( this.is_mapped() ) {
+        protected void on_size_allocate(Gtk.Allocation allocation) {
+            if (this.get_mapped()) {
                 // We are only interested to handle this event AFTER the window has
                 // been mapped.
 
                 // Remove the signal handler, as we only want to handle this once
-                this.size_allocate.disconnect( this.on_size_allocate );
+                this.size_allocate.disconnect(this.on_size_allocate);
 
                 // We only need to do all this, if the window is not at the
                 // correct position. Otherwise it would only cause flickering
                 // without any effect.
-                int x,y;
-                this.get_position( out x, out y );
-                if ( x == this.screen_geometry.x && y == this.screen_geometry.y ) {
+                int x, y;
+                this.get_position(out x, out y);
+                if (x == this.screen_geometry.x && y == this.screen_geometry.y) {
                     return;
                 }
-
-                // Certain window manager (eg. Xfce4) do not allow window movement
-                // while the window is maximized. Therefore it is ensured the
-                // window is not in this state.
-                //this.unfullscreen();
-                //this.unmaximize();
 
                 // The first movement might not have worked as expected, because of
                 // the before mentioned maximized window problem. Therefore it is
                 // done again
-                this.move( this.screen_geometry.x, this.screen_geometry.y );
-                //this.resize( this.screen_geometry.width, this.screen_geometry.height );
+                this.move(this.screen_geometry.x, this.screen_geometry.y);
 
                 this.fullscreen();
             }
@@ -147,12 +141,12 @@ namespace pdfpc.Window {
         /**
          * Called every time the mouse cursor is moved
          */
-        public bool on_mouse_move( Gtk.Widget source, EventMotion event ) {
+        public bool on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
             // Restore the mouse cursor to its default value
-            this.window.set_cursor( null );
+            this.get_window().set_cursor(null);
 
             this.restart_hide_cursor_timer();
-            
+
             return false;
         }
 
@@ -160,14 +154,11 @@ namespace pdfpc.Window {
          * Restart the 5 seconds timeout before hiding the mouse cursor
          */
         protected void restart_hide_cursor_timer(){
-            if ( this.hide_cursor_timeout != 0 ) {
-                Source.remove( this.hide_cursor_timeout );
+            if (this.hide_cursor_timeout != 0) {
+                Source.remove(this.hide_cursor_timeout);
             }
 
-            this.hide_cursor_timeout = Timeout.add_seconds(
-                5,
-                this.on_hide_cursor_timeout
-            );
+            this.hide_cursor_timeout = Timeout.add_seconds(5, this.on_hide_cursor_timeout);
         }
 
         /**
@@ -178,17 +169,12 @@ namespace pdfpc.Window {
             this.hide_cursor_timeout = 0;
 
             // Window might be null in case it has not been mapped
-            if ( this.window != null ) {
-                this.window.set_cursor(
-                    new Gdk.Cursor( 
-                        Gdk.CursorType.BLANK_CURSOR
-                    )
-                );
+            if (this.get_window() != null) {
+                this.get_window().set_cursor(new Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR));
 
                 // After the timeout disabled the cursor do not run it again
                 return false;
-            }
-            else {
+            } else {
                 // The window was not available. Possibly it was not mapped
                 // yet. We simply try it again if the mouse isn't moved for
                 // another five seconds.
@@ -197,3 +183,4 @@ namespace pdfpc.Window {
         }
     }
 }
+

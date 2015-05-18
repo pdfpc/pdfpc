@@ -1,8 +1,8 @@
 install(FILES
-        blank.svg
-        snow.svg
-        pause.svg
+    blank.svg
+    snow.svg
+    pause.svg
 DESTINATION
-        share/pixmaps/pdfpc
+    share/pixmaps/pdfpc
 )
 

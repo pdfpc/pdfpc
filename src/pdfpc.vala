@@ -4,23 +4,21 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-using Gtk;
 
 namespace pdfpc {
     /**
@@ -74,6 +72,7 @@ namespace pdfpc {
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
+            { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presenter console in width:height format (forces windowed mode)", null},
             { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
             { null }
         };
@@ -82,26 +81,68 @@ namespace pdfpc {
          * Parse the commandline and apply all found options to there according
          * static class members.
          *
-		 * Returns the name of the pdf file to open (or null if not present)
+         * Returns the name of the pdf file to open (or null if not present)
          */
         protected string? parse_command_line_options( ref unowned string[] args ) {
             var context = new OptionContext( "<pdf-file>" );
 
             context.add_main_entries( options, null );
-            
+
             try {
                 context.parse( ref args );
             }
             catch( OptionError e ) {
-                stderr.printf( "\n%s\n\n", e.message );
-                stderr.printf( "%s", context.get_help( true, null ) );
+                warning("\n%s\n\n", e.message);
+                warning("%s", context.get_help( true, null ));
                 Posix.exit( 1 );
             }
             if ( args.length < 2 ) {
-				return null;
+                return null;
             } else {
-				return args[1];
-			}
+                return args[1];
+            }
+        }
+
+        /**
+         * Set the CSS styling for GTK.
+         */
+        private void set_styling() {
+            Gtk.CssProvider provider = new Gtk.CssProvider();
+            Gtk.StyleContext.add_provider_for_screen(Gdk.Display.get_default().get_default_screen(),
+                provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            string css = """
+                * {
+                    background-color: black;
+                    background-image: none;
+                    color: white;
+                }
+                /* .slider and .trough are parts of scrollbar */
+                .slider, .progressbar {
+                    border: none;
+                    background-color: white;
+                }
+                GtkProgressBar {
+                    color: gray;
+                }
+                .trough {
+                    border: none;
+                }
+                pdfpcTimerLabel.pretalk {
+                    color: green;
+                }
+                pdfpcTimerLabel.last-minutes {
+                    color: orange;
+                }
+                pdfpcTimerLabel.overtime {
+                    color: red;
+                }
+            """;
+
+            try {
+                provider.load_from_data(css, -1);
+            } catch (Error error) {
+                warning("Could not load styling from data: %s", error.message);
+            }
         }
 
         /**
@@ -120,8 +161,8 @@ namespace pdfpc {
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation_window( Metadata.Pdf metadata, int monitor ) {
-            var presentation_window = new Window.Presentation( metadata, monitor, this.controller );
+        private Window.Presentation create_presentation_window( Metadata.Pdf metadata, int monitor, int width = -1, int height = -1 ) {
+            var presentation_window = new Window.Presentation( metadata, monitor, this.controller, width, height );
             //controller.register_controllable( presentation_window );
             presentation_window.set_cache_observer( this.cache_status );
 
@@ -137,7 +178,6 @@ namespace pdfpc {
                            + "(C) 2012 David Vilar\n"
                            + "(C) 2009-2011 Jakob Westhoff\n\n" );
 
-            Gdk.threads_init();
             Gtk.init( ref args );
 
             string pdfFilename = this.parse_command_line_options( ref args );
@@ -145,23 +185,42 @@ namespace pdfpc {
             Gst.init( ref args );
 
             if (Options.list_actions) {
-				stdout.printf("Config file commands accepted by pdfpc:\n");
-				string[] actions = PresentationController.getActionDescriptions();
-				for (int i = 0; i < actions.length; i+=2) {
-					string tabAlignment = "\t";
-					if (actions[i].length < 8)
-						tabAlignment += "\t";
-					stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
-				}
+                stdout.printf("Config file commands accepted by pdfpc:\n");
+                string[] actions = PresentationController.getActionDescriptions();
+                for (int i = 0; i < actions.length; i+=2) {
+                    string tabAlignment = "\t";
+                    if (actions[i].length < 8)
+                        tabAlignment += "\t";
+                    stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+                }
                 return;
             }
-			if (pdfFilename == null) {
-				stderr.printf( "Error: No pdf file given\n");
-				Posix.exit(1);
-			}
+            if (pdfFilename == null) {
+                warning("Error: No pdf file given\n");
+                Posix.exit(1);
+            } else if (!GLib.FileUtils.test(pdfFilename, (GLib.FileTest.IS_REGULAR))) {
+                warning("Error: pdf file not found\n");
+                Posix.exit(1);
+            }
 
-            // Initialize the application wide mutex objects
-            MutexLocks.init();
+            // parse size option
+            // should be in the width:height format
+
+            int width = -1, height = -1;
+            if (Options.size != null) {
+                int colonIndex = Options.size.index_of(":");
+
+                width = int.parse(Options.size.substring(0, colonIndex));
+                height = int.parse(Options.size.substring(colonIndex + 1));
+
+                if (width < 1 || height < 1) {
+                    warning("Error: Failed to parse size\n");
+                    Posix.exit(1);
+
+                }
+
+                Options.windowed = true;
+            }
 
             stdout.printf( "Initializing rendering...\n" );
 
@@ -170,14 +229,20 @@ namespace pdfpc {
             if ( Options.duration != 987654321u )
                 metadata.set_duration(Options.duration);
 
+
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
             this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
 
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
-            configFileReader.readConfig(etc_path + "/pdfpcrc");
-            configFileReader.readConfig(Environment.get_home_dir() + "/.pdfpcrc");
+
+            configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
+            configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
+            configFileReader.readConfig(Path.build_filename(Environment.get_home_dir(),
+                ".pdfpcrc"));
+
+            set_styling();
 
             var screen = Gdk.Screen.get_default();
             if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
@@ -187,22 +252,22 @@ namespace pdfpc {
                 else
                     presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
                 presentation_monitor = (presenter_monitor + 1) % 2;
-                this.presenter_window = 
+                this.presenter_window =
                     this.create_presenter_window( metadata, presenter_monitor );
-                this.presentation_window = 
-                    this.create_presentation_window( metadata, presentation_monitor );
+                this.presentation_window =
+                    this.create_presentation_window( metadata, presentation_monitor, width, height );
             } else if (Options.windowed && !Options.single_screen) {
                 this.presenter_window =
                     this.create_presenter_window( metadata, -1 );
                 this.presentation_window =
-                    this.create_presentation_window( metadata, -1 );
+                    this.create_presentation_window( metadata, -1, width, height );
             } else {
                     if ( !Options.display_switch)
                         this.presenter_window =
                             this.create_presenter_window( metadata, -1 );
                     else
                         this.presentation_window =
-                            this.create_presentation_window( metadata, -1 );
+                            this.create_presentation_window( metadata, -1, width, height );
             }
 
             // The windows are always displayed at last to be sure all caches have
@@ -211,7 +276,7 @@ namespace pdfpc {
                 this.presentation_window.show_all();
                 this.presentation_window.update();
             }
-            
+
             if ( this.presenter_window != null ) {
                 this.presenter_window.show_all();
                 this.presenter_window.update();
@@ -219,9 +284,7 @@ namespace pdfpc {
 
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
-            Gdk.threads_enter();
             Gtk.main();
-            Gdk.threads_leave();
         }
 
         /**

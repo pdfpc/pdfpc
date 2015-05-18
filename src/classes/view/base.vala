@@ -4,39 +4,37 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-using GLib;
-
 namespace pdfpc {
     /**
      * Base class for every slide view
      */
-    public abstract class View.Base: Gtk.DrawingArea {
+    public abstract class View.Base : Gtk.DrawingArea {
         /**
          * Signal fired every time a slide is about to be left
          */
-        public signal void leaving_slide( int from, int to );
+        public signal void leaving_slide(int from, int to);
 
         /**
          * Signal fired every time a slide is entered
          */
-        public signal void entering_slide( int slide_number );
-        
+        public signal void entering_slide(int slide_number);
+
         /**
          * Renderer to be used for rendering the slides
          */
@@ -47,12 +45,9 @@ namespace pdfpc {
          */
         protected Base( Renderer.Base renderer ) {
             this.renderer = renderer;
-            this.set_size_request( 
-                renderer.get_width(),
-                renderer.get_height()
-            );
+            this.set_size_request(renderer.width, renderer.height);
         }
-        
+
         /**
          * Return the used renderer object
          */
@@ -65,7 +60,7 @@ namespace pdfpc {
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public abstract void display( int slide_number, bool force_redraw=false )
+        public abstract void display(int slide_number, bool force_redraw=false)
             throws Renderer.RenderError;
 
         /**
@@ -84,3 +79,4 @@ namespace pdfpc {
         public abstract int get_current_slide_number();
     }
 }
+

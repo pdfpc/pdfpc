@@ -4,25 +4,21 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-using GLib;
-
-using pdfpc;
 
 namespace pdfpc.View.Behaviour {
     /**
@@ -44,13 +40,13 @@ namespace pdfpc.View.Behaviour {
          * Precalculated Gdk.Rectangles for every link mapping
          */
         protected Gdk.Rectangle[] precalculated_mapping_rectangles = null;
-        
+
         public override void associate(View.Base target)
             throws AssociationError {
             this.enforce_exclusive_association(target);
             this.attach(target);
         }
-        
+
         /**
          * Attach a View.Pdf to this signal provider
          */
@@ -133,15 +129,13 @@ namespace pdfpc.View.Behaviour {
         public void on_entering_slide( View.Base source, int page_number ) {
             // Get the link mapping table
             bool in_range = true;
-            MutexLocks.poppler.lock();
-            Metadata.Pdf metadata = source.get_renderer().get_metadata() as Metadata.Pdf;
+            Metadata.Pdf metadata = source.get_renderer().metadata as Metadata.Pdf;
             if (page_number < metadata.get_slide_count()) {
                 this.page_link_mappings = metadata.get_action_mapping( page_number );
             } else {
                 this.page_link_mappings = null;
                 in_range = false;
             }
-            MutexLocks.poppler.unlock();
             if (!in_range)
                 return;
 
@@ -150,7 +144,7 @@ namespace pdfpc.View.Behaviour {
                 this.precalculated_mapping_rectangles = new Gdk.Rectangle[this.page_link_mappings.length()];
                 int i=0;
                 foreach( var mapping in this.page_link_mappings ) {
-                    this.precalculated_mapping_rectangles[i++] = ((View.Pdf)this.target).convert_poppler_rectangle_to_gdk_rectangle( 
+                    this.precalculated_mapping_rectangles[i++] = ((View.Pdf)this.target).convert_poppler_rectangle_to_gdk_rectangle(
                         mapping.area
                     );
                 }
