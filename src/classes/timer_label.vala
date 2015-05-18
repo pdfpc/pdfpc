@@ -75,11 +75,13 @@ namespace pdfpc {
             if ( this.timeout != 0 && this.time < 0 ) {
                 // We are in pretalk, with timeout already running.
                 // Jump to talk mode
-                this.time = 0;
+                this.start_time = Time.local( time_t() ).mktime(); // now
             } else if ( this.timeout == 0 ) {
                 // Start the timer if it is not running
+                this.start_time = Time.local( time_t() - this.time ).mktime();
                 this.timeout = GLib.Timeout.add( 1000, this.on_timeout );
             }
+            this.update_time();
         }
 
         /**
@@ -127,7 +129,7 @@ namespace pdfpc {
          */
         public virtual void reset() {
             this.stop();
-            this.time = this.calculate_countdown();
+            this.update_time();
             if ( this.time < 0 )
                 this.start();
             else
@@ -136,20 +138,20 @@ namespace pdfpc {
         }
 
         /**
-         * Calculate and return the countdown time in (negative) seconds until
-         * the talk begins.
+         * Set the time field to the difference in seconds between now and start_time
+         *
+         * Time can be negative if the talk begins in future.
          */
-        protected int calculate_countdown()
-        {
+        protected void update_time() {
             time_t now = Time.local( time_t() ).mktime();
-            return (int)( now - this.start_time );
+            this.time =  (int)( now - this.start_time );
         }
 
         /**
          * Update the timer on every timeout step (every second)
          */
         protected virtual bool on_timeout() {
-            ++this.time;
+            update_time();
             this.format_time();
             return true;
         }
@@ -251,9 +253,8 @@ namespace pdfpc {
         }
 
         public override void start() {
-            time_t now = Time.local( time_t() ).mktime();
-            this.duration = (int)(this.end_time - now);
             base.start();
+            this.duration = (int)(this.end_time - this.start_time);
         }
 
         public override void stop() {
@@ -265,14 +266,6 @@ namespace pdfpc {
             base.reset();
             if ( this.timeout == 0 )
                 this.set_text(this.end_time_object.format("Until %H:%M"));
-        }
-
-        public override bool on_timeout() {
-            if (this.time == -1) { // We will switch from pre-talk to in-talk
-                time_t now = Time.local( time_t() ).mktime();
-                this.duration = (int)(this.end_time - now);
-            }
-            return base.on_timeout();
         }
     }
 
