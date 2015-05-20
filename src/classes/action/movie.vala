@@ -228,13 +228,13 @@ namespace pdfpc {
             var bin = new Gst.Bin("bin");
             var tee = Gst.ElementFactory.make("tee", "tee");
             bin.add_many(tee);
-            bin.add_pad(new Gst.GhostPad("sink", tee.get_pad("sink")));
+            bin.add_pad(new Gst.GhostPad("sink", tee.get_static_pad("sink")));
             Gdk.Rectangle rect;
             int n = 0;
-            uint xid;
+            uint* xid;
             while (true) {
                 xid = this.controller.overlay_pos(n, this.area, out rect);
-                if (xid == 0)
+                if (xid == null)
                     break;
                 var sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
                 var queue = Gst.ElementFactory.make("queue", @"queue$n");
@@ -243,15 +243,16 @@ namespace pdfpc {
                 var ad_element = this.link_additional(n, queue, bin, rect);
                 ad_element.link(sink);
 
-                var xoverlay = sink as Gst.XOverlay;
+                var xoverlay = sink as Gst.Video.Overlay;
                 xoverlay.set_window_handle(xid);
                 xoverlay.handle_events(false);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
                 n++;
             }
 
-            this.pipeline = Gst.ElementFactory.make("playbin2", "playbin");
+            this.pipeline = Gst.ElementFactory.make("playbin", "playbin");
             this.pipeline.uri = uri;
+            this.pipeline.force_aspect_ratio = false;
             this.pipeline.video_sink = bin;
             var bus = this.pipeline.get_bus();
             bus.add_signal_watch();
@@ -323,7 +324,7 @@ namespace pdfpc {
          */
         public virtual void toggle_play() {
             Gst.State state;
-            Gst.ClockTime time = Gst.util_get_timestamp();
+            Gst.ClockTime time = Gst.Util.get_timestamp();
             this.pipeline.get_state(out state, null, time);
             if (state == Gst.State.PLAYING)
                 this.pause();
@@ -447,11 +448,11 @@ namespace pdfpc {
             try {
                 var scale = gst_element_make("videoscale", "scale");
                 var rate = gst_element_make("videorate", "rate");
-                var adaptor1 = gst_element_make("ffmpegcolorspace", "adaptor1");
-                adaptor2 = gst_element_make("ffmpegcolorspace", "adaptor2");
+                var adaptor1 = gst_element_make("videoconvert", "adaptor1");
+                adaptor2 = gst_element_make("videoconvert", "adaptor2");
                 overlay = gst_element_make("cairooverlay", "overlay");
                 var caps = Gst.Caps.from_string(
-                    "video/x-raw-rgb," + // Same as cairooverlay; hope to minimize transformations
+                    "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
                     "framerate=[25/1,2147483647/1]," + // At least 25 fps
                     @"width=$(rect.width),height=$(rect.height)"
                 );
@@ -477,15 +478,15 @@ namespace pdfpc {
          * for the view with the controls.)
          */
         public void on_prepare(Gst.Element overlay, Gst.Caps caps){
-            int width = -1, height = -1;
-            Gst.VideoFormat format = Gst.VideoFormat.UNKNOWN;
-            Gst.video_format_parse_caps(caps, ref format, ref width, ref height);
+            var info = Gst.Video.Info();
+            info.from_caps(caps);
+            int width = info.width, height = info.height;
             scalex = 1.0*width / rect.width;
             scaley = 1.0*height / rect.height;
             vheight = height;
 
             var tformat = Gst.Format.TIME;
-            overlay.query_duration(ref tformat, out duration);
+            overlay.query_duration(tformat, out duration);
         }
 
         /**
@@ -595,7 +596,7 @@ namespace pdfpc {
          */
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
             Gst.State state;
-            Gst.ClockTime time = Gst.util_get_timestamp();
+            Gst.ClockTime time = Gst.Util.get_timestamp();
             this.pipeline.get_state(out state, null, time);
             if (state == Gst.State.NULL || widget != this.controller.main_view) {
                 this.toggle_play();
@@ -645,7 +646,7 @@ namespace pdfpc {
                 return;
             int64 curr_time;
             var tformat = Gst.Format.TIME;
-            this.pipeline.query_position(ref tformat, out curr_time);
+            this.pipeline.query_position(tformat, out curr_time);
             this.start_refresh_time(curr_time);
         }
 
