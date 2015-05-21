@@ -3,3 +3,9 @@ install(FILES
 DESTINATION
     ${SYSCONFDIR}
 )
+
+install(FILES
+    pdfpc.css
+DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/share/pixmaps/pdfpc/
+)
