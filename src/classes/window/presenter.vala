@@ -124,6 +124,11 @@ namespace pdfpc.Window {
             this.destroy.connect((source) => presentation_controller.quit());
 
             this.presentation_controller = presentation_controller;
+            this.presentation_controller.update_request.connect(this.update);
+            this.presentation_controller.edit_note_request.connect(this.edit_note);
+            this.presentation_controller.ask_goto_page_request.connect(this.ask_goto_page);
+            this.presentation_controller.show_overview_request.connect(this.show_overview);
+            this.presentation_controller.hide_overview_request.connect(this.hide_overview);
 
             this.metadata = metadata;
 
