@@ -384,14 +384,9 @@ should not be too important for up to some hundreds of slides.
 Other bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "the issue tracker" .
 
-.SH CONTACT
-.PP
-Comments and suggestion are welcome. Write an email to
-.URL mailto:davvil@gmail.com "David Vilar" .
-
 .SH SEE ALSO
-pdfpc 4.0 is a fork of pdfpc mainly developed by davvil at
-.URL https://github.com/davvil/pdfpc "online" .
+pdfpc 4.0 is the continued work of pdfpc mainly developed by davvil
+.URL https://github.com/davvil/pdfpc "" .
 
 pdfpc is a fork of Pdf Presenter Console, available
 .URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "online" .

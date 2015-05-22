@@ -24,7 +24,7 @@ In order to compile and run pdfpc the following
 requirements need to be met:
 
 - CMake Version >=2.6
-- valac >= 0.24
+- valac >= 0.26
 - GTK+ 3.x
 - gee 0.8
 - libpoppler with glib bindings
@@ -76,7 +76,7 @@ unstable development happens in the *devel* branch.
 When installing from git you will need two additional dependencies:
 
 - git
-- Vala Compiler Version >=0.24
+- Vala Compiler Version >=0.26
 
 The pdfpc source can be retrieved from github::
 
@@ -131,7 +131,7 @@ pdfpc to get a feeling of it::
 Acknowledgements
 ================
 
-pdfpc 4.0 is a fork of pdfpc mainly developed by davvil at
+pdfpc 4.0 is the continued work of pdfpc mainly developed by davvil
 https://github.com/davvil/pdfpc
 
 pdfpc is a  fork  of  pdf-presenter  console,  available  at
