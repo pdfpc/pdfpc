@@ -35,31 +35,6 @@ namespace pdfpc {
          * The view on which links and annotations should be handled.
          */
         public abstract View.Pdf main_view { get; }
-
-        /**
-         * Update the display
-         */
-        public abstract void update();
-
-        /**
-         * Edit note for current slide
-         */
-        public virtual void edit_note() {}
-
-        /**
-         * Ask for the page to jump to
-         */
-        public virtual void ask_goto_page() {}
-
-        /**
-         * Show an overview of all slides
-         */
-        public virtual void show_overview() {}
-
-        /**
-         * Hide the overview
-         */
-        public virtual void hide_overview() {}
     }
 }
 

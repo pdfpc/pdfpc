@@ -55,6 +55,7 @@ namespace pdfpc.Window {
             this.destroy.connect((source) => presentation_controller.quit());
 
             this.presentation_controller = presentation_controller;
+            this.presentation_controller.update_request.connect(this.update);
 
             var fixedLayout = new Gtk.Fixed();
             fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);

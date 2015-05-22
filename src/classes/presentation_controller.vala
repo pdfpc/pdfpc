@@ -72,6 +72,31 @@ namespace pdfpc {
         public bool ignore_mouse_events { get; protected set; default = false; }
 
         /**
+         * Signal: Update the display
+         */
+        public signal void update_request();
+
+        /**
+         * Signal: Start editing notes
+         */
+        public signal void edit_note_request();
+
+        /**
+         * Signal: Ask for the page to jump to
+         */
+        public signal void ask_goto_page_request();
+
+        /**
+         * Signal: Show an overview of all slides
+         */
+        public signal void show_overview_request();
+
+        /**
+         * Signal: Hide the overview
+         */
+        public signal void hide_overview_request();
+
+        /**
          * A flag signaling if we allow for a black slide at the end. Tis is
          * useful for the next view and (for some presenters) also for the main
          * view.
@@ -685,8 +710,7 @@ namespace pdfpc {
          * Notify the controllables that they have to update the view
          */
         protected void controllables_update() {
-            foreach (Controllable c in this.controllables)
-                c.update();
+            this.update_request();
         }
 
         /**
@@ -709,8 +733,7 @@ namespace pdfpc {
         protected void controllables_show_overview() {
             if (this.overview != null) {
                 this.ignore_mouse_events = true;
-                foreach( Controllable c in this.controllables )
-                    c.show_overview();
+                this.show_overview_request();
                 this.overview_shown = true;
             }
         }
@@ -723,8 +746,7 @@ namespace pdfpc {
             if (this.current_user_slide_number >= this.user_n_slides)
                 this.goto_last();
             this.overview_shown = false;
-            foreach (Controllable c in this.controllables)
-                c.hide_overview();
+            this.hide_overview_request();
             this.controllables_update();
         }
 
@@ -742,9 +764,7 @@ namespace pdfpc {
         protected void controllables_edit_note() {
             if (this.overview_shown)
                 return;
-            foreach (Controllable c in this.controllables) {
-                c.edit_note();
-            }
+            this.edit_note_request(); // emit signal
         }
 
         /**
@@ -753,9 +773,7 @@ namespace pdfpc {
         protected void controllables_ask_goto_page() {
             if (this.overview_shown)
                 return;
-            foreach (Controllable c in this.controllables) {
-                c.ask_goto_page();
-            }
+            this.ask_goto_page_request();
         }
 
         /**
