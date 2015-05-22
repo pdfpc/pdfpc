@@ -1,4 +1,4 @@
-.TH  pdfpc "1" "May 2013"
+.TH  pdfpc "1" "May 2015"
 .de URL
 \\$2 \(laURL: \\$1 \(ra\\$3
 ..
@@ -270,7 +270,7 @@ slide in the actual presentation.
 Things like bibliographic references or slides referring to specialized
 questions are typical examples.
 Pdf Presenter Console lets you define which is the last slide in the
-actual presentation vie the \[aq]e\[aq] key.
+actual presentation via the \[aq]e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
 .SS pdfpc Files
@@ -343,7 +343,7 @@ via the \-L command line option.
 
 Some configuration files for commonly used devices
 (wireless presenters, bluetooth headsets, ...)
-.URL http://davvil.github.com/pdfpc#configs "are available" .
+.URL https://pdfpc.github.io/#config-files "are available" .
 If your device is not
 yet supported and you generated a working config file, please
 contribute it (see contact information below).
@@ -367,9 +367,9 @@ will be reset after leaving and returning to a slide.
 
 Movies may be included in PDF files as "screen annotations".  pdfpc does
 not yet support options that modify the playback of these movies.  In LaTeX,
-such movies may be added to a presentation with the "movie15" package.
-Note that the poster, autoplay, and repeat options are not yet supported.
-(Also, run ps2pdf with the \-dNOSAFER flag.)
+such movies may be added to a presentation with the "movie15" or "multimedia"
+package. Note that the poster, autoplay, and repeat options are not yet
+supported. (Also, run ps2pdf with the \-dNOSAFER flag.)
 
 As a perhaps simpler option, pdfpc will play back movies linked from a
 hyperlink of type "launch".  A query string may be added to the URL of the
@@ -392,13 +392,11 @@ There may be a small memory leak in the program. I am trying to solve it. It
 should not be too important for up to some hundreds of slides.
 
 Other bugs can be reported at
-.URL https://github.com/davvil/pdfpc/issues "the issue tracker" .
-
-.SH CONTACT
-.PP
-Comments and suggestion are welcome. Write an email to
-.URL mailto:davvil@gmail.com "David Vilar" .
+.URL https://github.com/pdfpc/pdfpc/issues "the issue tracker" .
 
 .SH SEE ALSO
+pdfpc was previously developed by
+.URL https://github.com/davvil/pdfpc "davvil" .
+
 pdfpc is a fork of Pdf Presenter Console, available
-.URL http://westhoffswelt.de/projects/pdf_presenter_console.html "online" .
+.URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "online" .
