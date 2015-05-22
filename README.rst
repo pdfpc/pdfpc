@@ -24,9 +24,11 @@ In order to compile and run pdfpc the following
 requirements need to be met:
 
 - CMake Version >=2.6
-- Gtk+ 2.x
-- libPoppler with glib bindings
-- librsvg
+- valac >= 0.24
+- GTK+ 3.x
+- gee 0.8
+- libpoppler with glib bindings
+- gstreamer 1.0
 
 Compile and install
 ===================
@@ -35,18 +37,20 @@ Compiling from source tarballs
 ------------------------------
 
 You can download the latest stable release of pdfpc in the download section of
-github (https://github.com/davvil/pdfpc/downloads). Uncompress the tarball (we
-use v3.0 as an example here)::
+github (https://github.com/pdfpc/pdfpc/downloads). Uncompress the tarball (we
+use v4.0 as an example here)::
 
-    tar xvf pdfpc-3.0.tgz
+    tar xvf pdfpc-4.0.tgz
 
 Change to the extracted directory::
 
-    cd pdfpc-3.0
+    cd pdfpc-4.0
 
 Compile and install::
 
-    cmake .
+    mkdir build/
+    cd build/
+    cmake ..
     make
     sudo make install
 
@@ -60,7 +64,7 @@ the pdfpc files will be installed under */usr/local/*. If you want to change
 that, for example to be installed under */usr/*, with config files under
 */etc/* you may specify another installation prefix as follows::
 
-    cmake -DCMAKE_INSTALL_PREFIX="/usr" -DSYSCONFDIR=/etc .
+    cmake -DCMAKE_INSTALL_PREFIX="/usr" -DSYSCONFDIR=/etc ..
 
 Compiling from github
 ---------------------
@@ -72,18 +76,14 @@ unstable development happens in the *devel* branch.
 When installing from git you will need two additional dependencies:
 
 - git
-- Vala Compiler Version >=0.16.0
+- Vala Compiler Version >=0.24
 
 The pdfpc source can be retrieved from github::
 
-    git clone git://github.com/davvil/pdfpc.git
+    git clone --recursive git://github.com/pdfpc/pdfpc.git
 
 After it has been transfered you need to switch to the ``pdfpc`` directory,
-which has just been created. From inside this directory use these commands to
-retrieve all needed submodules::
-
-    git submodule init
-    git submodule update
+which has just been created.
 
 You are now set to compile and install pdfpc.  Start by creating a build
 directory (this is optional but it keeps the directories clean, in case you
@@ -95,7 +95,7 @@ want to do some changes)::
 After you are inside the build directory create the needed Makefiles using
 CMake::
 
-    cmake ../
+    cmake ..
 
 If you have put your build directory elsewhere on your system adapt the path
 above accordingly. You need to provide CMake with the pdfpc directory as
@@ -131,8 +131,11 @@ pdfpc to get a feeling of it::
 Acknowledgements
 ================
 
+pdfpc 4.0 is a fork of pdfpc mainly developed by davvil at
+https://github.com/davvil/pdfpc
+
 pdfpc is a  fork  of  pdf-presenter  console,  available  at
-http://westhoffswelt.de/projects/pdf_presenter_console.html
+https://github.com/jakobwesthoff/Pdf-Presenter-Console
 
 
 ..
