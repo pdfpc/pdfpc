@@ -142,18 +142,12 @@ namespace pdfpc.Window {
             // should use as a percentage value. The maximal height is 90% of
             // the screen, as we need a place to display the timer and slide
             // count.
-            Gdk.Rectangle current_scale_rect;
-            int current_allocated_width = (int) Math.floor(
-                this.screen_geometry.width * Options.current_size / (double) 100);
             this.current_view = new View.Pdf.from_metadata(
                 metadata,
-                current_allocated_width,
-                (int) Math.floor(0.8 * bottom_position),
                 Metadata.Area.NOTES,
                 Options.black_on_end,
                 true,
-                this.presentation_controller,
-                out current_scale_rect
+                this.presentation_controller
             );
 
             // The next slide is right to the current one and takes up the
@@ -161,40 +155,14 @@ namespace pdfpc.Window {
             //Requisition cv_requisition;
             //this.current_view.size_request(out cv_requisition);
             //current_allocated_width = cv_requisition.width;
-            Gdk.Rectangle next_scale_rect;
-            var next_allocated_width = this.screen_geometry.width - current_allocated_width - 4;
             // We leave a bit of margin between the two views
-            this.next_view = new View.Pdf.from_metadata(
-                metadata,
-                next_allocated_width,
-                (int) Math.floor(0.7 * bottom_position),
-                Metadata.Area.CONTENT,
-                true,
-                false,
-                this.presentation_controller,
-                out next_scale_rect
-            );
+            this.next_view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                true, false, this.presentation_controller);
 
-            this.strict_next_view = new View.Pdf.from_metadata(
-                metadata,
-                (int) Math.floor(0.5 * current_allocated_width),
-                (int) Math.floor(0.19 * bottom_position) - 2,
-                Metadata.Area.CONTENT,
-                true,
-                false,
-                this.presentation_controller,
-                out next_scale_rect
-            );
-            this.strict_prev_view = new View.Pdf.from_metadata(
-                metadata,
-                (int) Math.floor(0.5 * current_allocated_width),
-                (int) Math.floor(0.19 * bottom_position) - 2,
-                Metadata.Area.CONTENT,
-                true,
-                false,
-                this.presentation_controller,
-                out next_scale_rect
-            );
+            this.strict_next_view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                true, false, this.presentation_controller);
+            this.strict_prev_view = new View.Pdf.from_metadata(metadata, Metadata.Area.CONTENT,
+                true, false, this.presentation_controller);
 
             // TextView for notes in the slides
             var notes_font = Pango.FontDescription.from_string("Verdana");
@@ -256,18 +224,6 @@ namespace pdfpc.Window {
             this.presentation_controller.set_overview(this.overview);
             this.presentation_controller.register_controllable(this);
 
-            // Enable the render caching if it hasn't been forcefully disabled.
-            if (!Options.disable_caching) {
-                ((Renderer.Caching) this.current_view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
-                ((Renderer.Caching) this.next_view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
-                ((Renderer.Caching) this.strict_next_view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
-                ((Renderer.Caching)this.strict_prev_view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
-            }
-
             this.build_layout();
         }
 
@@ -303,31 +259,34 @@ namespace pdfpc.Window {
         }
 
         protected void build_layout() {
-            Gtk.Box slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
+            Gtk.Paned slide_views = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            strict_views.pack_start(this.strict_prev_view, false, false, 0);
-            strict_views.pack_end(this.strict_next_view, false, false, 0);
+            strict_views.pack_start(this.strict_prev_view, true, true, 0);
+            ((View.Default) this.strict_prev_view).horizontal_align =
+                View.Default.Alignment.START;
+            strict_views.pack_start(this.strict_next_view, true, true, 0);
+            ((View.Default) this.strict_next_view).horizontal_align =
+                View.Default.Alignment.END;
 
-            this.current_view.halign = Gtk.Align.CENTER;
-            this.current_view.valign = Gtk.Align.CENTER;
+            var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            current_view_and_stricts.pack1(current_view, true, true);
+            current_view_and_stricts.pack2(strict_views, true, true);
+            current_view_and_stricts.position = (int) (this.screen_geometry.height * 0.75);
 
-            var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
-            current_view_and_stricts.pack_start(current_view, false, false, 2);
-            current_view_and_stricts.pack_start(strict_views, false, false, 2);
+            slide_views.pack1(current_view_and_stricts, true, true);
 
-
-            slide_views.pack_start(current_view_and_stricts, true, true, 0);
-
-            var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            this.next_view.halign = Gtk.Align.CENTER;
-            this.next_view.valign = Gtk.Align.CENTER;
-            nextViewWithNotes.pack_start(next_view, false, false, 0);
+            Gtk.Paned next_view_with_notes = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            next_view_with_notes.pack1(next_view, true, true);
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.add(this.notes_view);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-            nextViewWithNotes.pack_start(notes_sw, true, true, 5);
-            slide_views.pack_start(nextViewWithNotes, true, true, 0);
+            next_view_with_notes.pack2(notes_sw, true, true);
+            next_view_with_notes.position = this.screen_geometry.height *
+                (int) Options.current_size / 100;
+
+            slide_views.pack2(next_view_with_notes, true, true);
+            slide_views.position = this.screen_geometry.width * (int) Options.current_size / 100;
 
             this.overview.halign = Gtk.Align.CENTER;
             this.overview.valign = Gtk.Align.CENTER;
@@ -381,23 +340,19 @@ namespace pdfpc.Window {
         public void update() {
             int current_slide_number = this.presentation_controller.current_slide_number;
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
-            try {
-                this.current_view.display(current_slide_number);
-                this.next_view.display(this.metadata.user_slide_to_real_slide(
-                    current_user_slide_number + 1));
-                if (this.presentation_controller.skip_next()) {
-                    this.strict_next_view.display(current_slide_number + 1, true);
-                } else {
-                    this.strict_next_view.fade_to_black();
-                }
-                if (this.presentation_controller.skip_previous()) {
-                    this.strict_prev_view.display(current_slide_number - 1, true);
-                } else {
-                    this.strict_prev_view.fade_to_black();
-                }
+
+            this.current_view.display(current_slide_number);
+            this.next_view.display(this.metadata.user_slide_to_real_slide(
+                current_user_slide_number + 1));
+            if (this.presentation_controller.skip_next()) {
+                this.strict_next_view.display(current_slide_number + 1, true);
+            } else {
+                this.strict_next_view.fade_to_black();
             }
-            catch( Renderer.RenderError e ) {
-                error("The pdf page %d could not be rendered: %s", current_slide_number, e.message);
+            if (this.presentation_controller.skip_previous()) {
+                this.strict_prev_view.display(current_slide_number - 1, true);
+            } else {
+                this.strict_prev_view.fade_to_black();
             }
             this.update_slide_count();
             this.update_note();
@@ -420,12 +375,8 @@ namespace pdfpc.Window {
          * Display a specific page
          */
         public void goto_page(int page_number) {
-            try {
-                this.current_view.display(page_number);
-                this.next_view.display(page_number + 1);
-            } catch( Renderer.RenderError e ) {
-                error("The pdf page %d could not be rendered: %s", page_number, e.message);
-            }
+            this.current_view.display(page_number);
+            this.next_view.display(page_number + 1);
 
             this.update_slide_count();
             this.update_note();
@@ -517,23 +468,15 @@ namespace pdfpc.Window {
          * for display, as it is a Image widget after all.
          */
         public void set_cache_observer(CacheStatus observer) {
-            var current_prerendering_view = this.current_view as View.Prerendering;
-            if (current_prerendering_view != null) {
-                observer.monitor_view(current_prerendering_view);
+            if (!Options.disable_caching) {
+                observer.update_progress.connect(this.prerender_progress.set_fraction);
+                observer.update_complete.connect(this.prerender_finished);
+                this.prerender_progress.show();
             }
-            var next_prerendering_view = this.next_view as View.Prerendering;
-            if (next_prerendering_view != null) {
-                observer.monitor_view(next_prerendering_view);
-            }
-
-            observer.update_progress.connect(this.prerender_progress.set_fraction);
-            observer.update_complete.connect(this.prerender_finished);
-            this.prerender_progress.show();
         }
 
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
-            this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).cache);
         }
     }
 }

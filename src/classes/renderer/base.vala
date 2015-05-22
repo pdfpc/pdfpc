@@ -51,19 +51,13 @@ namespace pdfpc {
         }
 
         /**
-         * Render the given slide_number to a Cairo.ImageSurface and return it.
+         * Render the given slide_number to a Cairo.Context and return it.
          *
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error should be thrown.
          */
-        public abstract Cairo.ImageSurface render_to_surface(int slide_number)
+        public abstract void render(Cairo.Context context, int slide_number, int width, int height)
             throws RenderError;
-
-        /**
-         * Fill the display with black. Useful for last "slide" or for fading
-         * to black at certain points in the presentation.
-         */
-        public abstract Cairo.ImageSurface fade_to_black();
     }
 
     /**

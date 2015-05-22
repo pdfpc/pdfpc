@@ -42,9 +42,7 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Store a surface in the cache using the given index as identifier
          */
-        public override void store( uint index, Cairo.ImageSurface surface ) {
-            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
-                surface.get_height());
+        public override void store( uint index, Gdk.Pixbuf pixbuf ) {
             uint8[] buffer;
 
             try {
@@ -63,7 +61,7 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Cairo.ImageSurface? retrieve( uint index ) {
+        public override Gdk.Pixbuf? retrieve( uint index ) {
             var item = this.storage[index];
             if ( item == null ) {
                 return null;
@@ -78,15 +76,7 @@ namespace pdfpc.Renderer.Cache {
                 error( "Could not load cached PNG image for slide %u: %s", index, e.message );
             }
 
-            var pixbuf = loader.get_pixbuf();
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.ARGB32,
-                pixbuf.get_width(), pixbuf.get_height());
-            Cairo.Context cr = new Cairo.Context(surface);
-            Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
-            cr.fill();
-
-            return surface;
+            return loader.get_pixbuf();
         }
     }
 }

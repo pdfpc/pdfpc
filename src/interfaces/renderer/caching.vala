@@ -29,7 +29,7 @@ namespace pdfpc.Renderer {
         /**
          * A Cache store to be used for caching
          */
-        public abstract Cache.Base? cache { get; set; }
+        public abstract Cache.Base? cache { get; protected set; }
     }
 }
 

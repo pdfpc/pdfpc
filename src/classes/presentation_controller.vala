@@ -113,6 +113,9 @@ namespace pdfpc {
          */
         protected Metadata.Pdf metadata;
 
+        public Renderer.Pdf slide_renderer { get; protected set; }
+        public Renderer.Pdf notes_renderer { get; protected set; }
+
         /**
          * The presenters overview. We need to communicate with it for toggling
          * skips
@@ -169,10 +172,13 @@ namespace pdfpc {
         /**
          * Instantiate a new controller
          */
-        public PresentationController(Metadata.Pdf metadata, bool allow_black_on_end) {
+        public PresentationController(Metadata.Pdf metadata, Renderer.Pdf slide_renderer,
+            Renderer.Pdf notes_renderer) {
             this.metadata = metadata;
+            this.slide_renderer = slide_renderer;
+            this.notes_renderer = notes_renderer;
             this.metadata.controller = this;
-            this.black_on_end = allow_black_on_end;
+            this.black_on_end = Options.black_on_end;
 
             this.controllables = new GLib.List<Controllable>();
 
@@ -199,6 +205,18 @@ namespace pdfpc {
             this.current_user_slide_number = 0;
 
             this.add_actions();
+
+            // Once everything's set up, make sure that prerendering gets started
+            Idle.add(() => {
+                if (Options.disable_caching)
+                    return false;
+
+                if (this.overview == null)
+                    this.trigger_prerender();
+                else
+                    this.overview.previews_ready.connect(this.trigger_prerender);
+                return false;
+            });
         }
 
         /*
@@ -211,6 +229,13 @@ namespace pdfpc {
 
         public void set_overview(Window.Overview o) {
             this.overview = o;
+        }
+
+        protected void trigger_prerender() {
+            this.slide_renderer.finish_prerender.begin();
+            this.notes_renderer.finish_prerender.begin();
+            if (this.overview != null)
+                this.overview.previews_ready.disconnect(this.trigger_prerender);
         }
 
         protected void add_actions() {

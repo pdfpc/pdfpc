@@ -45,7 +45,6 @@ namespace pdfpc {
          */
         protected Base( Renderer.Base renderer ) {
             this.renderer = renderer;
-            this.set_size_request(renderer.width, renderer.height);
         }
 
         /**
@@ -60,8 +59,7 @@ namespace pdfpc {
          *
          * If the slide number does not exist a RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public abstract void display(int slide_number, bool force_redraw=false)
-            throws Renderer.RenderError;
+        public abstract void display(int slide_number, bool force_redraw=false);
 
         /**
          * Make the screen black. Useful for presentations together with a whiteboard

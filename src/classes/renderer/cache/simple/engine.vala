@@ -28,20 +28,20 @@ namespace pdfpc.Renderer.Cache {
         /**
          * In memory storage for all the given surfaces
          */
-        protected Cairo.ImageSurface[] storage = null;
+        protected Gdk.Pixbuf[] storage = null;
 
         /**
          * Initialize the cache store
          */
         public Engine( Metadata.Base metadata ) {
             base( metadata );
-            this.storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
+            this.storage = new Gdk.Pixbuf[this.metadata.get_slide_count()];
         }
 
         /**
          * Store a surface in the cache using the given index as identifier
          */
-        public override void store( uint index, Cairo.ImageSurface surface ) {
+        public override void store( uint index, Gdk.Pixbuf surface ) {
             this.storage[index] = surface;
         }
 
@@ -50,7 +50,7 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Cairo.ImageSurface? retrieve( uint index ) {
+        public override Gdk.Pixbuf? retrieve( uint index ) {
             return this.storage[index];
         }
     }

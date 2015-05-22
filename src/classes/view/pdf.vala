@@ -51,12 +51,10 @@ namespace pdfpc {
          * aspect ration. The scale rectangle is provided in the scale_rect
          * argument.
          */
-        public Pdf.from_metadata(Metadata.Pdf metadata, int width, int height,
-            Metadata.Area area, bool allow_black_on_end, bool clickable_links,
-            PresentationController presentation_controller, out Gdk.Rectangle scale_rect = null) {
-            var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
-            scale_rect = scaler.scale_to(width, height);
-            var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
+        public Pdf.from_metadata(Metadata.Pdf metadata, Metadata.Area area, bool allow_black_on_end,
+            bool clickable_links, PresentationController presentation_controller) {
+            Renderer.Pdf renderer = (area == Metadata.Area.NOTES) ?
+                presentation_controller.notes_renderer : presentation_controller.slide_renderer;
 
             this(renderer, allow_black_on_end, clickable_links, presentation_controller);
         }
@@ -75,26 +73,27 @@ namespace pdfpc {
          */
         public Gdk.Rectangle convert_poppler_rectangle_to_gdk_rectangle(
             Poppler.Rectangle poppler_rectangle) {
+            Metadata.Pdf metadata = this.get_renderer().metadata as Metadata.Pdf;
+            int width = this.get_allocated_width();
+            int height = this.get_allocated_height();
+            double page_width = metadata.get_page_width();
+            double page_height = metadata.get_page_height();
+            double scale = double.min(width / page_width, height / page_height);
             Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
-
-            Gtk.Requisition requisition;
-            Gtk.Requisition min_requisition;
-            this.get_preferred_size(out min_requisition, out requisition);
 
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates
-            var metadata = this.get_renderer().metadata as Metadata.Pdf;
-            gdk_rectangle.x = (int) Math.ceil((poppler_rectangle.x1 / metadata.get_page_width()) *
-                requisition.width );
-            gdk_rectangle.width = (int) Math.floor(((poppler_rectangle.x2 - poppler_rectangle.x1 ) /
-                metadata.get_page_width()) * requisition.width);
+            gdk_rectangle.x = (int) Math.ceil(poppler_rectangle.x1 * scale +
+                this.horizontal_align * (width - page_width * scale) / 2);
+            gdk_rectangle.width = (int) Math.floor((poppler_rectangle.x2 - poppler_rectangle.x1 ) *
+                scale);
 
             // Gdk has its coordinate origin in the upper left, while Poppler
             // has its origin in the lower left.
-            gdk_rectangle.y = (int) Math.ceil(((metadata.get_page_height() - poppler_rectangle.y2) /
-                metadata.get_page_height()) * requisition.height);
-            gdk_rectangle.height = (int) Math.floor(((poppler_rectangle.y2 - poppler_rectangle.y1) /
-                metadata.get_page_height()) * requisition.height);
+            gdk_rectangle.y = (int) Math.ceil((page_height - poppler_rectangle.y2) * scale +
+                this.vertical_align * (height - page_height * scale) / 2);
+            gdk_rectangle.height = (int) Math.floor((poppler_rectangle.y2 - poppler_rectangle.y1) *
+                scale);
 
             return gdk_rectangle;
         }

@@ -53,7 +53,7 @@ namespace pdfpc {
          * cached slides to provide a visual feedback to the user about the
          * rendering state
          */
-        private CacheStatus cache_status;
+        private CacheStatus cache_status = new CacheStatus();
 
         /**
          * Commandline option parser entry definitions
@@ -126,6 +126,9 @@ namespace pdfpc {
                 }
                 .trough {
                     border: none;
+                }
+                .pane-separator:hover {
+                    background-color: gray;
                 }
                 pdfpcTimerLabel.pretalk {
                     color: green;
@@ -229,11 +232,29 @@ namespace pdfpc {
             if ( Options.duration != 987654321u )
                 metadata.set_duration(Options.duration);
 
+            Gdk.Screen screen = Gdk.Screen.get_default();
+            Gdk.Rectangle screen_geometry;
+            int max_width = 0, max_height = 0;
+            for (int i = 0; i < screen.get_n_monitors(); i++) {
+                screen.get_monitor_geometry(i, out screen_geometry);
+                max_width = int.max(max_width, screen_geometry.width);
+                max_height = int.max(max_height, screen_geometry.height);
+            }
+            Renderer.Pdf slide_renderer = new Renderer.Pdf(metadata, max_width, max_height,
+                Metadata.Area.CONTENT);
+            this.cache_status.monitor_renderer(slide_renderer);
+            Renderer.Pdf notes_renderer;
+            if (notes_position == Metadata.NotesPosition.NONE) {
+                notes_renderer = slide_renderer;
+            } else {
+                notes_renderer = new Renderer.Pdf(metadata, max_width, max_height,
+                    Metadata.Area.NOTES);
+                this.cache_status.monitor_renderer(notes_renderer);
+            }
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
-            this.controller = new PresentationController( metadata, Options.black_on_end );
-            this.cache_status = new CacheStatus();
+            this.controller = new PresentationController(metadata, slide_renderer, notes_renderer);
 
             ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
 
@@ -244,7 +265,6 @@ namespace pdfpc {
 
             set_styling();
 
-            var screen = Gdk.Screen.get_default();
             if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
                 int presenter_monitor, presentation_monitor;
                 if ( Options.display_switch != true )
