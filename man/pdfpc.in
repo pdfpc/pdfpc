@@ -270,7 +270,7 @@ slide in the actual presentation.
 Things like bibliographic references or slides referring to specialized
 questions are typical examples.
 Pdf Presenter Console lets you define which is the last slide in the
-actual presentation vie the \[aq]e\[aq] key.
+actual presentation via the \[aq]e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
 .SS pdfpc Files
