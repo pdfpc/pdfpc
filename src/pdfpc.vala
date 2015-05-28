@@ -74,6 +74,7 @@ namespace pdfpc {
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presenter console in width:height format (forces windowed mode)", null},
             { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
+            { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
             { null }
         };
 
@@ -101,6 +102,19 @@ namespace pdfpc {
             } else {
                 return args[1];
             }
+        }
+
+        /**
+         * Print version string and copyright statement
+         */
+        private void print_version() {
+            stdout.printf("pdfpc v4.0\n"
+                        + "(C) 2015 Robert Schroll, Andreas Bilke, Andy Barry and others\n"
+                        + "(C) 2012 David Vilar\n"
+                        + "(C) 2009-2011 Jakob Westhoff\n\n"
+                        + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"
+                        + "This is free software: you are free to change and redistribute it.\n"
+                        + "There is NO WARRANTY, to the extent permitted by law.\n");
         }
 
         /**
@@ -174,13 +188,14 @@ namespace pdfpc {
          * initializes the Gtk system.
          */
         public void run( string[] args ) {
-            stdout.printf( "pdfpc v3.1.1\n"
-                           + "(C) 2012 David Vilar\n"
-                           + "(C) 2009-2011 Jakob Westhoff\n\n" );
-
             Gtk.init( ref args );
 
             string pdfFilename = this.parse_command_line_options( ref args );
+
+            if (Options.version) {
+                print_version();
+                Posix.exit(0);
+            }
 
             Gst.init( ref args );
 
