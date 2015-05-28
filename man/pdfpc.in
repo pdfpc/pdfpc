@@ -273,6 +273,40 @@ Pdf Presenter Console lets you define which is the last slide in the
 actual presentation via the \[aq]e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
+
+.SS Movies
+.PP
+Pdfpc can play back movies included in the PDF file.  Movies may be started
+and stopped by clicking within their area.  For the presenter, a progress
+bar is drawn along the bottom of the movie.  This expands when the mouse
+hovers over it, allowing one to seek by clicking or dragging within the
+progress bar.  Switching slides automatically stops playback, and movies
+will be reset after leaving and returning to a slide.
+
+.PP
+Movies may be included in PDF files as "screen annotations".  pdfpc does
+not yet support options that modify the playback of these movies.  In LaTeX,
+such movies may be added to a presentation with the "movie15" or "multimedia"
+package. Note that the poster, autoplay, and repeat options are not yet
+supported. (Also, run ps2pdf with the \-dNOSAFER flag.)
+
+.PP
+As a perhaps simpler option, pdfpc will play back movies linked from a
+hyperlink of type "launch".  A query string may be added to the URL of the
+movie to enable the "autostart" and "loop" properties.  (E.g., a link to
+"movie.avi?autostart&loop" will start playing automatically, and loop when
+it reaches the end.)  In LaTeX, such links are created with
+
+.RS
+\\usepackage{hyperref}
+.br
+\\href{run:<movie file>}{<placeholder content>}
+.RE
+
+.PP
+The movie will playback in the area taken by the placeholder content.  Using
+a frame of the movie will ensure the correct aspect ratio.
+
 .SS pdfpc Files
 .PP
 The notes and other additional information are stored in a file with the
@@ -299,7 +333,6 @@ The slide numbers of the notes refer to user slides
 The [notes] sections must be the last one in the file
 .IP \[bu] 2
 For the programmers out there: slide indexes start at 1
-.PP
 
 .SH CONFIG FILE
 
@@ -345,36 +378,6 @@ Some configuration files for commonly used devices
 If your device is not
 yet supported and you generated a working config file, please
 contribute it (see contact information below).
-
-.SS Movies
-
-Pdfpc can play back movies included in the PDF file.  Movies may be started
-and stopped by clicking within their area.  For the presenter, a progress
-bar is drawn along the bottom of the movie.  This expands when the mouse
-hovers over it, allowing one to seek by clicking or dragging within the
-progress bar.  Switching slides automatically stops playback, and movies
-will be reset after leaving and returning to a slide.
-
-Movies may be included in PDF files as "screen annotations".  pdfpc does
-not yet support options that modify the playback of these movies.  In LaTeX,
-such movies may be added to a presentation with the "movie15" or "multimedia"
-package. Note that the poster, autoplay, and repeat options are not yet
-supported. (Also, run ps2pdf with the \-dNOSAFER flag.)
-
-As a perhaps simpler option, pdfpc will play back movies linked from a
-hyperlink of type "launch".  A query string may be added to the URL of the
-movie to enable the "autostart" and "loop" properties.  (E.g., a link to
-"movie.avi?autostart&loop" will start playing automatically, and loop when
-it reaches the end.)  In LaTeX, such links are created with
-
-.RS
-\\usepackage{hyperref}
-.br
-\\href{run:<movie file>}{<placeholder content>}
-.RE
-
-The movie will playback in the area taken by the placeholder content.  Using
-a frame of the movie will ensure the correct aspect ratio.
 
 .SH BUGS
 
