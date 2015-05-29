@@ -13,7 +13,7 @@ Version 4.0
 
 - Movie playback, based on gstreamer 1.0
 
-- Support slides with notes
+- Support LaTeX beamer slides with notes
 
 - Option to sepcify size in windowed mode
 
