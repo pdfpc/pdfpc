@@ -1,0 +1,32 @@
+* {
+    background-color: black;
+    background-image: none;
+    color: white;
+}
+
+/* .slider and .trough are parts of scrollbar */
+.slider, .progressbar {
+    border: none;
+    background-color: white;
+}
+
+GtkProgressBar {
+    color: gray;
+}
+
+.trough {
+    border: none;
+}
+
+pdfpcTimerLabel.pretalk {
+    color: green;
+}
+
+pdfpcTimerLabel.last-minutes {
+    color: orange;
+}
+
+pdfpcTimerLabel.overtime {
+    color: red;
+}
+
