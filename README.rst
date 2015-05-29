@@ -25,7 +25,7 @@ requirements need to be met:
 
 - CMake Version >=2.6
 - valac >= 0.26
-- GTK+ 3.x
+- GTK+ >= 3.10
 - gee 0.8
 - libpoppler with glib bindings
 - gstreamer 1.0
@@ -131,10 +131,11 @@ pdfpc to get a feeling of it::
 Acknowledgements
 ================
 
-pdfpc 4.0 is the continued work of pdfpc mainly developed by davvil
+pdfpc has been developed by Jakob Westhoff, David Vilar, Robert Schroll, Andreas
+Bilke, Andy Barry, and others.  It was previously available at
 https://github.com/davvil/pdfpc
 
-pdfpc is a  fork  of  pdf-presenter  console,  available  at
+pdfpc is a fork of Pdf-Presenter-Console by Jakob Westhoff, available at
 https://github.com/jakobwesthoff/Pdf-Presenter-Console
 
 
