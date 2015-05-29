@@ -3,7 +3,7 @@
  *
  * This file is part of pdfpc.
  *
- * Copyright (C) 2012 Robert Schroll <rschroll@gmail.com>
+ * Copyright 2012, 2015 Robert Schroll
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
