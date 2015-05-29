@@ -11,7 +11,11 @@ Version 4.0
 
 - New Maintainer
 
-- Moved to gstreamer 1.0
+- Movie playback, based on gstreamer 1.0
+
+- Support slides with notes
+
+- Option to sepcify size in windowed mode
 
 - Various bug fixed and documentation
   improvements
