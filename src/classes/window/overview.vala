@@ -261,7 +261,13 @@ namespace pdfpc.Window {
             if (this.idle_id != 0)
                 Source.remove(idle_id);
             this.next_undone_preview = 0;
-            this.idle_id = GLib.Idle.add(this._fill_previews);
+            this.idle_id = GLib.Idle.add(() => {
+                if (!this._fill_previews()) {
+                    this.idle_id = 0;
+                    return false;
+                }
+                return true;
+            });
         }
 
         protected bool _fill_previews() {
