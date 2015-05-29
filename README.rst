@@ -15,7 +15,7 @@ documents, which can be created using nearly any of today's presentation
 software.
 
 More information, including screenshots and a demo presentation, can be found
-at http://pdfpc.github.com/pdfpc/
+at https://pdfpc.github.io/
 
 Requirements
 ============

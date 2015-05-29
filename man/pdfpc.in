@@ -374,7 +374,7 @@ via the \-L command line option.
 
 Some configuration files for commonly used devices
 (wireless presenters, bluetooth headsets, ...)
-.URL http://pdfpc.github.com/pdfpc#configs "are available" .
+.URL https://pdfpc.github.io/#config-files "are available" .
 If your device is not
 yet supported and you generated a working config file, please
 contribute it (see contact information below).
