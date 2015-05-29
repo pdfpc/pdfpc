@@ -109,5 +109,10 @@ namespace pdfpc {
          * Size of the presenter window
          */
         public static string? size = null;
+
+        /**
+         * Flag if the version string should be printed on startup
+         */
+        public static bool version = false;
     }
 }
