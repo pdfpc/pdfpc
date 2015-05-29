@@ -214,8 +214,6 @@ namespace pdfpc {
                 Options.windowed = true;
             }
 
-            stdout.printf( "Initializing rendering...\n" );
-
             pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
             var metadata = new Metadata.Pdf( pdfFilename, notes_position );
             if ( Options.duration != 987654321u )
