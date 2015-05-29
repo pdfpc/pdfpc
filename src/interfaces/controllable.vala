@@ -4,6 +4,9 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
+ * Copyright 2011-2012 David Vilar
+ * Copyright 2012, 2015 Robert Schroll
+ * Copyright 2015 Andreas Bilke
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

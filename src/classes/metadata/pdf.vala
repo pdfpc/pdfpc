@@ -4,6 +4,11 @@
  * This file is part of pdfpc.
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
+ * Copyright 2012 Robert Schroll
+ * Copyright 2012 Pascal Germroth
+ * Copyright 2012 David Vilar
+ * Copyright 2012 Andreas Bilke
+ * Copyright 2013 Stefan Tauner
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
