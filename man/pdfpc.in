@@ -1,7 +1,9 @@
 .TH  pdfpc "1" "May 2015"
+.if !dURL \{\
 .de URL
 \\$2 \(laURL: \\$1 \(ra\\$3
 ..
+.\}
 .if \n[.g] .mso www.tmac
 
 .SH NAME
