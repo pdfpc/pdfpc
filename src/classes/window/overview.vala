@@ -108,7 +108,7 @@ namespace pdfpc.Window {
          * When the section changes, we need to update the current slide number.
          * Also, make sure we don't end up with no selection.
          */
-        public void on_selection_changed(Gtk.Widget source) {
+        public void on_selection_changed() {
             var ltp = this.slides_view.get_selected_items();
             if (ltp != null) {
                 var tp = ltp.data;
