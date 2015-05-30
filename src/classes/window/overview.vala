@@ -387,7 +387,7 @@ namespace pdfpc.Window {
      */
     public class CellRendererHighlight: Gtk.CellRendererPixbuf {
 
-        public new void render(Cairo.Context cr, Gtk.Widget widget,
+        public override void render(Cairo.Context cr, Gtk.Widget widget,
                                     Gdk.Rectangle background_area, Gdk.Rectangle cell_area,
                                     Gtk.CellRendererState flags) {
             base.render(cr, widget, background_area, cell_area, flags);
