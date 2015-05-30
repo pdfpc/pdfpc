@@ -224,8 +224,8 @@ in this mode.
 Many slide preparation systems allow for overlays, i.e.  sets of slides that
 are logically grouped together as a single, changing slide.  Examples include
 enumerations where the single items are displayed one after another or rough
-"animations", where parts of a picture change from slide to slide.  Pdf
-Presenter Console includes facilities for dealing with such overlays.
+"animations", where parts of a picture change from slide to slide. Pdfpc
+includes facilities for dealing with such overlays.
 
 In this description, we will differentiate between slides (i.e.  pages in the
 pdf document) and "user slides", that are the logical slides.  The standard
@@ -242,7 +242,7 @@ backward through the single steps of it
 If the current slide is not part of an overlay (or if it is the first one), but
 the previous slides are, we jump to the previous user slide.  This means that
 when going back in the presentation you do not have to go through every step of
-the overlay, Pdf Presenter Console just shows the first slide of the each
+the overlay, pdfc just shows the first slide of the each
 overlay.  As you normally only go back in a presentation when looking for a
 concrete slide, this is more convenient.
 .PP
@@ -255,7 +255,7 @@ When going through an overlay, two additional previews may be activated
 in the presenter view, just below the main view, showing the next and
 the previous slide in an overlay.
 
-Pdf Presenter Console tries to find these overlays automatically by looking
+Pdfpc tries to find these overlays automatically by looking
 into the page labels in the pdf file.  For LaTeX this works correctly at least
 with the beamer class and also modifying the page numbers manually (compiling
 with pdflatex).  If your preferred slide-producing method does not work
@@ -269,7 +269,7 @@ Some people like to have some additional, backup slides after the last
 slide in the actual presentation.
 Things like bibliographic references or slides referring to specialized
 questions are typical examples.
-Pdf Presenter Console lets you define which is the last slide in the
+Pdfpc lets you define which is the last slide in the
 actual presentation via the \[aq]e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
@@ -311,7 +311,7 @@ a frame of the movie will ensure the correct aspect ratio.
 .PP
 The notes and other additional information are stored in a file with the
 extension "pdfpc".
-When invoking Pdf Presenter Console with a non pdfpc file, it
+When invoking pdfpc with a non pdfpc file, it
 automatically checks if there exists such a file and in this case loads
 the additional information.
 This means that you normally do not have to deal with this kind of files
