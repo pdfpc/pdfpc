@@ -27,7 +27,7 @@ requirements need to be met:
 - valac >= 0.26
 - GTK+ >= 3.10
 - gee 0.8
-- libpoppler with glib bindings
+- poppler with glib bindings
 - gstreamer 1.0
 
 Compile and install

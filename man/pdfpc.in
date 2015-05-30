@@ -7,7 +7,7 @@
 .if \n[.g] .mso www.tmac
 
 .SH NAME
-pdfpc \- pdf presenter console with multi-monitor support
+pdfpc \- PDF presenter console with multi-monitor support
 
 .SH SYNOPSIS
 .B pdfpc
@@ -82,7 +82,7 @@ Run in windowed mode
 Size of the presenter console in width:height format (forces windowed mode)
 .TP
 .BI "\-n, \-\-notes"=P
-Position of notes on the pdf page. Position can be either left, right, top or bottom (Default none)
+Position of notes on the PDF page. Position can be either left, right, top or bottom (Default none)
 .TP
 .BI "\-h, \-\-help"
 Shows the help
@@ -161,41 +161,47 @@ below if you want to customize the keybindings.
 
 .SS Caching / Pre-rendering
 
-To allow fast changes between the different slides of the presentation the pdf
+.PP
+To allow fast changes between the different slides of the presentation the PDF
 pages are pre-rendered to memory.  The progress bar on the bottom of the
 presenter screen indicates how many percent of the slides have been
 pre-rendered already.  During the initial rendering phase this will slow down
-slide changes, as most cpu power is used for the rendering process in the
+slide changes, as most CPU power is used for the rendering process in the
 background.  After the cache is fully primed however the changing of slides
-should be much faster, as with normal pdf viewers.
+should be much faster, as with normal PDF viewers.
 
+.PP
 As the pre-rendering takes a lot of memory it can be disabled using the
 \-\-disable\-cache switch at the cost of speed.
 .SS Cache compression
 
+.PP
 The pre-rendered and cached slides can be compressed in memory to save up some
-memory.  Without compression a set of about 100 pdf pages can easily grow up to
-about 1.5gb size.  Netbooks with only 1gb of memory would swap themselves to
+memory.  Without compression a set of about 100 PDF pages can easily grow up to
+about 1.5 GB size.  Netbooks with only 1 GB of memory would swap themselves to
 death if pre-rendering is enabled in such a situation.  The compression is
 enabled by default as it does not harm rendering speed in a noticeable way on
-most systems.  It does however slow down prerendering by about a factor of two.
+most systems.  It does however slow down pre-rendering by about a factor of two.
 If you have got enough memory and want to ensure the fastest possible
 pre-rendering you can disable slide compression by using the \-z switch. But be
 warned using the uncompressed pre-rendering storage will use about 30 times the
-memory the new compressed storage utilizes (e.g. 50MB will become about 1.5GB).
+memory the new compressed storage utilizes (e.g. 50 MB will become about 1.5 GB).
 
 .SS Timer
+.PP
 If a duration is given (\-d option), the timer will show a countdown with the
 given parameters.  If no duration is specified (or if a value of 0 is given to
 the \-d option), the timer will show how much time has been spent.  The duration
 is stored automatically, so you do not need to repeat it for every invocation.
 
+.PP
 The timer is started if you are navigating away from the first page for the
-first time.  This feature is quite useful as you may want to show the titlepage
+first time.  This feature is quite useful as you may want to show the title page
 of your presentation while people are still entering the room and the
-presentation hasn\[aq]t really begun yet.  If you want to start over you can
-use the r key which will make the presenter reset the timer.
+presentation has not really begun yet.  If you want to start over you can
+use the \[aq]r\[aq] key which will make the presenter reset the timer.
 
+.PP
 If a duration is given, at the moment the timer reaches the defined
 last-minutes value it will change color to indicate your talk is nearing its
 end.  As soon as the timer reaches the zero mark (00:00:00) it will turn red
@@ -204,16 +210,19 @@ many minutes you are overtime.
 
 .SS Notes
 
+.PP
 Textual notes can be displayed for each slide.  While in the presentation,
-pressing n will allow you to take notes for the screen.  To go out of editing
-mode, press the Escape key.  Note that while editing a note the keybindings
-stop working, i.e.  you are not able to change slides.
+pressing \[aq]n\[aq] will allow you to take notes for the screen.  To go out of
+editing mode, press the Escape key.  Note that while editing a note the
+keybindings stop working, i.e.  you are not able to change slides.
 
+.PP
 The notes are stored in the given file in a plain text format, easy to edit
 also from outside the program.  See the section about the pdfpc format below.
 
 .SS Overview mode
 
+.PP
 Pressing tab you can enter the overview mode, where miniatures for the slides
 are shown.  You can select one slide to jump to with the mouse or with the
 arrow keys.  You can also define overlays and the end slide (see next sections)
@@ -221,14 +230,16 @@ in this mode.
 
 .SS Overlays
 
+.PP
 Many slide preparation systems allow for overlays, i.e.  sets of slides that
 are logically grouped together as a single, changing slide.  Examples include
 enumerations where the single items are displayed one after another or rough
-"animations", where parts of a picture change from slide to slide.  Pdf
-Presenter Console includes facilities for dealing with such overlays.
+"animations", where parts of a picture change from slide to slide. Pdfpc
+includes facilities for dealing with such overlays.
 
+.PP
 In this description, we will differentiate between slides (i.e.  pages in the
-pdf document) and "user slides", that are the logical slides.  The standard
+PDF document) and "user slides", that are the logical slides.  The standard
 forward movement command (page down, enter, etc.) moves through one slide at a
 time, as expected.  That means that every step in the overlay is traversed.
 The backward movement command works differently depending if the current and
@@ -245,21 +256,23 @@ when going back in the presentation you do not have to go through every step of
 the overlay, pdfpc just shows the first slide of the each
 overlay.  As you normally only go back in a presentation when looking for a
 concrete slide, this is more convenient.
-.PP
 
+.PP
 The up and down cursor keys work on a user slide basis.
 You can use them to skip the rest of an overlay or to jump to the
 previous user slide, ignoring the state of the current slide.
 
+.PP
 When going through an overlay, two additional previews may be activated
 in the presenter view, just below the main view, showing the next and
 the previous slide in an overlay.
 
+.PP
 Pdfpc tries to find these overlays automatically by looking
-into the page labels in the pdf file.  For LaTeX this works correctly at least
+into the page labels in the PDF file.  For LaTeX this works correctly at least
 with the beamer class and also modifying the page numbers manually (compiling
 with pdflatex).  If your preferred slide-producing method does not work
-correctly with this detection, you can supply this information using the o key
+correctly with this detection, you can supply this information using the \[aq]o\[aq] key
 for each slide that is part of an overlay (except the first one!).  The page
 numbering is also adapted.  This information is automatically stored.
 
@@ -337,6 +350,7 @@ For the programmers out there: slide indexes start at 1
 
 .SS Keybindings
 
+.PP
 The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
 Additionally, $HOME/.pdfpcrc is also read, if present. Following commands are
 aceepted
@@ -373,8 +387,9 @@ bind S+Next    next10
 A list of all possible functions can be obtained
 via the \-L command line option.
 
+.PP
 Some configuration files for commonly used devices
-(wireless presenters, bluetooth headsets, ...)
+(wireless presenters, Bluetooth headsets, ...)
 .URL https://pdfpc.github.io/#config-files "are available" .
 If your device is not
 yet supported and you generated a working config file, please
@@ -390,9 +405,11 @@ it to $XDG_CONFIG_HOME/pdfpc.css and change the attributes as he likes.
 
 .SH BUGS
 
+.PP
 There may be a small memory leak in the program. I am trying to solve it. It
 should not be too important for up to some hundreds of slides.
 
+.PP
 Other bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "the issue tracker" .
 
