@@ -211,10 +211,10 @@ namespace pdfpc {
             this.current_user_slide_number = 0;
 
             this.add_actions();
-            
-            this.screensaver = Bus.get_proxy_sync(BusType.SESSION, "org.freedesktop.ScreenSaver",
-                "/org/freedesktop/ScreenSaver");
+
             try {
+                this.screensaver = Bus.get_proxy_sync(BusType.SESSION, "org.freedesktop.ScreenSaver",
+                    "/org/freedesktop/ScreenSaver");
                 this.screensaver_cookie = this.screensaver.inhibit("pdfpc",
                     "Showing a presentation");
                 stdout.printf("Screensaver inhibited\n");

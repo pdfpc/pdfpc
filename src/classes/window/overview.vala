@@ -108,7 +108,7 @@ namespace pdfpc.Window {
          * When the section changes, we need to update the current slide number.
          * Also, make sure we don't end up with no selection.
          */
-        public void on_selection_changed(Gtk.Widget source) {
+        public void on_selection_changed() {
             var ltp = this.slides_view.get_selected_items();
             if (ltp != null) {
                 var tp = ltp.data;
@@ -387,7 +387,7 @@ namespace pdfpc.Window {
      */
     public class CellRendererHighlight: Gtk.CellRendererPixbuf {
 
-        public override void render(Cairo.Context cr, Gtk.Widget widget,
+        public new void render(Cairo.Context cr, Gtk.Widget widget,
                                     Gdk.Rectangle background_area, Gdk.Rectangle cell_area,
                                     Gtk.CellRendererState flags) {
             base.render(cr, widget, background_area, cell_area, flags);
