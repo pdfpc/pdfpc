@@ -15,17 +15,15 @@ pdfpc \- pdf presenter console with multi-monitor support
 
 .SH DESCRIPTION
 .PP
-pdfpc is a GTK based presentation viewer application which uses Keynote
-like multi-monitor output to provide meta information to the speaker
-during the presentation.
-It is able to show a normal presentation window on one screen, while
-showing a more sophisticated overview on the other one providing
-information like a picture of the next slide, as well as the left over
-time till the end of the presentation.
-The input files processed by pdfpc are PDF documents, which can be
-created using nearly any of today\[aq]s presentation software.
+pdfpc is a GTK-based presentation viewer for GNU/Linux which uses Keynote-like
+multi-monitor output to provide meta information to the speaker during the
+presentation. It is able to show a normal presentation window on one screen
+while showing a more sophisticated overview on the other one, providing
+information like a picture of the next slide, as well as the time left in the
+presentation. pdfpc processes PDF documents, which can be created using nearly
+all modern presentation software.
 .PP
-To run pdfppc, simply type
+To run pdfpc, simply type
 .RS
 .PP
 pdfpc file.pdf
@@ -184,7 +182,7 @@ most systems.  It does however slow down prerendering by about a factor of two.
 If you have got enough memory and want to ensure the fastest possible
 pre-rendering you can disable slide compression by using the \-z switch. But be
 warned using the uncompressed pre-rendering storage will use about 30 times the
-memory the new compressed storage utilizes (aka the 1.5gb become about 50mb)
+memory the new compressed storage utilizes (e.g. 50MB will become about 1.5GB).
 
 .SS Timer
 If a duration is given (\-d option), the timer will show a countdown with the
@@ -244,7 +242,7 @@ backward through the single steps of it
 If the current slide is not part of an overlay (or if it is the first one), but
 the previous slides are, we jump to the previous user slide.  This means that
 when going back in the presentation you do not have to go through every step of
-the overlay, Pdf Presenter Console just shows the first slide of the each
+the overlay, pdfpc just shows the first slide of the each
 overlay.  As you normally only go back in a presentation when looking for a
 concrete slide, this is more convenient.
 .PP
@@ -257,7 +255,7 @@ When going through an overlay, two additional previews may be activated
 in the presenter view, just below the main view, showing the next and
 the previous slide in an overlay.
 
-Pdf Presenter Console tries to find these overlays automatically by looking
+Pdfpc tries to find these overlays automatically by looking
 into the page labels in the pdf file.  For LaTeX this works correctly at least
 with the beamer class and also modifying the page numbers manually (compiling
 with pdflatex).  If your preferred slide-producing method does not work
@@ -271,7 +269,7 @@ Some people like to have some additional, backup slides after the last
 slide in the actual presentation.
 Things like bibliographic references or slides referring to specialized
 questions are typical examples.
-Pdf Presenter Console lets you define which is the last slide in the
+Pdfpc lets you define which is the last slide in the
 actual presentation via the \[aq]e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
@@ -313,9 +311,8 @@ a frame of the movie will ensure the correct aspect ratio.
 .PP
 The notes and other additional information are stored in a file with the
 extension "pdfpc".
-When invoking Pdf Presenter Console with a non pdfpc file, it
-automatically checks if there exists such a file and in this case loads
-the additional information.
+When pdfpc is invoked with a PDF file, it
+automatically checks for and loads the associated pdfpc file, if it exists.
 This means that you normally do not have to deal with this kind of files
 explicitly.
 .PP
