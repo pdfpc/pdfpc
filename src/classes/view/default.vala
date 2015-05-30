@@ -53,10 +53,6 @@ namespace pdfpc {
         public Default(Renderer.Base renderer) {
            base(renderer);
 
-           // As we are using our own kind of double buffer and blit in a one
-           // time action, we do not need gtk to double buffer as well.
-           this.set_double_buffered(false);
-
            this.current_slide_number = 0;
 
            this.n_slides = (int) renderer.metadata.get_slide_count();
