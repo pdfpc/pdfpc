@@ -36,11 +36,11 @@ Compile and install
 Compiling from source tarballs
 ------------------------------
 
-You can download the latest stable release of pdfpc in the download section of
-github (https://github.com/pdfpc/pdfpc/downloads). Uncompress the tarball (we
+You can download the latest stable release of pdfpc in the release section of
+github (https://github.com/pdfpc/pdfpc/releases). Uncompress the tarball (we
 use v4.0 as an example here)::
 
-    tar xvf pdfpc-4.0.tgz
+    tar xvf pdfpc-4.0.tar.gz
 
 Change to the extracted directory::
 
