@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Vala_CMake/vala)
 
-find_package(Vala "0.24" REQUIRED)
+find_package(Vala "0.26" REQUIRED)
 include(${VALA_USE_FILE})
 
 set(SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/etc" CACHE FILEPATH "sysconfdir")

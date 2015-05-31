@@ -170,7 +170,8 @@ namespace pdfpc.Window {
 
             // Window might be null in case it has not been mapped
             if (this.get_window() != null) {
-                this.get_window().set_cursor(new Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR));
+                var cursor = new Gdk.Cursor.for_display(Gdk.Display.get_default(), Gdk.CursorType.BLANK_CURSOR);
+                this.get_window().set_cursor(cursor);
 
                 // After the timeout disabled the cursor do not run it again
                 return false;

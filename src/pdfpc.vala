@@ -121,39 +121,31 @@ namespace pdfpc {
          * Set the CSS styling for GTK.
          */
         private void set_styling() {
-            Gtk.CssProvider provider = new Gtk.CssProvider();
+            var globalProvider = new Gtk.CssProvider();
+            var userProvider = new Gtk.CssProvider();
+
             Gtk.StyleContext.add_provider_for_screen(Gdk.Display.get_default().get_default_screen(),
-                provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            string css = """
-                * {
-                    background-color: black;
-                    background-image: none;
-                    color: white;
-                }
-                /* .slider and .trough are parts of scrollbar */
-                .slider, .progressbar {
-                    border: none;
-                    background-color: white;
-                }
-                GtkProgressBar {
-                    color: gray;
-                }
-                .trough {
-                    border: none;
-                }
-                pdfpcTimerLabel.pretalk {
-                    color: green;
-                }
-                pdfpcTimerLabel.last-minutes {
-                    color: orange;
-                }
-                pdfpcTimerLabel.overtime {
-                    color: red;
-                }
-            """;
+                globalProvider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            Gtk.StyleContext.add_provider_for_screen(Gdk.Display.get_default().get_default_screen(),
+                userProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
+            var sourceCssPath = Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpc.css");
+            var distCssPath = Path.build_filename(Paths.ICON_PATH, "pdfpc.css");
+            var userCssDir = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
 
             try {
-                provider.load_from_data(css, -1);
+                // pdfpc.css in dist path or in build directory is mandatory
+                if (GLib.FileUtils.test(sourceCssPath, (GLib.FileTest.IS_REGULAR))) {
+                    globalProvider.load_from_path(sourceCssPath);
+                } else if (GLib.FileUtils.test(distCssPath, (GLib.FileTest.IS_REGULAR))) {
+                    globalProvider.load_from_path(distCssPath);
+                } else {
+                    warning("No CSS file found");
+                }
+                // load custom user css on top
+                if (GLib.FileUtils.test(userCssDir, (GLib.FileTest.IS_REGULAR))) {
+                    userProvider.load_from_path(userCssDir);
+                }
             } catch (Error error) {
                 warning("Could not load styling from data: %s", error.message);
             }
@@ -236,8 +228,6 @@ namespace pdfpc {
 
                 Options.windowed = true;
             }
-
-            stdout.printf( "Initializing rendering...\n" );
 
             pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
             var metadata = new Metadata.Pdf( pdfFilename, notes_position );
