@@ -36,11 +36,11 @@ Compile and install
 Compiling from source tarballs
 ------------------------------
 
-You can download the latest stable release of pdfpc in the download section of
-github (https://github.com/pdfpc/pdfpc/downloads). Uncompress the tarball (we
+You can download the latest stable release of pdfpc in the release section of
+github (https://github.com/pdfpc/pdfpc/releases). Uncompress the tarball (we
 use v4.0 as an example here)::
 
-    tar xvf pdfpc-4.0.tgz
+    tar xvf pdfpc-4.0.tar.gz
 
 Change to the extracted directory::
 
@@ -70,13 +70,7 @@ Compiling from github
 ---------------------
 
 If you want the bleeding-edge version of pdfpc, you should checkout the git
-repository. The *master* branch should be fairly stable and safe to use,
-unstable development happens in the *devel* branch.
-
-When installing from git you will need two additional dependencies:
-
-- git
-- Vala Compiler Version >=0.26
+repository. The *master* branch should be fairly stable and safe to use.
 
 The pdfpc source can be retrieved from github::
 
@@ -89,8 +83,8 @@ You are now set to compile and install pdfpc.  Start by creating a build
 directory (this is optional but it keeps the directories clean, in case you
 want to do some changes)::
 
-    mkdir build
-    cd build
+    mkdir build/
+    cd build/
 
 After you are inside the build directory create the needed Makefiles using
 CMake::
@@ -113,10 +107,7 @@ derivative you may have installed. Simply issue the following command to start
 building the application::
 
     make
-    make install
-
-You may need to prefix the last command with a *sudo* or obtain super-user
-rights in any other way applicable to your situation.
+    sudo make install
 
 Congratulations you just installed pdfpc on your system.
 
@@ -135,7 +126,7 @@ pdfpc has been developed by Jakob Westhoff, David Vilar, Robert Schroll, Andreas
 Bilke, Andy Barry, and others.  It was previously available at
 https://github.com/davvil/pdfpc
 
-pdfpc is a fork of Pdf-Presenter-Console by Jakob Westhoff, available at
+pdfpc is a fork of Pdf Presenter Console by Jakob Westhoff, available at
 https://github.com/jakobwesthoff/Pdf-Presenter-Console
 
 
