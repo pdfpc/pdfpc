@@ -70,13 +70,7 @@ Compiling from github
 ---------------------
 
 If you want the bleeding-edge version of pdfpc, you should checkout the git
-repository. The *master* branch should be fairly stable and safe to use,
-unstable development happens in the *devel* branch.
-
-When installing from git you will need two additional dependencies:
-
-- git
-- Vala Compiler Version >=0.26
+repository. The *master* branch should be fairly stable and safe to use.
 
 The pdfpc source can be retrieved from github::
 
