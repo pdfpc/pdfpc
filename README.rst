@@ -83,8 +83,8 @@ You are now set to compile and install pdfpc.  Start by creating a build
 directory (this is optional but it keeps the directories clean, in case you
 want to do some changes)::
 
-    mkdir build
-    cd build
+    mkdir build/
+    cd build/
 
 After you are inside the build directory create the needed Makefiles using
 CMake::
@@ -107,10 +107,7 @@ derivative you may have installed. Simply issue the following command to start
 building the application::
 
     make
-    make install
-
-You may need to prefix the last command with a *sudo* or obtain super-user
-rights in any other way applicable to your situation.
+    sudo make install
 
 Congratulations you just installed pdfpc on your system.
 
@@ -129,7 +126,7 @@ pdfpc has been developed by Jakob Westhoff, David Vilar, Robert Schroll, Andreas
 Bilke, Andy Barry, and others.  It was previously available at
 https://github.com/davvil/pdfpc
 
-pdfpc is a fork of Pdf-Presenter-Console by Jakob Westhoff, available at
+pdfpc is a fork of Pdf Presenter Console by Jakob Westhoff, available at
 https://github.com/jakobwesthoff/Pdf-Presenter-Console
 
 
