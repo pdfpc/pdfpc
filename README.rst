@@ -74,7 +74,7 @@ repository. The *master* branch should be fairly stable and safe to use.
 
 The pdfpc source can be retrieved from github::
 
-    git clone --recursive git://github.com/pdfpc/pdfpc.git
+    git clone git://github.com/pdfpc/pdfpc.git
 
 After it has been transfered you need to switch to the ``pdfpc`` directory,
 which has just been created.
