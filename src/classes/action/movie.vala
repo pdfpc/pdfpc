@@ -28,13 +28,15 @@ namespace pdfpc {
         ElementConstruction,
         Linking
     }
+    
     /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
     public Gst.Element gst_element_make(string factoryname, string? name) throws PipelineError {
         var element = Gst.ElementFactory.make(factoryname, name);
         if (element == null)
-            throw new PipelineError.ElementConstruction(@"Could not make element $name of type $factoryname.");
+            throw new PipelineError.ElementConstruction(
+                @"Could not make element $name of type $factoryname.");
         return element;
     }
 
@@ -82,7 +84,7 @@ namespace pdfpc {
                 PresentationController controller, Poppler.Document document,
                 string uri, bool autostart, bool loop, bool temp=false) {
             other.init(area, controller, document);
-            var movie = other as Movie;
+            Movie movie = (Movie) other;
             movie.loop = loop;
             movie.temp = temp ? uri.substring(7) : "";
             GLib.Idle.add( () => {
@@ -115,24 +117,24 @@ namespace pdfpc {
             if (mapping.action.type != Poppler.ActionType.LAUNCH)
                 return null;
 
-            var file = ((Poppler.ActionLaunch*)mapping.action).file_name;
-            var splitfile = file.split("?", 2);
+            string file = ((Poppler.ActionLaunch*) mapping.action).file_name;
+            string[] splitfile = file.split("?", 2);
             file = splitfile[0];
-            var querystring = "";
+            string querystring = "";
             if (splitfile.length == 2)
                 querystring = splitfile[1];
-            var queryarray = querystring.split("&");
-            var autostart = "autostart" in queryarray;
-            var loop = "loop" in queryarray;
+            string[] queryarray = querystring.split("&");
+            bool autostart = "autostart" in queryarray;
+            bool loop = "loop" in queryarray;
 
             string uri = filename_to_uri(file, controller.get_pdf_url());
             bool uncertain;
-            var ctype = GLib.ContentType.guess(uri, null, out uncertain);
+            string ctype = GLib.ContentType.guess(uri, null, out uncertain);
             if (!("video" in ctype))
                 return null;
 
-            var type = Type.from_instance(this);
-            var new_obj = GLib.Object.new(type) as ActionMapping;
+            Type type = Type.from_instance(this);
+            ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
             this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop);
             return new_obj;
         }
@@ -160,7 +162,7 @@ namespace pdfpc {
          */
         public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            var annot = mapping.annot;
+            Poppler.Annot annot = mapping.annot;
             string uri;
             bool temp = false;
             switch (annot.get_annot_type()) {
@@ -168,8 +170,8 @@ namespace pdfpc {
                 if (!("video" in annot.get_contents()))
                     return null;
 
-                var action = ((Poppler.AnnotScreen) annot).get_action();
-                var movie = (Poppler.Media) action.movie.movie;
+                Poppler.Action action = ((Poppler.AnnotScreen) annot).get_action();
+                Poppler.Media movie = (Poppler.Media) action.movie.movie;
 
                 if (movie.is_embedded()) {
                     string tmp_fn;
@@ -199,6 +201,7 @@ namespace pdfpc {
                     temp = false;
                 }
                 break;
+            
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
                 if (movie.need_poster())
@@ -211,12 +214,13 @@ namespace pdfpc {
                 uri = filename_to_uri(file, controller.get_pdf_url());
                 temp = false;
                 break;
+            
             default:
                 return null;
             }
 
-            var type = Type.from_instance(this);
-            var new_obj = GLib.Object.new(type) as ActionMapping;
+            Type type = Type.from_instance(this);
+            ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
             this.init_other(new_obj, mapping.area, controller, document, uri, false, false, temp);
             return new_obj;
         }
@@ -225,8 +229,8 @@ namespace pdfpc {
          * Set up the gstreamer pipeline.
          */
         protected void establish_pipeline(string uri) {
-            var bin = new Gst.Bin("bin");
-            var tee = Gst.ElementFactory.make("tee", "tee");
+            Gst.Bin bin = new Gst.Bin("bin");
+            Gst.Element tee = Gst.ElementFactory.make("tee", "tee");
             bin.add_many(tee);
             bin.add_pad(new Gst.GhostPad("sink", tee.get_static_pad("sink")));
             Gdk.Rectangle rect;
@@ -236,14 +240,14 @@ namespace pdfpc {
                 xid = this.controller.overlay_pos(n, this.area, out rect);
                 if (xid == null)
                     break;
-                var sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
-                var queue = Gst.ElementFactory.make("queue", @"queue$n");
+                Gst.Element sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
+                Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
                 tee.link(queue);
-                var ad_element = this.link_additional(n, queue, bin, rect);
+                Gst.Element ad_element = this.link_additional(n, queue, bin, rect);
                 ad_element.link(sink);
 
-                var xoverlay = sink as Gst.Video.Overlay;
+                Gst.Video.Overlay xoverlay = (Gst.Video.Overlay) sink;
                 xoverlay.set_window_handle(xid);
                 xoverlay.handle_events(false);
                 xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
@@ -254,7 +258,7 @@ namespace pdfpc {
             this.pipeline.uri = uri;
             this.pipeline.force_aspect_ratio = false;
             this.pipeline.video_sink = bin;
-            var bus = this.pipeline.get_bus();
+            Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
             bus.message["error"] += this.on_message;
             bus.message["eos"] += this.on_eos;
@@ -289,7 +293,7 @@ namespace pdfpc {
                 return file;
             if (GLib.Path.is_absolute(file))
                 return "file://" + file;
-            var dirname = GLib.Path.get_dirname(pdf_url);
+            string dirname = GLib.Path.get_dirname(pdf_url);
             return GLib.Path.build_filename(dirname, file);
         }
 
@@ -426,9 +430,10 @@ namespace pdfpc {
          * Movie.init_other that attempts to justify this ugliness.
          */
         public override void init_other(ActionMapping other, Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document, string file, bool autostart, bool loop, bool temp=false) {
+                PresentationController controller, Poppler.Document document, string file,
+                bool autostart, bool loop, bool temp=false) {
             base.init_other(other, area, controller, document, file, autostart, loop, temp);
-            var movie = other as ControlledMovie;
+            ControlledMovie movie = (ControlledMovie) other;
             controller.main_view.motion_notify_event.connect(movie.on_motion);
             controller.main_view.button_release_event.connect(movie.on_button_release);
         }
@@ -437,7 +442,7 @@ namespace pdfpc {
          * Hook up the elements to draw the controls to the first output leg.
          */
         protected override Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
-                                                       Gdk.Rectangle rect) {
+                Gdk.Rectangle rect) {
             if (n != 0)
                 return source;
 
@@ -446,12 +451,12 @@ namespace pdfpc {
             dynamic Gst.Element overlay;
             Gst.Element adaptor2;
             try {
-                var scale = gst_element_make("videoscale", "scale");
-                var rate = gst_element_make("videorate", "rate");
-                var adaptor1 = gst_element_make("videoconvert", "adaptor1");
+                Gst.Element scale = gst_element_make("videoscale", "scale");
+                Gst.Element rate = gst_element_make("videorate", "rate");
+                Gst.Element adaptor1 = gst_element_make("videoconvert", "adaptor1");
                 adaptor2 = gst_element_make("videoconvert", "adaptor2");
                 overlay = gst_element_make("cairooverlay", "overlay");
-                var caps = Gst.Caps.from_string(
+                Gst.Caps caps = Gst.Caps.from_string(
                     "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
                     "framerate=[25/1,2147483647/1]," + // At least 25 fps
                     @"width=$(rect.width),height=$(rect.height)"
@@ -477,22 +482,22 @@ namespace pdfpc {
          * needs to be scaled to fit in the alloted area.  (This is only important
          * for the view with the controls.)
          */
-        public void on_prepare(Gst.Element overlay, Gst.Caps caps){
+        public void on_prepare(Gst.Element overlay, Gst.Caps caps) {
             var info = Gst.Video.Info();
             info.from_caps(caps);
             int width = info.width, height = info.height;
-            scalex = 1.0*width / rect.width;
-            scaley = 1.0*height / rect.height;
-            vheight = height;
+            this.scalex = (double) width / rect.width;
+            this.scaley = (double) height / rect.height;
+            this.vheight = height;
 
-            var tformat = Gst.Format.TIME;
-            overlay.query_duration(tformat, out duration);
+            overlay.query_duration(Gst.Format.TIME, out duration);
         }
 
         /**
          * Everytime we get a new frame, update the progress bar.
          */
-        public void on_draw(Gst.Element overlay, Cairo.Context cr, uint64 timestamp, uint64 duration) {
+        public void on_draw(Gst.Element overlay, Cairo.Context cr, uint64 timestamp,
+                uint64 duration) {
             // Transform to work from bottom left, in screen coordinates
             cr.translate(0, this.vheight);
             cr.scale(this.scalex, -this.scaley);
@@ -501,33 +506,33 @@ namespace pdfpc {
         }
 
         private void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
-            double fraction = 1.0*timestamp / this.duration;
+            double fraction = (double) timestamp / this.duration;
             if (this.in_seek_bar || this.mouse_drag) {
-                var bar_end = fraction * (rect.width - 2*this.seek_bar_padding);
+                double bar_end = fraction * (rect.width - 2 * this.seek_bar_padding);
                 cr.rectangle(0, 0, rect.width, this.seek_bar_height);
-                cr.set_source_rgba(0,0,0,0.8);
+                cr.set_source_rgba(0, 0, 0, 0.8);
                 cr.fill();
                 cr.rectangle(this.seek_bar_padding, this.seek_bar_padding,
-                            bar_end, this.seek_bar_height-4);
-                cr.set_source_rgba(1,1,1,0.8);
+                    bar_end, this.seek_bar_height-4);
+                cr.set_source_rgba(1, 1, 1, 0.8);
                 cr.fill();
 
-                var time_in_sec = (int)(timestamp / Gst.SECOND);
-                var timestring = "%i:%02i".printf(time_in_sec/60, time_in_sec%60);
-                var dur_in_sec = (int)(this.duration / Gst.SECOND);
-                var durstring = "%i:%02i".printf(dur_in_sec/60, dur_in_sec%60);
+                int time_in_sec = (int) (timestamp / Gst.SECOND);
+                string timestring = "%i:%02i".printf(time_in_sec / 60, time_in_sec % 60);
+                int dur_in_sec = (int) (this.duration / Gst.SECOND);
+                string durstring = "%i:%02i".printf(dur_in_sec / 60, dur_in_sec % 60);
                 Cairo.TextExtents te;
                 Cairo.FontOptions fo = new Cairo.FontOptions();
                 fo.set_antialias(Cairo.Antialias.GRAY);
                 cr.set_font_options(fo);
                 cr.select_font_face("sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-                cr.set_font_size(this.seek_bar_height - 2*seek_bar_padding);
+                cr.set_font_size(this.seek_bar_height - 2 * seek_bar_padding);
 
                 cr.text_extents(durstring, out te);
-                if ((bar_end + te.width + 4*this.seek_bar_padding) < rect.width) {
-                    cr.move_to(rect.width - te.width - 2*this.seek_bar_padding,
-                               this.seek_bar_height/2 - te.height/2);
-                    cr.set_source_rgba(0.8,0.8,0.8,1);
+                if ((bar_end + te.width + 4 * this.seek_bar_padding) < rect.width) {
+                    cr.move_to(rect.width - te.width - 2 * this.seek_bar_padding,
+                        this.seek_bar_height / 2 - te.height / 2);
+                    cr.set_source_rgba(0.8, 0.8, 0.8, 1);
                     cr.save();
                     cr.scale(1, -1);
                     cr.show_text(durstring);
@@ -536,23 +541,24 @@ namespace pdfpc {
 
                 cr.text_extents(timestring, out te);
                 if (bar_end > te.width) {
-                    cr.move_to(bar_end - te.width, this.seek_bar_height/2 - te.height/2);
-                    cr.set_source_rgba(0,0,0,1);
+                    cr.move_to(bar_end - te.width, this.seek_bar_height / 2 - te.height / 2);
+                    cr.set_source_rgba(0, 0, 0, 1);
                 } else {
-                    cr.move_to(bar_end + 2*this.seek_bar_padding, this.seek_bar_height/2 - te.height/2);
-                    cr.set_source_rgba(0.8,0.8,0.8,1);
+                    cr.move_to(bar_end + 2 * this.seek_bar_padding,
+                        this.seek_bar_height / 2 - te.height / 2);
+                    cr.set_source_rgba(0.8, 0.8, 0.8, 1);
                 }
                 cr.save();
-                cr.scale(1,-1);
+                cr.scale(1, -1);
                 cr.show_text(timestring);
                 cr.restore();
 
             } else {
                 cr.rectangle(0, 0, rect.width, 4);
-                cr.set_source_rgba(0,0,0,0.8);
+                cr.set_source_rgba(0, 0, 0, 0.8);
                 cr.fill();
                 cr.rectangle(1, 1, fraction * (rect.width - 2), 2);
-                cr.set_source_rgba(1,1,1,0.8);
+                cr.set_source_rgba(1, 1, 1, 0.8);
                 cr.fill();
             }
         }
@@ -570,10 +576,13 @@ namespace pdfpc {
          * Seek to the time indicated by the mouse's position on the progress bar.
          */
         public int64 mouse_seek(double x, double y) {
-            double seek_fraction = (x - this.seek_bar_padding) / (rect.width - 2*this.seek_bar_padding);
-            if (seek_fraction < 0) seek_fraction = 0;
-            if (seek_fraction > 1) seek_fraction = 1;
-            var seek_time = (int64)(seek_fraction * this.duration);
+            double seek_fraction = (x - this.seek_bar_padding) / (rect.width -
+                2 * this.seek_bar_padding);
+            if (seek_fraction < 0)
+                seek_fraction = 0;
+            if (seek_fraction > 1)
+                seek_fraction = 1;
+            int64 seek_time = (int64) (seek_fraction * this.duration);
             this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
             return seek_time;
         }
