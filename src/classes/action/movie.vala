@@ -47,7 +47,7 @@ namespace pdfpc {
         /**
          * The gstreamer pipeline for playback.
          */
-        public dynamic Gst.Element pipeline;
+        public Gst.Element pipeline;
 
         /**
          * A flag to indicate when we've reached the End Of Stream, so we
@@ -255,9 +255,9 @@ namespace pdfpc {
             }
 
             this.pipeline = Gst.ElementFactory.make("playbin", "playbin");
-            this.pipeline.uri = uri;
-            this.pipeline.force_aspect_ratio = false;
-            this.pipeline.video_sink = bin;
+            this.pipeline.set("uri", uri);
+            this.pipeline.set("force_aspect_ratio", false);
+            this.pipeline.set("video_sink", bin);
             Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
             bus.message["error"] += this.on_message;
@@ -461,8 +461,8 @@ namespace pdfpc {
                     "framerate=[25/1,2147483647/1]," + // At least 25 fps
                     @"width=$(rect.width),height=$(rect.height)"
                 );
-                dynamic Gst.Element filter = gst_element_make("capsfilter", "filter");
-                filter.caps = caps;
+                Gst.Element filter = gst_element_make("capsfilter", "filter");
+                filter.set("caps", caps);
                 bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
                 if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
                     throw new PipelineError.Linking("Could not link pipeline.");
