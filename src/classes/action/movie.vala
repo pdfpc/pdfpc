@@ -246,6 +246,7 @@ namespace pdfpc {
                 tee.link(queue);
                 Gst.Element ad_element = this.link_additional(n, queue, bin, rect);
                 ad_element.link(sink);
+                sink.set("force_aspect_ratio", false);
 
                 Gst.Video.Overlay xoverlay = (Gst.Video.Overlay) sink;
                 xoverlay.set_window_handle(xid);
@@ -256,7 +257,7 @@ namespace pdfpc {
 
             this.pipeline = Gst.ElementFactory.make("playbin", "playbin");
             this.pipeline.set("uri", uri);
-            this.pipeline.set("force_aspect_ratio", false);
+            this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
             this.pipeline.set("video_sink", bin);
             Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
