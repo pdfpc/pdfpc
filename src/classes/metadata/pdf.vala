@@ -33,7 +33,7 @@ namespace pdfpc.Metadata {
     {
         protected string? pdf_fname = null;
         public string? pdf_url = null;
-        protected string? pdfpc_url = null;
+        protected string? pdfpc_fname = null;
 
         /**
          * Poppler document which belongs to the associated pdf file
@@ -88,63 +88,47 @@ namespace pdfpc.Metadata {
         protected uint duration;
 
         /**
-         * The parsing states for the pdfpc file
-         */
-        enum ParseState {
-            FILE,
-            SKIP,
-            DURATION,
-            END_USER_SLIDE,
-            NOTES,
-            NOTHING
-        }
-
-        /**
          * Parse the given pdfpc file
          */
         void parse_pdfpc_file(out string? skip_line) {
             skip_line = null;
             try {
-                var file = File.new_for_uri(this.pdfpc_url);
-                uint8[] raw_datau8;
-                file.load_contents(null, out raw_datau8, null);
-                string[] lines = ((string) raw_datau8).split("\n");
-                ParseState state = ParseState.NOTHING;
-                for (int i=0; i < lines.length; ++i) {
-                    string l = lines[i].strip();
-                    if (l == "")
-                        continue;
-                    if (l == "[file]")
-                        state = ParseState.FILE;
-                    else if (l == "[skip]")
-                        state = ParseState.SKIP;
-                    else if (l == "[duration]")
-                        state = ParseState.DURATION;
-                    else if (l == "[end_user_slide]")
-                        state = ParseState.END_USER_SLIDE;
-                    else if (l == "[notes]") {
-                        notes.parse_lines(lines[i+1:lines.length]);
-                        break;
-                    } else {
-                        // How this line should be interpreted depends on the state
-                        switch (state) {
-                        case ParseState.FILE:
-                            this.pdf_fname = l;
-                            var pdffile = file.get_parent().get_child(this.pdf_fname);
-                            this.pdf_url = pdffile.get_uri();
-                            state = ParseState.NOTHING;
+                string content;
+                GLib.FileUtils.get_contents(this.pdfpc_fname, out content);
+                GLib.Regex regex = new GLib.Regex("(\\[[A-Za-z_]+\\])");
+
+                string[] config_sections = regex.split_full(content);
+                // config_sections[0] is empty
+                // config_sections[i] = [section_name]
+                // config_sections[i + 1] = section_content
+                for (int i = 1; i < config_sections.length; i += 2) {
+                    string section_type =  config_sections[i].strip();
+                    string section_content =  config_sections[i + 1].strip();
+
+                    switch (section_type) {
+                        case "[file]": {
+                            this.pdf_fname = section_content;
                             break;
-                        case ParseState.SKIP:
-                            // This must be delayed until we know how many pages we have in the document
-                            skip_line = l;
+                        }
+                        case "[skip]": {
+                            skip_line = section_content;
                             skips_by_user = true;
-                            state = ParseState.NOTHING;
                             break;
-                        case ParseState.DURATION:
-                            this.duration = int.parse(l);
+                        }
+                        case "[duration]": {
+                            this.duration = int.parse(section_content);
                             break;
-                        case ParseState.END_USER_SLIDE:
-                            this.end_user_slide = int.parse(l);
+                        }
+                        case "[end_user_slide]": {
+                            this.end_user_slide = int.parse(section_content);
+                            break;
+                        }
+                        case "[notes]": {
+                            notes.parse_lines(section_content.split("\n"));
+                            break;
+                        }
+                        default: {
+                            GLib.printerr("unknown section type %s\n", section_type);
                             break;
                         }
                     }
@@ -182,18 +166,13 @@ namespace pdfpc.Metadata {
          */
         void fill_path_info(string fname) {
             int l = fname.length;
-            var file = File.new_for_commandline_arg(fname);
 
-            if (fname.length < 6 || fname[l-6:l] != ".pdfpc") {
-                this.pdf_fname = file.get_basename();
-                this.pdf_url = file.get_uri();
-                string pdf_basefname = file.get_basename();
-                int extension_index = pdf_basefname.last_index_of(".");
-                string pdfpc_basefname = pdf_basefname[0:extension_index] + ".pdfpc";
-                var pdfpc_file = file.get_parent().get_child(pdfpc_basefname);
-                this.pdfpc_url = pdfpc_file.get_uri();
+            if (l > 6 && fname[l-6:l] != ".pdfpc") {
+                this.pdf_fname = fname;
+                int extension_index = fname.last_index_of(".");
+                this.pdfpc_fname = fname[0:extension_index] + ".pdfpc";
             } else {
-                this.pdfpc_url = file.get_uri();
+                this.pdfpc_fname = fname;
             }
         }
 
@@ -216,10 +195,9 @@ namespace pdfpc.Metadata {
                               + format_end_user_slide()
                               + format_notes();
             try {
-                var pdfpc_file = File.new_for_uri(this.pdfpc_url);
-                if (contents != "" || pdfpc_file.query_exists()) {
+                if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                     contents = "[file]\n" + this.pdf_fname + "\n" + contents;
-                    pdfpc_file.replace_contents(contents.data, null, false, FileCreateFlags.NONE, null);
+                    GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
             } catch (Error e) {
                 error("%s", e.message);
@@ -307,9 +285,10 @@ namespace pdfpc.Metadata {
             notes = new slides_notes();
             skips_by_user = false;
             string? skip_line = null;
-            if (File.new_for_uri(this.pdfpc_url).query_exists())
+            if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                 parse_pdfpc_file(out skip_line);
-            this.document = this.open_pdf_document( this.pdf_url );
+            }
+            this.document = this.open_pdf_document(this.pdf_fname);
 
             // Cache some often used values to minimize thread locking in the
             // future.
@@ -560,8 +539,8 @@ namespace pdfpc.Metadata {
         /**
          * Open a given pdf document url and return a Poppler.Document for it.
          */
-        protected Poppler.Document open_pdf_document( string url ) {
-            var file = File.new_for_uri( url );
+        protected Poppler.Document open_pdf_document(string fname) {
+            var file = File.new_for_commandline_arg(fname);
 
             Poppler.Document document = null;
 

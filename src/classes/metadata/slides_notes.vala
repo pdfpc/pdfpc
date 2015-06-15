@@ -63,36 +63,36 @@ namespace pdfpc {
          * Returns the string that should be written to the pdfpc file
          */
         public string format_to_save() {
-            string text="";
+            var builder = new GLib.StringBuilder();
             for (int i = 0; i < notes.length; ++i) {
                 if (notes[i] != null) {
-                    text += @"### $(i+1)\n" + notes[i];
-                    if (text[text.length-1] != '\n') // [last] == '\0'
-                        text += "\n";
+                    builder.append(@"### $(i+1)\n");
+                    builder.append(notes[i]);
                 }
             }
-            return text;
+
+            return builder.str;
         }
 
         /**
          * Parse the notes line of the pdfpc file
          */
         public void parse_lines(string[] lines) {
-            int current_slide = -1;
-            string current_note = "";
-            int last_line = lines.length;
-            while (lines[last_line-1].strip() == "")
-                --last_line;
-            for (int i=0; i < lines.length; ++i) {
-                if (lines[i].length > 3 && lines[i][0:3] == "###") {
-                    set_note(current_note, current_slide);
-                    current_slide = int.parse(lines[i].substring(3)) - 1;
-                    current_note = "";
-                } else {
-                    current_note += lines[i] + "\n";
+            string long_line = string.joinv("\n", lines);
+            string[] notes_sections = long_line.split("### ");
+
+            for (int notes_section = 0; notes_section < notes_sections.length; ++notes_section) {
+                if (notes_sections[notes_section].length == 0) {
+                    continue;
                 }
+                int first_newline = notes_sections[notes_section].index_of("\n");
+                var header_string = notes_sections[notes_section][0:first_newline];
+                var notes = notes_sections[notes_section][first_newline + 1:notes_sections[notes_section].length];
+
+                int slide_number = int.parse(header_string);
+                set_note(notes, slide_number - 1);
+
             }
-            set_note(current_note, current_slide);
         }
     }
 }
