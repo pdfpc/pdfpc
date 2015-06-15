@@ -88,6 +88,13 @@ namespace pdfpc.Metadata {
         protected uint duration;
 
         /**
+         * The font size used for notes. -1 if none is
+         * specified in pdfpc file.
+         */
+        private int _font_size = -1;
+        public int font_size { get { return _font_size; } set { _font_size = value; } }
+
+        /**
          * Parse the given pdfpc file
          */
         void parse_pdfpc_file(out string? skip_line) {
@@ -125,6 +132,10 @@ namespace pdfpc.Metadata {
                         }
                         case "[notes]": {
                             notes.parse_lines(section_content.split("\n"));
+                            break;
+                        }
+                        case "[font_size]": {
+                            this.font_size = int.parse(section_content);
                             break;
                         }
                         default: {
@@ -193,6 +204,7 @@ namespace pdfpc.Metadata {
             string contents =   format_duration()
                               + format_skips()
                               + format_end_user_slide()
+                              + format_font_size()
                               + format_notes();
             try {
                 if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
@@ -229,6 +241,15 @@ namespace pdfpc.Metadata {
             string contents = "";
             if (this.end_user_slide >= 0) {
                 contents += "[end_user_slide]\n%d\n".printf(this.end_user_slide);
+            }
+
+            return contents;
+        }
+
+        protected string format_font_size() {
+            string contents = "";
+            if (this.font_size >= 0) {
+                contents += "[font_size]\n%d\n".printf(this.font_size);
             }
 
             return contents;
