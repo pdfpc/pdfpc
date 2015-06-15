@@ -160,18 +160,18 @@ namespace pdfpc.Metadata {
         void parse_skip_line(string line) {
             int s = 0; // Counter over real slides
             string[] fields = line.split(",");
-            for ( int f=0; f < fields.length-1; ++f ) {
+            for (int f = 0; f < fields.length - 1; ++f) {
                 if ( fields[f] == "")
                     continue;
-                int current_skip = int.parse( fields[f] ) - 1;
-                while ( s < current_skip ) {
+                int current_skip = int.parse(fields[f]) - 1;
+                while (s < current_skip) {
                     user_view_indexes += s;
                     ++s;
                 }
                 ++s;
             }
             // Now we have to reach the end
-            while ( s < this.page_count ) {
+            while (s < this.page_count) {
                 user_view_indexes += s;
                 ++s;
             }
@@ -231,24 +231,28 @@ namespace pdfpc.Metadata {
          */
         protected string format_skips() {
             string contents = "";
-            if ( this.user_view_indexes.length < this.page_count && this.skips_by_user ) {
+            if (this.user_view_indexes.length < this.page_count && this.skips_by_user) {
                 contents += "[skip]\n";
                 int user_slide = 0;
                 for (int slide = 0; slide < this.page_count; ++slide) {
-                    if (slide != user_view_indexes[user_slide])
+                    if (slide != user_view_indexes[user_slide]) {
                         contents += "%d,".printf(slide + 1);
-                    else
+                    } else {
                         ++user_slide;
+                    }
                 }
                 contents += "\n";
             }
+
             return contents;
         }
 
         protected string format_end_user_slide() {
             string contents = "";
-            if ( this.end_user_slide >= 0 )
+            if (this.end_user_slide >= 0) {
                 contents += "[end_user_slide]\n%d\n".printf(this.end_user_slide);
+            }
+
             return contents;
         }
 
@@ -257,15 +261,19 @@ namespace pdfpc.Metadata {
          */
         protected string format_notes() {
             string contents = "";
-            if ( this.notes.has_notes() )
+            if (this.notes.has_notes()) {
                 contents += ("[notes]\n" + this.notes.format_to_save());
+            }
+
             return contents;
         }
 
         protected string format_duration() {
             string contents = "";
-            if ( this.duration > 0 )
+            if (this.duration > 0) {
                 contents += "[duration]\n%u\n".printf(duration);
+            }
+
             return contents;
         }
 
@@ -284,15 +292,14 @@ namespace pdfpc.Metadata {
                             break;
                     }
                 }
-                //page.free_annot_mapping(anns);
             }
         }
 
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf( string fname, NotesPosition notes_position ) {
-            base( fname );
+        public Pdf(string fname, NotesPosition notes_position) {
+            base(fname);
 
             this.notes_position = notes_position;
 
@@ -307,7 +314,7 @@ namespace pdfpc.Metadata {
             // Cache some often used values to minimize thread locking in the
             // future.
             this.page_count = this.document.get_n_pages();
-            this.document.get_page( 0 ).get_size(
+            this.document.get_page(0).get_size(
                 out this.original_page_width,
                 out this.original_page_height
             );
@@ -316,7 +323,7 @@ namespace pdfpc.Metadata {
                 // Auto-detect which pages to skip
                 string previous_label = null;
                 int user_pages = 0;
-                for ( int i = 0; i < this.page_count; ++i ) {
+                for (int i = 0; i < this.page_count; ++i) {
                     string this_label = this.document.get_page(i).label;
                     if (this_label != previous_label) {
                         this.user_view_indexes += i;
@@ -372,35 +379,43 @@ namespace pdfpc.Metadata {
          *
          * Returns the offset to move the current user_slide_number
          */
-        public int toggle_skip( int slide_number, int user_slide_number ) {
-            if ( slide_number == 0 )
+        public int toggle_skip(int slide_number, int user_slide_number) {
+            if (slide_number == 0) {
                 return 0; // We cannot skip the first slide
+            }
             skips_by_user = true;
             int converted_user_slide = user_slide_to_real_slide(user_slide_number);
             int offset;
             int l = this.user_view_indexes.length;
             if (converted_user_slide == slide_number) { // Activate skip
                 int[] new_indexes = new int[ l-1 ];
-                for ( int i=0; i<user_slide_number; ++i)
+                for (int i = 0; i < user_slide_number; ++i) {
                     new_indexes[i] = this.user_view_indexes[i];
-                for ( int i=user_slide_number+1; i<l; ++i)
+                }
+                for (int i = user_slide_number + 1; i < l; ++i) {
                     new_indexes[i-1] = this.user_view_indexes[i];
+                }
                 this.user_view_indexes = new_indexes;
-                if ( this.end_user_slide >= 0 && user_slide_number < this.end_user_slide )
+                if (this.end_user_slide >= 0 && user_slide_number < this.end_user_slide) {
                     --this.end_user_slide;
+                }
                 offset = -1;
             } else { // Deactivate skip
                 int[] new_indexes = new int[ l+1 ];
-                for ( int i=0; i<=user_slide_number; ++i)
+                for (int i = 0; i <= user_slide_number; ++i) {
                     new_indexes[i] = this.user_view_indexes[i];
+                }
                 new_indexes[user_slide_number+1] = slide_number;
-                for ( int i=user_slide_number+1; i<l; ++i)
+                for (int i = user_slide_number+1; i < l; ++i) {
                     new_indexes[i+1] = this.user_view_indexes[i];
+                }
                 this.user_view_indexes = new_indexes;
-                if ( this.end_user_slide >= 0 && user_slide_number < this.end_user_slide )
+                if (this.end_user_slide >= 0 && user_slide_number < this.end_user_slide) {
                     ++this.end_user_slide;
+                }
                 offset = +1;
             }
+
             return offset;
         }
 
@@ -408,10 +423,11 @@ namespace pdfpc.Metadata {
          * Transform from user slide numbers to real slide numbers
          */
         public int user_slide_to_real_slide(int number) {
-            if ( number < user_view_indexes.length )
+            if (number < user_view_indexes.length) {
                 return this.user_view_indexes[number];
-            else
+            } else {
                 return (int)this.page_count;
+            }
         }
 
         public int real_slide_to_user_slide(int number) {
@@ -427,6 +443,7 @@ namespace pdfpc.Metadata {
                     break;
                 }
             }
+
             return user_slide;
         }
 
@@ -553,8 +570,8 @@ namespace pdfpc.Metadata {
                     file.get_uri(),
                     null
                 );
-            } catch( GLib.Error e ) {
-                GLib.printerr( "Unable to open pdf file: %s\n", e.message );
+            } catch(GLib.Error e) {
+                GLib.printerr("Unable to open pdf file: %s\n", e.message);
                 Posix.exit(1);
             }
 
@@ -576,10 +593,11 @@ namespace pdfpc.Metadata {
          * destroy the existing action mappings and create new mappings for
          * the new page.
          */
-        public unowned GLib.List<ActionMapping> get_action_mapping( int page_num ) {
+        public unowned GLib.List<ActionMapping> get_action_mapping(int page_num) {
             if (page_num != this.mapping_page_num) {
-                foreach (var mapping in this.action_mapping)
+                foreach (var mapping in this.action_mapping) {
                     mapping.deactivate();
+                }
                 this.action_mapping = null; //.Is this really the correct way to clear a list?
 
                 GLib.List<Poppler.LinkMapping> link_mappings;
