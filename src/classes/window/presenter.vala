@@ -125,6 +125,7 @@ namespace pdfpc.Window {
             PresentationController presentation_controller) {
             base(screen_num);
             this.role = "presenter";
+            this.title = "pdfpc - presenter (%s)".printf(metadata.get_document().get_title());
 
             this.destroy.connect((source) => presentation_controller.quit());
 
