@@ -30,8 +30,10 @@ namespace pdfpc {
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-    TimerLabel getTimerLabel(int duration, time_t end_time, uint last_minutes = 0, time_t start_time = 0) {
-        if (end_time > 0) {
+    TimerLabel getTimerLabel(int duration, time_t end_time, uint last_minutes = 0, time_t start_time = 0, bool clock_time = false) {
+        if (clock_time) {
+            return new TimeOfDayTimer();
+        } else if (end_time > 0) {
             return new EndTimeTimer(end_time, last_minutes, start_time);
         } else if (duration > 0) {
             return new CountdownTimer(duration, last_minutes, start_time);
@@ -98,7 +100,7 @@ namespace pdfpc {
         /**
          * Pauses the timer if it's running. Returns if the timer is paused.
          */
-        public bool pause() {
+        public virtual bool pause() {
             bool paused = false;
             if (this.time > 0) { // In pretalk mode it doesn't make much sense to pause
                 if (this.timeout != 0) {
@@ -114,7 +116,7 @@ namespace pdfpc {
         /**
          * Returns if the timer is paused
          */
-        public bool is_paused() {
+        public virtual bool is_paused() {
             return (this.time > 0 && this.timeout == 0);
         }
 
@@ -144,7 +146,7 @@ namespace pdfpc {
          *
          * Time can be negative if the talk begins in future.
          */
-        protected void update_time() {
+        protected virtual void update_time() {
             time_t now = GLib.Time.local(time_t()).mktime();
             this.time =  (int)(now - this.start_time);
         }
@@ -166,7 +168,7 @@ namespace pdfpc {
         /**
          * Shows a time (in seconds) in hh:mm:ss format, with an additional prefix
          */
-        protected void show_time(uint timeInSecs, string prefix) {
+        protected virtual void show_time(uint timeInSecs, string prefix) {
             uint hours, minutes, seconds;
 
             hours = timeInSecs / 60 / 60;
@@ -299,6 +301,57 @@ namespace pdfpc {
                 context.remove_class("pretalk");
             }
             this.show_time(timeInSecs, prefix);
+        }
+    }
+
+    public class TimeOfDayTimer : TimerLabel {
+        /**
+         * Just start the timer if is not running
+         */
+        public override void start() {
+            if (this.timeout == 0) {
+                this.timeout = GLib.Timeout.add(1000, this.on_timeout);
+            }
+            this.format_time();
+        }
+
+        public override void stop() {
+            if (this.timeout != 0) {
+                Source.remove(this.timeout);
+                this.timeout = 0;
+            }
+        }
+
+        /**
+         * This timer label cannot be paused, since
+         * it does not make any sense.
+         */
+        public override bool pause() {
+            return false;
+        }
+
+        /*
+         * Cannot be paused
+         */
+        public override bool is_paused() {
+            return false;
+        }
+
+        /**
+         * Start it if necessary
+         */
+        public override void reset() {
+            this.start();
+        }
+
+        protected override void update_time() {
+            // NOOP
+        }
+
+        protected override void format_time() {
+            GLib.Time now = GLib.Time.local(time_t());
+            uint timeInSecs = now.second + now.minute*60 + now.hour*60*60;
+            this.show_time(timeInSecs, "");
         }
     }
 }
