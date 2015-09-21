@@ -79,6 +79,7 @@ namespace pdfpc {
             { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presenter console in width:height format (forces windowed mode)", null},
             { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
             { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
+            { "fontscale", 'f', 0, OptionArg.DOUBLE, ref Options.fontscale, "Scale timer font by fontscale (for high DPI screens)", null },
             { null }
         };
 
@@ -159,8 +160,8 @@ namespace pdfpc {
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presenter create_presenter_window( Metadata.Pdf metadata, int monitor ) {
-            var presenter_window = new Window.Presenter( metadata, monitor, this.controller );
+        private Window.Presenter create_presenter_window( Metadata.Pdf metadata, int monitor, double fontscale ) {
+            var presenter_window = new Window.Presenter( metadata, monitor, fontscale, this.controller );
             //controller.register_controllable( presenter_window );
             presenter_window.set_cache_observer( this.cache_status );
 
@@ -262,18 +263,18 @@ namespace pdfpc {
                     presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
                 presentation_monitor = (presenter_monitor + 1) % 2;
                 this.presenter_window =
-                    this.create_presenter_window( metadata, presenter_monitor );
+				this.create_presenter_window( metadata, presenter_monitor, Options.fontscale );
                 this.presentation_window =
                     this.create_presentation_window( metadata, presentation_monitor, width, height );
             } else if (Options.windowed && !Options.single_screen) {
                 this.presenter_window =
-                    this.create_presenter_window( metadata, -1 );
+				this.create_presenter_window( metadata, -1, Options.fontscale );
                 this.presentation_window =
                     this.create_presentation_window( metadata, -1, width, height );
             } else {
                     if ( !Options.display_switch)
                         this.presenter_window =
-                            this.create_presenter_window( metadata, -1 );
+					this.create_presenter_window( metadata, -1, Options.fontscale );
                     else
                         this.presentation_window =
                             this.create_presentation_window( metadata, -1, width, height );
