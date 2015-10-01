@@ -3,5 +3,5 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pdfpc.in ${CMAKE_CURRENT_SOURCE_DIR}/
 install(FILES
     pdfpc.1
 DESTINATION
-    share/man/man1
+    ${MANDIR}
 )
