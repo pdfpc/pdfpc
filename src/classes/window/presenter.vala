@@ -219,9 +219,9 @@ namespace pdfpc.Window {
             }
 
             // Initial font needed for the labels
-            // We approximate the point size using pt = px * .75
             var font = Pango.FontDescription.from_string("Verdana");
-            font.set_size((int) Math.floor(bottom_height * 0.8 * 0.75) * Pango.SCALE);
+            var absoluteSize = Math.floor(bottom_height * 0.6 * Pango.SCALE);
+            font.set_absolute_size(absoluteSize);
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
@@ -360,10 +360,11 @@ namespace pdfpc.Window {
             this.timer.valign = Gtk.Align.CENTER;
 
             var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            progress_alignment.expand = false;
             progress_alignment.pack_end(this.slide_progress);
             this.prerender_progress.vexpand = false;
             this.prerender_progress.valign = Gtk.Align.CENTER;
-            progress_alignment.pack_start(this.prerender_progress, true, true, 0);
+            progress_alignment.pack_end(this.prerender_progress, true, true, 0);
 
             bottom_row.pack_start(status, true, true, 0);
             bottom_row.pack_start(this.timer, true, true, 0);
