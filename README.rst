@@ -111,14 +111,36 @@ building the application::
 
 Congratulations you just installed pdfpc on your system.
 
-Compiling Trouble Shooting
---------------------------
+Troubleshooting
+===============
+
+valac is not found during cmake
+-------------------------------
 
 Some distributions do not have a *valac* executable. Instead they ship with a
 version suffix like *valac-0.28*. If cmake can not find your compiler you can
 try running cmake with::
 
     cmake -DVALA_EXECUTABLE:NAMES=valac-0.28 ..
+
+Fullscreen problems using awesome window manager
+------------------------------------------------
+
+You can setup some awesome rules to force fullscreen mode of the pdfpc windows
+and move them to the appropriate monitors. See issue #79.
+
+    { rule = { class = "Pdfpc-git", role = "presentation" },
+    properties = {opacity = 1 },
+    callback = function(c)
+        --awful.client.movetoscreen
+        awful.client.movetotag(tags[1][9],
+        c)
+        awful.client.movetoscreen(c)
+        end},
+
+    --presenter console
+    { rule = { class = "Pdfpc-git", role = "presenter" },
+    properties = { tag = tags[1][9], switchtotag = true, opacity = 1} },
 
 How to go on
 ============
