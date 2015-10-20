@@ -90,6 +90,11 @@ namespace pdfpc {
         public static string? start_time = null;
 
         /**
+         * Use the current time of the day as a timer
+         */
+        public static bool use_time_of_day = false;
+
+        /**
          * Time the talk should end
          */
         public static string? end_time = null;
@@ -108,7 +113,7 @@ namespace pdfpc {
          * Position of notes on slides
          */
         public static string? notes_position = null;
-        
+
         /**
          * Size of the presenter window
          */

@@ -208,7 +208,7 @@ namespace pdfpc {
                 this.metadata.set_duration(0);
             }
             this.timer = getTimerLabel((int) this.metadata.get_duration() * 60,
-                end_time, Options.last_minutes, start_time);
+                end_time, Options.last_minutes, start_time, Options.use_time_of_day);
             this.timer.reset();
 
             this.n_slides = (int) this.metadata.get_slide_count();

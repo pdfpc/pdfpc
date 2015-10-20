@@ -30,13 +30,16 @@ namespace pdfpc {
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-    TimerLabel getTimerLabel( int duration, time_t end_time, uint last_minutes = 0, time_t start_time = 0 ) {
-        if ( end_time > 0 )
-            return new EndTimeTimer( end_time, last_minutes, start_time );
-        else if ( duration > 0 )
-            return new CountdownTimer( duration, last_minutes, start_time );
-        else
-            return new CountupTimer( start_time );
+    TimerLabel getTimerLabel(int duration, time_t end_time, uint last_minutes = 0, time_t start_time = 0, bool clock_time = false) {
+        if (clock_time) {
+            return new TimeOfDayTimer();
+        } else if (end_time > 0) {
+            return new EndTimeTimer(end_time, last_minutes, start_time);
+        } else if (duration > 0) {
+            return new CountdownTimer(duration, last_minutes, start_time);
+        } else {
+            return new CountupTimer(start_time);
+        }
     }
 
     /**
@@ -63,12 +66,8 @@ namespace pdfpc {
         /**
          * Default constructor taking the initial time as argument, as well as
          * the time to countdown until the talk actually starts.
-         *
-         * The second argument is optional. If no countdown_time is specified
-         * the countdown will be disabled. The timer is paused in such a case
-         * at the given intial_time.
          */
-        public TimerLabel( time_t start_time = 0 ) {
+        public TimerLabel(time_t start_time = 0) {
             this.start_time = start_time;
         }
 
@@ -76,14 +75,14 @@ namespace pdfpc {
          * Start the timer
          */
         public virtual void start() {
-            if ( this.timeout != 0 && this.time < 0 ) {
+            if (this.timeout != 0 && this.time < 0) {
                 // We are in pretalk, with timeout already running.
                 // Jump to talk mode
-                this.start_time = GLib.Time.local( time_t() ).mktime(); // now
-            } else if ( this.timeout == 0 ) {
+                this.start_time = GLib.Time.local(time_t()).mktime(); // now
+            } else if (this.timeout == 0) {
                 // Start the timer if it is not running
-                this.start_time = GLib.Time.local( time_t() - this.time ).mktime();
-                this.timeout = GLib.Timeout.add( 1000, this.on_timeout );
+                this.start_time = GLib.Time.local(time_t() - this.time).mktime();
+                this.timeout = GLib.Timeout.add(1000, this.on_timeout);
             }
             this.update_time();
         }
@@ -92,8 +91,8 @@ namespace pdfpc {
          * Stop the timer
          */
         public virtual void stop() {
-            if ( this.timeout != 0 ) {
-                Source.remove( this.timeout );
+            if (this.timeout != 0) {
+                Source.remove(this.timeout);
                 this.timeout = 0;
             }
         }
@@ -101,10 +100,10 @@ namespace pdfpc {
         /**
          * Pauses the timer if it's running. Returns if the timer is paused.
          */
-        public bool pause() {
+        public virtual bool pause() {
             bool paused = false;
-            if ( this.time > 0 ) { // In pretalk mode it doesn't make much sense to pause
-                if ( this.timeout != 0 ) {
+            if (this.time > 0) { // In pretalk mode it doesn't make much sense to pause
+                if (this.timeout != 0) {
                     this.stop();
                     paused = true;
                 } else {
@@ -117,7 +116,7 @@ namespace pdfpc {
         /**
          * Returns if the timer is paused
          */
-        public bool is_paused() {
+        public virtual bool is_paused() {
             return (this.time > 0 && this.timeout == 0);
         }
 
@@ -134,10 +133,11 @@ namespace pdfpc {
         public virtual void reset() {
             this.stop();
             this.update_time();
-            if ( this.time < 0 )
+            if (this.time < 0) {
                 this.start();
-            else
+            } else {
                 this.time = 0;
+            }
             this.format_time();
         }
 
@@ -146,10 +146,9 @@ namespace pdfpc {
          *
          * Time can be negative if the talk begins in future.
          */
-        protected void update_time()
-        {
-            time_t now = GLib.Time.local( time_t() ).mktime();
-            this.time =  (int)( now - this.start_time );
+        protected virtual void update_time() {
+            time_t now = GLib.Time.local(time_t()).mktime();
+            this.time =  (int)(now - this.start_time);
         }
 
         /**
@@ -169,7 +168,7 @@ namespace pdfpc {
         /**
          * Shows a time (in seconds) in hh:mm:ss format, with an additional prefix
          */
-        protected void show_time(uint timeInSecs, string prefix) {
+        protected virtual void show_time(uint timeInSecs, string prefix) {
             uint hours, minutes, seconds;
 
             hours = timeInSecs / 60 / 60;
@@ -199,7 +198,7 @@ namespace pdfpc {
          */
         protected uint last_minutes = 5;
 
-        public CountdownTimer( int duration, uint last_minutes, time_t start_time = 0 ) {
+        public CountdownTimer(int duration, uint last_minutes, time_t start_time = 0) {
             base(start_time);
             this.duration = duration;
             this.last_minutes = last_minutes;
@@ -219,17 +218,16 @@ namespace pdfpc {
             // sign is not needed and the prefix is just an empty string.
             string prefix = "";
             Gtk.StyleContext context = this.get_style_context();
-            if ( this.time < 0 ) // pretalk
-            {
+            if (this.time < 0) { // pretalk
                 prefix = "-";
                 timeInSecs = -this.time;
                 context.add_class("pretalk");
             } else {
                 context.remove_class("pretalk");
-                if ( this.time < this.duration ) {
+                if (this.time < this.duration) {
                     timeInSecs = duration - this.time;
                     // Still on presentation time
-                    if ( timeInSecs < this.last_minutes * 60 )
+                    if (timeInSecs < this.last_minutes * 60)
                         context.add_class("last-minutes");
                 } else {
                     // Time is over!
@@ -251,7 +249,7 @@ namespace pdfpc {
         protected time_t end_time;
         protected GLib.Time end_time_object;
 
-        public EndTimeTimer( time_t end_time, uint last_minutes, time_t start_time = 0 ) {
+        public EndTimeTimer(time_t end_time, uint last_minutes, time_t start_time = 0) {
             base(1000, last_minutes, start_time);
             this.end_time = end_time;
             this.end_time_object = GLib.Time.local(end_time);
@@ -269,13 +267,14 @@ namespace pdfpc {
 
         public override void reset() {
             base.reset();
-            if ( this.timeout == 0 )
+            if (this.timeout == 0) {
                 this.set_text(this.end_time_object.format("Until %H:%M"));
+            }
         }
     }
 
     public class CountupTimer : TimerLabel {
-        public CountupTimer( time_t start_time = 0 ) {
+        public CountupTimer(time_t start_time = 0) {
             base(start_time);
         }
 
@@ -293,8 +292,7 @@ namespace pdfpc {
             // sign is not needed and the prefix is just an empty string.
             string prefix = "";
             Gtk.StyleContext context = this.get_style_context();
-            if ( this.time < 0 ) // pretalk
-            {
+            if (this.time < 0) { // pretalk
                 prefix = "-";
                 timeInSecs = -this.time;
                 context.add_class("pretalk");
@@ -303,6 +301,57 @@ namespace pdfpc {
                 context.remove_class("pretalk");
             }
             this.show_time(timeInSecs, prefix);
+        }
+    }
+
+    public class TimeOfDayTimer : TimerLabel {
+        /**
+         * Just start the timer if is not running
+         */
+        public override void start() {
+            if (this.timeout == 0) {
+                this.timeout = GLib.Timeout.add(1000, this.on_timeout);
+            }
+            this.format_time();
+        }
+
+        public override void stop() {
+            if (this.timeout != 0) {
+                Source.remove(this.timeout);
+                this.timeout = 0;
+            }
+        }
+
+        /**
+         * This timer label cannot be paused, since
+         * it does not make any sense.
+         */
+        public override bool pause() {
+            return false;
+        }
+
+        /*
+         * Cannot be paused
+         */
+        public override bool is_paused() {
+            return false;
+        }
+
+        /**
+         * Start it if necessary
+         */
+        public override void reset() {
+            this.start();
+        }
+
+        protected override void update_time() {
+            // NOOP
+        }
+
+        protected override void format_time() {
+            GLib.Time now = GLib.Time.local(time_t());
+            uint timeInSecs = now.second + now.minute*60 + now.hour*60*60;
+            this.show_time(timeInSecs, "");
         }
     }
 }

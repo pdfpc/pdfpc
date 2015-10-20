@@ -1,4 +1,4 @@
-.TH  pdfpc "1" "May 2015"
+.TH  pdfpc "1" "October 2015"
 .if !dURL \{\
 .de URL
 \\$2 \(laURL: \\$1 \(ra\\$3
@@ -49,6 +49,9 @@ Time in minutes, from which on the timer changes its color. (Default 5 minutes)
 .TP
 .BI "\-t, \-\-start\-time"=T
 Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
+.TP
+.BI "\-C, \-\-time\-of\-day
+Display the time of the day
 .TP
 .BI "\-u, \-\-current\-size"=N
 Percentage of the presenter screen to be used for the current slide.  (Default 60)
