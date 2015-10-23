@@ -123,5 +123,10 @@ namespace pdfpc {
          * Flag if the version string should be printed on startup
          */
         public static bool version = false;
+
+        /**
+         * Scale factor for timer-fonts in presenter window
+         */
+        public static double fontscale = 1.0;
     }
 }
