@@ -119,6 +119,11 @@ namespace pdfpc.Window {
         protected Metadata.Pdf metadata;
 
         /**
+         * Width of next/notes area
+         **/
+        protected int next_allocated_width;
+
+        /**
          * Base constructor instantiating a new presenter window
          */
         public Presenter(Metadata.Pdf metadata, int screen_num,
@@ -154,7 +159,7 @@ namespace pdfpc.Window {
             this.current_view = new View.Pdf.from_metadata(
                 metadata,
                 current_allocated_width,
-                (int) Math.floor(0.8 * bottom_position),
+                (int) Math.floor(Options.current_height * bottom_position / (double) 100),
                 Metadata.Area.NOTES,
                 Options.black_on_end,
                 true,
@@ -169,11 +174,12 @@ namespace pdfpc.Window {
             //current_allocated_width = cv_requisition.width;
             Gdk.Rectangle next_scale_rect;
             var next_allocated_width = this.screen_geometry.width - current_allocated_width - 4;
+            this.next_allocated_width = next_allocated_width;
             // We leave a bit of margin between the two views
             this.next_view = new View.Pdf.from_metadata(
                 metadata,
                 next_allocated_width,
-                (int) Math.floor(0.7 * bottom_position),
+                (int) Math.floor(Options.next_height * bottom_position / (double)100 ),
                 Metadata.Area.CONTENT,
                 true,
                 false,
@@ -206,6 +212,7 @@ namespace pdfpc.Window {
             var notes_font = Pango.FontDescription.from_string("Verdana");
             notes_font.set_size((int) Math.floor(20 * 0.75) * Pango.SCALE);
             this.notes_view = new Gtk.TextView();
+            this.notes_view.set_size_request(next_allocated_width, -1);
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
@@ -326,10 +333,12 @@ namespace pdfpc.Window {
             slide_views.pack_start(current_view_and_stricts, true, true, 0);
 
             var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            nextViewWithNotes.set_size_request(this.next_allocated_width, -1);
             this.next_view.halign = Gtk.Align.CENTER;
             this.next_view.valign = Gtk.Align.CENTER;
             nextViewWithNotes.pack_start(next_view, false, false, 0);
             var notes_sw = new Gtk.ScrolledWindow(null, null);
+            notes_sw.set_size_request(this.next_allocated_width, -1);
             notes_sw.add(this.notes_view);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
             nextViewWithNotes.pack_start(notes_sw, true, true, 5);

@@ -56,6 +56,12 @@ Display the time of the day
 .BI "\-u, \-\-current\-size"=N
 Percentage of the presenter screen to be used for the current slide.  (Default 60)
 .TP
+.BI "\-\-current\-height"=N
+Percentage of the height of the presenter screen to be used for the current slide. (Default 80)
+.TP
+.BI "\-\-next\-height"=N
+Percentage of the height of the presenter screen to be used for the next slide. (Default 70)
+.TP
 .BI "\-o, \-\-overview\-min\-size"=N
 Minimum width for the overview miniatures, in pixels. (Default 150)
 .TP
