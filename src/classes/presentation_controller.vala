@@ -109,6 +109,16 @@ namespace pdfpc {
         public signal void hide_overview_request();
 
         /**
+         * Signal: Increase font sizes
+         */
+        public signal void increase_font_size_request();
+
+        /**
+         * Signal: Decrease font sizes
+         */
+        public signal void decrease_font_size_request();
+
+        /**
          * A flag signaling if we allow for a black slide at the end. Tis is
          * useful for the next view and (for some presenters) also for the main
          * view.
@@ -279,6 +289,9 @@ namespace pdfpc {
             add_action("note", this.controllables_edit_note);
             add_action("endSlide", this.set_end_user_slide);
 
+            add_action("increaseFontSize", this.increase_font_size);
+            add_action("decreaseFontSize", this.decrease_font_size);
+
             add_action("exitState", this.exit_state);
             add_action("quit", this.quit);
         }
@@ -317,6 +330,8 @@ namespace pdfpc {
                 "overlay", "Mark current slide as overlay slide",
                 "note", "Edit note for current slide",
                 "endSlide", "Set current slide as end slide",
+                "increaseFontSize", "Increase the current font size by 10%",
+                "decreaseFontSize", "Decrease the current font size by 10%",
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
                 "quit", "Exit pdfpc"
             };
@@ -860,6 +875,14 @@ namespace pdfpc {
          */
         protected void reset_timer() {
             this.timer.reset();
+        }
+
+        protected void increase_font_size() {
+            this.increase_font_size_request();
+        }
+
+        protected void decrease_font_size() {
+            this.decrease_font_size_request();
         }
 
         protected void exit_state() {

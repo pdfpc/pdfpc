@@ -33,7 +33,7 @@ namespace pdfpc.Metadata {
     {
         protected string? pdf_fname = null;
         public string? pdf_url = null;
-        protected string? pdfpc_url = null;
+        protected string? pdfpc_fname = null;
 
         /**
          * Poppler document which belongs to the associated pdf file
@@ -88,16 +88,11 @@ namespace pdfpc.Metadata {
         protected uint duration;
 
         /**
-         * The parsing states for the pdfpc file
+         * The font size used for notes. -1 if none is
+         * specified in pdfpc file.
          */
-        enum ParseState {
-            FILE,
-            SKIP,
-            DURATION,
-            END_USER_SLIDE,
-            NOTES,
-            NOTHING
-        }
+        private int _font_size = -1;
+        public int font_size { get { return _font_size; } set { _font_size = value; } }
 
         /**
          * Parse the given pdfpc file
@@ -105,46 +100,46 @@ namespace pdfpc.Metadata {
         void parse_pdfpc_file(out string? skip_line) {
             skip_line = null;
             try {
-                var file = File.new_for_uri(this.pdfpc_url);
-                uint8[] raw_datau8;
-                file.load_contents(null, out raw_datau8, null);
-                string[] lines = ((string) raw_datau8).split("\n");
-                ParseState state = ParseState.NOTHING;
-                for (int i=0; i < lines.length; ++i) {
-                    string l = lines[i].strip();
-                    if (l == "")
-                        continue;
-                    if (l == "[file]")
-                        state = ParseState.FILE;
-                    else if (l == "[skip]")
-                        state = ParseState.SKIP;
-                    else if (l == "[duration]")
-                        state = ParseState.DURATION;
-                    else if (l == "[end_user_slide]")
-                        state = ParseState.END_USER_SLIDE;
-                    else if (l == "[notes]") {
-                        notes.parse_lines(lines[i+1:lines.length]);
-                        break;
-                    } else {
-                        // How this line should be interpreted depends on the state
-                        switch (state) {
-                        case ParseState.FILE:
-                            this.pdf_fname = l;
-                            var pdffile = file.get_parent().get_child(this.pdf_fname);
-                            this.pdf_url = pdffile.get_uri();
-                            state = ParseState.NOTHING;
+                string content;
+                GLib.FileUtils.get_contents(this.pdfpc_fname, out content);
+                GLib.Regex regex = new GLib.Regex("(\\[[A-Za-z_]+\\])");
+
+                string[] config_sections = regex.split_full(content);
+                // config_sections[0] is empty
+                // config_sections[i] = [section_name]
+                // config_sections[i + 1] = section_content
+                for (int i = 1; i < config_sections.length; i += 2) {
+                    string section_type =  config_sections[i].strip();
+                    string section_content =  config_sections[i + 1].strip();
+
+                    switch (section_type) {
+                        case "[file]": {
+                            this.pdf_fname = section_content;
                             break;
-                        case ParseState.SKIP:
-                            // This must be delayed until we know how many pages we have in the document
-                            skip_line = l;
+                        }
+                        case "[skip]": {
+                            skip_line = section_content;
                             skips_by_user = true;
-                            state = ParseState.NOTHING;
                             break;
-                        case ParseState.DURATION:
-                            this.duration = int.parse(l);
+                        }
+                        case "[duration]": {
+                            this.duration = int.parse(section_content);
                             break;
-                        case ParseState.END_USER_SLIDE:
-                            this.end_user_slide = int.parse(l);
+                        }
+                        case "[end_user_slide]": {
+                            this.end_user_slide = int.parse(section_content);
+                            break;
+                        }
+                        case "[notes]": {
+                            notes.parse_lines(section_content.split("\n"));
+                            break;
+                        }
+                        case "[font_size]": {
+                            this.font_size = int.parse(section_content);
+                            break;
+                        }
+                        default: {
+                            GLib.printerr("unknown section type %s\n", section_type);
                             break;
                         }
                     }
@@ -160,18 +155,18 @@ namespace pdfpc.Metadata {
         void parse_skip_line(string line) {
             int s = 0; // Counter over real slides
             string[] fields = line.split(",");
-            for ( int f=0; f < fields.length-1; ++f ) {
+            for (int f = 0; f < fields.length - 1; ++f) {
                 if ( fields[f] == "")
                     continue;
-                int current_skip = int.parse( fields[f] ) - 1;
-                while ( s < current_skip ) {
+                int current_skip = int.parse(fields[f]) - 1;
+                while (s < current_skip) {
                     user_view_indexes += s;
                     ++s;
                 }
                 ++s;
             }
             // Now we have to reach the end
-            while ( s < this.page_count ) {
+            while (s < this.page_count) {
                 user_view_indexes += s;
                 ++s;
             }
@@ -182,18 +177,13 @@ namespace pdfpc.Metadata {
          */
         void fill_path_info(string fname) {
             int l = fname.length;
-            var file = File.new_for_commandline_arg(fname);
 
-            if (fname.length < 6 || fname[l-6:l] != ".pdfpc") {
-                this.pdf_fname = file.get_basename();
-                this.pdf_url = file.get_uri();
-                string pdf_basefname = file.get_basename();
-                int extension_index = pdf_basefname.last_index_of(".");
-                string pdfpc_basefname = pdf_basefname[0:extension_index] + ".pdfpc";
-                var pdfpc_file = file.get_parent().get_child(pdfpc_basefname);
-                this.pdfpc_url = pdfpc_file.get_uri();
+            if (l > 6 && fname[l-6:l] != ".pdfpc") {
+                this.pdf_fname = fname;
+                int extension_index = fname.last_index_of(".");
+                this.pdfpc_fname = fname[0:extension_index] + ".pdfpc";
             } else {
-                this.pdfpc_url = file.get_uri();
+                this.pdfpc_fname = fname;
             }
         }
 
@@ -214,12 +204,12 @@ namespace pdfpc.Metadata {
             string contents =   format_duration()
                               + format_skips()
                               + format_end_user_slide()
+                              + format_font_size()
                               + format_notes();
             try {
-                var pdfpc_file = File.new_for_uri(this.pdfpc_url);
-                if (contents != "" || pdfpc_file.query_exists()) {
+                if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                     contents = "[file]\n" + this.pdf_fname + "\n" + contents;
-                    pdfpc_file.replace_contents(contents.data, null, false, FileCreateFlags.NONE, null);
+                    GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
             } catch (Error e) {
                 error("%s", e.message);
@@ -231,24 +221,37 @@ namespace pdfpc.Metadata {
          */
         protected string format_skips() {
             string contents = "";
-            if ( this.user_view_indexes.length < this.page_count && this.skips_by_user ) {
+            if (this.user_view_indexes.length < this.page_count && this.skips_by_user) {
                 contents += "[skip]\n";
                 int user_slide = 0;
                 for (int slide = 0; slide < this.page_count; ++slide) {
-                    if (slide != user_view_indexes[user_slide])
+                    if (slide != user_view_indexes[user_slide]) {
                         contents += "%d,".printf(slide + 1);
-                    else
+                    } else {
                         ++user_slide;
+                    }
                 }
                 contents += "\n";
             }
+
             return contents;
         }
 
         protected string format_end_user_slide() {
             string contents = "";
-            if ( this.end_user_slide >= 0 )
+            if (this.end_user_slide >= 0) {
                 contents += "[end_user_slide]\n%d\n".printf(this.end_user_slide);
+            }
+
+            return contents;
+        }
+
+        protected string format_font_size() {
+            string contents = "";
+            if (this.font_size >= 0) {
+                contents += "[font_size]\n%d\n".printf(this.font_size);
+            }
+
             return contents;
         }
 
@@ -257,15 +260,19 @@ namespace pdfpc.Metadata {
          */
         protected string format_notes() {
             string contents = "";
-            if ( this.notes.has_notes() )
+            if (this.notes.has_notes()) {
                 contents += ("[notes]\n" + this.notes.format_to_save());
+            }
+
             return contents;
         }
 
         protected string format_duration() {
             string contents = "";
-            if ( this.duration > 0 )
+            if (this.duration > 0) {
                 contents += "[duration]\n%u\n".printf(duration);
+            }
+
             return contents;
         }
 
@@ -284,15 +291,14 @@ namespace pdfpc.Metadata {
                             break;
                     }
                 }
-                //page.free_annot_mapping(anns);
             }
         }
 
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf( string fname, NotesPosition notes_position ) {
-            base( fname );
+        public Pdf(string fname, NotesPosition notes_position) {
+            base(fname);
 
             this.notes_position = notes_position;
 
@@ -300,14 +306,15 @@ namespace pdfpc.Metadata {
             notes = new slides_notes();
             skips_by_user = false;
             string? skip_line = null;
-            if (File.new_for_uri(this.pdfpc_url).query_exists())
+            if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                 parse_pdfpc_file(out skip_line);
-            this.document = this.open_pdf_document( this.pdf_url );
+            }
+            this.document = this.open_pdf_document(this.pdf_fname);
 
             // Cache some often used values to minimize thread locking in the
             // future.
             this.page_count = this.document.get_n_pages();
-            this.document.get_page( 0 ).get_size(
+            this.document.get_page(0).get_size(
                 out this.original_page_width,
                 out this.original_page_height
             );
@@ -316,7 +323,7 @@ namespace pdfpc.Metadata {
                 // Auto-detect which pages to skip
                 string previous_label = null;
                 int user_pages = 0;
-                for ( int i = 0; i < this.page_count; ++i ) {
+                for (int i = 0; i < this.page_count; ++i) {
                     string this_label = this.document.get_page(i).label;
                     if (this_label != previous_label) {
                         this.user_view_indexes += i;
@@ -372,35 +379,43 @@ namespace pdfpc.Metadata {
          *
          * Returns the offset to move the current user_slide_number
          */
-        public int toggle_skip( int slide_number, int user_slide_number ) {
-            if ( slide_number == 0 )
+        public int toggle_skip(int slide_number, int user_slide_number) {
+            if (slide_number == 0) {
                 return 0; // We cannot skip the first slide
+            }
             skips_by_user = true;
             int converted_user_slide = user_slide_to_real_slide(user_slide_number);
             int offset;
             int l = this.user_view_indexes.length;
             if (converted_user_slide == slide_number) { // Activate skip
                 int[] new_indexes = new int[ l-1 ];
-                for ( int i=0; i<user_slide_number; ++i)
+                for (int i = 0; i < user_slide_number; ++i) {
                     new_indexes[i] = this.user_view_indexes[i];
-                for ( int i=user_slide_number+1; i<l; ++i)
+                }
+                for (int i = user_slide_number + 1; i < l; ++i) {
                     new_indexes[i-1] = this.user_view_indexes[i];
+                }
                 this.user_view_indexes = new_indexes;
-                if ( this.end_user_slide >= 0 && user_slide_number < this.end_user_slide )
+                if (this.end_user_slide >= 0 && user_slide_number < this.end_user_slide) {
                     --this.end_user_slide;
+                }
                 offset = -1;
             } else { // Deactivate skip
                 int[] new_indexes = new int[ l+1 ];
-                for ( int i=0; i<=user_slide_number; ++i)
+                for (int i = 0; i <= user_slide_number; ++i) {
                     new_indexes[i] = this.user_view_indexes[i];
+                }
                 new_indexes[user_slide_number+1] = slide_number;
-                for ( int i=user_slide_number+1; i<l; ++i)
+                for (int i = user_slide_number+1; i < l; ++i) {
                     new_indexes[i+1] = this.user_view_indexes[i];
+                }
                 this.user_view_indexes = new_indexes;
-                if ( this.end_user_slide >= 0 && user_slide_number < this.end_user_slide )
+                if (this.end_user_slide >= 0 && user_slide_number < this.end_user_slide) {
                     ++this.end_user_slide;
+                }
                 offset = +1;
             }
+
             return offset;
         }
 
@@ -408,10 +423,11 @@ namespace pdfpc.Metadata {
          * Transform from user slide numbers to real slide numbers
          */
         public int user_slide_to_real_slide(int number) {
-            if ( number < user_view_indexes.length )
+            if (number < user_view_indexes.length) {
                 return this.user_view_indexes[number];
-            else
+            } else {
                 return (int)this.page_count;
+            }
         }
 
         public int real_slide_to_user_slide(int number) {
@@ -427,6 +443,7 @@ namespace pdfpc.Metadata {
                     break;
                 }
             }
+
             return user_slide;
         }
 
@@ -543,8 +560,8 @@ namespace pdfpc.Metadata {
         /**
          * Open a given pdf document url and return a Poppler.Document for it.
          */
-        protected Poppler.Document open_pdf_document( string url ) {
-            var file = File.new_for_uri( url );
+        protected Poppler.Document open_pdf_document(string fname) {
+            var file = File.new_for_commandline_arg(fname);
 
             Poppler.Document document = null;
 
@@ -553,8 +570,8 @@ namespace pdfpc.Metadata {
                     file.get_uri(),
                     null
                 );
-            } catch( GLib.Error e ) {
-                GLib.printerr( "Unable to open pdf file: %s\n", e.message );
+            } catch(GLib.Error e) {
+                GLib.printerr("Unable to open pdf file: %s\n", e.message);
                 Posix.exit(1);
             }
 
@@ -576,10 +593,11 @@ namespace pdfpc.Metadata {
          * destroy the existing action mappings and create new mappings for
          * the new page.
          */
-        public unowned GLib.List<ActionMapping> get_action_mapping( int page_num ) {
+        public unowned GLib.List<ActionMapping> get_action_mapping(int page_num) {
             if (page_num != this.mapping_page_num) {
-                foreach (var mapping in this.action_mapping)
+                foreach (var mapping in this.action_mapping) {
                     mapping.deactivate();
+                }
                 this.action_mapping = null; //.Is this really the correct way to clear a list?
 
                 GLib.List<Poppler.LinkMapping> link_mappings;

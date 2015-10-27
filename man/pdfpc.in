@@ -136,6 +136,12 @@ Overview mode
 .B g
 Input a slide number to jump to
 .TP
+.B Plus / Equal / KP_Add / Bracket Left
+Increase Notes Font Size
+.TP
+.B Minus / KP_Substract / Bracket Right
+Decrease Notes Font Size
+.TP
 .B Escape / q
 Exit pdfpc
 .TP

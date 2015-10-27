@@ -140,6 +140,8 @@ namespace pdfpc.Window {
             this.presentation_controller.ask_goto_page_request.connect(this.ask_goto_page);
             this.presentation_controller.show_overview_request.connect(this.show_overview);
             this.presentation_controller.hide_overview_request.connect(this.hide_overview);
+            this.presentation_controller.increase_font_size_request.connect(this.increase_font_size);
+            this.presentation_controller.decrease_font_size_request.connect(this.decrease_font_size);
 
             this.metadata = metadata;
 
@@ -209,21 +211,25 @@ namespace pdfpc.Window {
             );
 
             // TextView for notes in the slides
-            var notes_font = Pango.FontDescription.from_string("Verdana");
-            notes_font.set_size((int) Math.floor(20 * 0.75) * Pango.SCALE);
             this.notes_view = new Gtk.TextView();
+            this.notes_view.name = "notesView";
             this.notes_view.set_size_request(next_allocated_width, -1);
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
-            this.notes_view.override_font(notes_font);
             this.notes_view.buffer.text = "";
             this.notes_view.key_press_event.connect(this.on_key_press_notes_view);
+            if (this.metadata.font_size >= 0) {
+                Pango.FontDescription font_desc = get_notes_font_description();
+
+                font_desc.set_size(this.metadata.font_size);
+                this.notes_view.override_font(font_desc);
+            }
 
             // Initial font needed for the labels
-            // We approximate the point size using pt = px * .75
             var font = Pango.FontDescription.from_string("Verdana");
-            font.set_size((int) Math.floor(bottom_height * 0.8 * 0.75) * Pango.SCALE);
+            var absoluteSize = Math.floor(bottom_height * 0.6 * Pango.SCALE);
+            font.set_absolute_size(absoluteSize);
 
             // The countdown timer is centered in the 90% bottom part of the screen
             // It takes 3/4 of the available width
@@ -242,9 +248,9 @@ namespace pdfpc.Window {
             this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);
 
             this.prerender_progress = new Gtk.ProgressBar();
+            this.prerender_progress.name = "prerenderProgress";
             this.prerender_progress.show_text = true;
             this.prerender_progress.text = "Prerendering...";
-            this.prerender_progress.override_font(notes_font);
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
@@ -364,10 +370,11 @@ namespace pdfpc.Window {
             this.timer.valign = Gtk.Align.CENTER;
 
             var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            progress_alignment.expand = false;
             progress_alignment.pack_end(this.slide_progress);
             this.prerender_progress.vexpand = false;
             this.prerender_progress.valign = Gtk.Align.CENTER;
-            progress_alignment.pack_start(this.prerender_progress, true, true, 0);
+            progress_alignment.pack_end(this.prerender_progress, true, true, 0);
 
             bottom_row.pack_start(status, true, true, 0);
             bottom_row.pack_start(this.timer, true, true, 0);
@@ -549,6 +556,38 @@ namespace pdfpc.Window {
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
             this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).cache);
+        }
+
+        /**
+         * Increase font sizes for Widgets
+         */
+        public void increase_font_size() {
+            Pango.FontDescription font_desc = get_notes_font_description();
+
+            int font_size = (int)(font_desc.get_size()*1.1);
+            font_desc.set_size(font_size);
+            this.metadata.font_size = font_size;
+            this.notes_view.override_font(font_desc);
+        }
+
+        /**
+         * Decrease font sizes for Widgets
+         */
+        public void decrease_font_size() {
+            Pango.FontDescription font_desc = get_notes_font_description();
+
+            int font_size = (int)(font_desc.get_size()/1.1);
+            font_desc.set_size(font_size);
+            this.metadata.font_size = font_size;
+            this.notes_view.override_font(font_desc);
+        }
+
+        private Pango.FontDescription get_notes_font_description() {
+            Gtk.StyleContext style_context = this.notes_view.get_style_context();
+            Pango.FontDescription font_desc;
+            style_context.get(style_context.get_state(), "font", out font_desc, null);
+
+            return font_desc;
         }
     }
 }
