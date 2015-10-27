@@ -56,6 +56,7 @@ namespace pdfpc.Window {
             PresentationController presentation_controller, int width = -1, int height = -1) {
             base(screen_num, width, height);
             this.role = "presentation";
+            this.title = "pdfpc - presentation (%s)".printf(metadata.get_document().get_title());
 
             this.destroy.connect((source) => presentation_controller.quit());
 

@@ -79,6 +79,18 @@ namespace pdfpc {
         public static uint current_size = 60;
 
         /**
+         * Commandline option providing the height of the current slide in
+         * the presenter window
+         **/
+        public static uint current_height = 80;
+
+        /**
+         * Commandline option providing the maximum height of the next slide
+         * in the presenter window
+         **/
+        public static uint next_height = 70;
+
+        /**
          * Minimum width for the overview miniatures
          */
         public static int min_overview_width = 150;
@@ -88,6 +100,11 @@ namespace pdfpc {
          * this time.
          */
         public static string? start_time = null;
+
+        /**
+         * Use the current time of the day as a timer
+         */
+        public static bool use_time_of_day = false;
 
         /**
          * Time the talk should end
@@ -108,7 +125,7 @@ namespace pdfpc {
          * Position of notes on slides
          */
         public static string? notes_position = null;
-        
+
         /**
          * Size of the presenter window
          */

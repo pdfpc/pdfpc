@@ -24,7 +24,7 @@ In order to compile and run pdfpc the following
 requirements need to be met:
 
 - CMake Version >=2.6
-- valac >= 0.26
+- vala >= 0.26
 - GTK+ >= 3.10
 - gee 0.8
 - poppler with glib bindings
