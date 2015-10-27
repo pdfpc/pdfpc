@@ -79,6 +79,18 @@ namespace pdfpc {
         public static uint current_size = 60;
 
         /**
+         * Commandline option providing the height of the current slide in
+         * the presenter window
+         **/
+        public static uint current_height = 80;
+
+        /**
+         * Commandline option providing the maximum height of the next slide
+         * in the presenter window
+         **/
+        public static uint next_height = 70;
+
+        /**
          * Minimum width for the overview miniatures
          */
         public static int min_overview_width = 150;
