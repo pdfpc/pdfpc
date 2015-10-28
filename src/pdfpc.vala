@@ -213,7 +213,7 @@ namespace pdfpc {
                 warning("Error: No pdf file given\n");
                 Posix.exit(1);
             } else if (!GLib.FileUtils.test(pdfFilename, (GLib.FileTest.IS_REGULAR))) {
-                warning("Error: pdf file not found\n");
+                warning("Error: pdf file \"%s\" not found\n", pdfFilename);
                 Posix.exit(1);
             }
 

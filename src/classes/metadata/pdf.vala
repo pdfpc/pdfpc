@@ -571,7 +571,8 @@ namespace pdfpc.Metadata {
                     null
                 );
             } catch(GLib.Error e) {
-                GLib.printerr("Unable to open pdf file: %s\n", e.message);
+                GLib.printerr("Unable to open pdf file \"%s\": %s\n",
+                              fname, e.message);
                 Posix.exit(1);
             }
 
