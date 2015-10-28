@@ -456,10 +456,10 @@ namespace pdfpc {
         }
 
         /**
-         * Get the PDF URL
+         * Get the PDF file name
          */
-        public string? get_pdf_url() {
-            return this.metadata.pdf_url;
+        public string? get_pdf_fname() {
+            return this.metadata.pdf_fname;
         }
 
         /**

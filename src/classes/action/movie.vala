@@ -160,7 +160,7 @@ namespace pdfpc {
                     stop = int.parse(param.split("=")[1]);
                 }
             }
-            string uri = filename_to_uri(file, controller.get_pdf_url());
+            string uri = filename_to_uri(file, controller.get_pdf_fname());
             bool uncertain;
             string ctype = GLib.ContentType.guess(uri, null, out uncertain);
             if (!("video" in ctype))
@@ -230,11 +230,11 @@ namespace pdfpc {
                         warning("Movie not embedded and has no file name");
                         return null;
                     }
-                    uri = filename_to_uri(file, controller.get_pdf_url());
+                    uri = filename_to_uri(file, controller.get_pdf_fname());
                     temp = false;
                 }
                 break;
-            
+
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
                 if (movie.need_poster())
@@ -244,10 +244,10 @@ namespace pdfpc {
                     warning("Movie has no file name");
                     return null;
                 }
-                uri = filename_to_uri(file, controller.get_pdf_url());
+                uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
                 break;
-            
+
             default:
                 return null;
             }
@@ -315,9 +315,11 @@ namespace pdfpc {
         }
 
         /**
-         * Utility function for converting filenames to uris.
+         * Utility function for converting filenames to uris. If file
+         * is not an absolute path, use the pdf file location as a base
+         * directory.
          */
-        public string filename_to_uri(string file, string pdf_url) {
+        public string filename_to_uri(string file, string pdf_fname) {
             Regex uriRE = null;
             try {
                 uriRE = new Regex("^[a-z]*://");
@@ -328,8 +330,8 @@ namespace pdfpc {
                 return file;
             if (GLib.Path.is_absolute(file))
                 return "file://" + file;
-            string dirname = GLib.Path.get_dirname(pdf_url);
-            return GLib.Path.build_filename(dirname, file);
+            string dirname = GLib.Path.get_dirname(pdf_fname);
+            return "file://" + Posix.realpath(GLib.Path.build_filename(dirname, file));
         }
 
         /**
