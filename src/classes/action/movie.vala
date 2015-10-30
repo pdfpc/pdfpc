@@ -28,15 +28,16 @@ namespace pdfpc {
         ElementConstruction,
         Linking
     }
-    
+
     /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
     public Gst.Element gst_element_make(string factoryname, string? name) throws PipelineError {
         var element = Gst.ElementFactory.make(factoryname, name);
-        if (element == null)
+        if (element == null) {
             throw new PipelineError.ElementConstruction(
                 @"Could not make element $name of type $factoryname.");
+        }
         return element;
     }
 
@@ -112,8 +113,9 @@ namespace pdfpc {
                 movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
                 movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, movie.starttime * Gst.SECOND);
 
-                if (autostart)
+                if (autostart) {
                     movie.play();
+                }
                 return false;
             } );
         }
@@ -137,18 +139,20 @@ namespace pdfpc {
          */
         public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            if (mapping.action.type != Poppler.ActionType.LAUNCH)
+            if (mapping.action.type != Poppler.ActionType.LAUNCH) {
                 return null;
+            }
 
             string file = ((Poppler.ActionLaunch*) mapping.action).file_name;
             string[] splitfile = file.split("?", 2);
             file = splitfile[0];
             string querystring = "";
-            if (splitfile.length == 2)
+            if (splitfile.length == 2) {
                 querystring = splitfile[1];
+            }
             string[] queryarray = querystring.split("&");
             bool autostart = "autostart" in queryarray;
-	    bool noaudio = "noaudio" in queryarray;
+            bool noaudio = "noaudio" in queryarray;
             bool loop = "loop" in queryarray;
             var start = 0;
             var stop = 0;
@@ -160,11 +164,12 @@ namespace pdfpc {
                     stop = int.parse(param.split("=")[1]);
                 }
             }
-            string uri = filename_to_uri(file, controller.get_pdf_url());
+            string uri = filename_to_uri(file, controller.get_pdf_fname());
             bool uncertain;
             string ctype = GLib.ContentType.guess(uri, null, out uncertain);
-            if (!("video" in ctype))
+            if (!("video" in ctype)) {
                 return null;
+            }
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
@@ -200,8 +205,9 @@ namespace pdfpc {
             bool temp = false;
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
-                if (!("video" in annot.get_contents()))
+                if (!("video" in annot.get_contents())) {
                     return null;
+                }
 
                 Poppler.Action action = ((Poppler.AnnotScreen) annot).get_action();
                 Poppler.Media movie = (Poppler.Media) action.movie.movie;
@@ -230,24 +236,25 @@ namespace pdfpc {
                         warning("Movie not embedded and has no file name");
                         return null;
                     }
-                    uri = filename_to_uri(file, controller.get_pdf_url());
+                    uri = filename_to_uri(file, controller.get_pdf_fname());
                     temp = false;
                 }
                 break;
-            
+
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
-                if (movie.need_poster())
+                if (movie.need_poster()) {
                     warning("Movie requests poster.  Not yet supported.");
+                }
                 string file = movie.get_filename();
                 if (file == null) {
                     warning("Movie has no file name");
                     return null;
                 }
-                uri = filename_to_uri(file, controller.get_pdf_url());
+                uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
                 break;
-            
+
             default:
                 return null;
             }
@@ -315,21 +322,26 @@ namespace pdfpc {
         }
 
         /**
-         * Utility function for converting filenames to uris.
+         * Utility function for converting filenames to uris. If file
+         * is not an absolute path, use the pdf file location as a base
+         * directory.
          */
-        public string filename_to_uri(string file, string pdf_url) {
+        public string filename_to_uri(string file, string pdf_fname) {
             Regex uriRE = null;
             try {
                 uriRE = new Regex("^[a-z]*://");
             } catch (Error error) {
                 // Won't happen
             }
-            if (uriRE.match(file))
+            if (uriRE.match(file)) {
                 return file;
-            if (GLib.Path.is_absolute(file))
+            }
+            if (GLib.Path.is_absolute(file)) {
                 return "file://" + file;
-            string dirname = GLib.Path.get_dirname(pdf_url);
-            return GLib.Path.build_filename(dirname, file);
+            }
+
+            string dirname = GLib.Path.get_dirname(pdf_fname);
+            return "file://" + Posix.realpath(GLib.Path.build_filename(dirname, file));
         }
 
         /**
@@ -365,10 +377,11 @@ namespace pdfpc {
             Gst.State state;
             Gst.ClockTime time = Gst.Util.get_timestamp();
             this.pipeline.get_state(out state, null, time);
-            if (state == Gst.State.PLAYING)
+            if (state == Gst.State.PLAYING) {
                 this.pause();
-            else
+            } else {
                 this.play();
+            }
         }
 
         /**
@@ -407,9 +420,11 @@ namespace pdfpc {
          */
         public override void deactivate() {
             this.stop();
-            if (this.temp != "")
-                if (FileUtils.unlink(this.temp) != 0)
+            if (this.temp != "") {
+                if (FileUtils.unlink(this.temp) != 0) {
                     warning("Problem deleting temp file %s", this.temp);
+                }
+            }
         }
     }
 
@@ -478,8 +493,9 @@ namespace pdfpc {
          */
         protected override Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
                 Gdk.Rectangle rect) {
-            if (n != 0)
+            if (n != 0) {
                 return source;
+            }
 
             this.rect = rect;
 
@@ -541,7 +557,7 @@ namespace pdfpc {
 
             // if a stop time is defined, stop there (but still let
             // the user manually seek *after* this timestamp)
-            if (this.stoptime != 0 && 
+            if (this.stoptime != 0 &&
                 this.stoptime * Gst.SECOND < timestamp &&
                 timestamp < (this.stoptime + 0.2) * Gst.SECOND) {
                 if (this.loop) {
@@ -555,7 +571,7 @@ namespace pdfpc {
 
         }
 
-        
+
         private void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
             double start = (double) this.starttime*Gst.SECOND / this.duration;
             double stop = (double) this.stoptime*Gst.SECOND / this.duration;
@@ -578,7 +594,7 @@ namespace pdfpc {
                     bar_end, this.seek_bar_height-4);
                 cr.set_source_rgba(1, 1, 1, 0.8);
                 cr.fill();
-		cr.rectangle(start_bar, 0, stop_bar - start_bar, this.seek_bar_height);
+                cr.rectangle(start_bar, 0, stop_bar - start_bar, this.seek_bar_height);
                 cr.set_source_rgba(0,1,0,0.5);
                 cr.fill();
 
@@ -646,10 +662,12 @@ namespace pdfpc {
         public int64 mouse_seek(double x, double y) {
             double seek_fraction = (x - this.seek_bar_padding) / (rect.width -
                 2 * this.seek_bar_padding);
-            if (seek_fraction < 0)
+            if (seek_fraction < 0) {
                 seek_fraction = 0;
-            if (seek_fraction > 1)
+            }
+            if (seek_fraction > 1) {
                 seek_fraction = 1;
+            }
             int64 seek_time = (int64) (seek_fraction * this.duration);
             this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
             return seek_time;
@@ -661,8 +679,9 @@ namespace pdfpc {
         public bool on_motion(Gdk.EventMotion event) {
             double x, y;
             this.set_mouse_in(event.x, event.y, out x, out y);
-            if (this.mouse_drag)
+            if (this.mouse_drag) {
                 this.mouse_seek(x, y);
+            }
             return false;
         }
 
@@ -682,9 +701,9 @@ namespace pdfpc {
 
             double x, y;
             this.set_mouse_in(event.x, event.y, out x, out y);
-            if (!this.in_seek_bar)
+            if (!this.in_seek_bar) {
                 this.toggle_play();
-            else {
+            } else {
                 this.mouse_drag = true;
                 this.drag_was_playing = (this.pipeline.current_state == Gst.State.PLAYING);
                 this.pause();
@@ -706,9 +725,10 @@ namespace pdfpc {
                 if (this.drag_was_playing || this.eos) {
                     this.eos = false;
                     this.play();
-                } else
+                } else {
                     // Otherwise, time resets to 0 (don't know why).
                     this.start_refresh_time(seek_time);
+                }
             }
             this.mouse_drag = false;
             return false;
@@ -719,8 +739,9 @@ namespace pdfpc {
          * the movie is paused, so that the controls can still be updated.
          */
         public void start_refresh() {
-            if (this.refresh_timeout != 0)
+            if (this.refresh_timeout != 0) {
                 return;
+            }
             int64 curr_time;
             var tformat = Gst.Format.TIME;
             this.pipeline.query_position(tformat, out curr_time);
@@ -732,11 +753,13 @@ namespace pdfpc {
          * gstreamer to redraw the current frame.
          */
         public void start_refresh_time(int64 curr_time) {
-            if (this.eos)
+            if (this.eos) {
                 // Seeking to the very end won't refresh the output.
                 curr_time -= 1;
-            if (this.refresh_timeout != 0)
+            }
+            if (this.refresh_timeout != 0) {
                 Source.remove(this.refresh_timeout);
+            }
             this.refresh_timeout = Timeout.add(50, () => {
                 this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, curr_time);
                 return true;
@@ -747,8 +770,9 @@ namespace pdfpc {
          * Stop the refresh timeout.
          */
         public void stop_refresh() {
-            if (this.refresh_timeout == 0)
+            if (this.refresh_timeout == 0) {
                 return;
+            }
             Source.remove(this.refresh_timeout);
             this.refresh_timeout = 0;
         }
