@@ -66,6 +66,11 @@ that, for example to be installed under */usr/*, with config files under
 
     cmake -DCMAKE_INSTALL_PREFIX="/usr" -DSYSCONFDIR=/etc ..
 
+By default, pdfpc includes support for movie playback.  This requires several
+gstreamer dependencies as well as gdk-x11.  The requirement for these packages
+can be removed by compiling without support for movie playback by passing
+*-DMOVIES=OFF* to the cmake command.
+
 Compiling from github
 ---------------------
 

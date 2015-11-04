@@ -906,6 +906,7 @@ namespace pdfpc {
             return tm.mktime();
         }
 
+#if MOVIES
         /**
          * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
          * controllable's main view.  Also, return the XID for the view's window,
@@ -925,5 +926,6 @@ namespace pdfpc {
             rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
             return (uint*) ((Gdk.X11.Window) view.get_window()).get_xid();
         }
+#endif
     }
 }

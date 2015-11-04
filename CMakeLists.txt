@@ -11,6 +11,8 @@ set(MANDIR "share/man/man1" CACHE FILEPATH "mandir")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+option(MOVIES "Compile support for movie playback (requires gdk-x11)" ON)
+
 add_subdirectory(src)
 add_subdirectory(icons)
 add_subdirectory(man)

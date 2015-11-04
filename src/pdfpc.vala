@@ -195,9 +195,9 @@ namespace pdfpc {
                 print_version();
                 Posix.exit(0);
             }
-
+#if MOVIES
             Gst.init( ref args );
-
+#endif
             if (Options.list_actions) {
                 stdout.printf("Config file commands accepted by pdfpc:\n");
                 string[] actions = PresentationController.getActionDescriptions();
