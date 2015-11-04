@@ -5,11 +5,20 @@ pkg_check_modules(GEE REQUIRED gee-0.8)
 pkg_check_modules(POPPLER REQUIRED poppler-glib)
 pkg_check_modules(GTK REQUIRED gtk+-3.0)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
-pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
-pkg_check_modules(GSTBASE REQUIRED gstreamer-base-1.0)
-pkg_check_modules(GSTAUDIO REQUIRED gstreamer-audio-1.0)
-pkg_check_modules(GSTVIDEO REQUIRED gstreamer-video-1.0)
-pkg_check_modules(GDKX11 REQUIRED gdk-x11-3.0)
+if (MOVIES)
+    pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+    pkg_check_modules(GSTBASE REQUIRED gstreamer-base-1.0)
+    pkg_check_modules(GSTAUDIO REQUIRED gstreamer-audio-1.0)
+    pkg_check_modules(GSTVIDEO REQUIRED gstreamer-video-1.0)
+    pkg_check_modules(GDKX11 REQUIRED gdk-x11-3.0)
+    set(MOVIE_PACKAGES
+        gstreamer-1.0
+        gstreamer-base-1.0
+        gstreamer-audio-1.0
+        gstreamer-video-1.0
+        gdk-x11-3.0
+    )
+endif ()
 
 set(CFLAGS
     ${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
@@ -56,6 +65,11 @@ link_directories(${LIB_PATHS})
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_SOURCE_DIR}/paths.vala)
 
 file (GLOB_RECURSE VALA_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.vala)
+if (MOVIES)
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D MOVIES)
+else ()
+    LIST(REMOVE_ITEM VALA_SRC classes/action/movie.vala)
+endif ()
 
 vala_precompile(VALA_C
     ${VALA_SRC}
@@ -65,15 +79,12 @@ PACKAGES
     poppler-glib
     gtk+-3.0
     posix
-    gstreamer-1.0
-    gstreamer-base-1.0
-    gstreamer-audio-1.0
-    gstreamer-video-1.0
-    gdk-x11-3.0
+    ${MOVIE_PACKAGES}
 OPTIONS
     --thread
     --debug
     --enable-experimental
+    ${EXTRA_VALA_OPTIONS}
 GENERATE_HEADER
     presenter
 GENERATE_VAPI

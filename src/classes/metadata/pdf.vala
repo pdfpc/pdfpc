@@ -584,7 +584,12 @@ namespace pdfpc.Metadata {
          */
         private int mapping_page_num = -1;
         private GLib.List<ActionMapping> action_mapping;
-        private ActionMapping[] blanks = {new ControlledMovie(), new LinkAction()};
+        private ActionMapping[] blanks = {
+#if MOVIES
+            new ControlledMovie(),
+#endif
+            new LinkAction()
+        };
         public weak PresentationController controller = null;
 
         /**
