@@ -1,4 +1,4 @@
-.TH  pdfpc "1" "October 2015"
+.TH  pdfpc "1" "November 2015" "pdfpc 4\&.0\&.1"
 .if !dURL \{\
 .de URL
 \\$2 \(laURL: \\$1 \(ra\\$3
