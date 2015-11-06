@@ -29,9 +29,16 @@ namespace pdfpc.Metadata {
     /**
      * Metadata for Pdf files
      */
-    public class Pdf: Base
+    public class Pdf: Object
     {
+        /**
+         * File name of the pdf to display
+         */
         public string? pdf_fname = null;
+
+        /**
+         * File name of the .pdfpc file
+         */
         protected string? pdfpc_fname = null;
 
         /**
@@ -113,7 +120,7 @@ namespace pdfpc.Metadata {
 
                     switch (section_type) {
                         case "[file]": {
-                            this.pdf_fname = section_content;
+                            // NOOP for backwards compatibility
                             break;
                         }
                         case "[skip]": {
@@ -177,12 +184,13 @@ namespace pdfpc.Metadata {
         void fill_path_info(string fname) {
             int l = fname.length;
 
-            if (l > 6 && fname[l-6:l] != ".pdfpc") {
+            int extension_index = fname.last_index_of(".");
+            if (l <= 6 || fname[l-6:l] != ".pdfpc") {
                 this.pdf_fname = fname;
-                int extension_index = fname.last_index_of(".");
                 this.pdfpc_fname = fname[0:extension_index] + ".pdfpc";
             } else {
                 this.pdfpc_fname = fname;
+                this.pdf_fname = fname[0:extension_index] + ".pdf";
             }
         }
 
@@ -207,7 +215,6 @@ namespace pdfpc.Metadata {
                               + format_notes();
             try {
                 if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
-                    contents = "[file]\n" + this.pdf_fname + "\n" + contents;
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
             } catch (Error e) {
@@ -297,8 +304,6 @@ namespace pdfpc.Metadata {
          * Base constructor taking the file url to the pdf file
          */
         public Pdf(string fname, NotesPosition notes_position) {
-            base(fname);
-
             this.notes_position = notes_position;
 
             fill_path_info(fname);
@@ -341,7 +346,7 @@ namespace pdfpc.Metadata {
         /**
          * Return the number of pages in the pdf document
          */
-        public override uint get_slide_count() {
+        public uint get_slide_count() {
             return this.page_count;
         }
 

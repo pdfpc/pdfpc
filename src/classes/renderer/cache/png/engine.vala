@@ -36,7 +36,7 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Initialize the cache store
          */
-        public Engine( Metadata.Base metadata ) {
+        public Engine( Metadata.Pdf metadata ) {
             base( metadata );
             this.storage = new PNG.Item[this.metadata.get_slide_count()];
         }
