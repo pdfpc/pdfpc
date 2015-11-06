@@ -31,7 +31,7 @@ namespace pdfpc {
         /**
          * Metadata object to render slides for
          */
-        public Metadata.Base metadata { get; protected set; }
+        public Metadata.Pdf metadata { get; protected set; }
 
         /**
          * Width to render to
@@ -47,7 +47,7 @@ namespace pdfpc {
          * Base constructor taking a metadata object as well as the desired
          * render width and height as parameters.
          */
-        public Base(Metadata.Base metadata, int width, int height) {
+        public Base(Metadata.Pdf metadata, int width, int height) {
             this.metadata = metadata;
             this.width = width;
             this.height = height;
