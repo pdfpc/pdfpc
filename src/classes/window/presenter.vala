@@ -226,23 +226,18 @@ namespace pdfpc.Window {
                 this.notes_view.override_font(font_desc);
             }
 
-            // Initial font needed for the labels
-            var font = Pango.FontDescription.from_string("Verdana");
-            var absoluteSize = Math.floor(bottom_height * 0.6 * Pango.SCALE);
-            font.set_absolute_size(absoluteSize);
-
             // The countdown timer is centered in the 90% bottom part of the screen
-            // It takes 3/4 of the available width
             this.timer = this.presentation_controller.getTimer();
+            this.timer.name = "timer";
+            this.timer.get_style_context().add_class("bottomText");
             this.timer.set_justify(Gtk.Justification.CENTER);
-            this.timer.override_font(font);
 
 
             // The slide counter is centered in the 90% bottom part of the screen
-            // It takes 1/4 of the available width on the right
             this.slide_progress = new Gtk.Entry();
+            this.slide_progress.name = "slideProgress";
+            this.slide_progress.get_style_context().add_class("bottomText");
             this.slide_progress.set_alignment(1f);
-            this.slide_progress.override_font(font);
             this.slide_progress.sensitive = false;
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);

@@ -11,6 +11,10 @@
     background-color: white;
 }
 
+.bottomText {
+    font-size: 5em;
+}
+
 GtkProgressBar {
     color: gray;
 }
