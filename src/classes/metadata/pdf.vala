@@ -177,7 +177,7 @@ namespace pdfpc.Metadata {
         void fill_path_info(string fname) {
             int l = fname.length;
 
-            if (l > 6 && fname[l-6:l] != ".pdfpc") {
+            if (l < 6 || fname[l-6:l] != ".pdfpc") {
                 this.pdf_fname = fname;
                 int extension_index = fname.last_index_of(".");
                 this.pdfpc_fname = fname[0:extension_index] + ".pdfpc";
