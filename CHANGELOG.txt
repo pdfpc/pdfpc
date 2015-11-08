@@ -2,6 +2,27 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.1
+=============
+
+*Released: November 2015*
+
+- Keybindings for changing font size of the notes view
+
+- Hyperlinks to web pages are now opened in the web browser
+
+- Instead of count downs, the current time can be displayed
+
+- start/stop, noaudio attributes for movies
+
+- The user can now configure the presenter view layout according to their needs
+
+- Movie support can be disabled to allow compilation on Mac OS X / Windows (via
+  cmake -DMOVIES=OFF)
+
+- Bug fixes
+
+
 Version 4.0
 =============
 

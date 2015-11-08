@@ -9,6 +9,7 @@
  * Copyright 2012, 2015 Andreas Bilke
  * Copyright 2013 Gabor Adam Toth
  * Copyright 2015 Andy Barry
+ * Copyright 2015 Jeremy Maitin-Shepard
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
