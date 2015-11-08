@@ -236,8 +236,10 @@ namespace pdfpc {
                 Options.windowed = true;
             }
 
+            GLib.Environment.set_current_dir(GLib.Path.get_dirname(pdfFilename));
+
             pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
-            var metadata = new Metadata.Pdf( pdfFilename, notes_position );
+            var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename), notes_position);
             if ( Options.duration != 987654321u )
                 metadata.set_duration(Options.duration);
 
