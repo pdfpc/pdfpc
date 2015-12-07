@@ -116,9 +116,6 @@ namespace pdfpc {
                 bt.keyCode = button;
                 bt.modMask = modMask;
                 bt.actionName = fields[2];
-                if (Options.mouse_bindings == null) {
-                    stderr.printf("Wuff\n");
-                }
                 Options.mouse_bindings.add(bt);
             }
         }
