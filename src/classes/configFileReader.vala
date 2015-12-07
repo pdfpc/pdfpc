@@ -181,8 +181,8 @@ namespace pdfpc {
                         case "unmouse_all":
                             this.unbindMouseAll();
                             break;
-                        case "switch-screens":
-                            Options.display_switch = !Options.display_switch;
+                        case "option":
+                            this.readOption(uncommentedLine, fields);
                             break;
                         default:
                             stderr.printf("Warning: Unknown command line \"%s\"\n", uncommentedLine);
@@ -190,6 +190,37 @@ namespace pdfpc {
                     }
                 }
             } catch (Error e) {
+            }
+        }
+
+        private void readOption(string wholeLine, string[] fields) {
+            if (fields.length != 3) {
+                stderr.printf("Bad option specification: %s\n", wholeLine);
+                return;
+            }
+
+            switch (fields[1]) {
+                case "current-size":
+                    Options.current_size = int.parse(fields[2]);
+                    break;
+                case "current-height":
+                    Options.current_height = int.parse(fields[2]);
+                    break;
+                case "next-height":
+                    Options.next_height = int.parse(fields[2]);
+                    break;
+                case "overview-min-size":
+                    Options.min_overview_width = int.parse(fields[2]);
+                    break;
+                case "black-on-end":
+                    Options.black_on_end = bool.parse(fields[2]);
+                    break;
+                case "switch-screens":
+                    Options.display_switch = bool.parse(fields[2]);
+                    break;
+                default:
+                    stderr.printf("Unknown option %s in pdfpcrc\n", fields[1]);
+                    break;
             }
         }
     }
