@@ -365,13 +365,13 @@ The [notes] sections must be the last one in the file
 For the programmers out there: slide indexes start at 1
 
 .SH CONFIG FILES
-
-.SS Keybindings
-
 .PP
 The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
-Additionally, $HOME/.pdfpcrc is also read, if present. Following commands are
-aceepted
+Additionally, $HOME/.pdfpcrc is also read, if present.
+
+.SS Keybindings
+.PP
+Following commands are aceepted:
 .TP
 .B bind <key> <func>
 Bind a key to a function
@@ -390,10 +390,7 @@ Unbinds a mouse button
 .TP
 .B unmouse_all
 Unbinds all the mouse bindings
-.TP
-.B switch-screens
-Switches screens, in the same way as the command line parameter with the same
-name.
+
 .P
 Key names can be obtained with the help of the xev utility. Note that
 names are case sensitive. Modifiers can be specified in the form
@@ -412,6 +409,35 @@ Some configuration files for commonly used devices
 If your device is not
 yet supported and you generated a working config file, please
 contribute it (see contact information below).
+
+
+.SS Options
+.PP
+Some permanent changes can be configured via config file. The syntax is:
+.TP
+.B option <option_name> <option_value>
+
+.PP
+The following option_name are allowed:
+
+.TP
+.B current-size
+Percentage of the presenter screen to be used for the current slide. (int, Default 60)
+.TP
+.B current-height
+Percentage of the height of the presenter screen to be used for the current slide. (int, Default 80)
+.TP
+.B next-height
+Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
+.TP
+.B overview-min-size
+Minimum width for the overview miniatures, in pixels. (int, Default 150)
+.TP
+.B black-on-end
+Add an additional black slide at the end of the presentation (bool, Default false)
+.TP
+.B switch-screens
+Switch the presentation and the presenter screen. (bool, Default false)
 
 .SS Appearance
 
