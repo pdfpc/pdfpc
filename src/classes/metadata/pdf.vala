@@ -322,19 +322,26 @@ namespace pdfpc.Metadata {
                 out this.original_page_height
             );
 
-            if (!skips_by_user) {
+            if (Options.disable_auto_grouping && !skips_by_user) {
+                // Ignore overlayed slides
+                for (int i = 0; i < this.page_count; ++i) {
+                    this.user_view_indexes += i;
+                }
+            }
+
+            if (!Options.disable_auto_grouping && !skips_by_user) {
                 // Auto-detect which pages to skip
                 string previous_label = null;
-                int user_pages = 0;
                 for (int i = 0; i < this.page_count; ++i) {
                     string this_label = this.document.get_page(i).label;
                     if (this_label != previous_label) {
                         this.user_view_indexes += i;
                         previous_label = this_label;
-                        ++user_pages;
                     }
                 }
-            } else {
+            }
+
+            if(skips_by_user) {
                 parse_skip_line(skip_line);
             }
 
