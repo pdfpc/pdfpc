@@ -172,13 +172,13 @@ namespace pdfpc.Window {
 
             // The next slide is right to the current one and takes up the
             // remaining width
-            //Requisition cv_requisition;
-            //this.current_view.size_request(out cv_requisition);
-            //current_allocated_width = cv_requisition.width;
-            Gdk.Rectangle next_scale_rect;
-            var next_allocated_width = this.screen_geometry.width - current_allocated_width - 4;
+
+            // do not allocate negative width (in case of current_allocated_width == this.screen_geometry.width)
+            // this happens, when the user set -u 100
+            int next_allocated_width = (int)Math.fmax(this.screen_geometry.width - current_allocated_width - 4, 0);
             this.next_allocated_width = next_allocated_width;
             // We leave a bit of margin between the two views
+            Gdk.Rectangle next_scale_rect;
             this.next_view = new View.Pdf.from_metadata(
                 metadata,
                 next_allocated_width,
