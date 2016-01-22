@@ -255,6 +255,7 @@ namespace pdfpc.Window {
             } else {
                 this.prerender_progress.text = "Prerendering...";
             }
+            this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
