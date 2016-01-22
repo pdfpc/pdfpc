@@ -60,6 +60,11 @@ namespace pdfpc {
         public static bool disable_cache_compression = false;
 
         /**
+         * Commandline option to disable the auto detection of overlay slides
+         */
+        public static bool disable_auto_grouping = false;
+
+        /**
          * Commandline option providing the talk duration, which will be used to
          * display a timer
          *

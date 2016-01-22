@@ -75,6 +75,9 @@ Disable caching and pre-rendering of slides to save memory at the cost of speed.
 Disable the compression of slide images to trade memory consumption for speed.
 (Avg.  factor 30)
 .TP
+.BI "\-g, \-\-disable\-auto\-grouping"
+Disable auto detection of overlay groups. (Default: enabled)
+.TP
 .BI "\-b, \-\-black\-on\-end"
 Add an additional black slide at the end of the presentation
 .TP
