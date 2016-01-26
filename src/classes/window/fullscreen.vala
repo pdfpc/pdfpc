@@ -136,14 +136,21 @@ namespace pdfpc.Window {
                 // The first movement might not have worked as expected, because of
                 // the before mentioned maximized window problem. Therefore it is
                 // done again
-
-                // First, unfullscreen otherwise we could be too large
-                // for the other screen, preventing a successful move
-                // to that screen
-                this.unfullscreen();
-
                 this.move(this.screen_geometry.x, this.screen_geometry.y);
 
+                this.fullscreen();
+
+                // Check to see if that move was successful
+                this.get_position(out x, out y);
+                if (x == this.screen_geometry.x && y == this.screen_geometry.y) {
+                    return;
+                }
+
+                // That move failed.  Now unfullscreen in case the window
+                // is too large for the other screen, preventing a
+                // successful move to that screen and try again.
+                this.unfullscreen();
+                this.move(this.screen_geometry.x, this.screen_geometry.y);
                 this.fullscreen();
             }
         }
