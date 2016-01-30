@@ -75,7 +75,7 @@ namespace pdfpc {
         /**
          * Key modifiers that we support
          */
-        public uint accepted_key_mods { get; set; }
+        public uint accepted_key_mods = Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.META_MASK;
 
         /**
          * Ignore input events. Useful e.g. for editing notes.
@@ -237,6 +237,9 @@ namespace pdfpc {
             } catch (Error error) {
                 // pass
             }
+
+            readKeyBindings();
+            readMouseBindings();
         }
 
         /*
@@ -536,6 +539,30 @@ namespace pdfpc {
          */
         public TimerLabel getTimer() {
             return this.timer;
+        }
+
+        private void readKeyBindings() {
+            foreach (var bt in Options.key_bindings) {
+                if (bt.type == "bind") {
+                    bind(bt.keyCode, bt.modMask, bt.actionName);
+                } else if (bt.type == "unbind") {
+                    unbind(bt.keyCode, bt.modMask);
+                } else if (bt.type == "unbindall") {
+                    unbindAll();
+                }
+            }
+        }
+
+        private void readMouseBindings() {
+            foreach (var bt in Options.mouse_bindings) {
+                if (bt.type == "bind") {
+                    bindMouse(bt.keyCode, bt.modMask, bt.actionName);
+                } else if (bt.type == "unbind") {
+                    unbindMouse(bt.keyCode, bt.modMask);
+                } else if (bt.type == "unbindall") {
+                    unbindAllMouse();
+                }
+            }
         }
 
         /**

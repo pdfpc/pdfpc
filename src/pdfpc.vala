@@ -70,15 +70,10 @@ namespace pdfpc {
             { "last-minutes", 'l', 0, OptionArg.INT, ref Options.last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5 minutes)", "N" },
             { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
             { "time-of-day", 'C', 0, 0, ref Options.use_time_of_day, "Use the current time of the day for the timer", null},
-            { "current-size", 'u', 0, OptionArg.INT, ref Options.current_size, "Percentage of the presenter screen to be used for the current slide. (Default 60)", "N" },
-            { "current-height", 'h', 0, OptionArg.INT, ref Options.current_height, "Percentage of the height of the presenter screen to be used for the current slide. (Default 80)", "N" },
-            { "next-height", 'H', 0, OptionArg.INT, ref Options.next_height, "Percentage of the height of the presenter screen to be used for the next slide. (Default 70)", "N" },
-            { "overview-min-size", 'o', 0, OptionArg.INT, ref Options.min_overview_width, "Minimum width for the overview miniatures, in pixels. (Default 150)", "N" },
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
             { "disable-auto-grouping", 'g', 0, 0, ref Options.disable_auto_grouping, "Disable auto detection and grouping of overlayed slides", null },
-            { "black-on-end", 'b', 0, 0, ref Options.black_on_end, "Add an additional black slide at the end of the presentation", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
@@ -95,8 +90,10 @@ namespace pdfpc {
          * Returns the name of the pdf file to open (or null if not present)
          */
         protected string? parse_command_line_options( ref unowned string[] args ) {
-            var context = new OptionContext( "<pdf-file>" );
+            // intialize Options for the first time to invoke static construct
+            Options o = new Options();
 
+            var context = new OptionContext( "<pdf-file>" );
             context.add_main_entries( options, null );
 
             try {
@@ -198,6 +195,12 @@ namespace pdfpc {
                 print_version();
                 Posix.exit(0);
             }
+            ConfigFileReader configFileReader = new ConfigFileReader();
+            configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
+            configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
+            configFileReader.readConfig(Path.build_filename(Environment.get_home_dir(),
+                ".pdfpcrc"));
+
 #if MOVIES
             Gst.init( ref args );
 #endif
@@ -251,13 +254,6 @@ namespace pdfpc {
             // crosscutting concerns between the different windows.
             this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
-
-            ConfigFileReader configFileReader = new ConfigFileReader(this.controller);
-
-            configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
-            configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
-            configFileReader.readConfig(Path.build_filename(Environment.get_home_dir(),
-                ".pdfpcrc"));
 
             set_styling();
 
