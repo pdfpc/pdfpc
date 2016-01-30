@@ -224,6 +224,8 @@ namespace pdfpc {
                 context.add_class("pretalk");
             } else {
                 context.remove_class("pretalk");
+                context.remove_class("last-minutes");
+                context.remove_class("overtime");
                 if (this.time < this.duration) {
                     timeInSecs = duration - this.time;
                     // Still on presentation time
