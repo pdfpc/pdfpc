@@ -23,16 +23,7 @@
 
 namespace pdfpc {
     class ConfigFileReader {
-        protected PresentationController presentation_controller;
-
-        public ConfigFileReader(PresentationController controller) {
-            this.presentation_controller = controller;
-            uint supportedModifiers = Gdk.ModifierType.SHIFT_MASK
-                                      | Gdk.ModifierType.CONTROL_MASK
-                                      | Gdk.ModifierType.META_MASK
-                                    ;
-            this.presentation_controller.accepted_key_mods = supportedModifiers;
-        }
+        public ConfigFileReader() { }
 
         delegate uint binding2uint(string a);
         private void readBindDef(string name, binding2uint conversor, out uint code, out uint modMask) {
@@ -75,7 +66,12 @@ namespace pdfpc {
             if (keycode == 0x0) {
                 stderr.printf("Warning: Unknown key: %s\n", fields[1]);
             } else {
-                this.presentation_controller.bind(keycode, modMask, fields[2]);
+                Options.BindTuple bt = new Options.BindTuple();
+                bt.type = "bind";
+                bt.keyCode = keycode;
+                bt.modMask = modMask;
+                bt.actionName = fields[2];
+                Options.key_bindings.add(bt);
             }
         }
 
@@ -90,8 +86,18 @@ namespace pdfpc {
             if (keycode == 0x0) {
                 stderr.printf("Warning: Unknown key: %s\n", fields[1]);
             } else {
-                this.presentation_controller.unbind(keycode, modMask);
+                Options.BindTuple bt = new Options.BindTuple();
+                bt.type = "unbind";
+                bt.keyCode = keycode;
+                bt.modMask = modMask;
+                Options.key_bindings.add(bt);
             }
+        }
+
+        private void unbindKeyAll() {
+            Options.BindTuple bt = new Options.BindTuple();
+            bt.type = "unbindall";
+            Options.key_bindings.add(bt);
         }
 
         private void bindMouse(string wholeLine, string[] fields) {
@@ -105,7 +111,12 @@ namespace pdfpc {
             if (button == 0x0) {
                 stderr.printf("Warning: Unknown button: %s\n", fields[1]);
             } else {
-                this.presentation_controller.bindMouse(button, modMask, fields[2]);
+                Options.BindTuple bt = new Options.BindTuple();
+                bt.type = "bind";
+                bt.keyCode = button;
+                bt.modMask = modMask;
+                bt.actionName = fields[2];
+                Options.mouse_bindings.add(bt);
             }
         }
 
@@ -120,9 +131,20 @@ namespace pdfpc {
             if (button == 0x0) {
                 stderr.printf("Warning: Unknown button: %s\n", fields[1]);
             } else {
-                this.presentation_controller.unbindMouse(button, modMask);
+                Options.BindTuple bt = new Options.BindTuple();
+                bt.type = "unbind";
+                bt.keyCode = button;
+                bt.modMask = modMask;
+                Options.mouse_bindings.add(bt);
             }
         }
+
+        private void unbindMouseAll() {
+            Options.BindTuple bt = new Options.BindTuple();
+            bt.type = "unbindall";
+            Options.key_bindings.add(bt);
+        }
+
 
         public void readConfig(string fname) {
             var file = File.new_for_path(fname);
@@ -145,7 +167,7 @@ namespace pdfpc {
                             this.unbindKey(uncommentedLine, fields);
                             break;
                         case "unbind_all":
-                            this.presentation_controller.unbindAll();
+                            this.unbindKeyAll();
                             break;
                         case "mouse":
                             this.bindMouse(uncommentedLine, fields);
@@ -154,10 +176,10 @@ namespace pdfpc {
                             this.unbindMouse(uncommentedLine, fields);
                             break;
                         case "unmouse_all":
-                            this.presentation_controller.unbindAllMouse();
+                            this.unbindMouseAll();
                             break;
-                        case "switch-screens":
-                            Options.display_switch = !Options.display_switch;
+                        case "option":
+                            this.readOption(uncommentedLine, fields);
                             break;
                         default:
                             stderr.printf("Warning: Unknown command line \"%s\"\n", uncommentedLine);
@@ -165,6 +187,43 @@ namespace pdfpc {
                     }
                 }
             } catch (Error e) {
+            }
+        }
+
+        private void readOption(string wholeLine, string[] fields) {
+            if (fields.length != 3) {
+                stderr.printf("Bad option specification: %s\n", wholeLine);
+                return;
+            }
+
+            switch (fields[1]) {
+                case "current-size":
+                    Options.current_size = int.parse(fields[2]);
+                    break;
+                case "current-height":
+                    Options.current_height = int.parse(fields[2]);
+                    break;
+                case "next-height":
+                    Options.next_height = int.parse(fields[2]);
+                    break;
+                case "overview-min-size":
+                    Options.min_overview_width = int.parse(fields[2]);
+                    break;
+                case "black-on-end":
+                    Options.black_on_end = bool.parse(fields[2]);
+                    break;
+                case "switch-screens":
+                    // ensure that the command line option switches screens
+                    // even if this is true (since the command line option
+                    // should toggle the screen, not set it true or false)
+                    bool config_file_display_switch = bool.parse(fields[2]);
+                    if (config_file_display_switch) {
+                        Options.display_switch = !Options.display_switch;
+                    }
+                    break;
+                default:
+                    stderr.printf("Unknown option %s in pdfpcrc\n", fields[1]);
+                    break;
             }
         }
     }
