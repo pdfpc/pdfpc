@@ -246,7 +246,16 @@ namespace pdfpc.Window {
             this.prerender_progress = new Gtk.ProgressBar();
             this.prerender_progress.name = "prerenderProgress";
             this.prerender_progress.show_text = true;
-            this.prerender_progress.text = "Prerendering...";
+
+            // Don't display prerendering text if the user has disabled
+            // it, but still create the control to ensure the layout
+            // doesn't change.
+            if (Options.disable_caching) {
+                this.prerender_progress.text = "";
+            } else {
+                this.prerender_progress.text = "Prerendering...";
+            }
+            this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
             this.prerender_progress.no_show_all = true;
 
             int icon_height = bottom_height - 10;
