@@ -213,7 +213,13 @@ namespace pdfpc {
                     Options.black_on_end = bool.parse(fields[2]);
                     break;
                 case "switch-screens":
-                    Options.display_switch = bool.parse(fields[2]);
+                    // ensure that the command line option switches screens
+                    // even if this is true (since the command line option
+                    // should toggle the screen, not set it true or false)
+                    bool config_file_display_switch = bool.parse(fields[2]);
+                    if (config_file_display_switch) {
+                        Options.display_switch = !Options.display_switch;
+                    }
                     break;
                 default:
                     stderr.printf("Unknown option %s in pdfpcrc\n", fields[1]);
