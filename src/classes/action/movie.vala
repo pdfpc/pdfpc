@@ -563,7 +563,12 @@ namespace pdfpc {
                 this.stoptime * Gst.SECOND < timestamp &&
                 timestamp < (this.stoptime + 0.2) * Gst.SECOND) {
                 if (this.loop) {
-                    this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                    // attempting to seek from this callback fails, so we
+                    // must schedule a seek on next idle time.
+                    GLib.Idle.add( () => {
+                        this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                        return false;
+                    } );
                 } else {
                     // Can't seek to beginning w/o updating output, so mark to seek later
                     this.eos = true;
