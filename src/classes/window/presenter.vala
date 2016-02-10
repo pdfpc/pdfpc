@@ -272,6 +272,22 @@ namespace pdfpc.Window {
             this.button_press_event.connect(this.presentation_controller.button_press);
             this.scroll_event.connect(this.presentation_controller.scroll);
 
+            // resize the bottom text based on the window height
+            // (see http://stackoverflow.com/a/35237445/730138)
+            var bottom_text_css_provider = new Gtk.CssProvider();
+            Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),
+                bottom_text_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
+
+            const string bottom_text_css_template = ".bottomText { font-size: %dpx; }";
+            var target_size_height = (int) ((double)this.screen_geometry.height / 400.0 * 12.0);
+            var bottom_css = bottom_text_css_template.printf(target_size_height);
+
+            try {
+                bottom_text_css_provider.load_from_data(bottom_css, -1);
+            } catch (Error e) {
+                stderr.printf("Warning: failed to set CSS for auto-sized bottom controls.\n");
+            }
+
             // Store the slide count once
             this.slide_count = metadata.get_slide_count();
 

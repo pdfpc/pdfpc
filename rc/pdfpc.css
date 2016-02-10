@@ -11,9 +11,14 @@
     background-color: white;
 }
 
-.bottomText {
-    font-size: 5em;
-}
+/* The bottom text is automatically sized based on the resolution of
+ * the presenter's screen but setting this value in the user's custom
+ * CSS will override the auto-sizing.  See the man page for more
+ * details.
+    .bottomText {
+        font-size: 5em;
+    }
+ */
 
 GtkProgressBar {
     color: gray;
