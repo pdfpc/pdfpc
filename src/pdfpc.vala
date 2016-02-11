@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * Copyright 2012 David Vilar
- * Copyright 2012, 2015 Andreas Bilke
+ * Copyright 2012, 2015-2016 Andreas Bilke
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2014-2015 Andy Barry
  * Copyright 2015 Maurizio Tomasi
@@ -115,8 +115,8 @@ namespace pdfpc {
          * Print version string and copyright statement
          */
         private void print_version() {
-            stdout.printf("pdfpc v4.0\n"
-                        + "(C) 2015 Robert Schroll, Andreas Bilke, Andy Barry and others\n"
+            stdout.printf("pdfpc v4.0.2\n"
+                        + "(C) 2015-2016 Robert Schroll, Andreas Bilke, Andy Barry and others\n"
                         + "(C) 2012 David Vilar\n"
                         + "(C) 2009-2011 Jakob Westhoff\n\n"
                         + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"

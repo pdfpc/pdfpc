@@ -2,6 +2,22 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.2
+=============
+
+*Released: February 2016*
+
+- Adds a option, -g, to disable auto-grouping of overlay slides
+
+- Removes some command line options in favor of a configuration file, pdfpcrc
+
+- Bug fixes:
+    - Movies with an end-time now correctly loop
+    - Fixes cut-off text in a number of cases
+    - Fixes issues where the screens might not move to the correct monitor
+    - Other small fixes
+
+
 Version 4.0.1
 =============
 
@@ -182,11 +198,3 @@ Version 1.0
 ===========
 
 - Initial release
-
-
-..
-   Local Variables:
-   mode: rst
-   fill-column: 79
-   End: 
-   vim: et syn=rst tw=79

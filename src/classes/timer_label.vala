@@ -8,6 +8,7 @@
  * Copyright 2013 Michal Sojka
  * Copyright 2015 Andreas Bilke
  * Copyright 2015 Robert Schroll
+ * Copyright 2015-2016 Andy Barry
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

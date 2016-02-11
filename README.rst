@@ -38,13 +38,13 @@ Compiling from source tarballs
 
 You can download the latest stable release of pdfpc in the release section of
 github (https://github.com/pdfpc/pdfpc/releases). Uncompress the tarball (we
-use v4.0 as an example here)::
+use v4.0.2 as an example here)::
 
-    tar xvf pdfpc-4.0.tar.gz
+    tar xvf pdfpc-4.0.2.tar.gz
 
 Change to the extracted directory::
 
-    cd pdfpc-4.0
+    cd pdfpc-4.0.2
 
 Compile and install::
 
@@ -142,11 +142,3 @@ https://github.com/davvil/pdfpc
 
 pdfpc is a fork of Pdf Presenter Console by Jakob Westhoff, available at
 https://github.com/jakobwesthoff/Pdf-Presenter-Console
-
-
-..
-   Local Variables:
-   mode: rst
-   fill-column: 79
-   End: 
-   vim: et syn=rst tw=79

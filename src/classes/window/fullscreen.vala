@@ -6,7 +6,7 @@
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * Copyright 2011, 2012 David Vilar
  * Copyright 2012, 2015 Robert Schroll
- * Copyright 2014 Andy Barry
+ * Copyright 2014,2016 Andy Barry
  * Copyright 2015 Andreas Bilke
  *
  * This program is free software; you can redistribute it and/or modify

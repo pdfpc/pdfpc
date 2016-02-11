@@ -4,8 +4,9 @@
  * This file is part of pdfpc.
  *
  * Copyright 2012, 2015 Robert Schroll
- * Copyright 2015 Séverin Lemaignan
+ * Copyright 2014-2015 Séverin Lemaignan
  * Copyright 2015 Andreas Bilke
+ * Copyright 2016 Andy Barry
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

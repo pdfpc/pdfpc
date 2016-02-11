@@ -10,6 +10,7 @@
  * Copyright 2012, 2015 Andreas Bilke
  * Copyright 2013 Stefan Tauner
  * Copyright 2015 Maurizio Tomasi
+ * Copyright 2015 endzone
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -10,6 +10,7 @@
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2012 Thomas Tschager
  * Copyright 2015 Andreas Bilke
+ * Copyright 2015 Andy Barry
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
