@@ -76,7 +76,7 @@ List actions supported in the config file(s)
 Run in windowed mode
 .TP
 .BI "\-Z, \-\-size"
-Size of the presenter console in width:height format (forces windowed mode)
+Size of the presentation window in width:height format (forces windowed mode)
 .TP
 .BI "\-n, \-\-notes"=P
 Position of notes on the PDF page. Position can be either left, right, top or bottom (Default none)
