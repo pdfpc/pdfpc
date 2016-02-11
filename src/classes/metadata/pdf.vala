@@ -224,7 +224,7 @@ namespace pdfpc.Metadata {
          */
         protected string format_skips() {
             string contents = "";
-            if (this.user_view_indexes.length < this.page_count && this.skips_by_user) {
+            if (this.user_view_indexes.length <= this.page_count && this.skips_by_user) {
                 contents += "[skip]\n";
                 int user_slide = 0;
                 for (int slide = 0; slide < this.page_count; ++slide) {
