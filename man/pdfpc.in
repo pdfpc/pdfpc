@@ -432,6 +432,11 @@ locations where pdfpc is looking for files. The default location is
 @CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. A user can copy
 it to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and change the attributes as he likes.
 
+.SH INTEGRATION WITH OTHER TOOLS
+Pdfpc provides a dbus interface that other tools can use to execute any
+action listed by \fB--list-actions\fR.  The interface appears on the session bus
+as \fI io.github.pdfpc\fR.
+
 .SH BUGS
 
 .PP
