@@ -241,6 +241,7 @@ namespace pdfpc {
 
             readKeyBindings();
             readMouseBindings();
+            DBusServer.start_server(this, this.metadata);
         }
 
         /*
@@ -339,6 +340,13 @@ namespace pdfpc {
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
                 "quit", "Exit pdfpc"
             };
+        }
+
+        /**
+         * Trigger an action by name
+         */
+        public void trigger_action(string name) {
+            this.action_group.activate_action(name, null);
         }
 
         /**
