@@ -138,7 +138,8 @@ namespace pdfpc {
 
             var sourceCssPath = Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpc.css");
             var distCssPath = Path.build_filename(Paths.ICON_PATH, "pdfpc.css");
-            var userCssDir = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
+            var legacyUserCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
+            var userCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpc.css");
 
             try {
                 // pdfpc.css in dist path or in build directory is mandatory
@@ -150,8 +151,11 @@ namespace pdfpc {
                     warning("No CSS file found");
                 }
                 // load custom user css on top
-                if (GLib.FileUtils.test(userCssDir, (GLib.FileTest.IS_REGULAR))) {
-                    userProvider.load_from_path(userCssDir);
+                if (GLib.FileUtils.test(userCssPath, (GLib.FileTest.IS_REGULAR))) {
+                    userProvider.load_from_path(userCssPath);
+                } else if (GLib.FileUtils.test(legacyUserCssPath, (GLib.FileTest.IS_REGULAR))) {
+                    userProvider.load_from_path(legacyUserCssPath);
+                    warning("Loaded pdfpc.css from legacy location. Please move your style sheet to %s", userCssPath);
                 }
             } catch (Error error) {
                 warning("Could not load styling from data: %s", error.message);
@@ -198,8 +202,16 @@ namespace pdfpc {
             ConfigFileReader configFileReader = new ConfigFileReader();
             configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
             configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
-            configFileReader.readConfig(Path.build_filename(Environment.get_home_dir(),
-                ".pdfpcrc"));
+            var legacyUserConfig = Path.build_filename(Environment.get_home_dir(), ".pdfpcrc");
+            var userConfig = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpcrc");
+            if (GLib.FileUtils.test(userConfig, (GLib.FileTest.IS_REGULAR))) {
+                // first, use the xdg config directory
+                configFileReader.readConfig(userConfig);
+            } else if (GLib.FileUtils.test(legacyUserConfig, (GLib.FileTest.IS_REGULAR))) {
+                // if not found, use the legacy location
+                configFileReader.readConfig(legacyUserConfig);
+                warning("Loaded pdfpcrc from legacy location. Please move your config file to %s", userConfig);
+            }
 
 #if MOVIES
             Gst.init( ref args );
