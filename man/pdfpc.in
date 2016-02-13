@@ -352,7 +352,7 @@ For the programmers out there: slide indexes start at 1
 .SH CONFIG FILES
 .PP
 The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
-Additionally, $HOME/.pdfpcrc is also read, if present.
+Additionally, $XDG_CONFIG_DIR/pdfpc/pdfpcrc is also read, if present.
 
 .SS Keybindings
 .PP
@@ -430,7 +430,7 @@ Switch the presentation and the presenter screen. (bool, Default false)
 With GTK3 it is possible to modify the appearance of pdfpc. There are two
 locations where pdfpc is looking for files. The default location is
 @CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. A user can copy
-it to $XDG_CONFIG_HOME/pdfpc.css and change the attributes as he likes.
+it to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and change the attributes as he likes.
 
 .SH BUGS
 
