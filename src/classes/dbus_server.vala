@@ -25,6 +25,8 @@ namespace pdfpc {
     [DBus (name = "io.github.pdfpc")]
     public class DBusServer : Object {
 
+        private string _url;
+
         public signal void overlay_change(int number);
 
         public signal void slide_change(int number);
@@ -41,9 +43,10 @@ namespace pdfpc {
             }
         }
 
+
         public string url {
             get {
-                return this.metadata.pdf_url;
+                return _url;
             }
         }
 
@@ -53,6 +56,7 @@ namespace pdfpc {
         public DBusServer(PresentationController controller, Metadata.Pdf metadata) {
             this.controller = controller;
             this.metadata = metadata;
+            this._url = this.metadata.get_url();
             controller.notify["current-slide-number"].connect(
                 () => overlay_change(controller.current_slide_number));
             controller.notify["current-user-slide-number"].connect(
