@@ -268,6 +268,7 @@ namespace pdfpc {
         protected void add_actions() {
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
+            add_action("lastOverlay", this.jump_to_last_overlay);
             add_action("nextOverlay", this.next_user_page);
             add_action("prev", this.previous_page);
             add_action("prev10", this.back10);
@@ -317,6 +318,7 @@ namespace pdfpc {
         public static string[] getActionDescriptions() {
             return {"next", "Go to next slide",
                 "next10", "Jump 10 slides forward",
+                "lastOverlay", "Jump to the last overlay of the current slide",
                 "nextOverlay", "Jump forward outside of current overlay",
                 "prev", "Go to previous slide",
                 "prev10", "Jump 10 slides back",
@@ -641,9 +643,36 @@ namespace pdfpc {
                         this.fade_to_black();
                     }
                 } else {
-                    // move to the last slide, we we are already at the last user slide
+                    // move to the last slide, we are already at the last user slide
                     this.current_slide_number = this.n_slides - 1;
                 }
+            }
+
+            if (needs_update) {
+                if (!this.frozen) {
+                    this.faded_to_black = false;
+                }
+                this.controllables_update();
+            }
+        }
+
+        /**
+         * Jump to the last overlay for the current user slide
+         */
+        public void jump_to_last_overlay() {
+            this.timer.start();
+            bool needs_update = false; // Did we change anything? Default: no
+
+            // there is a next user slide
+            if (this.current_user_slide_number < this.metadata.get_user_slide_count() - 1) {
+                // last overlay = next user slide (as real) - 1
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1) - 1;
+                needs_update = true;
+            } else {
+                // we are at the last user slide
+                // last overlay == last last
+                this.current_slide_number = this.n_slides - 1;
+                needs_update = true;
             }
 
             if (needs_update) {
