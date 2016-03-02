@@ -5,6 +5,7 @@ bind Next      next
 bind Return    next
 bind Right     next
 bind space     next
+bind l         lastOverlay
 bind Down      nextOverlay
 bind S+Next    next10
 bind S+Return  next10
