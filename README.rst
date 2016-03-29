@@ -19,7 +19,7 @@ at https://pdfpc.github.io/
 
 Installation
 ============
-- On Ubuntu or Debian systems:
+- On Ubuntu or Debian systems::
 
         sudo apt-get install pdf-presenter-console
 - [Compiling from source](#compile-and-install)
@@ -31,7 +31,7 @@ Sample presentations
 - [Simple demo](https://pdfpc.github.io/demo/pdfpc-demo.pdf)
 - [Embedded movies](https://pdfpc.github.io/demo/pdfpc-video-example.zip)
 
-Try it out:
+Try it out::
 
     pdfpc pdfpc-demo.pdf
 
@@ -52,11 +52,11 @@ requirements need to be met:
 - poppler with glib bindings
 - gstreamer 1.0
 
-On Ubuntu systems, you can install these dependencies with:
+On Ubuntu systems, you can install these dependencies with::
 
     sudo apt-get install cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgee-0.8-dev librsvg2-dev libpoppler-glib-dev libgtk2.0-dev libgtk-3-dev
 
-and you should consider installing all the available gstreamer codecs:
+and you should consider installing all the available gstreamer codecs::
 
     sudo apt-get install gstreamer1.0-*
 
@@ -65,15 +65,15 @@ Compiling from source tarballs
 
 You can download the latest stable release of pdfpc in the release section of
 github (https://github.com/pdfpc/pdfpc/releases). Uncompress the tarball (we
-use v4.0.2 as an example here):
+use v4.0.2 as an example here)::
 
     tar xvf pdfpc-4.0.2.tar.gz
 
-Change to the extracted directory:
+Change to the extracted directory::
 
     cd pdfpc-4.0.2
 
-Compile and install:
+Compile and install::
 
     mkdir build/
     cd build/
@@ -89,7 +89,7 @@ distributions you may have to install *-devel* packages).
 Note: You may alter the final installation prefix in the cmake call. By default
 the pdfpc files will be installed under */usr/local/*. If you want to change
 that, for example to be installed under */usr/*, with config files under
-*/etc/* you may specify another installation prefix as follows:
+*/etc/* you may specify another installation prefix as follows::
 
     cmake -DCMAKE_INSTALL_PREFIX="/usr" -DSYSCONFDIR=/etc ..
 
@@ -104,7 +104,7 @@ Compiling from github
 If you want the bleeding-edge version of pdfpc, you should checkout the git
 repository. The *master* branch should be fairly stable and safe to use.
 
-The pdfpc source can be retrieved from github:
+The pdfpc source can be retrieved from github::
 
     git clone git://github.com/pdfpc/pdfpc.git
 
@@ -113,13 +113,13 @@ which has just been created.
 
 You are now set to compile and install pdfpc.  Start by creating a build
 directory (this is optional but it keeps the directories clean, in case you
-want to do some changes):
+want to do some changes)::
 
     mkdir build/
     cd build/
 
 After you are inside the build directory create the needed Makefiles using
-CMake:
+CMake::
 
     cmake ..
 
@@ -136,7 +136,7 @@ packages.
 
 The next step is to compile and install pdfpc using GNU Make or any other make
 derivative you may have installed. Simply issue the following command to start
-building the application:
+building the application::
 
     make
     sudo make install
@@ -148,7 +148,7 @@ Compiling Trouble Shooting
 
 Some distributions do not have a *valac* executable. Instead they ship with a
 version suffix like *valac-0.28*. If cmake can not find your compiler you can
-try running cmake with:
+try running cmake with::
 
     cmake -DVALA_EXECUTABLE:NAMES=valac-0.28 ..
 
@@ -156,7 +156,7 @@ try running cmake with:
 Usage
 =====
 
-Now download some [sample presentations](#sample-presentations) and load  them up:
+Now download some [sample presentations](#sample-presentations) and load  them up::
 
     pdfpc pdfpc-demo.pdf
 
