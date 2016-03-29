@@ -22,14 +22,14 @@ Installation
 - On Ubuntu or Debian systems::
 
         sudo apt-get install pdf-presenter-console
-- [Compiling from source](#compile-and-install)
-- [Compiling from github](#compiling-from-github)
+- `Compiling from source <#compile-and-install>`_
+- `Compiling from github <#compiling-from-github>`_
 
 Sample presentations
 --------------------
 
-- [Simple demo](https://pdfpc.github.io/demo/pdfpc-demo.pdf)
-- [Embedded movies](https://pdfpc.github.io/demo/pdfpc-video-example.zip)
+- `Simple demo <https://pdfpc.github.io/demo/pdfpc-demo.pdf>`_
+- `Embedded movies <https://pdfpc.github.io/demo/pdfpc-video-example.zip>`_
 
 Try it out::
 
