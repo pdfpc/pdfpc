@@ -563,9 +563,7 @@ namespace pdfpc {
             cr.translate(0, this.vheight);
             cr.scale(this.scalex, -this.scaley);
 
-            if (this.noprogress == false) {
-                this.draw_seek_bar(cr, timestamp);
-            }
+            this.draw_seek_bar(cr, timestamp);
 
             // if a stop time is defined, stop there (but still let
             // the user manually seek *after* this timestamp)
@@ -651,7 +649,7 @@ namespace pdfpc {
                 cr.show_text(timestring);
                 cr.restore();
 
-            } else {
+            } else if (this.noprogress == false) {
                 cr.rectangle(0, 0, rect.width, 4);
                 cr.set_source_rgba(0, 0, 0, 0.8);
                 cr.fill();
@@ -661,7 +659,7 @@ namespace pdfpc {
                 cr.rectangle(start_bar, 0, stop_bar - start_bar, 4);
                 cr.set_source_rgba(1,1,1,0.5);
                 cr.fill();
-             }
+            }
         }
 
         /**
