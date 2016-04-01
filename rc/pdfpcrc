@@ -57,6 +57,11 @@ bind minus     decreaseFontSize
 bind KP_Subtract decreaseFontSize
 bind bracketright decreaseFontSize
 
+# Pointer
+bind 8 togglePointer
+bind 7 decreasePointer
+bind 9 increasePointer
+
 #### Mouse bindings
 mouse 1        next
 mouse S+1      next10
