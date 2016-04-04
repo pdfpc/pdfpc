@@ -52,7 +52,7 @@ namespace pdfpc.Window {
 	private Gtk.Fixed fixedLayout;
 
 	public void add_to_fixed(Gtk.Widget w, int x, int y) {
-	       fixedLayout.put(w, y, y);
+	       fixedLayout.put(w, x, y);
 	}
 
         /**
