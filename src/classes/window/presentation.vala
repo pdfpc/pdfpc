@@ -49,11 +49,11 @@ namespace pdfpc.Window {
          */
         protected View.Base view;
 
-	private Gtk.Fixed fixedLayout;
+        private Gtk.Fixed fixedLayout;
 
-	public void add_to_fixed(Gtk.Widget w, int x, int y) {
-	       fixedLayout.put(w, x, y);
-	}
+        public void add_to_fixed(Gtk.Widget w, int x, int y) {
+            fixedLayout.put(w, x, y);
+        }
 
         /**
          * Base constructor instantiating a new presentation window

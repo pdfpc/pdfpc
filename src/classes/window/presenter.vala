@@ -124,11 +124,11 @@ namespace pdfpc.Window {
          **/
         protected int next_allocated_width;
 
-	private Gtk.Fixed fixedLayout;
+        private Gtk.Fixed fixedLayout;
 
-	public void add_to_fixed(Gtk.Widget w, int x, int y) {
-	       fixedLayout.put(w, y, y);
-	}
+        public void add_to_fixed(Gtk.Widget w, int x, int y) {
+               fixedLayout.put(w, y, y);
+        }
 
         /**
          * Base constructor instantiating a new presenter window
@@ -360,8 +360,8 @@ namespace pdfpc.Window {
 
 
 
-	    fixedLayout = new Gtk.Fixed();
-	    fixedLayout.put(current_view, 0, 0);
+            fixedLayout = new Gtk.Fixed();
+            fixedLayout.put(current_view, 0, 0);
 
             var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             current_view_and_stricts.pack_start(fixedLayout, false, false, 0);
