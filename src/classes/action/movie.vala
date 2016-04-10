@@ -99,6 +99,15 @@ namespace pdfpc {
         public virtual void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
                 string uri, bool autostart, bool loop, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
+
+            // A small hack to make videos fit the size of the poster image better.
+            // I presume the mapping area is a bit larger than the actual image size.
+
+            area.x1 += 4.9;
+            area.y1 += 0.9;
+            area.x2 -= 0.9;
+            area.y2 -= 0.8;
+
             other.init(area, controller, document);
             Movie movie = (Movie) other;
             movie.loop = loop;
