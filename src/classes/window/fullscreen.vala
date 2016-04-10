@@ -70,6 +70,11 @@ namespace pdfpc.Window {
                 screen.get_monitor_geometry(current_screen, out this.screen_geometry);
             }
 
+            // We always render ouput to fit to an exact size.
+            // This also forces some tiling window managers like i3 to
+            // put the windows on the right screens.
+            this.resizable = false;
+
             if (!Options.windowed) {
                 // Move to the correct monitor
                 // This movement is done here and after mapping, to minimize flickering
@@ -91,7 +96,6 @@ namespace pdfpc.Window {
                         this.screen_geometry.width /= 2;
                         this.screen_geometry.height /= 2;
                 }
-                this.resizable = false;
             }
 
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
