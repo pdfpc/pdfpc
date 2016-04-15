@@ -64,6 +64,11 @@ namespace pdfpc {
          */
         protected bool loop;
 
+        /**
+         * A flag to indicated whether the progress bar should be supressed.
+         */
+        protected bool noprogress = false;
+
          /**
          * A flag to indicate whether the audio should be played or not.
          */
@@ -98,10 +103,11 @@ namespace pdfpc {
          */
         public virtual void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
+                string uri, bool autostart, bool loop, bool noprogress, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
             other.init(area, controller, document);
             Movie movie = (Movie) other;
             movie.loop = loop;
+            movie.noprogress = noprogress;
             movie.noaudio = noaudio;
             movie.starttime = start;
             movie.stoptime = stop;
@@ -157,6 +163,7 @@ namespace pdfpc {
             bool autostart = "autostart" in queryarray;
             bool noaudio = "noaudio" in queryarray;
             bool loop = "loop" in queryarray;
+            bool noprogress = "noprogress" in queryarray;
             var start = 0;
             var stop = 0;
             foreach (string param in queryarray) {
@@ -176,7 +183,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, noaudio, start, stop);
+            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, noprogress, noaudio, start, stop);
             return new_obj;
         }
 
@@ -264,7 +271,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, false, 0, 0, temp);
+            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, false, false, 0, 0, temp);
             return new_obj;
         }
 
@@ -484,8 +491,8 @@ namespace pdfpc {
          */
         public override void init_other(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document, string file,
-                bool autostart, bool loop, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
-            base.init_other(other, area, controller, document, file, autostart, loop, noaudio, start, stop, temp);
+                bool autostart, bool loop, bool noprogress, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
+            base.init_other(other, area, controller, document, file, autostart, loop, noprogress, noaudio, start, stop, temp);
             ControlledMovie movie = (ControlledMovie) other;
             controller.main_view.motion_notify_event.connect(movie.on_motion);
             controller.main_view.button_release_event.connect(movie.on_button_release);
@@ -642,7 +649,7 @@ namespace pdfpc {
                 cr.show_text(timestring);
                 cr.restore();
 
-            } else {
+            } else if (this.noprogress == false) {
                 cr.rectangle(0, 0, rect.width, 4);
                 cr.set_source_rgba(0, 0, 0, 0.8);
                 cr.fill();
@@ -652,7 +659,7 @@ namespace pdfpc {
                 cr.rectangle(start_bar, 0, stop_bar - start_bar, 4);
                 cr.set_source_rgba(1,1,1,0.5);
                 cr.fill();
-             }
+            }
         }
 
         /**

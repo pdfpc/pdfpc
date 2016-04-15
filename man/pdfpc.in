@@ -309,9 +309,12 @@ supported. (Also, run ps2pdf with the \-dNOSAFER flag.)
 .PP
 As a perhaps simpler option, pdfpc will play back movies linked from a
 hyperlink of type "launch".  A query string may be added to the URL of the
-movie to enable the "autostart" and "loop" properties.  (E.g., a link to
-"movie.avi?autostart&loop" will start playing automatically, and loop when
-it reaches the end.)  In LaTeX, such links are created with
+movie to enable the "autostart", "loop" and "noprogress" properties, if
+necessary.  (E.g., a link to "movie.avi?autostart&loop&noprogress" will add a
+video that starts playing automatically, loops when it reaches the end, and
+does not show the progress bar.)
+
+In LaTeX, such links are created with
 
 .RS
 \\usepackage{hyperref}
