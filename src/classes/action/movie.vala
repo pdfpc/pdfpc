@@ -544,7 +544,7 @@ namespace pdfpc {
          * for the view with the controls.)
          */
         public void on_prepare(Gst.Element overlay, Gst.Caps caps) {
-            var info = Gst.Video.Info();
+            var info = new Gst.Video.Info();
             info.from_caps(caps);
             int width = info.width, height = info.height;
             this.scalex = (double) width / rect.width;
