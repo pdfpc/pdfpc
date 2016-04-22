@@ -143,6 +143,29 @@ building the application::
 
 Congratulations you just installed pdfpc on your system.
 
+Compiling on Windows
+--------------------
+
+On issue #106 there is a short tutorial on how to compile pdfpc on Windows.
+First a cygwin installation with the following depedencies is needed:
+
+- cmake
+- automake
+- make
+- gcc
+- gcc-c++
+- libstdc++-4.8-dev
+- x11
+
+For pdfpc the following compile time dependencies are necessary:
+
+- vala
+- gtk
+- gee
+- libpoppler
+- gstreamer
+- libgstinterfaces1.0-devel (has gstreamer.audio included)
+
 Compiling Trouble Shooting
 --------------------------
 
