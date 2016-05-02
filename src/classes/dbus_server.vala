@@ -72,7 +72,7 @@ namespace pdfpc {
                     } catch (IOError e) {
                         warning("Could not register DBus service.");
                     }
-                }, () => {}, () => warning("Could not aquire DBus bus."));
+                }, () => {}, () => warning("Could not acquire DBus bus."));
         }
 
         public void trigger_action(string name) {
