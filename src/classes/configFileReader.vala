@@ -7,6 +7,7 @@
  * Copyright 2015 Robert Schroll
  * Copyright 2015 Andreas Bilke
  * Copyright 2016 Andy Barry
+ * Copyright 2016 Joakim Nilsson
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +55,14 @@ namespace pdfpc {
                     }
                 }
                 code = conversor(fields[1]);
+            }
+            // 'X' adds keybinding shift+x
+            if ('A' <= code && code <= 'Z') { // If uppercase
+                modMask |= Gdk.ModifierType.SHIFT_MASK;
+            }
+            // 'S+x' adds keybinding shift+x
+            if ('a' <= code && code <= 'z' && ((modMask | Gdk.ModifierType.SHIFT_MASK) == modMask)) { // If lowercase without shift
+                code ^= (1 << 5); // Toggle case
             }
         }
 

@@ -387,6 +387,13 @@ A/M (for Alt/Meta). E.g.
 .TP
 bind S+Next    next10
 .P
+A shorthand for specifying key combinations constituting shift and an
+alphabetic character is to simply give the uppercase version of the
+alphabetic character. For example, to bind <shift>+r to the 'reset'
+function, use
+.TP
+bind R reset
+.P
 A list of all possible functions can be obtained
 via the \-L command line option.
 
