@@ -34,19 +34,6 @@ namespace pdfpc {
      * initializing the application, like commandline parsing and window creation.
      */
     public class Application: GLib.Object {
-        /**
-         * Window which shows the current slide in fullscreen
-         *
-         * This window is supposed to be shown on the beamer
-         */
-        private Window.Presentation presentation_window;
-
-        /**
-         * Presenter window showing the current and the next slide as well as
-         * different other meta information useful for the person giving the
-         * presentation.
-         */
-        private Window.Presenter presenter_window;
 
         /**
          * PresentationController instanace managing all actions which need to
@@ -166,24 +153,24 @@ namespace pdfpc {
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presenter create_presenter_window( Metadata.Pdf metadata, int monitor ) {
-            var presenter_window = new Window.Presenter( metadata, monitor, this.controller );
-            //controller.register_controllable( presenter_window );
-            presenter_window.set_cache_observer( this.cache_status );
+        private Window.Presenter create_presenter( Metadata.Pdf metadata, int monitor ) {
+            this.controller.presenter = new Window.Presenter( metadata, monitor, this.controller );
+            //controller.register_controllable( controller.presenter );
+            controller.presenter.set_cache_observer( this.cache_status );
 
-            return presenter_window;
+            return controller.presenter;
         }
 
         /**
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation_window( Metadata.Pdf metadata, int monitor, int width = -1, int height = -1 ) {
-            var presentation_window = new Window.Presentation( metadata, monitor, this.controller, width, height );
-            //controller.register_controllable( presentation_window );
-            presentation_window.set_cache_observer( this.cache_status );
+        private Window.Presentation create_presentation( Metadata.Pdf metadata, int monitor, int width = -1, int height = -1 ) {
+            this.controller.presentation = new Window.Presentation( metadata, monitor, this.controller, width, height );
+            //controller.register_controllable( controller.presentation );
+            controller.presentation.set_cache_observer( this.cache_status );
 
-            return presentation_window;
+            return controller.presentation;
         }
 
         /**
@@ -277,34 +264,34 @@ namespace pdfpc {
                 else
                     presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
                 presentation_monitor = (presenter_monitor + 1) % 2;
-                this.presenter_window =
-                    this.create_presenter_window( metadata, presenter_monitor );
-                this.presentation_window =
-                    this.create_presentation_window( metadata, presentation_monitor, width, height );
+                this.controller.presenter =
+                    this.create_presenter( metadata, presenter_monitor );
+                this.controller.presentation =
+                    this.create_presentation( metadata, presentation_monitor, width, height );
             } else if (Options.windowed && !Options.single_screen) {
-                this.presenter_window =
-                    this.create_presenter_window( metadata, -1 );
-                this.presentation_window =
-                    this.create_presentation_window( metadata, -1, width, height );
+                this.controller.presenter =
+                    this.create_presenter( metadata, -1 );
+                this.controller.presentation =
+                    this.create_presentation( metadata, -1, width, height );
             } else {
                     if ( !Options.display_switch)
-                        this.presenter_window =
-                            this.create_presenter_window( metadata, -1 );
+                        this.controller.presenter =
+                            this.create_presenter( metadata, -1 );
                     else
-                        this.presentation_window =
-                            this.create_presentation_window( metadata, -1, width, height );
+                        this.controller.presentation =
+                            this.create_presentation( metadata, -1, width, height );
             }
 
             // The windows are always displayed at last to be sure all caches have
             // been created at this point.
-            if ( this.presentation_window != null ) {
-                this.presentation_window.show_all();
-                this.presentation_window.update();
+            if ( this.controller.presentation != null ) {
+                this.controller.presentation.show_all();
+                this.controller.presentation.update();
             }
 
-            if ( this.presenter_window != null ) {
-                this.presenter_window.show_all();
-                this.presenter_window.update();
+            if ( this.controller.presenter != null ) {
+                this.controller.presenter.show_all();
+                this.controller.presenter.update();
             }
 
             // Enter the Glib eventloop

@@ -74,6 +74,49 @@ namespace pdfpc {
         }
 
         /**
+         * Presenter window showing the current and the next slide as well as
+         * different other meta information useful for the person giving the
+         * presentation.
+         */
+        public Window.Presenter presenter {
+            get {
+                return _presenter;
+            }
+            set {
+                _presenter = value;
+                if (value != null) {
+                    presenter.current_view.size_allocate.connect(init_presenter_pointer);
+                }
+            }
+        }
+        private Window.Presenter _presenter=null;
+
+
+
+        /**
+         * Window which shows the current slide in fullscreen
+         *
+         * This window is supposed to be shown on the beamer
+         */
+        public Window.Presentation presentation {
+            get {
+                return _presentation;
+            }
+            set {
+                _presentation = value;
+                if (value != null) {
+                    presentation.main_view.size_allocate.connect(init_presentation_pointer);
+                }
+            }
+        }
+        private Window.Presentation _presentation=null;
+        public Gtk.Image presenter_pointer;
+        public Gtk.Image presentation_pointer;
+
+        public Gtk.DrawingArea presenter_surface;
+        public Gtk.DrawingArea presentation_surface;
+
+        /**
          * Key modifiers that we support
          */
         public uint accepted_key_mods = Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.META_MASK;
@@ -242,8 +285,160 @@ namespace pdfpc {
 
             readKeyBindings();
             readMouseBindings();
+
+
             DBusServer.start_server(this, this.metadata);
         }
+
+        private Gtk.Allocation presenter_allocation;
+        private Gtk.Allocation presentation_allocation;
+        private uint pointer_size = 10;
+        private uint pointer_step = 10;
+
+        private double highlight_x;
+        private double highlight_y;
+        private double highlight_w;
+        private double highlight_h;
+        private double drag_x;
+        private double drag_y;
+        private bool pointer_enabled = false;
+        private double pointer_x;
+        private double pointer_y;
+
+        protected void init_presentation_pointer(Gtk.Allocation a) {
+            presentation_allocation = a;
+            presentation_surface = new Gtk.DrawingArea();
+            presentation_surface.set_size_request(a.width, a.height);
+            var transparent = Gdk.RGBA ();
+            transparent.alpha=0;
+            this.presentation_surface.override_background_color(Gtk.StateFlags.NORMAL, transparent);
+            this.presentation_surface.draw.connect ((context) => {
+                    draw_pointer(context, presentation_allocation);
+                    return true;
+                });
+            presentation.add_to_fixed(presentation_surface, a.x, a.y);
+        }
+
+        protected void init_presenter_pointer(Gtk.Allocation a) {
+            presenter_allocation = a;
+            presenter_surface = new Gtk.DrawingArea();
+            presenter_surface.set_size_request(a.width, a.height);
+            var transparent = Gdk.RGBA ();
+            transparent.alpha=0;
+            this.presenter_surface.override_background_color(Gtk.StateFlags.NORMAL, transparent);
+            this.presenter_surface.draw.connect ((context) => {
+                    draw_pointer(context, presenter_allocation);
+                    return true;
+                });
+            drag_x=-1;
+            drag_y=-1;
+            this.presenter_surface.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
+            this.presenter_surface.button_press_event.connect((event) => {
+                    drag_x=event.x/presenter_allocation.width;
+                    drag_y=event.y/presenter_allocation.height;
+                    highlight_w=0;
+                    highlight_h=0;
+                    return true;
+                });
+            this.presenter_surface.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
+            this.presenter_surface.button_release_event.connect((event) => {
+                    update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
+                    drag_x=-1;
+                    drag_y=-1;
+                    return true;
+                });
+            this.presenter_surface.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
+            this.presenter_surface.motion_notify_event.connect(on_move);
+            presenter.add_to_fixed(presenter_surface, a.x, a.y);
+            var w = presenter_surface.get_window();
+            if (w != null) {
+                w.set_cursor(new Gdk.Cursor.from_name(Gdk.Display.get_default(), "none"));
+            }
+            //presenter_surface.show();
+
+        }
+
+        public void move_pointer(double percent_x, double percent_y) {
+            pointer_y = percent_y;
+            pointer_x = percent_x;
+            if (presenter!=null) presenter_surface.queue_draw();
+            if (presentation!=null) presentation_surface.queue_draw();
+        }
+
+        /**
+         * Handle mouse scrolling events on the window and, if neccessary send
+         * them to the presentation controller
+         */
+        protected bool on_move( Gtk.Widget source, Gdk.EventMotion move ) {
+            move_pointer(move.x / (double) presenter_allocation.width, move.y / (double) presenter_allocation.height);
+            update_highlight(move.x/presenter_allocation.width, move.y/presenter_allocation.height);
+            return true;
+        }
+
+
+        protected void update_highlight(double x, double y) {
+            if (drag_x!=-1) {
+                highlight_w=Math.fabs(drag_x-x);
+                highlight_h=Math.fabs(drag_y-y);
+                highlight_x=(drag_x<x?drag_x:x);
+                highlight_y=(drag_y<y?drag_y:y);
+                if (presenter!=null) presenter_surface.queue_draw();
+                if (presentation!=null) presentation_surface.queue_draw();
+            }
+        }
+
+        protected void draw_pointer(Cairo.Context context, Gtk.Allocation a) {
+            if (pointer_enabled) {
+                int x = (int)(a.width*pointer_x);
+                int y = (int)(a.height*pointer_y);
+                int r = (int)(a.height*0.001*pointer_size);
+
+                if (highlight_w>0) {
+                    context.rectangle(0,0,a.width, a.height);
+                    context.new_sub_path();
+                    context.rectangle((int)(highlight_x*a.width), (int)(highlight_y*a.height), (int)(highlight_w*a.width), (int)(highlight_h*a.height));
+
+                    context.set_fill_rule (Cairo.FillRule.EVEN_ODD);
+                    context.set_source_rgba(0,0,0,0.5);
+                    context.fill_preserve();
+
+                    //cursor
+                    context.new_path();
+                    context.set_source_rgba(255,0,0,0.5);
+                    context.arc(x, y, r, 0, 2*Math.PI);
+                    context.fill();
+                } else {
+                    context.set_source_rgba(255,0,0,0.5);
+                    context.arc(x, y, r, 0, 2*Math.PI);
+                    context.fill();
+                }
+            }
+        }
+
+
+        public void toggle_pointers() {
+            pointer_enabled = !pointer_enabled;
+            if (pointer_enabled) {
+                if (presenter!=null) presenter_surface.show();
+                if (presentation!=null) presentation_surface.show();
+            } else {
+                if (presenter!=null) presenter_surface.hide();
+                if (presentation!=null) presentation_surface.hide();
+            }
+        }
+
+        public void inc_pointer() {
+            if (pointer_size<1000) pointer_size+=pointer_step;
+            if (presenter!=null) presenter_surface.queue_draw();
+            if (presentation!=null) presentation_surface.queue_draw();
+        }
+
+        public void dec_pointer() {
+            if (pointer_size>pointer_step) pointer_size-=pointer_step;
+            if (presenter!=null) presenter_surface.queue_draw();
+            if (presentation!=null) presentation_surface.queue_draw();
+        }
+
 
         /*
          * Inform metadata of quit, and then quit.
@@ -266,6 +461,11 @@ namespace pdfpc {
         }
 
         protected void add_actions() {
+            add_action("togglePointer", this.toggle_pointers);
+            add_action("increasePointer", this.inc_pointer);
+            add_action("decreasePointer", this.dec_pointer);
+
+
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
             add_action("lastOverlay", this.jump_to_last_overlay);
@@ -340,6 +540,9 @@ namespace pdfpc {
                 "endSlide", "Set current slide as end slide",
                 "increaseFontSize", "Increase the current font size by 10%",
                 "decreaseFontSize", "Decrease the current font size by 10%",
+                "togglePointer", "Toggle pointer mode",
+                "increasePointer", "Increase pointer size",
+                "decreasePointer", "Decrease pointer size",
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
                 "quit", "Exit pdfpc"
             };
@@ -1007,6 +1210,7 @@ namespace pdfpc {
             tm.strptime(t + ":00", "%H:%M:%S");
             return tm.mktime();
         }
+
 
 #if MOVIES
         /**

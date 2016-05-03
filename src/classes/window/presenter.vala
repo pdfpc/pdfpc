@@ -51,7 +51,7 @@ namespace pdfpc.Window {
         /**
          * View showing the current slide
          */
-        protected View.Base current_view;
+        public View.Base current_view;
 
         /**
          * View showing a preview of the next slide
@@ -123,6 +123,12 @@ namespace pdfpc.Window {
          * Width of next/notes area
          **/
         protected int next_allocated_width;
+
+        private Gtk.Fixed fixedLayout;
+
+        public void add_to_fixed(Gtk.Widget w, int x, int y) {
+               fixedLayout.put(w, y, y);
+        }
 
         /**
          * Base constructor instantiating a new presenter window
@@ -352,9 +358,14 @@ namespace pdfpc.Window {
             this.current_view.halign = Gtk.Align.CENTER;
             this.current_view.valign = Gtk.Align.CENTER;
 
-            var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
-            current_view_and_stricts.pack_start(current_view, false, false, 2);
-            current_view_and_stricts.pack_start(strict_views, false, false, 2);
+
+
+            fixedLayout = new Gtk.Fixed();
+            fixedLayout.put(current_view, 0, 0);
+
+            var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            current_view_and_stricts.pack_start(fixedLayout, false, false, 0);
+            current_view_and_stricts.pack_start(strict_views, false, false, 0);
 
 
             slide_views.pack_start(current_view_and_stricts, true, true, 0);
