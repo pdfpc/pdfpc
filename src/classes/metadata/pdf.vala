@@ -67,6 +67,11 @@ namespace pdfpc.Metadata {
         protected slides_notes notes;
 
         /**
+         * Jump Points
+         */
+        protected jump_points jump_points;
+
+        /**
          * The a virtual mapping of "real pages" to "user-view pages". The
          * indexes in the vector are the user-view slide, the contents are the
          * real slide numbers.
@@ -112,7 +117,6 @@ namespace pdfpc.Metadata {
                 for (int i = 1; i < config_sections.length; i += 2) {
                     string section_type =  config_sections[i].strip();
                     string section_content =  config_sections[i + 1].strip();
-
                     switch (section_type) {
                         case "[file]": {
                             this.pdf_fname = section_content;
@@ -139,6 +143,10 @@ namespace pdfpc.Metadata {
                             this.font_size = int.parse(section_content);
                             break;
                         }
+                        case "[jump_points]": {
+                            this.jump_points.parse_lines(section_content.split("\n"));
+                            break;
+                        }
                         default: {
                             GLib.printerr("unknown section type %s\n", section_type);
                             break;
@@ -148,6 +156,10 @@ namespace pdfpc.Metadata {
             } catch (Error e) {
                 error("%s", e.message);
             }
+        }
+
+        public Gee.HashMap<uint, int> get_jump_points() {
+          return this.jump_points.get_points();
         }
 
         /**
@@ -209,6 +221,7 @@ namespace pdfpc.Metadata {
                               + format_skips()
                               + format_end_user_slide()
                               + format_font_size()
+                              + format_jump_points()
                               + format_notes();
             try {
                 if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
@@ -248,6 +261,15 @@ namespace pdfpc.Metadata {
             }
 
             return contents;
+        }
+
+        protected string format_jump_points() {
+          string formatted = this.jump_points.format_to_save();
+          if (formatted.length > 0) {
+            return "[jump_points]\n" + formatted;
+          } else {
+            return "";
+          }
         }
 
         protected string format_font_size() {
@@ -308,6 +330,7 @@ namespace pdfpc.Metadata {
 
             fill_path_info(fname);
             notes = new slides_notes();
+            jump_points = new pdfpc.Metadata.jump_points();
             skips_by_user = false;
             string? skip_line = null;
             if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {

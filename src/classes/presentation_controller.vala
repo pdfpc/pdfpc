@@ -286,6 +286,7 @@ namespace pdfpc {
             readKeyBindings();
             readMouseBindings();
 
+            bind_jump_keys();
 
             DBusServer.start_server(this, this.metadata);
         }
@@ -501,6 +502,12 @@ namespace pdfpc {
 
             add_action("exitState", this.exit_state);
             add_action("quit", this.quit);
+
+            foreach (Gee.Map.Entry<uint, int> jump_point in this.metadata.get_jump_points().entries) {
+              SimpleAction jump_action = new SimpleAction(@"jumpToSlide_$(jump_point.value)", null);
+              jump_action.activate.connect(() => this.goto_slide(jump_point.value));
+              this.action_group.add_action(jump_action);
+            }
         }
 
         protected void add_action(string name, callback func) {
@@ -510,7 +517,7 @@ namespace pdfpc {
         }
 
         /**
-         * Gets an array wit all function names
+         * Gets an array with all function names
          *
          * It would be more legant yo use the keys property of actionNames, but
          * we would need an instance for doing this...
@@ -553,6 +560,13 @@ namespace pdfpc {
          */
         public void trigger_action(string name) {
             this.action_group.activate_action(name, null);
+        }
+
+        private void bind_jump_keys() {
+          foreach (Gee.Map.Entry<uint, int> jump_point in this.metadata.get_jump_points().entries) {
+            Action jump_action =  this.action_group.lookup_action(@"jumpToSlide_$(jump_point.value)");
+            this.keyBindings.set(new KeyDef(jump_point.key, 0), jump_action);
+          }
         }
 
         /**
@@ -983,6 +997,22 @@ namespace pdfpc {
                 this.faded_to_black = false;
             }
             this.controllables_update();
+        }
+
+        public void goto_slide(int nr) {
+          if (this.overview_shown) {
+              return;
+          }
+
+          this.timer.start();
+
+          this.current_user_slide_number = nr;
+          this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+
+          if (!this.frozen) {
+              this.faded_to_black = false;
+          }
+          this.controllables_update();
         }
 
         /**
