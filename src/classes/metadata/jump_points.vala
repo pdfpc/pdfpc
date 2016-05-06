@@ -1,11 +1,10 @@
 /**
- * Storage for the notes of a presentation
+ * Storage for the jump points of a presentation
  *
  * This file is part of pdfpc.
  *
- * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
- * Copyright 2012 David Vilar
  * Copyright 2015 Andreas Bilke
+ * Original Author: Lukas Barth
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
