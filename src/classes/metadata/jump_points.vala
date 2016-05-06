@@ -51,8 +51,11 @@ namespace pdfpc.Metadata {
           for (int i = 0 ; i < lines.length ; i++) {
             string line = lines[i];
             string[] tokens = line.split("=");
+            if (tokens.length != 2) {
+              continue;
+            }
             uint key = Gdk.keyval_from_name(tokens[0].strip());
-            int slide_no = int.parse(tokens[1]);
+            int slide_no = int.parse(tokens[1]) - 1;
 
             this.points.set(key, slide_no);
           }
