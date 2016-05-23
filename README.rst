@@ -22,6 +22,11 @@ Installation
 - On Ubuntu or Debian systems::
 
         sudo apt-get install pdf-presenter-console
+
+- On Fedora::
+
+        sudo dnf install pdfpc
+
 - `Compiling from source <#compile-and-install>`_
 - `Compiling from github <#compiling-from-github>`_
 
