@@ -98,6 +98,7 @@ namespace pdfpc.Window {
                         this.screen_geometry.width /= 2;
                         this.screen_geometry.height /= 2;
                 }
+                this.resizable = false;
             }
 
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
