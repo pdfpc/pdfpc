@@ -2,6 +2,23 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.3
+=============
+
+*Released: July 2016*
+
+- Compiles with vala 0.32
+
+- pdfpc can now show some highlighting pointer
+
+- Adds D-Bus Server for controlling pdfpc
+
+- Minor Improvements:
+    - Search pdfpcrc files in XDG compliant directories
+    - Key shortcut to jump to the last overlay
+    - Made progress bar in movie playback optional
+
+
 Version 4.0.2
 =============
 
