@@ -73,7 +73,7 @@ namespace pdfpc.Window {
             // We always render ouput to fit to an exact size.
             // This also forces some tiling window managers like i3 to
             // put the windows on the right screens.
-            this.resizable = false;
+            this.resizable = true;
 
             if (!Options.windowed) {
                 // Move to the correct monitor
