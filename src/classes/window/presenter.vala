@@ -199,7 +199,7 @@ namespace pdfpc.Window {
             this.strict_next_view = new View.Pdf.from_metadata(
                 metadata,
                 (int) Math.floor(0.5 * current_allocated_width),
-                (int) Math.floor(0.19 * bottom_position) - 2,
+                (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
                 true,
                 false,
@@ -209,7 +209,7 @@ namespace pdfpc.Window {
             this.strict_prev_view = new View.Pdf.from_metadata(
                 metadata,
                 (int) Math.floor(0.5 * current_allocated_width),
-                (int) Math.floor(0.19 * bottom_position) - 2,
+                (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
                 true,
                 false,
