@@ -5,7 +5,7 @@ pdfpc Changelog
 Version 4.0.3
 =============
 
-*Released: July 2016*
+*Released: October 2016*
 
 - Compiles with vala 0.32
 
