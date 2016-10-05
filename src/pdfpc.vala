@@ -102,7 +102,7 @@ namespace pdfpc {
          * Print version string and copyright statement
          */
         private void print_version() {
-            stdout.printf("pdfpc v4.0.2\n"
+            stdout.printf("pdfpc v4.0.3\n"
                         + "(C) 2015-2016 Robert Schroll, Andreas Bilke, Andy Barry and others\n"
                         + "(C) 2012 David Vilar\n"
                         + "(C) 2009-2011 Jakob Westhoff\n\n"
