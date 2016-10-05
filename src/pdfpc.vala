@@ -186,6 +186,12 @@ namespace pdfpc {
                 print_version();
                 Posix.exit(0);
             }
+
+            if (Options.notes_position != null) {
+                Options.disable_auto_grouping = true;
+                stderr.printf("--notes option detected. Disable auto grouping.\n");
+            }
+
             ConfigFileReader configFileReader = new ConfigFileReader();
             configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
             configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
