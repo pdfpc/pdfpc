@@ -22,6 +22,14 @@ progressbar trough {
     background-color: white;
 }
 
+GtkProgressBar * {
+    background-color: blue;
+}
+
+GtkProgressBar {
+    background-color: white;
+}
+
 /* The bottom text is automatically sized based on the resolution of
  * the presenter's screen but setting this value in the user's custom
  * CSS will override the auto-sizing.  See the man page for more
