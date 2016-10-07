@@ -45,7 +45,7 @@ presentation.
 End time of the presentation. (Format: HH:MM (24h))
 .TP
 .BI "\-l, \-\-last\-minutes"=N
-Time in minutes, from which on the timer changes its color. (Default 5 minutes)
+Time in minutes, from which on the timer changes its color. (Default: 5 minutes)
 .TP
 .BI "\-t, \-\-start\-time"=T
 Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
@@ -79,7 +79,7 @@ Run in windowed mode
 Size of the presentation window in width:height format (forces windowed mode)
 .TP
 .BI "\-n, \-\-notes"=P
-Position of notes on the PDF page. Position can be either left, right, top or bottom (Default none)
+Position of notes on the PDF page. Position can be either left, right, top or bottom (Default: none)
 .TP
 .BI "\-h, \-\-help"
 Shows the help
