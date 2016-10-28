@@ -1,13 +1,32 @@
 * {
     background-color: black;
     background-image: none;
+    border: none;
     color: white;
     font-family: Verdana;
 }
 
-/* .slider and .trough are parts of scrollbar */
-.slider, .progressbar {
-    border: none;
+scrolledwindow trough * {
+    background-color: gray;
+}
+
+scrolledwindow trough {
+    background-color: white;
+}
+
+progressbar trough * {
+    background-color: blue;
+}
+
+progressbar trough {
+    background-color: white;
+}
+
+GtkProgressBar * {
+    background-color: blue;
+}
+
+GtkProgressBar {
     background-color: white;
 }
 
@@ -19,14 +38,6 @@
         font-size: 5em;
     }
  */
-
-GtkProgressBar {
-    color: gray;
-}
-
-.trough {
-    border: none;
-}
 
 pdfpcTimerLabel.pretalk {
     color: green;
