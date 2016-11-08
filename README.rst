@@ -171,6 +171,20 @@ For pdfpc the following compile time dependencies are necessary:
 - gstreamer
 - libgstinterfaces1.0-devel (has gstreamer.audio included)
 
+Compiling in Mac OS X (Yosemite)
+--------------------------------
+
+First, install homebrew as described on their webpage, then install the dependencies::
+
+    brew install cmake vala gtk+3 libgee poppler
+
+You need to call cmake with::
+
+    cmake -DMOVIES=off
+
+since Yosemite has no X11 implementation, and the movie playback uses X11
+features. Note that the icons don't load (see issue #179)
+
 Compiling Trouble Shooting
 --------------------------
 
