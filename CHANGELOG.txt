@@ -2,6 +2,15 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.4
+=============
+
+*Released: November 2016*
+
+- auto-workaround for notes and auto-grouping bug
+
+- fix CSS for newer GTK versions
+
 Version 4.0.3
 =============
 
