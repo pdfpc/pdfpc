@@ -187,7 +187,6 @@ namespace pdfpc {
                 Posix.exit(0);
             }
 
-            stdout.printf("%s\n", Options.notes_position);
             if (Options.notes_position != null) {
                 Options.disable_auto_grouping = true;
                 stderr.printf("--notes option detected. Disable auto grouping.\n");
