@@ -202,6 +202,10 @@ Now download some [sample presentations](#sample-presentations) and load  them u
 
     pdfpc pdfpc-demo.pdf
 
+FAQ
+===
+* Embedded video playback is not working.
+ * You likely have a ``gstreamer`` codec issue.  Try loading the video file you want to play with the following command: ``gst-launch-1.0 filesrc location=<your video> ! decodebin ! autovideosink``  If the video plays, go ahead and `submit an issue <https://github.com/pdfpc/pdfpc/issues>`_.  Otherwise, the command will likely output some good hints for why gstreamer cannot decode the video.
 
 Acknowledgements
 ================
