@@ -58,6 +58,11 @@ namespace pdfpc {
         public static bool disable_caching = false;
 
         /**
+         * Commandline option which allows to persist the cache in a file
+         */
+        public static bool persist_cache = false;
+
+        /**
          * Commandline option to disable the compression of cached slides. This
          * trades speed for memory. A lot of memory ;) It's about factor 30
          * bigger for normal presentations.

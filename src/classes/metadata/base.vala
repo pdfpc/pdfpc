@@ -54,6 +54,13 @@ namespace pdfpc {
         }
 
         /**
+         * Return the registered file name
+         */
+        public string get_fname() {
+            return this.fname;
+        }
+
+        /**
          * Return the number of slides defined by the given url
          */
         public abstract uint get_slide_count();
