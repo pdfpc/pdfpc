@@ -22,12 +22,12 @@ progressbar trough {
     background-color: white;
 }
 
-GtkProgressBar * {
-    background-color: blue;
-}
-
 GtkProgressBar {
     background-color: white;
+}
+
+GtkProgressBar * {
+    background-color: blue;
 }
 
 /* The bottom text is automatically sized based on the resolution of
