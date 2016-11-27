@@ -47,6 +47,7 @@ namespace pdfpc.Renderer.Cache {
          * Store a surface in the cache using the given index as identifier
          */
         public override void store( uint index, Cairo.ImageSurface surface ) {
+            cache_update_required = true;
             Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
                 surface.get_height());
             uint8[] buffer;

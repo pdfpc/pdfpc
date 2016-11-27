@@ -58,7 +58,7 @@ namespace pdfpc.Renderer.Cache {
          * on-disk slide cache
          */
         public static void persist_all() {
-            if(!cache_update_required) {
+            if(!cache_update_required || !Options.persist_cache) {
                 return;
             }
 

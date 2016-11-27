@@ -46,6 +46,7 @@ namespace pdfpc.Renderer.Cache {
          * Store a surface in the cache using the given index as identifier
          */
         public override void store( uint index, Cairo.ImageSurface surface ) {
+            cache_update_required = true;
             this.storage[index] = surface;
         }
 
