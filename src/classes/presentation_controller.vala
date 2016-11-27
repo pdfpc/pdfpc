@@ -811,11 +811,7 @@ namespace pdfpc {
             // there is a next slide
             if (this.current_slide_number < this.n_slides - 1) {
                 ++this.current_slide_number;
-
-                // if the next slide is also a new user slide
-                if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1)) {
-                    ++this.current_user_slide_number;
-                }
+                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
 
                 if (!this.frozen) {
                     this.faded_to_black = false;
@@ -893,12 +889,8 @@ namespace pdfpc {
             this.timer.start();
 
             if (this.current_slide_number > 0) {
-                if (this.current_slide_number == this.metadata.user_slide_to_real_slide(this.current_user_slide_number)) {
-                    --this.current_user_slide_number;
-                    this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-                } else {
-                    --this.current_slide_number;
-                }
+                --this.current_slide_number;
+                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
 
                 if (!this.frozen) {
                     this.faded_to_black = false;
