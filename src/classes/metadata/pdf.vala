@@ -434,7 +434,9 @@ namespace pdfpc.Metadata {
          * Transform from user slide numbers to real slide numbers
          */
         public int user_slide_to_real_slide(int number) {
-            if (number < user_view_indexes.length) {
+            if (number + 1 < user_view_indexes.length) {
+                return this.user_view_indexes[number+1] - 1;
+            } else if (number < user_view_indexes.length) {
                 return this.user_view_indexes[number];
             } else {
                 return (int)this.page_count;
@@ -445,7 +447,7 @@ namespace pdfpc.Metadata {
             // Here we could do a binary search
             int user_slide = 0;
             for (int u = 0; u < this.get_user_slide_count(); ++u) {
-                int real_slide = this.user_slide_to_real_slide(u);
+                int real_slide = this.user_view_indexes[u];
                 if (number == real_slide) {
                     user_slide = u;
                     break;
