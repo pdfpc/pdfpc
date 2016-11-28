@@ -65,6 +65,11 @@ namespace pdfpc {
         public static bool disable_cache_compression = false;
 
         /**
+         * Commandline option to persist the PNG cache to disk.
+         */
+        public static bool persist_cache = false;
+
+        /**
          * Commandline option to disable the auto detection of overlay slides
          */
         public static bool disable_auto_grouping = false;

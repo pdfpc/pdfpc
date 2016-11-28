@@ -60,6 +60,7 @@ namespace pdfpc {
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
+            { "persist-cache", 'p', 0, 0, ref Options.persist_cache, "Persist the PNG cache on disk for faster startup.", null },
             { "disable-auto-grouping", 'g', 0, 0, ref Options.disable_auto_grouping, "Disable auto detection and grouping of overlayed slides", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
