@@ -45,6 +45,10 @@ namespace pdfpc.Renderer.Cache {
          * Store a surface in the cache using the given index as identifier
          */
         public override void store( uint index, Cairo.ImageSurface surface ) {
+            png_store(index, surface);
+        }
+
+        protected void png_store(uint index, Cairo.ImageSurface surface ) {
             Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
                 surface.get_height());
             uint8[] buffer;
@@ -66,6 +70,10 @@ namespace pdfpc.Renderer.Cache {
          * If no item with the given index is available null is returned
          */
         public override Cairo.ImageSurface? retrieve( uint index ) {
+            return png_retrieve(index);
+        }
+
+        protected Cairo.ImageSurface? png_retrieve( uint index ) {
             var item = this.storage[index];
             if ( item == null ) {
                 return null;
