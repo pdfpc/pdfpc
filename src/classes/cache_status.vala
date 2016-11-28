@@ -54,6 +54,8 @@ namespace pdfpc {
         public void update() {
             // Only draw if the widget is actually added to some parent
             if (this.current_value == this.max_value) {
+                // If the progress is at its maximum, tell the caches to persist to disk
+                pdfpc.Renderer.Cache.Base.persist_all();
                 update_complete();
             } else {
                 update_progress((double)this.current_value / this.max_value);

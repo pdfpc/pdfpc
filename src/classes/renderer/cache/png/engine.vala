@@ -38,13 +38,16 @@ namespace pdfpc.Renderer.Cache {
          */
         public Engine( Metadata.Base metadata ) {
             base( metadata );
-            this.storage = new PNG.Item[this.metadata.get_slide_count()];
+            if( this.storage.length == 0 ) {
+                this.storage = new PNG.Item[this.metadata.get_slide_count()];
+            }
         }
 
         /**
          * Store a surface in the cache using the given index as identifier
          */
         public override void store( uint index, Cairo.ImageSurface surface ) {
+            cache_update_required = true;
             Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
                 surface.get_height());
             uint8[] buffer;
@@ -89,6 +92,36 @@ namespace pdfpc.Renderer.Cache {
             cr.fill();
 
             return surface;
+        }
+
+        /**
+         * Store the cache to disk
+         */
+        public override void persist(DataOutputStream cache) throws Error {
+            cache.put_int32(1); /* Mark this as a version 1 cache for the PNG engine */
+            cache.put_int32(storage.length);
+            for(var i=0; i<storage.length; i++) {
+                cache.put_uint32(this.storage[i].get_length());
+                cache.write(this.storage[i].get_png_data());
+            }
+        }
+
+        /**
+         * Load the cache from disk
+         */
+        public override void load_from_disk(DataInputStream cache) throws Error {
+            if(cache.read_int32() != 1) {
+                error("Invalid cache file.");
+            }
+            var length = cache.read_int32();
+            this.storage = new PNG.Item[length];
+            for(var i=0; i<length; i++) {
+                var data_length = cache.read_uint32();
+                uint8[] data = new uint8[data_length];
+                cache.read(data);
+                var item = new PNG.Item(data);
+                this.storage[i] = item;
+            }
         }
     }
 }

@@ -83,7 +83,9 @@ namespace pdfpc {
             if (this.cache != null) {
                 Cairo.ImageSurface cache_content;
                 if ((cache_content = this.cache.retrieve(slide_number)) != null) {
-                    return cache_content;
+                    if(cache_content.get_width() == width && cache_content.get_height() == height) {
+                        return cache_content;
+                    }
                 }
             }
 
