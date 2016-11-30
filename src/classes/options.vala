@@ -70,6 +70,11 @@ namespace pdfpc {
         public static bool persist_cache = false;
 
         /**
+         * Commandline option to prerender for all resolutions.
+         */
+        public static bool prerender_all = false;
+
+        /**
          * Commandline option to disable the auto detection of overlay slides
          */
         public static bool disable_auto_grouping = false;
