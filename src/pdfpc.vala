@@ -60,6 +60,8 @@ namespace pdfpc {
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
+            { "persist-cache", 'p', 0, 0, ref Options.persist_cache, "Persist the PNG cache on disk for faster startup.", null },
+            { "prerender-all", 'P', 0, 0, ref Options.prerender_all, "Prerender for all resolutions. Usefor in conjunction with -p.", null },
             { "disable-auto-grouping", 'g', 0, 0, ref Options.disable_auto_grouping, "Disable auto detection and grouping of overlayed slides", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
@@ -259,6 +261,109 @@ namespace pdfpc {
             // crosscutting concerns between the different windows.
             this.controller = new PresentationController( metadata, Options.black_on_end );
             this.cache_status = new CacheStatus();
+
+            // Prerender mode
+            if (Options.prerender_all) {
+                if (!Options.persist_cache) {
+                    error("Note: Using --prerender-all without -p is useless.\n");
+                }
+
+                var resolutions_widths  = new Gee.ArrayList<int>();
+                var resolutions_heights = new Gee.ArrayList<int>();
+
+                // All common resolutions:
+                resolutions_widths.add(1024); resolutions_heights.add(576);
+                resolutions_widths.add(1024); resolutions_heights.add(768);
+                resolutions_widths.add(1152); resolutions_heights.add(864);
+                resolutions_widths.add(1280); resolutions_heights.add(1024);
+                resolutions_widths.add(1280); resolutions_heights.add(720);
+                resolutions_widths.add(1280); resolutions_heights.add(960);
+                resolutions_widths.add(1360); resolutions_heights.add(768);
+                resolutions_widths.add(1368); resolutions_heights.add(768);
+                resolutions_widths.add(1400); resolutions_heights.add(1050);
+                resolutions_widths.add(1440); resolutions_heights.add(900);
+                resolutions_widths.add(1600); resolutions_heights.add(1024);
+                resolutions_widths.add(1600); resolutions_heights.add(1200);
+                resolutions_widths.add(1600); resolutions_heights.add(900);
+                resolutions_widths.add(1680); resolutions_heights.add(1050);
+                resolutions_widths.add(1920); resolutions_heights.add(1080);
+                resolutions_widths.add(1920); resolutions_heights.add(1200);
+                resolutions_widths.add(640); resolutions_heights.add(360);
+                resolutions_widths.add(640); resolutions_heights.add(480);
+                resolutions_widths.add(720); resolutions_heights.add(400);
+                resolutions_widths.add(720); resolutions_heights.add(405);
+                resolutions_widths.add(800); resolutions_heights.add(600);
+                resolutions_widths.add(864); resolutions_heights.add(486);
+                resolutions_widths.add(960); resolutions_heights.add(540);
+
+                for (var i=0; i<resolutions_widths.size; i++) {
+
+                    var resolution_width = resolutions_widths[i];
+                    var resolution_height = resolutions_heights[i];
+
+                    pdfpc.Renderer.Cache.PNG.Persistent.Engine.reset_instance_counter();
+
+                    // Calculate size of the cached widgets
+                    // The order is important, because it determines the cache instance counter.
+
+                    var bottom_position = (int) Math.floor(resolution_height * 0.9);
+                    var bottom_height = resolution_height - bottom_position;
+                    int current_allocated_width = (int) Math.floor(resolution_width * Options.current_size / (double) 100);
+                    int next_allocated_width = (int)Math.fmax(resolution_width - current_allocated_width - 4, 0);
+
+                    var render_resolutions_widths = new Gee.ArrayList<int>();
+                    var render_resolutions_heights = new Gee.ArrayList<int>();
+                    var render_purposes = new Gee.ArrayList<Metadata.Area>();
+
+                    // "Current" view
+                    render_resolutions_widths.add(current_allocated_width);
+                    render_resolutions_heights.add((int) Math.floor(Options.current_height * bottom_position / (double) 100));
+                    render_purposes.add(Metadata.Area.NOTES);
+
+                    // "Next" view
+                    render_resolutions_widths.add(next_allocated_width);
+                    render_resolutions_heights.add((int) Math.floor(Options.next_height * bottom_position / (double)100 ));
+                    render_purposes.add(Metadata.Area.CONTENT);
+
+                    // "Strict next" view
+                    render_resolutions_widths.add((int) Math.floor(0.5 * current_allocated_width));
+                    render_resolutions_heights.add((int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.25 * bottom_position) - 2)));
+                    render_purposes.add(Metadata.Area.CONTENT);
+
+                    // "Strict prev" view
+                    render_resolutions_widths.add((int) Math.floor(0.5 * current_allocated_width));
+                    render_resolutions_heights.add((int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.25 * bottom_position) - 2)));
+                    render_purposes.add(Metadata.Area.CONTENT);
+
+                    // Full view in presenter
+                    render_resolutions_widths.add(resolution_width);
+                    render_resolutions_heights.add(resolution_height);
+                    render_purposes.add(Metadata.Area.CONTENT);
+
+                    // Now do all the rendering
+                    for (var k=0; k<render_resolutions_widths.size; k++) {
+                        // Calculate size of full view
+                        Gdk.Rectangle scale_rect;
+                        var pdf_view = new View.Pdf.from_metadata(metadata, render_resolutions_widths[k], render_resolutions_heights[k], render_purposes[k],
+                                Options.black_on_end, true, this.controller, out scale_rect);
+
+                        // Render all pages
+                        var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, Metadata.Area.CONTENT);
+                        ((Renderer.Caching) renderer).cache = Renderer.Cache.create(metadata);
+
+                        for (var j=0; j<metadata.get_slide_count(); j++) {
+                            print("\r\033[KResolution [%d/%d, %dx%d] View %d of 5 [%dx%d]: Slide %d/%u",
+                                i+1, resolutions_widths.size, resolution_width, resolution_height,
+                                k+1, scale_rect.width, scale_rect.height, j+1, metadata.get_slide_count());
+                            renderer.render_to_surface(j);
+                        }
+                    }
+                }
+
+                print("\nDone.\n");
+
+                return;
+            }
 
             set_styling();
 

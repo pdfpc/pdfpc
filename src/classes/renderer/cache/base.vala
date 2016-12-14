@@ -70,8 +70,13 @@ namespace pdfpc.Renderer.Cache {
      * Creates cache engines based on the global commandline options
      */
     public Base create(Metadata.Base metadata) {
-        if (!Options.disable_cache_compression)
+        if (Options.persist_cache) {
+            return new PNG.Persistent.Engine(metadata);
+        }
+
+        if (!Options.disable_cache_compression) {
             return new PNG.Engine(metadata);
+        }
 
         return new Simple.Engine(metadata);
     }
