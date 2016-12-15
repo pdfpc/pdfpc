@@ -63,6 +63,9 @@ Disable caching and pre-rendering of slides to save memory at the cost of speed.
 Disable the compression of slide images to trade memory consumption for speed.
 (Avg.  factor 30)
 .TP
+.BI "\-p, \-\-persist\-cache"
+Persist the PNG cache on disk for faster startup.
+.TP
 .BI "\-g, \-\-disable\-auto\-grouping"
 Disable auto detection of overlay groups. (Default: enabled)
 .TP
@@ -185,6 +188,13 @@ should be much faster, as with normal PDF viewers.
 .PP
 As the pre-rendering takes a lot of memory it can be disabled using the
 \-\-disable\-cache switch at the cost of speed.
+
+.PP
+It it also possible to store the pre-rendered slides on the disk (see
+\-\-persist-cache).  This speeds up the start of the program if the slide-set
+is used for a second
+time.
+
 .SS Cache compression
 
 .PP

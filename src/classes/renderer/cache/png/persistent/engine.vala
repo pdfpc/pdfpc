@@ -6,6 +6,7 @@
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * Copyright 2012 David Vilar
  * Copyright 2015 Andreas Bilke
+ * Copyright 2016 Phillip Berndt
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,10 +47,19 @@ namespace pdfpc.Renderer.Cache {
             var environment = GLib.Environ.get();
             var cache_home = GLib.Environ.get_variable(environment, "XDG_CACHE_HOME");
             if (cache_home == null) {
-                cache_directory = GLib.Environ.get_variable(environment, "HOME") + "/.cache/pdfpc/";
+                var home_dir =  GLib.Environ.get_variable(environment, "HOME");
+                cache_directory = Path.build_filename(home_dir, ".cache", "pdfpc");
+            } else {
+                cache_directory = Path.build_filename(cache_home, "pdfpc");
             }
-            else {
-                cache_directory = cache_home + "/pdfpc/";
+
+            try {
+                var pdf_file = File.new_for_uri(metadata.get_url());
+                var pdf_file_info = pdf_file.query_info(FileAttribute.TIME_MODIFIED, 0);
+                pdf_file_age = pdf_file_info.get_modification_time();
+            } catch (GLib.Error e) {
+                warning("cannot query pdf file modification date");
+                Process.exit(1);
             }
         }
 
@@ -65,7 +75,7 @@ namespace pdfpc.Renderer.Cache {
                     cache_height.to_string() + "\0" +
                     index.to_string());
 
-            return cache_directory + file_name.substring(0, 2) + "/" + file_name.substring(2) + ".png";
+            return Path.build_filename(cache_directory, file_name.substring(0, 2), file_name.substring(2) + ".png");
         }
 
         public override void store(uint index, Cairo.ImageSurface surface) {
@@ -84,9 +94,8 @@ namespace pdfpc.Renderer.Cache {
                     parent_directory.make_directory_with_parents();
                 }
                 cache_file.replace_contents(storage[index].get_png_data(), null, false, FileCreateFlags.NONE, null);
-            }
-            catch(Error e) {
-                print("Info: Storing slide %u to cache in %s failed.\n", index, cache_file_name);
+            } catch(Error e) {
+                warning("Storing slide %u to cache in %s failed.\n", index, cache_file_name);
             }
         }
 
@@ -103,15 +112,8 @@ namespace pdfpc.Renderer.Cache {
             var cache_candidate = GLib.File.new_for_path(get_cache_filename(index));
             if (cache_candidate.query_exists()) {
                 try {
-                    if (pdf_file_age == null) {
-                        var pdf_file = File.new_for_uri(metadata.get_url());
-                        var pdf_file_info = pdf_file.query_info(FileAttribute.TIME_MODIFIED, 0);
-                        pdf_file_age = pdf_file_info.get_modification_time();
-                    }
-
                     var cache_file_info = cache_candidate.query_info(FileAttribute.TIME_MODIFIED + ",standard::size", 0);
                     var cache_age = cache_file_info.get_modification_time();
-
 
                     if (pdf_file_age.tv_sec <= cache_age.tv_sec) {
                         uint8[] data = new uint8[cache_file_info.get_size()];
@@ -122,8 +124,7 @@ namespace pdfpc.Renderer.Cache {
 
                         return png_retrieve(index);
                     }
-                }
-                catch(Error e) {
+                } catch(Error e) {
                     /* Fail silently. We cannot fix anything here anyway, and
                        pdfpc will continue to work as expected. */
                 }
