@@ -32,7 +32,7 @@ namespace pdfpc {
      *
      * By default it does not implement any further functionality.
      */
-    public class View.Pdf : View.Default {
+    public class View.Pdf : View.Base {
         /**
          * Default constructor restricted to Pdf renderers as input parameter
          */

@@ -35,7 +35,7 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Initialize the cache store
          */
-        public Engine( Metadata.Base metadata ) {
+        public Engine( Metadata.Pdf metadata ) {
             base( metadata );
             this.storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
         }

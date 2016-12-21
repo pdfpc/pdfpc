@@ -304,13 +304,13 @@ namespace pdfpc.Window {
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if (!Options.disable_caching) {
-                ((Renderer.Caching) this.current_view.get_renderer()).cache =
+                ((Renderer.Pdf) this.current_view.get_renderer()).cache =
                     Renderer.Cache.create(metadata);
-                ((Renderer.Caching) this.next_view.get_renderer()).cache =
+                ((Renderer.Pdf) this.next_view.get_renderer()).cache =
                     Renderer.Cache.create(metadata);
-                ((Renderer.Caching) this.strict_next_view.get_renderer()).cache =
+                ((Renderer.Pdf) this.strict_next_view.get_renderer()).cache =
                     Renderer.Cache.create(metadata);
-                ((Renderer.Caching)this.strict_prev_view.get_renderer()).cache =
+                ((Renderer.Pdf)this.strict_prev_view.get_renderer()).cache =
                     Renderer.Cache.create(metadata);
             }
 
@@ -571,11 +571,11 @@ namespace pdfpc.Window {
          * for display, as it is a Image widget after all.
          */
         public void set_cache_observer(CacheStatus observer) {
-            var current_prerendering_view = this.current_view as View.Prerendering;
+            var current_prerendering_view = this.current_view as View.Base;
             if (current_prerendering_view != null) {
                 observer.monitor_view(current_prerendering_view);
             }
-            var next_prerendering_view = this.next_view as View.Prerendering;
+            var next_prerendering_view = this.next_view as View.Base;
             if (next_prerendering_view != null) {
                 observer.monitor_view(next_prerendering_view);
             }
@@ -587,7 +587,7 @@ namespace pdfpc.Window {
 
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
-            this.overview.set_cache(((Renderer.Caching) this.next_view.get_renderer()).cache);
+            this.overview.set_cache(((Renderer.Pdf) this.next_view.get_renderer()).cache);
         }
 
         /**
