@@ -27,7 +27,22 @@ namespace pdfpc {
     /**
      * Pdf slide renderer
      */
-    public class Renderer.Pdf : Renderer.Base, Renderer.Caching {
+    public class Renderer.Pdf : Object {
+        /**
+         * Metadata object to render slides for
+         */
+        public Metadata.Pdf metadata { get; protected set; }
+
+        /**
+         * Width to render to
+         */
+        public int width { get; protected set; }
+
+        /**
+         * Height to render to
+         */
+        public int height { get; protected set; }
+
         /**
          * The scaling factor needed to render the pdf page to the desired size.
          */
@@ -53,7 +68,9 @@ namespace pdfpc {
          * part of the pdf document.
          */
         public Pdf(Metadata.Pdf metadata, int width, int height, Metadata.Area area) {
-            base(metadata, width, height);
+            this.metadata = metadata;
+            this.width = width;
+            this.height = height;
 
             this.area = area;
 
@@ -68,7 +85,7 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public override Cairo.ImageSurface render_to_surface(int slide_number)
+        public Cairo.ImageSurface render_to_surface(int slide_number)
             throws Renderer.RenderError {
 
             var metadata = this.metadata as Metadata.Pdf;
@@ -113,7 +130,7 @@ namespace pdfpc {
             return surface;
         }
 
-        public override Cairo.ImageSurface fade_to_black() {
+        public Cairo.ImageSurface fade_to_black() {
             Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
                 this.height);
             Cairo.Context cr = new Cairo.Context(surface);
@@ -126,6 +143,13 @@ namespace pdfpc {
 
             return surface;
         }
+    }
+
+    /**
+     * Error domain used for every render error, which might occur
+     */
+    public errordomain Renderer.RenderError {
+        SLIDE_DOES_NOT_EXIST;
     }
 }
 

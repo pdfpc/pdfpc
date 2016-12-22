@@ -87,8 +87,7 @@ namespace pdfpc.Window {
                 Options.black_on_end, true, this.presentation_controller, out scale_rect);
 
             if (!Options.disable_caching) {
-                ((Renderer.Caching) this.view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
+                this.view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
             // Center the scaled pdf on the monitor
@@ -141,7 +140,7 @@ namespace pdfpc.Window {
          * cache status measurements.
          */
         public void set_cache_observer(CacheStatus observer) {
-            var prerendering_view = this.view as View.Prerendering;
+            var prerendering_view = this.view as View.Base;
             if (prerendering_view != null) {
                 observer.monitor_view(prerendering_view);
             }

@@ -38,7 +38,7 @@ namespace pdfpc.Renderer.Cache {
 
         protected string cache_directory;
 
-        public Engine( Metadata.Base metadata ) {
+        public Engine( Metadata.Pdf metadata ) {
             base( metadata );
 
             cache_instance_counter++;

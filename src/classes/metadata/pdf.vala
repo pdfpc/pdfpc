@@ -31,8 +31,19 @@ namespace pdfpc.Metadata {
     /**
      * Metadata for Pdf files
      */
-    public class Pdf: Base
-    {
+    public class Pdf: Object {
+        /**
+         * Unique Resource Locator for the given slideset
+         */
+        protected string url;
+
+        /**
+         * Return the registered url
+         */
+        public string get_url() {
+            return this.url;
+        }
+
         public string? pdf_fname = null;
         protected string? pdfpc_fname = null;
 
@@ -302,7 +313,7 @@ namespace pdfpc.Metadata {
          * Base constructor taking the file url to the pdf file
          */
         public Pdf(string fname, NotesPosition notes_position) {
-            base(fname);
+            this.url = File.new_for_commandline_arg(fname).get_uri();
 
             this.notes_position = notes_position;
 
@@ -353,7 +364,7 @@ namespace pdfpc.Metadata {
         /**
          * Return the number of pages in the pdf document
          */
-        public override uint get_slide_count() {
+        public uint get_slide_count() {
             return this.page_count;
         }
 
