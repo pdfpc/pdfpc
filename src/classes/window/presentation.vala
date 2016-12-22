@@ -87,8 +87,7 @@ namespace pdfpc.Window {
                 Options.black_on_end, true, this.presentation_controller, out scale_rect);
 
             if (!Options.disable_caching) {
-                ((Renderer.Pdf) this.view.get_renderer()).cache =
-                    Renderer.Cache.create(metadata);
+                this.view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
             // Center the scaled pdf on the monitor

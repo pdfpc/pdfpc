@@ -83,8 +83,6 @@ namespace pdfpc {
          */
         protected int n_slides;
 
-        protected int slide_limit;
-
         /**
          * List to store all associated behaviours
          */
@@ -100,7 +98,6 @@ namespace pdfpc {
             this.current_slide_number = 0;
 
             this.n_slides = (int) renderer.metadata.get_slide_count();
-            this.slide_limit = this.n_slides + 1;
 
             // Render the initial page on first realization.
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
@@ -118,9 +115,7 @@ namespace pdfpc {
                  // Executing the cycle here to ensure it is executed within the
                  // Gtk event loop. If it is not proper Gdk thread handling is
                  // impossible.
-                 var caching_renderer = this.renderer as Renderer.Pdf;
-                 if (caching_renderer != null && caching_renderer.cache != null &&
-                     caching_renderer.cache.allows_prerendering()) {
+                 if (renderer.cache != null && renderer.cache.allows_prerendering()) {
                      this.register_prerendering();
                  }
             });
@@ -203,9 +198,8 @@ namespace pdfpc {
             // each side of the document.
             if (slide_number < 0) {
                 slide_number = 0;
-            }
-            if (slide_number >= this.slide_limit) {
-                slide_number = this.slide_limit - 1;
+            } else if (slide_number >= this.n_slides) {
+                slide_number = this.n_slides - 1;
             }
 
             if (!force_redraw && slide_number == this.current_slide_number &&
