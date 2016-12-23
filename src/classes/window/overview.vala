@@ -355,7 +355,9 @@ namespace pdfpc.Window {
                     handled = true;
                     break;
                 case 0xff0d: /* Return */
-                    this.presentation_controller.goto_user_page(this.current_slide + 1);
+                    bool gotoFirst = (key.state & Gdk.ModifierType.SHIFT_MASK) != 0;
+                    this.presentation_controller.goto_user_page(this.current_slide + 1, !gotoFirst);
+                    handled = true;
                     break;
             }
 
@@ -379,8 +381,10 @@ namespace pdfpc.Window {
          * a drag, the current slide will have been updated by the motion.
          */
         public bool on_mouse_release(Gdk.EventButton event) {
-            if (event.button == 1)
-                this.presentation_controller.goto_user_page(this.current_slide + 1);
+            if (event.button == 1) {
+                bool gotoFirst = (event.state & Gdk.ModifierType.SHIFT_MASK) != 0;
+                this.presentation_controller.goto_user_page(this.current_slide + 1, !gotoFirst);
+            }
             return false;
         }
     }

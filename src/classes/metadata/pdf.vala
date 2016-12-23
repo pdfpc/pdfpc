@@ -443,9 +443,12 @@ namespace pdfpc.Metadata {
 
         /**
          * Transform from user slide numbers to real slide numbers
+         *
+         * If lastSlide is true, the last page of an overlay will be return,
+         * otherwise, the first one
          */
-        public int user_slide_to_real_slide(int number) {
-            if (number + 1 < user_view_indexes.length) {
+        public int user_slide_to_real_slide(int number, bool lastSlide = true) {
+            if (lastSlide && number + 1 < user_view_indexes.length) {
                 return this.user_view_indexes[number+1] - 1;
             } else if (number < user_view_indexes.length) {
                 return this.user_view_indexes[number];
