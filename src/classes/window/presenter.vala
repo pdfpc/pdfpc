@@ -51,18 +51,18 @@ namespace pdfpc.Window {
         /**
          * View showing the current slide
          */
-        public View.Base current_view;
+        public View.Pdf current_view;
 
         /**
          * View showing a preview of the next slide
          */
-        protected View.Base next_view;
+        protected View.Pdf next_view;
 
         /**
          * Small views for (non-user) next slides
          */
-        protected View.Base strict_next_view;
-        protected View.Base strict_prev_view;
+        protected View.Pdf strict_next_view;
+        protected View.Pdf strict_prev_view;
 
         /**
          * Timer for the presenation

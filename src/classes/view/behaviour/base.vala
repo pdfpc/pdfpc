@@ -36,7 +36,7 @@ namespace pdfpc.View {
          * association is exclusive. One Behaviour may only be associated with
          * one View.
          */
-        protected View.Base target = null;
+        protected View.Pdf target = null;
 
         /**
          * Base constructor not taking any arguments
@@ -50,14 +50,14 @@ namespace pdfpc.View {
          *
          * If no View has been associated yet null is returned
          */
-        public View.Base? get_target() {
+        public View.Pdf? get_target() {
             return this.target;
         }
 
         /**
          * Enfore the fact that a Behaviour may only be associated to one View
          */
-        protected void enforce_exclusive_association( View.Base target )
+        protected void enforce_exclusive_association( View.Pdf target )
             throws Behaviour.AssociationError {
             if ( this.target == target ) {
                 // Handle multiple association with the same View by simply
@@ -81,7 +81,7 @@ namespace pdfpc.View {
         /**
          * Associate the implementing Behaviour with the given View
          */
-        public abstract void associate( View.Base target )
+        public abstract void associate( View.Pdf target )
             throws Behaviour.AssociationError;
 
         /**
@@ -89,7 +89,7 @@ namespace pdfpc.View {
          *
          * By default every View is supported.
          */
-        protected bool is_supported( View.Base target ) {
+        protected bool is_supported( View.Pdf target ) {
             return true;
         }
     }

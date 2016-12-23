@@ -40,14 +40,14 @@ namespace pdfpc.Window {
          */
         public View.Pdf main_view {
             get {
-                return this.view as View.Pdf;
+                return this.view;
             }
         }
 
         /**
          * View containing the slide to show
          */
-        protected View.Base view;
+        protected View.Pdf view;
 
         private Gtk.Fixed fixedLayout;
 
@@ -140,10 +140,7 @@ namespace pdfpc.Window {
          * cache status measurements.
          */
         public void set_cache_observer(CacheStatus observer) {
-            var prerendering_view = this.view as View.Base;
-            if (prerendering_view != null) {
-                observer.monitor_view(prerendering_view);
-            }
+            observer.monitor_view(this.view);
         }
     }
 }

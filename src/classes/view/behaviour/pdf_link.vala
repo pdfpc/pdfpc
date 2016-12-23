@@ -42,7 +42,7 @@ namespace pdfpc.View.Behaviour {
          */
         protected Gdk.Rectangle[] precalculated_mapping_rectangles = null;
 
-        public override void associate(View.Base target)
+        public override void associate(View.Pdf target)
             throws AssociationError {
             this.enforce_exclusive_association(target);
             this.attach(target);
@@ -51,7 +51,7 @@ namespace pdfpc.View.Behaviour {
         /**
          * Attach a View.Pdf to this signal provider
          */
-        public void attach( View.Base view ) {
+        public void attach( View.Pdf view ) {
             this.target = view;
 
             view.add_events( Gdk.EventMask.BUTTON_PRESS_MASK );
@@ -127,7 +127,7 @@ namespace pdfpc.View.Behaviour {
          * Handle newly entered pdf pages to create a link mapping table for
          * further requests and checks.
          */
-        public void on_entering_slide( View.Base source, int page_number ) {
+        public void on_entering_slide( View.Pdf source, int page_number ) {
             // Get the link mapping table
             bool in_range = true;
             Metadata.Pdf metadata = source.get_renderer().metadata as Metadata.Pdf;
@@ -156,7 +156,7 @@ namespace pdfpc.View.Behaviour {
          * Free the allocated link mapping tables, which were created on page
          * entering
          */
-        public void on_leaving_slide( View.Base source, int from, int to ) {
+        public void on_leaving_slide( View.Pdf source, int from, int to ) {
             // Free memory of precalculated rectangles
             this.precalculated_mapping_rectangles = null;
         }
