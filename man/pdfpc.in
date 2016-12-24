@@ -167,6 +167,22 @@ Reset presentation (reset timer and go back to first slide)
 .TP
 .B e
 Define end slide
+
+.P
+Within overview mode the following key bindings are used
+.TP
+.B Return / Left mouse button
+Goto currently selected page (last page of overlay)
+.TP
+.B Shift + Return / Shift + Left mouse button
+Goto currently selected page (first page of overlay)
+.TP
+.B Cursor left / Page up
+Select previous slide
+.TP
+.B Cursor right / Page down
+Select next slide
+
 .P
 See
 .B CONFIG FILE
