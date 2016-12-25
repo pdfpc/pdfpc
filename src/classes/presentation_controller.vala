@@ -193,9 +193,8 @@ namespace pdfpc {
 
         /**
          * Stores the "history" of the slides (jumps only)
-         * A stack would be more useful.
          */
-        private int[] history;
+        private Gee.ArrayQueue<int> history;
 
         /**
          * Timer for the presentation. It should only be displayed on one view.
@@ -248,6 +247,8 @@ namespace pdfpc {
             this.black_on_end = allow_black_on_end;
 
             this.controllables = new GLib.List<Controllable>();
+
+            this.history = new Gee.ArrayQueue<int>();
 
             // Calculate the countdown to display until the presentation has to
             // start
@@ -721,7 +722,7 @@ namespace pdfpc {
          * Register the current slide in the history
          */
         void push_history() {
-            this.history += this.current_slide_number;
+            this.history.offer_head(this.current_slide_number);
         }
 
         /**
@@ -915,13 +916,20 @@ namespace pdfpc {
         }
 
         /**
-         * Go to the first slide
+         * Wrapper function to work with key bindings and callbacks
          */
         public void goto_first() {
+            _goto_first(false);
+        }
+
+        /**
+         * Go to the first slide
+         */
+        private void _goto_first(bool skipHistory) {
             this.timer.start();
 
             // update history if we are not already at the first slide
-            if (this.current_slide_number > 0) {
+            if (this.current_slide_number > 0 && !skipHistory) {
                 this.push_history();
             }
 
@@ -1027,16 +1035,16 @@ namespace pdfpc {
                 return;
             }
 
-            int history_length = this.history.length;
-            if (history_length == 0) {
-                this.goto_first();
+            if (this.history.is_empty) {
+                // skip history pushing to prevent slide hopping
+                this._goto_first(true);
 
                 return;
             }
 
-            this.current_slide_number = this.history[history_length - 1];
+            int history_head = this.history.poll_head();
+            this.current_slide_number = history_head;
             this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
-            this.history.resize(history_length - 1);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
