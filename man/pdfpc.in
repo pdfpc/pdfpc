@@ -185,8 +185,8 @@ Select next slide
 
 .P
 See
-.B CONFIG FILE
-below if you want to customize the keybindings.
+.B pdfpcrc(5)
+if you want to customize the keybindings.
 
 .SH FEATURES
 
@@ -363,11 +363,11 @@ a frame of the movie will ensure the correct aspect ratio.
 
 .SS Pointer Mode
 .PP
-If needed it is possible to turn on a pointer which draws a red dot in the 
-place pointed by mouse cursor on both - presenter and presentation screens. 
-It is also possible to increase and decrease the pointer size. Additionally 
-when the pointer is enabled it is possible to drag & drop some area of the 
-presenter screen causing it to be highlighted in both views as well. Area 
+If needed it is possible to turn on a pointer which draws a red dot in the
+place pointed by mouse cursor on both - presenter and presentation screens.
+It is also possible to increase and decrease the pointer size. Additionally
+when the pointer is enabled it is possible to drag & drop some area of the
+presenter screen causing it to be highlighted in both views as well. Area
 outside the selected region will be dimmed.
 
 .SS pdfpc Files
@@ -396,88 +396,6 @@ The [notes] sections must be the last one in the file
 .IP \[bu] 2
 For the programmers out there: slide indexes start at 1
 
-.SH CONFIG FILES
-.PP
-The main configuration file for pdfpc is located in @SYSCONFDIR@/pdfpcrc.
-Additionally, $XDG_CONFIG_DIR/pdfpc/pdfpcrc is also read, if present.
-
-.SS Keybindings
-.PP
-Following commands are aceepted:
-.TP
-.B bind <key> <func>
-Bind a key to a function
-.TP
-.B unbind <key>
-Unbinds the given key
-.TP
-.B unbind_all
-Unbinds all the keybindings
-.TP
-.B mouse <button> <func>
-Binds a mouse button to a function
-.TP
-.B unmouse <button>
-Unbinds a mouse button
-.TP
-.B unmouse_all
-Unbinds all the mouse bindings
-
-.P
-Key names can be obtained with the help of the xev utility. Note that
-names are case sensitive. Modifiers can be specified in the form
-<mod>+<key> where <mod> is one of S (for shift), C (for control) and
-A/M (for Alt/Meta). E.g.
-.TP
-bind S+Next    next10
-.P
-A shorthand for specifying key combinations constituting shift and an
-alphabetic character is to simply give the uppercase version of the
-alphabetic character. For example, to bind <shift>+r to the 'reset'
-function, use
-.TP
-bind R reset
-.P
-A list of all possible functions can be obtained
-via the \-L command line option.
-
-.PP
-Some configuration files for commonly used devices
-(wireless presenters, Bluetooth headsets, ...)
-.URL https://pdfpc.github.io/#config-files "are available" .
-If your device is not
-yet supported and you generated a working config file, please
-contribute it (see contact information below).
-
-
-.SS Options
-.PP
-Some permanent changes can be configured via config file. The syntax is:
-.TP
-.B option <option_name> <option_value>
-
-.PP
-The following option_name are allowed:
-
-.TP
-.B current-size
-Percentage of the presenter screen to be used for the current slide. (int, Default 60)
-.TP
-.B current-height
-Percentage of the height of the presenter screen to be used for the current slide. (int, Default 80)
-.TP
-.B next-height
-Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
-.TP
-.B overview-min-size
-Minimum width for the overview miniatures, in pixels. (int, Default 150)
-.TP
-.B black-on-end
-Add an additional black slide at the end of the presentation (bool, Default false)
-.TP
-.B switch-screens
-Switch the presentation and the presenter screen. (bool, Default false)
-
 .SS Appearance
 
 .PP
@@ -501,9 +419,14 @@ should not be too important for up to some hundreds of slides.
 Other bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "the issue tracker" .
 
-.SH SEE ALSO
+.SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by
 .URL https://github.com/davvil/pdfpc "davvil" .
 
 pdfpc is a fork of Pdf Presenter Console, available
 .URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "online" .
+
+.SH SEE ALSO
+.PP
+pdfpcrc(5)
+

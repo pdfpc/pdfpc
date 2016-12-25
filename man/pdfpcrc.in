@@ -1,0 +1,91 @@
+.TH  pdfpcrc "5" "November 2016" "pdfpc 4\&.0\&.4"
+.if !dURL \{\
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.\}
+.if \n[.g] .mso www.tmac
+
+.SH NAME
+pdfpcrc \- pdfpc configuration file
+
+.SH SYNOPSIS
+.B @SYSCONFDIR@/pdfpcrc / $XDG_CONFIG_DIR/pdfpc/pdfpcrc
+
+.SH DESCRIPTION
+.PP
+pdfpc(1) reads its configuration file from @SYSCONFDIR@/pdfpcrc. It also reads,
+if present, the file $XDG_CONFIG_DIR/pdfpc/pdfpcrc. If $XDG_CONFIG_DIR is not
+set, it uses $HOME/.config .
+
+.SS Keybindings
+.PP
+Following commands are aceepted:
+.TP
+.B bind <key> <func>
+Bind a key to a function
+.TP
+.B unbind <key>
+Unbinds the given key
+.TP
+.B unbind_all
+Unbinds all the keybindings
+.TP
+.B mouse <button> <func>
+Binds a mouse button to a function
+.TP
+.B unmouse <button>
+Unbinds a mouse button
+.TP
+.B unmouse_all
+Unbinds all the mouse bindings
+
+.P
+Key names can be obtained with the help of the xev utility. Note that
+names are case sensitive. Modifiers can be specified in the form
+<mod>+<key> where <mod> is one of S (for shift), C (for control) and
+A/M (for Alt/Meta). E.g.
+.TP
+bind S+Next    next10
+.P
+A shorthand for specifying key combinations constituting shift and an
+alphabetic character is to simply give the uppercase version of the
+alphabetic character. For example, to bind <shift>+r to the 'reset'
+function, use
+.TP
+bind R reset
+.P
+A list of all possible functions can be obtained
+via the \-L command line option if pdfpc(1).
+
+.SS Options
+.PP
+Some permanent changes can be configured via config file. The syntax is:
+.TP
+.B option <option_name> <option_value>
+
+.PP
+The following option_name are allowed:
+
+.TP
+.B current-size
+Percentage of the presenter screen to be used for the current slide. (int, Default 60)
+.TP
+.B current-height
+Percentage of the height of the presenter screen to be used for the current slide. (int, Default 80)
+.TP
+.B next-height
+Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
+.TP
+.B overview-min-size
+Minimum width for the overview miniatures, in pixels. (int, Default 150)
+.TP
+.B black-on-end
+Add an additional black slide at the end of the presentation (bool, Default false)
+.TP
+.B switch-screens
+Switch the presentation and the presenter screen. (bool, Default false)
+
+.SH SEE ALSO
+.PP
+pdfpc(1)
