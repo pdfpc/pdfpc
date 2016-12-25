@@ -549,9 +549,9 @@ namespace pdfpc.Window {
         }
 
         public void show_overview() {
+            this.overview.current_slide = this.presentation_controller.current_user_slide_number;
             this.slide_stack.set_visible_child_name("overview");
             this.overview.ensure_focus();
-            this.overview.current_slide = this.presentation_controller.current_user_slide_number;
         }
 
         public void hide_overview() {
