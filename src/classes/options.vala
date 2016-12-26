@@ -163,12 +163,12 @@ namespace pdfpc {
          * Global storage for key un/bindings from the config file.
          * Used to post pone binding execution in presentation controller
          */
-        public static Gee.ArrayList<BindTuple> key_bindings;
+        public static Gee.List<BindTuple> key_bindings;
 
         /**
          * Global storage for mouse un/bindings from the config file.
          * Used to post pone binding execution in presentation controller
          */
-        public static Gee.ArrayList<BindTuple> mouse_bindings;
+        public static Gee.List<BindTuple> mouse_bindings;
     }
 }
