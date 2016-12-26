@@ -155,11 +155,10 @@ namespace pdfpc {
          * while displaying the given file
          */
         private Window.Presenter create_presenter( Metadata.Pdf metadata, int monitor ) {
-            this.controller.presenter = new Window.Presenter( metadata, monitor, this.controller );
-            //controller.register_controllable( controller.presenter );
-            controller.presenter.set_cache_observer( this.cache_status );
+            var presenter = new Window.Presenter(metadata, monitor, this.controller);
+            presenter.set_cache_observer(this.cache_status);
 
-            return controller.presenter;
+            return presenter;
         }
 
         /**
@@ -167,11 +166,10 @@ namespace pdfpc {
          * while displaying the given file
          */
         private Window.Presentation create_presentation( Metadata.Pdf metadata, int monitor, int width = -1, int height = -1 ) {
-            this.controller.presentation = new Window.Presentation( metadata, monitor, this.controller, width, height );
-            //controller.register_controllable( controller.presentation );
-            controller.presentation.set_cache_observer( this.cache_status );
+            var presentation = new Window.Presentation(metadata, monitor, this.controller, width, height);
+            presentation.set_cache_observer( this.cache_status );
 
-            return controller.presentation;
+            return presentation;
         }
 
         /**
