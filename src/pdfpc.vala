@@ -250,7 +250,7 @@ namespace pdfpc {
 
             pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
             var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename), notes_position);
-            if ( Options.duration != 987654321u )
+            if ( Options.duration != uint.MAX)
                 metadata.set_duration(Options.duration);
 
 

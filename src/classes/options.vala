@@ -80,7 +80,7 @@ namespace pdfpc {
          *
          * Same problem as above with default value
          */
-        public static uint duration = 987654321u;
+        public static uint duration = uint.MAX;
 
         /**
          * Commandline option providing the time from which on the timer should
