@@ -49,12 +49,6 @@ namespace pdfpc.Window {
          */
         protected View.Pdf view;
 
-        private Gtk.Fixed fixedLayout;
-
-        public void add_to_fixed(Gtk.Widget w, int x, int y) {
-            fixedLayout.put(w, x, y);
-        }
-
         /**
          * Base constructor instantiating a new presentation window
          */
@@ -69,9 +63,8 @@ namespace pdfpc.Window {
             this.presentation_controller = presentation_controller;
             this.presentation_controller.update_request.connect(this.update);
 
-            fixedLayout = new Gtk.Fixed();
-            fixedLayout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
-            this.add(fixedLayout);
+            fixed_layout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
+            this.add(fixed_layout);
 
             Gdk.Rectangle scale_rect;
 
@@ -92,7 +85,7 @@ namespace pdfpc.Window {
 
             // Center the scaled pdf on the monitor
             // In most cases it will however fill the full screen
-            fixedLayout.put(this.view, scale_rect.x, scale_rect.y);
+            fixed_layout.put(this.view, scale_rect.x, scale_rect.y);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);

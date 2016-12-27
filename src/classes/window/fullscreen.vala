@@ -50,6 +50,15 @@ namespace pdfpc.Window {
         protected bool faded_to_black = false;
 
         /**
+         * Fixed layout
+         */
+        protected Gtk.Fixed fixed_layout;
+
+        public void add_to_fixed(Gtk.Widget w, int x, int y) {
+            this.fixed_layout.put(w, x, y);
+        }
+
+        /**
          * Stores if the view is frozen
          */
         protected bool frozen = false;
@@ -69,6 +78,8 @@ namespace pdfpc.Window {
                 int current_screen = screen.get_monitor_at_point(pointerx, pointery);
                 screen.get_monitor_geometry(current_screen, out this.screen_geometry);
             }
+
+            this.fixed_layout = new Gtk.Fixed();
 
             // Make the window resizable to allow the window manager
             // to correctly fit it to the screen. (Note: allegedly
