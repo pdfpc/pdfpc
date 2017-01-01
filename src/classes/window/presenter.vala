@@ -304,41 +304,6 @@ namespace pdfpc.Window {
                 this.strict_prev_view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
-            this.build_layout();
-        }
-
-        public override void show() {
-            base.show();
-            Gtk.Allocation allocation;
-            this.get_allocation(out allocation);
-            this.overview.set_available_space(allocation.width,
-                (int) Math.floor(allocation.height * 0.9));
-        }
-
-        protected Gtk.Image load_icon(string filename, int icon_height) {
-
-            // attempt to load from a local path (if the user hasn't installed)
-            // if that fails, attempt to load from the global path
-            string load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons", filename);
-            File icon_file = File.new_for_path(load_icon_path);
-            if (!icon_file.query_exists()) {
-                load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
-            }
-
-            Gtk.Image icon;
-            try {
-                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(load_icon_path,
-                    (int) Math.floor(1.06 * icon_height), icon_height);
-                icon = new Gtk.Image.from_pixbuf(pixbuf);
-                icon.no_show_all = true;
-            } catch (Error e) {
-                stderr.printf("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
-                icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
-            }
-            return icon;
-        }
-
-        protected void build_layout() {
             Gtk.Box slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
 
             var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
@@ -405,6 +370,37 @@ namespace pdfpc.Window {
             full_layout.pack_end(bottom_row, false, false, 0);
 
             this.add(full_layout);
+        }
+
+        public override void show() {
+            base.show();
+            Gtk.Allocation allocation;
+            this.get_allocation(out allocation);
+            this.overview.set_available_space(allocation.width,
+                (int) Math.floor(allocation.height * 0.9));
+        }
+
+        protected Gtk.Image load_icon(string filename, int icon_height) {
+
+            // attempt to load from a local path (if the user hasn't installed)
+            // if that fails, attempt to load from the global path
+            string load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons", filename);
+            File icon_file = File.new_for_path(load_icon_path);
+            if (!icon_file.query_exists()) {
+                load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
+            }
+
+            Gtk.Image icon;
+            try {
+                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(load_icon_path,
+                    (int) Math.floor(1.06 * icon_height), icon_height);
+                icon = new Gtk.Image.from_pixbuf(pixbuf);
+                icon.no_show_all = true;
+            } catch (Error e) {
+                stderr.printf("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
+                icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
+            }
+            return icon;
         }
 
         /**
