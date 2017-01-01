@@ -242,6 +242,7 @@ namespace pdfpc.Window {
             this.slide_progress.sensitive = false;
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);
+            this.slide_progress.valign = Gtk.Align.END;
 
             this.prerender_progress = new Gtk.ProgressBar();
             this.prerender_progress.name = "prerenderProgress";
@@ -343,6 +344,7 @@ namespace pdfpc.Window {
             this.slide_stack.homogeneous = true;
 
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            bottom_row.set_size_request(this.screen_geometry.width, bottom_height);
             bottom_row.homogeneous = true;
 
             var status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
@@ -351,13 +353,13 @@ namespace pdfpc.Window {
             status.pack_start(this.pause_icon, false, false, 0);
 
             this.timer.halign = Gtk.Align.CENTER;
-            this.timer.valign = Gtk.Align.CENTER;
+            this.timer.valign = Gtk.Align.END;
 
             var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             progress_alignment.expand = false;
             progress_alignment.pack_end(this.slide_progress);
             this.prerender_progress.vexpand = false;
-            this.prerender_progress.valign = Gtk.Align.CENTER;
+            this.prerender_progress.valign = Gtk.Align.END;
             progress_alignment.pack_end(this.prerender_progress, true, true, 0);
 
             bottom_row.pack_start(status, true, true, 0);
