@@ -258,7 +258,7 @@ namespace pdfpc.Window {
             this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
             this.prerender_progress.no_show_all = true;
 
-            int icon_height = bottom_height - 70;
+            int icon_height = (int)Math.round(bottom_height*0.9);;
 
             this.blank_icon = this.load_icon("blank.svg", icon_height);
             this.frozen_icon = this.load_icon("snow.svg", icon_height);
