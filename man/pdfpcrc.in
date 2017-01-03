@@ -1,4 +1,4 @@
-.TH  pdfpcrc "5" "November 2016" "pdfpc 4\&.0\&.4"
+.TH  PDFPCRC 5
 .if !dURL \{\
 .de URL
 \\$2 \(laURL: \\$1 \(ra\\$3
@@ -40,21 +40,27 @@ Unbinds a mouse button
 .B unmouse_all
 Unbinds all the mouse bindings
 
-.P
+.PP
 Key names can be obtained with the help of the xev utility. Note that
 names are case sensitive. Modifiers can be specified in the form
 <mod>+<key> where <mod> is one of S (for shift), C (for control) and
 A/M (for Alt/Meta). E.g.
-.TP
+
+.RS
 bind S+Next    next10
-.P
+.RE
+
+.PP
 A shorthand for specifying key combinations constituting shift and an
 alphabetic character is to simply give the uppercase version of the
 alphabetic character. For example, to bind <shift>+r to the 'reset'
 function, use
-.TP
+
+.RS
 bind R reset
-.P
+.RE
+
+.PP
 A list of all possible functions can be obtained
 via the \-L command line option if pdfpc(1).
 
