@@ -5,10 +5,10 @@ pdfpc
 About
 =====
 
-pdfpc is a GTK based presentation viewer application for GNU/Linux which uses
-Keynote like multi-monitor output to provide meta information to the speaker
-during the presentation. It is able to show a normal presentation window on one
-screen, while showing a more sophisticated overview on the other one providing
+pdfpc is a GTK based presentation viewer application which uses Keynote like
+multi-monitor output to provide meta information to the speaker during the
+presentation. It is able to show a normal presentation window on one screen,
+while showing a more sophisticated overview on the other one providing
 information like a picture of the next slide, as well as the left over time
 till the end of the presentation. The input files processed by pdfpc are PDF
 documents, which can be created using nearly any of today's presentation
