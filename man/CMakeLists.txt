@@ -3,7 +3,12 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/pdfpcrc.in ${CMAKE_CURRENT_SOURCE_DIR
 
 install(FILES
     pdfpc.1
+DESTINATION
+    ${MANDIR}/man1
+)
+
+install(FILES
     pdfpcrc.5
 DESTINATION
-    ${MANDIR}
+    ${MANDIR}/man5
 )

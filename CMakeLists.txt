@@ -7,7 +7,7 @@ find_package(Vala "0.26" REQUIRED)
 include(${VALA_USE_FILE})
 
 set(SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/etc" CACHE FILEPATH "sysconfdir")
-set(MANDIR "share/man/man1" CACHE FILEPATH "mandir")
+set(MANDIR "share/man" CACHE FILEPATH "mandir")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
