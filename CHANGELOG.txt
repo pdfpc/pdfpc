@@ -2,6 +2,30 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.5
+=============
+
+*Released: January 2017*
+
+- Persistent PNG cache for faster startup
+
+- Layout fix:
+    - CSS fix for older GTK versions
+    - Fixed prev-slide semantics
+    - Next-slide view shows full slide in case of overlays
+    - Fix highlighting in overview mode (removed pixman error in logs)
+    - Enforced timer/status bar height. this area no longer "jumps" if icons
+      are displayed
+
+- Overview mode: click on slide goes to full slide (in case of overlays), SHIFT
+  + click goes to the first slide
+
+- Fixed history-back semantics
+
+- Split man pages in pdfpc(1) for the program and pdfpcrc(5) for config file
+  options
+
+
 Version 4.0.4
 =============
 
