@@ -354,6 +354,11 @@ In LaTeX, such links are created with
 The movie will playback in the area taken by the placeholder content.  Using
 a frame of the movie will ensure the correct aspect ratio.
 
+.PP
+See
+.URL http://pdfpc.github.io/demo/pdfpc-video-example.zip "our website"
+for a full example.
+
 .SS Pointer Mode
 .PP
 If needed it is possible to turn on a pointer which draws a red dot in the
