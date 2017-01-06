@@ -94,12 +94,20 @@ namespace pdfpc {
         protected GLib.List<View.Behaviour.Base> behaviours = new GLib.List<View.Behaviour.Base>();
 
         /**
+         * GDK scale factor
+         */
+        protected int gdk_scale = 1;
+
+        /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
         public Pdf(Renderer.Pdf renderer, bool allow_black_on_end, bool clickable_links,
-            PresentationController presentation_controller) {
+            PresentationController presentation_controller, int gdk_scale_factor) {
             this.renderer = renderer;
-            this.set_size_request(renderer.width, renderer.height);
+            this.gdk_scale = gdk_scale_factor;
+
+            this.set_size_request((int)(renderer.width*(1.0/this.gdk_scale)),
+                                  (int)(renderer.height*(1.0/this.gdk_scale)));
 
             this.current_slide_number = 0;
 
@@ -142,13 +150,17 @@ namespace pdfpc {
          * argument.
          */
         public Pdf.from_metadata(Metadata.Pdf metadata, int width, int height,
-            Metadata.Area area, bool allow_black_on_end, bool clickable_links,
-            PresentationController presentation_controller, out Gdk.Rectangle scale_rect = null) {
+                                 Metadata.Area area, bool allow_black_on_end, bool clickable_links,
+                                 PresentationController presentation_controller, int gdk_scale_factor, out Gdk.Rectangle scale_rect = null) {
             var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
             scale_rect = scaler.scale_to(width, height);
+
+            scale_rect.width *= gdk_scale_factor;
+            scale_rect.height *= gdk_scale_factor;
+
             var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
 
-            this(renderer, allow_black_on_end, clickable_links, presentation_controller);
+            this(renderer, allow_black_on_end, clickable_links, presentation_controller, gdk_scale_factor);
         }
 
         /**
@@ -282,7 +294,7 @@ namespace pdfpc {
             this.current_slide_number = slide_number;
 
             // Have Gtk update the widget
-            this.queue_draw_area(0, 0, this.renderer.width, this.renderer.height);
+            this.queue_draw();
 
             this.entering_slide(this.current_slide_number);
         }
@@ -292,7 +304,7 @@ namespace pdfpc {
          */
         public void fade_to_black() {
             this.current_slide = this.renderer.fade_to_black();
-            this.queue_draw_area(0, 0, this.renderer.width, this.renderer.height);
+            this.queue_draw();
         }
 
         /**
@@ -316,6 +328,7 @@ namespace pdfpc {
          * the window surface.
          */
         public override bool draw(Cairo.Context cr) {
+            cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
             cr.set_source_surface(this.current_slide, 0, 0);
             cr.rectangle(0, 0, this.current_slide.get_width(), this.current_slide.get_height());
             cr.fill();

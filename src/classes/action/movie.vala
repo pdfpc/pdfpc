@@ -286,10 +286,12 @@ namespace pdfpc {
             Gdk.Rectangle rect;
             int n = 0;
             uint* xid;
+            int gdk_scale;
             while (true) {
-                xid = this.controller.overlay_pos(n, this.area, out rect);
-                if (xid == null)
+                xid = this.controller.overlay_pos(n, this.area, out rect, out gdk_scale);
+                if (xid == null) {
                     break;
+                }
                 Gst.Element sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
@@ -301,7 +303,8 @@ namespace pdfpc {
                 Gst.Video.Overlay xoverlay = (Gst.Video.Overlay) sink;
                 xoverlay.set_window_handle(xid);
                 xoverlay.handle_events(false);
-                xoverlay.set_render_rectangle(rect.x, rect.y, rect.width, rect.height);
+                xoverlay.set_render_rectangle(rect.x*gdk_scale, rect.y*gdk_scale,
+                                              rect.width*gdk_scale, rect.height*gdk_scale);
                 n++;
             }
 

@@ -63,21 +63,32 @@ namespace pdfpc.Window {
          */
         protected bool frozen = false;
 
+        /**
+         * The GDK scale factor. Used for better slide rendering
+         */
+        protected int gdk_scale = 1;
+
         public Fullscreen(int screen_num, int width = -1, int height = -1) {
             Gdk.Screen screen;
 
+            int screen_num_to_use;
             if (screen_num >= 0) {
+                screen_num_to_use = screen_num;
+
                 // Start in the given monitor
                 screen = Gdk.Screen.get_default();
-                screen.get_monitor_geometry(screen_num, out this.screen_geometry);
+                screen.get_monitor_geometry(screen_num_to_use, out this.screen_geometry);
             } else {
                 // Start in the monitor the cursor is in
                 var display = Gdk.Display.get_default().get_device_manager().get_client_pointer();
                 int pointerx, pointery;
                 display.get_position(out screen, out pointerx, out pointery);
-                int current_screen = screen.get_monitor_at_point(pointerx, pointery);
-                screen.get_monitor_geometry(current_screen, out this.screen_geometry);
+
+                screen_num_to_use = screen.get_monitor_at_point(pointerx, pointery);
+                screen.get_monitor_geometry(screen_num_to_use, out this.screen_geometry);
             }
+
+            this.gdk_scale = screen.get_monitor_scale_factor(screen_num_to_use);
 
             this.fixed_layout = new Gtk.Fixed();
 

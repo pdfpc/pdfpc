@@ -77,7 +77,7 @@ namespace pdfpc.Window {
             }
 
             this.view = new View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
-                Options.black_on_end, true, this.presentation_controller, out scale_rect);
+                Options.black_on_end, true, this.presentation_controller, this.gdk_scale, out scale_rect);
 
             if (!Options.disable_caching) {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);
