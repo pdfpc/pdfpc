@@ -167,6 +167,7 @@ namespace pdfpc.Window {
                 Options.black_on_end,
                 true,
                 this.presentation_controller,
+                this.gdk_scale,
                 out current_scale_rect
             );
 
@@ -187,6 +188,7 @@ namespace pdfpc.Window {
                 true,
                 false,
                 this.presentation_controller,
+                this.gdk_scale,
                 out next_scale_rect
             );
 
@@ -198,6 +200,7 @@ namespace pdfpc.Window {
                 true,
                 false,
                 this.presentation_controller,
+                this.gdk_scale,
                 out next_scale_rect
             );
             this.strict_prev_view = new View.Pdf.from_metadata(
@@ -208,6 +211,7 @@ namespace pdfpc.Window {
                 true,
                 false,
                 this.presentation_controller,
+                this.gdk_scale,
                 out next_scale_rect
             );
 
@@ -394,9 +398,13 @@ namespace pdfpc.Window {
 
             Gtk.Image icon;
             try {
-                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(load_icon_path,
-                    (int) Math.floor(1.06 * icon_height), icon_height);
-                icon = new Gtk.Image.from_pixbuf(pixbuf);
+                int width = (int) Math.floor(1.06 * icon_height) * this.gdk_scale;
+                int height = icon_height * this.gdk_scale;
+
+                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(load_icon_path, width, height);
+                Cairo.Surface surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, 0, null);
+
+                icon = new Gtk.Image.from_surface(surface);
                 icon.no_show_all = true;
             } catch (Error e) {
                 stderr.printf("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
