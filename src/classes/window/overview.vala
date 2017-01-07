@@ -82,13 +82,13 @@ namespace pdfpc.Window {
          */
         protected Presenter presenter;
 
-        /*
+        /**
          * The maximal size of the slides_view.
          */
         protected int max_width = -1;
         protected int max_height = -1;
 
-        /*
+        /**
          * The currently selected slide.
          */
         private int _current_slide = 0;
@@ -101,6 +101,9 @@ namespace pdfpc.Window {
                 }
         }
 
+        /**
+         * The used cell renderer, for later usage
+         */
         private CellRendererHighlight renderer;
 
         /*
@@ -140,11 +143,11 @@ namespace pdfpc.Window {
             this.presentation_controller = presentation_controller;
             this.presenter = presenter;
 
-            this.slides_view.motion_notify_event.connect( this.presenter.on_mouse_move );
-            this.slides_view.motion_notify_event.connect( this.on_mouse_move );
-            this.slides_view.button_release_event.connect( this.on_mouse_release );
-            this.slides_view.key_press_event.connect( this.on_key_press );
-            this.slides_view.selection_changed.connect( this.on_selection_changed );
+            this.slides_view.motion_notify_event.connect(this.presenter.on_mouse_move);
+            this.slides_view.motion_notify_event.connect(this.on_mouse_move);
+            this.slides_view.button_release_event.connect(this.on_mouse_release);
+            this.slides_view.key_press_event.connect(this.on_key_press);
+            this.slides_view.selection_changed.connect(this.on_selection_changed);
             this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
 
         }
@@ -160,8 +163,9 @@ namespace pdfpc.Window {
          */
         public void ensure_focus() {
             Gtk.Window top = this.get_toplevel() as Gtk.Window;
-            if (top != null && !top.has_toplevel_focus)
+            if (top != null && !top.has_toplevel_focus) {
                 top.present();
+            }
             this.slides_view.grab_focus();
         }
 
@@ -169,8 +173,9 @@ namespace pdfpc.Window {
          * Recalculate the structure, if needed.
          */
         public void ensure_structure() {
-            if (this.n_slides != this.last_structure_n_slides)
+            if (this.n_slides != this.last_structure_n_slides) {
                 this.prepare_layout();
+            }
         }
 
         /**
@@ -178,8 +183,9 @@ namespace pdfpc.Window {
          * for all the slides.
          */
         protected void prepare_layout() {
-            if (this.max_width == -1)
+            if (this.max_width == -1) {
                 return;
+            }
 
             double aspect_ratio = this.metadata.get_page_width() / this.metadata.get_page_height();
 
@@ -232,8 +238,9 @@ namespace pdfpc.Window {
             this.target_height = (int)Math.round(this.target_width / aspect_ratio);
             rows = (int)Math.ceil((float)this.n_slides / this.slides_view.columns);
             int full_height = rows*(this.target_height + 2*padding + 2*row_spacing) + 2*margin;
-            if (full_height > this.max_height)
+            if (full_height > this.max_height) {
                 full_height = this.max_height;
+            }
             this.set_size_request(-1, full_height);
 
             this.last_structure_n_slides = this.n_slides;
@@ -265,12 +272,13 @@ namespace pdfpc.Window {
          * triggers a rebuilding of the widget.
          */
         public void set_n_slides(int n) {
-            if ( n != this.n_slides ) {
+            if (n != this.n_slides) {
                 var currently_selected = this.current_slide;
                 this.n_slides = n;
                 this.prepare_layout();
-                if ( currently_selected >= this.n_slides )
+                if (currently_selected >= this.n_slides) {
                     currently_selected = this.n_slides - 1;
+                }
                 this.current_slide = currently_selected;
             }
         }
@@ -285,8 +293,9 @@ namespace pdfpc.Window {
             var iter = Gtk.TreeIter();
             this.slides.get_iter_from_string(out iter, @"$(this.current_slide)");
             this.slides.remove(iter);
-            if (this.current_slide >= this.n_slides)
+            if (this.current_slide >= this.n_slides) {
                 this.current_slide = this.n_slides - 1;
+            }
         }
 
         /**
@@ -296,17 +305,19 @@ namespace pdfpc.Window {
          */
         public bool on_key_press(Gtk.Widget source, Gdk.EventKey key) {
             bool handled = false;
-            switch ( key.keyval ) {
+            switch (key.keyval) {
                 case 0xff51: /* Cursor left */
                 case 0xff55: /* Page Up */
-                    if ( this.current_slide > 0)
+                    if (this.current_slide > 0) {
                         this.current_slide -= 1;
+                    }
                     handled = true;
                     break;
                 case 0xff53: /* Cursor right */
                 case 0xff56: /* Page down */
-                    if ( this.current_slide < this.n_slides - 1 )
+                    if (this.current_slide < this.n_slides - 1) {
                         this.current_slide += 1;
+                    }
                     handled = true;
                     break;
                 case 0xff0d: /* Return */
@@ -325,8 +336,9 @@ namespace pdfpc.Window {
         public bool on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
             Gtk.TreePath path;
             path = this.slides_view.get_path_at_pos((int)event.x, (int)event.y);
-            if (path != null && path.get_indices()[0] != this.current_slide)
+            if (path != null && path.get_indices()[0] != this.current_slide) {
                 this.current_slide = path.get_indices()[0];
+            }
             return false;
         }
 
@@ -345,7 +357,7 @@ namespace pdfpc.Window {
     }
 
     /*
-     * Render a pixbuf that is slightly shaded, unless it is the selected one.
+     * Render a surface that is slightly shaded, unless it is the selected one.
      */
     class CellRendererHighlight : Gtk.CellRenderer {
         public int slide_id { get; set; }
@@ -355,9 +367,9 @@ namespace pdfpc.Window {
         public int slide_width { get; set; }
         public int slide_height { get; set; }
 
-        public override void get_size (Gtk.Widget widget, Gdk.Rectangle? cell_area,
-                                       out int x_offset, out int y_offset,
-                                       out int width, out int height) {
+        public override void get_size(Gtk.Widget widget, Gdk.Rectangle? cell_area,
+                                      out int x_offset, out int y_offset,
+                                      out int width, out int height) {
             x_offset = 0;
             y_offset = 0;
             width = this.slide_width;
@@ -383,7 +395,7 @@ namespace pdfpc.Window {
 
             if ((flags & Gtk.CellRendererState.SELECTED) == 0) {
                 cr.rectangle(cell_area.x, cell_area.y, cell_area.width, cell_area.height);
-                cr.set_source_rgba(0,0,0,0.4);
+                cr.set_source_rgba(0, 0, 0, 0.4);
                 cr.fill();
             }
         }

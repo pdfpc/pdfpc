@@ -207,8 +207,9 @@ namespace pdfpc.Metadata {
          */
         public void quit() {
             this.save_to_disk();
-            foreach (var mapping in this.action_mapping)
+            foreach (var mapping in this.action_mapping) {
                 mapping.deactivate();
+            }
         }
 
         /**

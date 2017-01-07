@@ -528,8 +528,9 @@ namespace pdfpc {
                 Gst.Element filter = gst_element_make("capsfilter", "filter");
                 filter.set("caps", caps);
                 bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
-                if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2))
+                if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2)) {
                     throw new PipelineError.Linking("Could not link pipeline.");
+                }
             } catch (PipelineError err) {
                 warning(@"Error creating control pipeline: $(err.message)");
                 return source;
@@ -576,10 +577,10 @@ namespace pdfpc {
                 if (this.loop) {
                     // attempting to seek from this callback fails, so we
                     // must schedule a seek on next idle time.
-                    GLib.Idle.add( () => {
+                    GLib.Idle.add(() => {
                         this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
                         return false;
-                    } );
+                    });
                 } else {
                     // Can't seek to beginning w/o updating output, so mark to seek later
                     this.eos = true;
