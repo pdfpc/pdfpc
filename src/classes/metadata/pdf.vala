@@ -334,21 +334,30 @@ namespace pdfpc.Metadata {
                 out this.original_page_height
             );
 
-            if (Options.disable_auto_grouping && !skips_by_user) {
-                // Ignore overlayed slides
-                for (int i = 0; i < this.page_count; ++i) {
-                    this.user_view_indexes += i;
-                }
-            }
-
-            if (!Options.disable_auto_grouping && !skips_by_user) {
-                // Auto-detect which pages to skip
-                string previous_label = null;
-                for (int i = 0; i < this.page_count; ++i) {
-                    string this_label = this.document.get_page(i).label;
-                    if (this_label != previous_label) {
+            if (skips_by_user) {
+                parse_skip_line(skip_line);
+            } else {
+                if (Options.disable_auto_grouping) {
+                    // Ignore overlayed slides
+                    for (int i = 0; i < this.page_count; ++i) {
                         this.user_view_indexes += i;
-                        previous_label = this_label;
+                    }
+                } else if (!Options.disable_auto_grouping && !Options.full_slide_grouping) {
+                    string previous_label = null;
+                    for (int i = 0; i < this.page_count; ++i) {
+                        string this_label = this.document.get_page(i).label;
+                        if (this_label != previous_label) {
+                            this.user_view_indexes += i;
+                            previous_label = this_label;
+                        }
+                    }
+                } else { // Options.full_slide_grouping
+                    for (int i = 0; i < this.page_count; ++i) {
+                        string this_label = this.document.get_page(i).label;
+                        string next_label = i+1 < this.page_count ? this.document.get_page(i+1).label : null;
+                        if (this_label != next_label) {
+                            this.user_view_indexes += i;
+                        }
                     }
                 }
             }
