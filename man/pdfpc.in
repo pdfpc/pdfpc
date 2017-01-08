@@ -61,6 +61,9 @@ Position of notes on the PDF page. Position can be either left, right, top or bo
 .BI "\-p, \-\-persist\-cache"
 Persist the PNG cache on disk for faster startup.
 .TP
+.BI "\-P, \-\-page"
+Goto a specific page directly after startup. In case of overlays, the first slide will be displayed.
+.TP
 .BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
 .TP
