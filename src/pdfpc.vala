@@ -67,6 +67,7 @@ namespace pdfpc {
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presentation window in width:height format (forces windowed mode)", null},
             { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
+            { "page", 'P', 0, OptionArg.INT, ref Options.page, "Goto a specific page directly after startup", "PAGE" },
             { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
             { null }
         };
@@ -297,6 +298,14 @@ namespace pdfpc {
             if ( this.controller.presenter != null ) {
                 this.controller.presenter.show_all();
                 this.controller.presenter.update();
+            }
+
+            if(Options.page >= 1 && Options.page <= metadata.get_end_user_slide()) {
+                int u = metadata.user_slide_to_real_slide(Options.page - 1, false);
+                this.controller.page_change_request(u);
+            } else {
+                warning("-P argument must be between %d and %d", 1, metadata.get_end_user_slide());
+                Posix.exit(1);
             }
 
             // Enter the Glib eventloop

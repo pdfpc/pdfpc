@@ -148,6 +148,11 @@ namespace pdfpc {
         public static string? size = null;
 
         /**
+         * Page which should be displayed after startup
+         */
+        public static int page = 1;
+
+        /**
          * Flag if the version string should be printed on startup
          */
         public static bool version = false;
