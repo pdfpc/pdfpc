@@ -428,3 +428,26 @@ pdfpc is a fork of Pdf Presenter Console, available
 .PP
 pdfpcrc(5)
 
+There are several other programs with similar functionality.
+
+.BR impressive (1)
+has nice transition effects.
+
+.BR hpdfp (1)
+is the
+.URL http://michaeldadams.org/projects/haskell-pdf-presenter/ "Haskell PDF Presenter"
+program, which packs an amazing level of functionality into not many lines of Haskell.
+
+.BR pympress (1)
+is a little
+.URL https://github.com/Cimbali/pympress "PDF reader written in Python"
+which handles dual screens and beamer notes.
+
+.BR dspdfviewer (1)
+is also specialized for beamer-produced wide PDF with notes.
+
+Many PDF viewers have full-screen presentation modes, but without dual-monitor preview or notes or a timer. These include
+.BR zathura (1),
+.BR evince (1),
+and
+.BR okular (1).
