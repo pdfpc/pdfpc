@@ -315,6 +315,8 @@ namespace pdfpc.Metadata {
         public Pdf(string fname, NotesPosition notes_position) {
             this.url = File.new_for_commandline_arg(fname).get_uri();
 
+            this.action_mapping = new Gee.ArrayList<ActionMapping>();
+
             this.notes_position = notes_position;
 
             fill_path_info(fname);
@@ -611,7 +613,7 @@ namespace pdfpc.Metadata {
          * page.
          */
         private int mapping_page_num = -1;
-        private GLib.List<ActionMapping> action_mapping;
+        private Gee.List<ActionMapping> action_mapping;
         private ActionMapping[] blanks = {
 #if MOVIES
             new ControlledMovie(),
@@ -626,12 +628,12 @@ namespace pdfpc.Metadata {
          * destroy the existing action mappings and create new mappings for
          * the new page.
          */
-        public unowned GLib.List<ActionMapping> get_action_mapping(int page_num) {
+        public unowned Gee.List<ActionMapping> get_action_mapping(int page_num) {
             if (page_num != this.mapping_page_num) {
                 foreach (var mapping in this.action_mapping) {
                     mapping.deactivate();
                 }
-                this.action_mapping = null; //.Is this really the correct way to clear a list?
+                this.action_mapping.clear();
 
                 GLib.List<Poppler.LinkMapping> link_mappings;
                 link_mappings = this.get_document().get_page(page_num).get_link_mapping();
@@ -639,7 +641,7 @@ namespace pdfpc.Metadata {
                     foreach (var blank in blanks) {
                         var action = blank.new_from_link_mapping(mapping, this.controller, this.document);
                         if (action != null) {
-                            this.action_mapping.append(action);
+                            this.action_mapping.add(action);
                             break;
                         }
                     }
@@ -653,7 +655,7 @@ namespace pdfpc.Metadata {
                     foreach (var blank in blanks) {
                         var action = blank.new_from_annot_mapping(mapping, this.controller, this.document);
                         if (action != null) {
-                            this.action_mapping.append(action);
+                            this.action_mapping.add(action);
                             break;
                         }
                     }

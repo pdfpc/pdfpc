@@ -35,7 +35,7 @@ namespace pdfpc.View.Behaviour {
         /**
          * Poppler.LinkMappings of the current page
          */
-        protected unowned GLib.List<ActionMapping> page_link_mappings = null;
+        protected unowned Gee.List<ActionMapping>? page_link_mappings = null;
 
         /**
          * Precalculated Gdk.Rectangles for every link mapping
@@ -81,7 +81,7 @@ namespace pdfpc.View.Behaviour {
                   && ( x <= r.x + r.width )
                   && ( y >= r.y )
                   && ( y <= r.y + r.height ) ) {
-                    return this.page_link_mappings.nth_data( i );
+                    return this.page_link_mappings.get(i);
                 }
             }
             return null;
@@ -141,8 +141,8 @@ namespace pdfpc.View.Behaviour {
                 return;
 
             // Precalculate the a Gdk.Rectangle for every link mapping area
-            if ( this.page_link_mappings.length() > 0 ) {
-                this.precalculated_mapping_rectangles = new Gdk.Rectangle[this.page_link_mappings.length()];
+            if (this.page_link_mappings.size > 0) {
+                this.precalculated_mapping_rectangles = new Gdk.Rectangle[this.page_link_mappings.size];
                 int i=0;
                 foreach( var mapping in this.page_link_mappings ) {
                     this.precalculated_mapping_rectangles[i++] = ((View.Pdf)this.target).convert_poppler_rectangle_to_gdk_rectangle(

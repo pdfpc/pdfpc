@@ -172,7 +172,7 @@ namespace pdfpc {
         /**
          * Controllables which are registered with this presentation controller.
          */
-        protected GLib.List<Controllable> controllables;
+        protected Gee.List<Controllable> controllables;
 
         /**
          * The metadata of the presentation
@@ -246,7 +246,7 @@ namespace pdfpc {
             this.metadata.controller = this;
             this.black_on_end = allow_black_on_end;
 
-            this.controllables = new GLib.List<Controllable>();
+            this.controllables = new Gee.ArrayList<Controllable>();
 
             this.history = new Gee.ArrayQueue<int>();
 
@@ -784,13 +784,13 @@ namespace pdfpc {
          * registered false is returned.
          */
         public bool register_controllable(Controllable controllable) {
-            if (this.controllables.find(controllable) != null) {
+            if (this.controllables.contains(controllable)) {
                 // The controllable has already been added.
                 return false;
             }
 
             //controllable.set_controller( this );
-            this.controllables.append(controllable);
+            this.controllables.add(controllable);
             if (this.main_view == null)
                 this.main_view = controllable.main_view;
 
