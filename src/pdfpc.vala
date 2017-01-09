@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * Copyright 2012 David Vilar
- * Copyright 2012, 2015-2016 Andreas Bilke
+ * Copyright 2012, 2015-2017 Andreas Bilke
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2014-2015 Andy Barry
  * Copyright 2015 Maurizio Tomasi
@@ -78,22 +78,21 @@ namespace pdfpc {
          *
          * Returns the name of the pdf file to open (or null if not present)
          */
-        protected string? parse_command_line_options( ref unowned string[] args ) {
+        protected string? parse_command_line_options(ref unowned string[] args) {
             // intialize Options for the first time to invoke static construct
             Options o = new Options();
 
-            var context = new OptionContext( "<pdf-file>" );
-            context.add_main_entries( options, null );
+            var context = new OptionContext("<pdf-file>");
+            context.add_main_entries(options, null);
 
             try {
-                context.parse( ref args );
-            }
-            catch( OptionError e ) {
+                context.parse(ref args);
+            } catch(OptionError e) {
                 warning("\n%s\n\n", e.message);
-                warning("%s", context.get_help( true, null ));
-                Posix.exit( 1 );
+                warning("%s", context.get_help(true, null));
+                Posix.exit(1);
             }
-            if ( args.length < 2 ) {
+            if (args.length < 2) {
                 return null;
             } else {
                 return args[1];
@@ -155,7 +154,7 @@ namespace pdfpc {
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presenter create_presenter( Metadata.Pdf metadata, int monitor ) {
+        private Window.Presenter create_presenter(Metadata.Pdf metadata, int monitor) {
             var presenter = new Window.Presenter(metadata, monitor, this.controller);
             presenter.set_cache_observer(this.cache_status);
 
@@ -166,9 +165,9 @@ namespace pdfpc {
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation( Metadata.Pdf metadata, int monitor, int width = -1, int height = -1 ) {
+        private Window.Presentation create_presentation(Metadata.Pdf metadata, int monitor, int width = -1, int height = -1) {
             var presentation = new Window.Presentation(metadata, monitor, this.controller, width, height);
-            presentation.set_cache_observer( this.cache_status );
+            presentation.set_cache_observer(this.cache_status);
 
             return presentation;
         }
@@ -177,10 +176,10 @@ namespace pdfpc {
          * Main application function, which instantiates the windows and
          * initializes the Gtk system.
          */
-        public void run( string[] args ) {
-            Gtk.init( ref args );
+        public void run(string[] args) {
+            Gtk.init(ref args);
 
-            string pdfFilename = this.parse_command_line_options( ref args );
+            string pdfFilename = this.parse_command_line_options(ref args);
 
             if (Options.version) {
                 print_version();
@@ -207,7 +206,7 @@ namespace pdfpc {
             }
 
 #if MOVIES
-            Gst.init( ref args );
+            Gst.init(ref args);
 #endif
             if (Options.list_actions) {
                 stdout.printf("Config file commands accepted by pdfpc:\n");
@@ -218,6 +217,7 @@ namespace pdfpc {
                         tabAlignment += "\t";
                     stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
                 }
+
                 return;
             }
             if (pdfFilename == null) {
@@ -251,8 +251,9 @@ namespace pdfpc {
 
             pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
             var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename), notes_position);
-            if ( Options.duration != uint.MAX)
+            if (Options.duration != uint.MAX) {
                 metadata.set_duration(Options.duration);
+            }
 
 
             // Initialize global controller and CacheStatus, to manage
@@ -263,44 +264,41 @@ namespace pdfpc {
             set_styling();
 
             var screen = Gdk.Screen.get_default();
-            if ( !Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1 ) {
+            if (!Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1) {
                 int presenter_monitor, presentation_monitor;
-                if ( Options.display_switch != true )
-                    presenter_monitor    = screen.get_primary_monitor();
-                else
-                    presenter_monitor    = (screen.get_primary_monitor() + 1) % 2;
+                if (Options.display_switch != true) {
+                    presenter_monitor = screen.get_primary_monitor();
+                } else {
+                    presenter_monitor = (screen.get_primary_monitor() + 1) % 2;
+                }
+
                 presentation_monitor = (presenter_monitor + 1) % 2;
-                this.controller.presenter =
-                    this.create_presenter( metadata, presenter_monitor );
-                this.controller.presentation =
-                    this.create_presentation( metadata, presentation_monitor, width, height );
+                this.controller.presenter = this.create_presenter(metadata, presenter_monitor);
+                this.controller.presentation = this.create_presentation(metadata, presentation_monitor, width, height);
             } else if (Options.windowed && !Options.single_screen) {
-                this.controller.presenter =
-                    this.create_presenter( metadata, -1 );
-                this.controller.presentation =
-                    this.create_presentation( metadata, -1, width, height );
+                this.controller.presenter = this.create_presenter(metadata, -1);
+                this.controller.presentation = this.create_presentation(metadata, -1, width, height);
             } else {
-                    if ( !Options.display_switch)
-                        this.controller.presenter =
-                            this.create_presenter( metadata, -1 );
-                    else
-                        this.controller.presentation =
-                            this.create_presentation( metadata, -1, width, height );
+                if (!Options.display_switch) {
+                    this.controller.presenter = this.create_presenter(metadata, -1);
+                } else {
+                    this.controller.presentation = this.create_presentation(metadata, -1, width, height);
+                }
             }
 
             // The windows are always displayed at last to be sure all caches have
             // been created at this point.
-            if ( this.controller.presentation != null ) {
+            if (this.controller.presentation != null) {
                 this.controller.presentation.show_all();
                 this.controller.presentation.update();
             }
 
-            if ( this.controller.presenter != null ) {
+            if (this.controller.presenter != null) {
                 this.controller.presenter.show_all();
                 this.controller.presenter.update();
             }
 
-            if(Options.page >= 1 && Options.page <= metadata.get_end_user_slide()) {
+            if (Options.page >= 1 && Options.page <= metadata.get_end_user_slide()) {
                 int u = metadata.user_slide_to_real_slide(Options.page - 1, false);
                 this.controller.page_change_request(u);
             } else {
@@ -316,9 +314,9 @@ namespace pdfpc {
         /**
          * Basic application entry point
          */
-        public static int main ( string[] args ) {
+        public static int main (string[] args) {
             var application = new Application();
-            application.run( args );
+            application.run(args);
 
             return 0;
         }
