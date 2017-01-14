@@ -300,7 +300,7 @@ namespace pdfpc {
 
             if (Options.page >= 1 && Options.page <= metadata.get_end_user_slide()) {
                 int u = metadata.user_slide_to_real_slide(Options.page - 1, false);
-                this.controller.page_change_request(u);
+                this.controller.page_change_request(u, false);
             } else {
                 warning("-P argument must be between %d and %d", 1, metadata.get_end_user_slide());
                 Posix.exit(1);
