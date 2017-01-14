@@ -88,7 +88,7 @@ namespace pdfpc {
         public Cairo.ImageSurface render_to_surface(int slide_number)
             throws Renderer.RenderError {
 
-            var metadata = this.metadata as Metadata.Pdf;
+            var metadata = this.metadata;
 
             // Check if a valid page is requested, before locking anything.
             if (slide_number < 0 || slide_number >= metadata.get_slide_count()) {

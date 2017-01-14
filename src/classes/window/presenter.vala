@@ -44,7 +44,7 @@ namespace pdfpc.Window {
          */
         public View.Pdf main_view {
             get {
-                return this.current_view as View.Pdf;
+                return this.current_view;
             }
         }
 
