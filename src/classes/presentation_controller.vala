@@ -729,15 +729,18 @@ namespace pdfpc {
          * A request to change the page has been issued
          */
         public void page_change_request(int page_number, bool start_timer = true) {
-            if (page_number != this.current_slide_number)
+            if (page_number != this.current_slide_number) {
                 this.push_history();
+            }
+
             this.current_slide_number = page_number;
             this.current_user_slide_number = this.metadata.real_slide_to_user_slide(
                 this.current_slide_number);
+            this.controllables_update();
+
             if (start_timer) {
                 this.timer.start();
             }
-            this.controllables_update();
         }
 
         /**
