@@ -36,19 +36,19 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Initialize the cache store
          */
-        public Engine( Metadata.Pdf metadata ) {
-            base( metadata );
+        public Engine(Metadata.Pdf metadata) {
+            base(metadata);
             this.storage = new PNG.Item[this.metadata.get_slide_count()];
         }
 
         /**
          * Store a surface in the cache using the given index as identifier
          */
-        public override void store( uint index, Cairo.ImageSurface surface ) {
+        public override void store(uint index, Cairo.ImageSurface surface) {
             png_store(index, surface);
         }
 
-        protected void png_store(uint index, Cairo.ImageSurface surface ) {
+        protected void png_store(uint index, Cairo.ImageSurface surface) {
             int buffer_length = surface.get_stride()*surface.get_height();
             unowned uchar[] buffer = surface.get_data();
             uchar[] buffer_copy = buffer[0:buffer_length];
@@ -66,13 +66,13 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Cairo.ImageSurface? retrieve( uint index ) {
+        public override Cairo.ImageSurface? retrieve(uint index) {
             return png_retrieve(index);
         }
 
-        protected Cairo.ImageSurface? png_retrieve( uint index ) {
+        protected Cairo.ImageSurface? png_retrieve(uint index) {
             var item = this.storage[index];
-            if ( item == null ) {
+            if (item == null) {
                 return null;
             }
 

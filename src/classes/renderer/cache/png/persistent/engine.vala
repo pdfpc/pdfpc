@@ -38,8 +38,8 @@ namespace pdfpc.Renderer.Cache {
 
         protected string cache_directory;
 
-        public Engine( Metadata.Pdf metadata ) {
-            base( metadata );
+        public Engine(Metadata.Pdf metadata) {
+            base(metadata);
 
             cache_instance_counter++;
             cache_instance_id = cache_instance_counter;
@@ -99,7 +99,7 @@ namespace pdfpc.Renderer.Cache {
             }
         }
 
-        public override Cairo.ImageSurface? retrieve( uint index ) {
+        public override Cairo.ImageSurface? retrieve(uint index) {
             var item = png_retrieve(index);
             if ( item != null ) {
                 return item;
