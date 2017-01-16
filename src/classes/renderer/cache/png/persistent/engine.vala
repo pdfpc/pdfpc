@@ -93,7 +93,7 @@ namespace pdfpc.Renderer.Cache {
                 if (!parent_directory.query_exists()) {
                     parent_directory.make_directory_with_parents();
                 }
-                cache_file.replace_contents(storage[index].get_png_data(), null, false, FileCreateFlags.NONE, null);
+                cache_file.replace_contents(storage[index].data, null, false, FileCreateFlags.NONE, null);
             } catch(Error e) {
                 warning("Storing slide %u to cache in %s failed.\n", index, cache_file_name);
             }
@@ -119,7 +119,11 @@ namespace pdfpc.Renderer.Cache {
                         uint8[] data = new uint8[cache_file_info.get_size()];
                         cache_candidate.read().read_all(data, null);
 
-                        var cache_item = new PNG.Item(data);
+                        var cache_item = new PNG.Item();
+                        cache_item.data = data;
+                        cache_item.width = cache_width;
+                        cache_item.height = cache_height;
+
                         storage[index] = cache_item;
 
                         return png_retrieve(index);

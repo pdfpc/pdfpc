@@ -49,18 +49,15 @@ namespace pdfpc.Renderer.Cache {
         }
 
         protected void png_store(uint index, Cairo.ImageSurface surface ) {
-            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
-                surface.get_height());
-            uint8[] buffer;
+            int buffer_length = surface.get_stride()*surface.get_height();
+            unowned uchar[] buffer = surface.get_data();
+            uchar[] buffer_copy = buffer[0:buffer_length];
 
-            try {
-                pixbuf.save_to_buffer( out buffer, "png", "compression", "1", null );
-            }
-            catch( Error e ) {
-                error( "Could not generate PNG cache image for slide %u: %s", index, e.message );
-            }
+            var item = new PNG.Item();
+            item.data = buffer_copy;
+            item.width = surface.get_width();
+            item.height = surface.get_height();
 
-            var item = new PNG.Item( buffer );
             this.storage[index] = item;
         }
 
@@ -79,22 +76,10 @@ namespace pdfpc.Renderer.Cache {
                 return null;
             }
 
-            var loader = new Gdk.PixbufLoader();
-            try {
-                loader.write( item.get_png_data() );
-                loader.close();
-            }
-            catch( Error e ) {
-                error( "Could not load cached PNG image for slide %u: %s", index, e.message );
-            }
-
-            var pixbuf = loader.get_pixbuf();
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.ARGB32,
-                pixbuf.get_width(), pixbuf.get_height());
-            Cairo.Context cr = new Cairo.Context(surface);
-            Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
-            cr.fill();
+            Cairo.ImageSurface surface = new Cairo.ImageSurface.for_data(
+                item.data, Cairo.Format.RGB24, item.width, item.height,
+                Cairo.Format.RGB24.stride_for_width(item.width)
+            );
 
             return surface;
         }
