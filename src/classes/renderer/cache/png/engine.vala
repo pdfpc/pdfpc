@@ -36,31 +36,28 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Initialize the cache store
          */
-        public Engine( Metadata.Pdf metadata ) {
-            base( metadata );
+        public Engine(Metadata.Pdf metadata) {
+            base(metadata);
             this.storage = new PNG.Item[this.metadata.get_slide_count()];
         }
 
         /**
          * Store a surface in the cache using the given index as identifier
          */
-        public override void store( uint index, Cairo.ImageSurface surface ) {
+        public override void store(uint index, Cairo.ImageSurface surface) {
             png_store(index, surface);
         }
 
-        protected void png_store(uint index, Cairo.ImageSurface surface ) {
-            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, surface.get_width(),
-                surface.get_height());
-            uint8[] buffer;
+        protected void png_store(uint index, Cairo.ImageSurface surface) {
+            int buffer_length = surface.get_stride()*surface.get_height();
+            unowned uchar[] buffer = surface.get_data();
+            uchar[] buffer_copy = buffer[0:buffer_length];
 
-            try {
-                pixbuf.save_to_buffer( out buffer, "png", "compression", "1", null );
-            }
-            catch( Error e ) {
-                error( "Could not generate PNG cache image for slide %u: %s", index, e.message );
-            }
+            var item = new PNG.Item();
+            item.data = buffer_copy;
+            item.width = surface.get_width();
+            item.height = surface.get_height();
 
-            var item = new PNG.Item( buffer );
             this.storage[index] = item;
         }
 
@@ -69,32 +66,20 @@ namespace pdfpc.Renderer.Cache {
          *
          * If no item with the given index is available null is returned
          */
-        public override Cairo.ImageSurface? retrieve( uint index ) {
+        public override Cairo.ImageSurface? retrieve(uint index) {
             return png_retrieve(index);
         }
 
-        protected Cairo.ImageSurface? png_retrieve( uint index ) {
+        protected Cairo.ImageSurface? png_retrieve(uint index) {
             var item = this.storage[index];
-            if ( item == null ) {
+            if (item == null) {
                 return null;
             }
 
-            var loader = new Gdk.PixbufLoader();
-            try {
-                loader.write( item.get_png_data() );
-                loader.close();
-            }
-            catch( Error e ) {
-                error( "Could not load cached PNG image for slide %u: %s", index, e.message );
-            }
-
-            var pixbuf = loader.get_pixbuf();
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.ARGB32,
-                pixbuf.get_width(), pixbuf.get_height());
-            Cairo.Context cr = new Cairo.Context(surface);
-            Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
-            cr.fill();
+            Cairo.ImageSurface surface = new Cairo.ImageSurface.for_data(
+                item.data, Cairo.Format.RGB24, item.width, item.height,
+                Cairo.Format.RGB24.stride_for_width(item.width)
+            );
 
             return surface;
         }

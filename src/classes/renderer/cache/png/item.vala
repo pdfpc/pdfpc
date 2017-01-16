@@ -26,30 +26,8 @@ namespace pdfpc.Renderer.Cache {
      * PNG picture data stored by the PNG cache engine.
      */
     public class PNG.Item: Object {
-        /**
-         * PNG picture data stored for this item
-         */
-        protected uint8[] data;
-
-        /**
-         * Create the item from a uchar array
-         */
-        public Item( uint8[] data ) {
-            this.data = data;
-        }
-
-        /**
-         * Return the stored data
-         */
-        public uint8[] get_png_data() {
-            return this.data;
-        }
-
-        /**
-         * Shortcut to retrieve the length of the stored dataset
-         */
-        public int get_length() {
-            return this.data.length;
-        }
+        public uchar[] data { get; set; }
+        public int width { get; set; }
+        public int height { get; set; }
     }
 }
