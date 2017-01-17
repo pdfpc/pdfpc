@@ -65,11 +65,26 @@ namespace pdfpc {
          */
         public string format_to_save() {
             var builder = new GLib.StringBuilder();
-            for (int i = 0; i < notes.length; ++i) {
-                if (notes[i] != null) {
-                    builder.append(@"### $(i+1)\n");
-                    builder.append(notes[i]);
+            try {
+                // match for ether [, ] or #
+                var escape_regex = new Regex("[\\[\\]#]");
+                for (int i = 0; i < notes.length; ++i) {
+                    if (notes[i] != null) {
+                        builder.append(@"### $(i+1)\n");
+                        // match [,],# and replace it with \[ etc. \0 is the whole match (respectively just [,],#)
+                        // escaping escape characters is fun!
+                        var escaped_text = escape_regex.replace(notes[i], notes[i].length, 0, "\\\\\\0");
+                        builder.append(escaped_text);
+                    }
                 }
+            } catch (RegexError e) {
+                // we failed in formatting the notes for disk storage. put a
+                // raw dump to stderr.
+                for (int i = 0; i < notes.length; ++i) {
+                    stderr.printf("### %d\n%s\n", i, notes[i]);
+                }
+
+                error("Formating notes for pdfpc file failed.");
             }
 
             return builder.str;
@@ -82,17 +97,26 @@ namespace pdfpc {
             string long_line = string.joinv("\n", lines);
             string[] notes_sections = long_line.split("### ");
 
-            for (int notes_section = 0; notes_section < notes_sections.length; ++notes_section) {
-                if (notes_sections[notes_section].length == 0) {
-                    continue;
+            try {
+                // match [,],# with leading \ in the file. Use
+                // regex grouping to get only the [,],# character
+                var unescape_regex = new Regex("\\\\([\\[\\]#])");
+
+                for (int notes_section = 0; notes_section < notes_sections.length; ++notes_section) {
+                    if (notes_sections[notes_section].length == 0) {
+                        continue;
+                    }
+                    int first_newline = notes_sections[notes_section].index_of("\n");
+                    var header_string = notes_sections[notes_section][0:first_newline];
+                    var notes = notes_sections[notes_section][first_newline + 1:notes_sections[notes_section].length];
+                    var notes_unescaped = unescape_regex.replace(notes, notes.length, 0, "\\1");
+
+                    int slide_number = int.parse(header_string);
+                    set_note(notes_unescaped, slide_number - 1);
+
                 }
-                int first_newline = notes_sections[notes_section].index_of("\n");
-                var header_string = notes_sections[notes_section][0:first_newline];
-                var notes = notes_sections[notes_section][first_newline + 1:notes_sections[notes_section].length];
-
-                int slide_number = int.parse(header_string);
-                set_note(notes, slide_number - 1);
-
+            } catch (RegexError e) {
+                error("Parsing notes file failed.");
             }
         }
     }
