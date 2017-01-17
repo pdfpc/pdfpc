@@ -385,17 +385,14 @@ The most typical case is if you add or remove some slides after you have
 edited notes or defined overlays.
 It may be quicker to edit the pdfpc file than to re-enter the whole
 information.
-Future versions may include external tools for dealing with this case
-automatically.
+
 .PP
 The files are plain-text files that should be fairly self-explanatory.
 A couple of things to note:
 .IP \[bu] 2
 The slide numbers of the notes refer to user slides
 .IP \[bu] 2
-The [notes] sections must be the last one in the file
-.IP \[bu] 2
-For the programmers out there: slide indexes start at 1
+Slide indexes start at 1
 
 .SS Appearance
 
