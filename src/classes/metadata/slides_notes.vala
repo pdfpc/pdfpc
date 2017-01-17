@@ -83,10 +83,11 @@ namespace pdfpc {
                 // we failed in formatting the notes for disk storage. put a
                 // raw dump to stderr.
                 for (int i = 0; i < notes.length; ++i) {
-                    stderr.printf("### %d\n%s\n", i, notes[i]);
+                    GLib.print("### %d\n%s\n", i, notes[i]);
                 }
 
-                error("Formating notes for pdfpc file failed.");
+                GLib.printerr("Formating notes for pdfpc file failed.\n");
+                Process.exit(1);
             }
 
             return builder.str;
@@ -118,7 +119,8 @@ namespace pdfpc {
 
                 }
             } catch (RegexError e) {
-                error("Parsing notes file failed.");
+                GLib.printerr("Parsing notes file failed.\n");
+                Process.exit(1);
             }
         }
     }

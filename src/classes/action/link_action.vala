@@ -75,7 +75,7 @@ namespace pdfpc {
                     try {
                         AppInfo.launch_default_for_uri(this.action.uri.uri, null);
                     } catch (GLib.Error e) {
-                        stderr.printf(e.message);
+                        GLib.printerr("%s\n", e.message);
 
                         return false;
                     }

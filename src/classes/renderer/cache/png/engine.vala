@@ -57,7 +57,8 @@ namespace pdfpc.Renderer.Cache {
                 pixbuf.save_to_buffer( out buffer, "png", "compression", "1", null );
             }
             catch( Error e ) {
-                error( "Could not generate PNG cache image for slide %u: %s", index, e.message );
+                GLib.printerr("Could not generate PNG cache image for slide %u: %s\n", index, e.message);
+                Process.exit(1);
             }
 
             var item = new PNG.Item( buffer );
@@ -85,7 +86,8 @@ namespace pdfpc.Renderer.Cache {
                 loader.close();
             }
             catch( Error e ) {
-                error( "Could not load cached PNG image for slide %u: %s", index, e.message );
+                GLib.printerr("Could not load cached PNG image for slide %u: %s\n", index, e.message);
+                Process.exit(1);
             }
 
             var pixbuf = loader.get_pixbuf();

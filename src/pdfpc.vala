@@ -80,7 +80,7 @@ namespace pdfpc {
          */
         protected string? parse_command_line_options(ref unowned string[] args) {
             // intialize Options for the first time to invoke static construct
-            Options o = new Options();
+            new Options();
 
             var context = new OptionContext("<pdf-file>");
             context.add_main_entries(options, null);
@@ -88,9 +88,8 @@ namespace pdfpc {
             try {
                 context.parse(ref args);
             } catch(OptionError e) {
-                warning("\n%s\n\n", e.message);
-                warning("%s", context.get_help(true, null));
-                Posix.exit(1);
+                GLib.printerr("%s\n\n%s\n", e.message, context.get_help(true, null));
+                Process.exit(1);
             }
             if (args.length < 2) {
                 return null;
@@ -103,13 +102,13 @@ namespace pdfpc {
          * Print version string and copyright statement
          */
         private void print_version() {
-            stdout.printf("pdfpc v4.0.5\n"
-                        + "(C) 2015-2017 Robert Schroll, Andreas Bilke, Andy Barry, Phillip Berndt and others\n"
-                        + "(C) 2012 David Vilar\n"
-                        + "(C) 2009-2011 Jakob Westhoff\n\n"
-                        + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"
-                        + "This is free software: you are free to change and redistribute it.\n"
-                        + "There is NO WARRANTY, to the extent permitted by law.\n");
+            GLib.print("pdfpc v4.0.5\n"
+                     + "(C) 2015-2017 Robert Schroll, Andreas Bilke, Andy Barry, Phillip Berndt and others\n"
+                     + "(C) 2012 David Vilar\n"
+                     + "(C) 2009-2011 Jakob Westhoff\n\n"
+                     + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"
+                     + "This is free software: you are free to change and redistribute it.\n"
+                     + "There is NO WARRANTY, to the extent permitted by law.\n");
         }
 
         /**
@@ -136,17 +135,18 @@ namespace pdfpc {
                 } else if (GLib.FileUtils.test(distCssPath, (GLib.FileTest.IS_REGULAR))) {
                     globalProvider.load_from_path(distCssPath);
                 } else {
-                    warning("No CSS file found");
+                    GLib.printerr("No CSS file found\n");
+                    Process.exit(1);
                 }
                 // load custom user css on top
                 if (GLib.FileUtils.test(userCssPath, (GLib.FileTest.IS_REGULAR))) {
                     userProvider.load_from_path(userCssPath);
                 } else if (GLib.FileUtils.test(legacyUserCssPath, (GLib.FileTest.IS_REGULAR))) {
                     userProvider.load_from_path(legacyUserCssPath);
-                    warning("Loaded pdfpc.css from legacy location. Please move your style sheet to %s", userCssPath);
+                    GLib.printerr("Loaded pdfpc.css from legacy location. Please move your style sheet to %s\n", userCssPath);
                 }
             } catch (Error error) {
-                warning("Could not load styling from data: %s", error.message);
+                GLib.printerr("Could not load styling from data: %s\n", error.message);
             }
         }
 
@@ -183,12 +183,12 @@ namespace pdfpc {
 
             if (Options.version) {
                 print_version();
-                Posix.exit(0);
+                Process.exit(0);
             }
 
             if (Options.notes_position != null) {
                 Options.disable_auto_grouping = true;
-                stderr.printf("--notes option detected. Disable auto grouping.\n");
+                GLib.printerr("--notes option detected. Disable auto grouping.\n");
             }
 
             ConfigFileReader configFileReader = new ConfigFileReader();
@@ -202,30 +202,30 @@ namespace pdfpc {
             } else if (GLib.FileUtils.test(legacyUserConfig, (GLib.FileTest.IS_REGULAR))) {
                 // if not found, use the legacy location
                 configFileReader.readConfig(legacyUserConfig);
-                warning("Loaded pdfpcrc from legacy location. Please move your config file to %s", userConfig);
+                GLib.printerr("Loaded pdfpcrc from legacy location. Please move your config file to %s\n", userConfig);
             }
 
 #if MOVIES
             Gst.init(ref args);
 #endif
             if (Options.list_actions) {
-                stdout.printf("Config file commands accepted by pdfpc:\n");
+                GLib.print("Config file commands accepted by pdfpc:\n");
                 string[] actions = PresentationController.getActionDescriptions();
                 for (int i = 0; i < actions.length; i+=2) {
                     string tabAlignment = "\t";
                     if (actions[i].length < 8)
                         tabAlignment += "\t";
-                    stdout.printf("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+                    GLib.print("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
                 }
 
                 return;
             }
             if (pdfFilename == null) {
-                warning("Error: No pdf file given\n");
-                Posix.exit(1);
+                GLib.printerr("No pdf file given\n");
+                Process.exit(1);
             } else if (!GLib.FileUtils.test(pdfFilename, (GLib.FileTest.IS_REGULAR))) {
-                warning("Error: pdf file \"%s\" not found\n", pdfFilename);
-                Posix.exit(1);
+                GLib.printerr("Pdf file \"%s\" not found\n", pdfFilename);
+                Process.exit(1);
             }
 
             // parse size option
@@ -239,8 +239,8 @@ namespace pdfpc {
                 height = int.parse(Options.size.substring(colonIndex + 1));
 
                 if (width < 1 || height < 1) {
-                    warning("Error: Failed to parse size\n");
-                    Posix.exit(1);
+                    GLib.printerr("Failed to parse --size=%s\n", Options.size);
+                    Process.exit(1);
 
                 }
 
@@ -302,8 +302,8 @@ namespace pdfpc {
                 int u = metadata.user_slide_to_real_slide(Options.page - 1, false);
                 this.controller.page_change_request(u, false);
             } else {
-                warning("-P argument must be between %d and %d", 1, metadata.get_end_user_slide());
-                Posix.exit(1);
+                GLib.printerr("Argument --page/-P must be between %d and %d\n", 1, metadata.get_end_user_slide());
+                Process.exit(1);
             }
 
             // Enter the Glib eventloop

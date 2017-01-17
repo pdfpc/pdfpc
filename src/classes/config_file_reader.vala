@@ -50,7 +50,7 @@ namespace pdfpc {
                             modMask |= Gdk.ModifierType.META_MASK;
                             break;
                         default:
-                            stderr.printf("Warning: Ignoring unknown modifier '%c'\n", modString[m]);
+                            GLib.printerr("Warning: Ignoring unknown modifier '%c'\n", modString[m]);
                             break;
                     }
                 }
@@ -68,14 +68,14 @@ namespace pdfpc {
 
         private void bindKey(string wholeLine, string[] fields) {
             if (fields.length != 3) {
-                stderr.printf("Bad key specification: %s\n", wholeLine);
+                GLib.printerr("Bad key specification: %s\n", wholeLine);
                 return;
             }
             uint modMask = 0;
             uint keycode = 0;
             readBindDef(fields[1], Gdk.keyval_from_name, out keycode, out modMask);
             if (keycode == 0x0) {
-                stderr.printf("Warning: Unknown key: %s\n", fields[1]);
+                GLib.printerr("Warning: Unknown key: %s\n", fields[1]);
             } else {
                 Options.BindTuple bt = new Options.BindTuple();
                 bt.type = "bind";
@@ -88,14 +88,14 @@ namespace pdfpc {
 
         private void unbindKey(string wholeLine, string[] fields) {
             if (fields.length != 2) {
-                stderr.printf("Bad unbind specification: %s\n", wholeLine);
+                GLib.printerr("Bad unbind specification: %s\n", wholeLine);
                 return;
             }
             uint modMask = 0;
             uint keycode = 0;
             readBindDef(fields[1], Gdk.keyval_from_name, out keycode, out modMask);
             if (keycode == 0x0) {
-                stderr.printf("Warning: Unknown key: %s\n", fields[1]);
+                GLib.printerr("Warning: Unknown key: %s\n", fields[1]);
             } else {
                 Options.BindTuple bt = new Options.BindTuple();
                 bt.type = "unbind";
@@ -113,14 +113,14 @@ namespace pdfpc {
 
         private void bindMouse(string wholeLine, string[] fields) {
             if (fields.length != 3) {
-                stderr.printf("Bad mouse specification: %s\n", wholeLine);
+                GLib.printerr("Bad mouse specification: %s\n", wholeLine);
                 return;
             }
             uint modMask = 0;
             uint button = 0;
             readBindDef(fields[1], (x) => { return (uint)int.parse(x); }, out button, out modMask);
             if (button == 0x0) {
-                stderr.printf("Warning: Unknown button: %s\n", fields[1]);
+                GLib.printerr("Warning: Unknown button: %s\n", fields[1]);
             } else {
                 Options.BindTuple bt = new Options.BindTuple();
                 bt.type = "bind";
@@ -133,14 +133,14 @@ namespace pdfpc {
 
         private void unbindMouse(string wholeLine, string[] fields) {
             if (fields.length != 2) {
-                stderr.printf("Bad unmouse specification: %s\n", wholeLine);
+                GLib.printerr("Bad unmouse specification: %s\n", wholeLine);
                 return;
             }
             uint modMask = 0;
             uint button = 0;
             readBindDef(fields[1], (x) => { return (uint)int.parse(x); }, out button, out modMask);
             if (button == 0x0) {
-                stderr.printf("Warning: Unknown button: %s\n", fields[1]);
+                GLib.printerr("Warning: Unknown button: %s\n", fields[1]);
             } else {
                 Options.BindTuple bt = new Options.BindTuple();
                 bt.type = "unbind";
@@ -193,7 +193,7 @@ namespace pdfpc {
                             this.readOption(uncommentedLine, fields);
                             break;
                         default:
-                            stderr.printf("Warning: Unknown command line \"%s\"\n", uncommentedLine);
+                            GLib.printerr("Warning: Unknown command line \"%s\"\n", uncommentedLine);
                             break;
                     }
                 }
@@ -203,7 +203,7 @@ namespace pdfpc {
 
         private void readOption(string wholeLine, string[] fields) {
             if (fields.length != 3) {
-                stderr.printf("Bad option specification: %s\n", wholeLine);
+                GLib.printerr("Bad option specification: %s\n", wholeLine);
                 return;
             }
 
@@ -233,7 +233,7 @@ namespace pdfpc {
                     }
                     break;
                 default:
-                    stderr.printf("Unknown option %s in pdfpcrc\n", fields[1]);
+                    GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
                     break;
             }
         }

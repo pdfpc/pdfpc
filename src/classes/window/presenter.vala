@@ -290,7 +290,7 @@ namespace pdfpc.Window {
             try {
                 bottom_text_css_provider.load_from_data(bottom_css, -1);
             } catch (Error e) {
-                stderr.printf("Warning: failed to set CSS for auto-sized bottom controls.\n");
+                GLib.printerr("Warning: failed to set CSS for auto-sized bottom controls.\n");
             }
 
             // Store the slide count once
@@ -407,7 +407,7 @@ namespace pdfpc.Window {
                 icon = new Gtk.Image.from_surface(surface);
                 icon.no_show_all = true;
             } catch (Error e) {
-                stderr.printf("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
+                GLib.printerr("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
                 icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
             }
             return icon;
@@ -444,7 +444,8 @@ namespace pdfpc.Window {
                 }
             }
             catch( Renderer.RenderError e ) {
-                error("The pdf page %d could not be rendered: %s", current_slide_number, e.message);
+                GLib.printerr("The pdf page %d could not be rendered: %s\n", current_slide_number, e.message);
+                Process.exit(1);
             }
             this.update_slide_count();
             this.update_note();
@@ -471,7 +472,8 @@ namespace pdfpc.Window {
                 this.current_view.display(page_number);
                 this.next_view.display(page_number + 1);
             } catch( Renderer.RenderError e ) {
-                error("The pdf page %d could not be rendered: %s", page_number, e.message);
+                GLib.printerr("The pdf page %d could not be rendered: %s\n", page_number, e.message);
+                Process.exit(1);
             }
 
             this.update_slide_count();

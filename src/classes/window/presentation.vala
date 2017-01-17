@@ -120,8 +120,9 @@ namespace pdfpc.Window {
             try {
                 this.view.display(this.presentation_controller.current_slide_number, true);
             } catch (Renderer.RenderError e) {
-                error("The pdf page %d could not be rendered: %s",
+                GLib.printerr("The pdf page %d could not be rendered: %s\n",
                     this.presentation_controller.current_slide_number, e.message );
+                Process.exit(1);
             }
         }
 

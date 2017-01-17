@@ -279,7 +279,7 @@ namespace pdfpc {
                     "/org/freedesktop/ScreenSaver");
                 this.screensaver_cookie = this.screensaver.inhibit("pdfpc",
                     "Showing a presentation");
-                stdout.printf("Screensaver inhibited\n");
+                GLib.print("Screensaver inhibited\n");
             } catch (Error error) {
                 // pass
             }
@@ -449,7 +449,7 @@ namespace pdfpc {
             if (this.screensaver != null && this.screensaver_cookie != 0) {
                 try {
                     this.screensaver.un_inhibit(this.screensaver_cookie);
-                    stdout.printf("Screensaver reactivated\n");
+                    GLib.print("Screensaver reactivated\n");
                 } catch (Error error) {
                     // pass
                 }
@@ -561,10 +561,11 @@ namespace pdfpc {
          */
         public void bind(uint keycode, uint modMask, string action_name) {
             Action? action = this.action_group.lookup_action(action_name);
-            if (action != null)
+            if (action != null) {
                 this.keyBindings.set(new KeyDef(keycode, modMask), action);
-            else
-                warning("Unknown action %s", action_name);
+            } else {
+                GLib.printerr("Unknown action %s\n", action_name);
+            }
         }
 
         /**
@@ -586,10 +587,11 @@ namespace pdfpc {
          */
         public void bindMouse(uint button, uint modMask, string action_name) {
             Action? action = this.action_group.lookup_action(action_name);
-            if (action != null)
+            if (action != null) {
                 this.mouseBindings.set(new KeyDef(button, modMask), action);
-            else
-                warning("Unknown action %s", action_name);
+            } else {
+                GLib.printerr("Unknown action %s\n", action_name);
+            }
         }
 
         /**

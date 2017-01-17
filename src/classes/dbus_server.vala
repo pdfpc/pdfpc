@@ -70,9 +70,9 @@ namespace pdfpc {
                         connection.register_object("/io/github/pdfpc",
                             new DBusServer(controller, metadata));
                     } catch (IOError e) {
-                        warning("Could not register DBus service.");
+                        GLib.printerr("Could not register DBus service.\n");
                     }
-                }, () => {}, () => warning("Could not acquire DBus bus."));
+                }, () => {}, () => GLib.printerr("Could not acquire DBus bus.\n"));
         }
 
         public void trigger_action(string name) {

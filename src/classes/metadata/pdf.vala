@@ -157,7 +157,8 @@ namespace pdfpc.Metadata {
                     }
                 }
             } catch (Error e) {
-                error("%s", e.message);
+                GLib.printerr("%s\n", e.message);
+                Process.exit(1);
             }
         }
 
@@ -228,7 +229,8 @@ namespace pdfpc.Metadata {
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
             } catch (Error e) {
-                error("%s", e.message);
+                GLib.printerr("%s\n", e.message);
+                Process.exit(1);
             }
         }
 
@@ -603,7 +605,7 @@ namespace pdfpc.Metadata {
             } catch(GLib.Error e) {
                 GLib.printerr("Unable to open pdf file \"%s\": %s\n",
                               fname, e.message);
-                Posix.exit(1);
+                Process.exit(1);
             }
 
             return document;

@@ -116,22 +116,23 @@ namespace pdfpc {
             // Render the initial page on first realization.
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
             this.realize.connect(() => {
-                 try {
-                     this.display( this.current_slide_number );
-                 } catch( Renderer.RenderError e ) {
-                     // There should always be a page 0 but you never know.
-                     error("Could not render initial page %d: %s",
-                         this.current_slide_number, e.message);
-                 }
+                try {
+                    this.display( this.current_slide_number );
+                } catch( Renderer.RenderError e ) {
+                    // There should always be a page 0 but you never know.
+                    GLib.printerr("Could not render initial page %d: %s\n",
+                        this.current_slide_number, e.message);
+                    Process.exit(1);
+                }
 
-                 // Start the prerender cycle if the renderer supports caching
-                 // and the used cache engine allows prerendering.
-                 // Executing the cycle here to ensure it is executed within the
-                 // Gtk event loop. If it is not proper Gdk thread handling is
-                 // impossible.
-                 if (renderer.cache != null && renderer.cache.allows_prerendering()) {
-                     this.register_prerendering();
-                 }
+                // Start the prerender cycle if the renderer supports caching
+                // and the used cache engine allows prerendering.
+                // Executing the cycle here to ensure it is executed within the
+                // Gtk event loop. If it is not proper Gdk thread handling is
+                // impossible.
+                if (renderer.cache != null && renderer.cache.allows_prerendering()) {
+                    this.register_prerendering();
+                }
             });
 
             if (clickable_links) {
@@ -224,7 +225,8 @@ namespace pdfpc {
                 try {
                     this.get_renderer().render_to_surface(*i);
                 } catch(Renderer.RenderError e) {
-                    error("Could not render page '%i' while pre-rendering: %s", *i, e.message);
+                    GLib.printerr("Could not render page '%i' while pre-rendering: %s\n", *i, e.message);
+                    Process.exit(1);
                 }
 
                 // Inform possible observers about the cached slide
@@ -254,7 +256,8 @@ namespace pdfpc {
             try {
                 behaviour.associate(this);
             } catch(Behaviour.AssociationError e) {
-                error("Behaviour association failure: %s", e.message);
+                GLib.printerr("Behaviour association failure: %s\n", e.message);
+                Process.exit(1);
             }
         }
 

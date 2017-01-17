@@ -228,14 +228,14 @@ namespace pdfpc {
                     try {
                         fh = FileUtils.open_tmp("pdfpc-XXXXXX", out tmp_fn);
                     } catch (FileError e) {
-                        warning("Could not create temp file: %s", e.message);
+                        GLib.printerr("Could not create temp file: %s\n", e.message);
                         return null;
                     }
                     FileUtils.close(fh);
                     try {
                         movie.save(tmp_fn);
                     } catch (Error e) {
-                        warning("Could not save temp file: %s", e.message);
+                        GLib.printerr("Could not save temp file: %s\n", e.message);
                         return null;
                     }
                     uri = "file://" + tmp_fn;
@@ -243,7 +243,7 @@ namespace pdfpc {
                 } else {
                     string file = movie.get_filename();
                     if (file == null) {
-                        warning("Movie not embedded and has no file name");
+                        GLib.printerr("Movie not embedded and has no file name\n");
                         return null;
                     }
                     uri = filename_to_uri(file, controller.get_pdf_fname());
@@ -254,11 +254,11 @@ namespace pdfpc {
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
                 if (movie.need_poster()) {
-                    warning("Movie requests poster.  Not yet supported.");
+                    GLib.printerr("Movie requests poster. Not yet supported.\n");
                 }
                 string file = movie.get_filename();
                 if (file == null) {
-                    warning("Movie has no file name");
+                    GLib.printerr("Movie has no file name\n");
                     return null;
                 }
                 uri = filename_to_uri(file, controller.get_pdf_fname());
@@ -404,7 +404,7 @@ namespace pdfpc {
             GLib.Error err;
             string debug;
             message.parse_error(out err, out debug);
-            stderr.printf("Gstreamer error %s\n", err.message);
+            GLib.printerr("Gstreamer error %s\n", err.message);
         }
 
         /**
@@ -435,7 +435,7 @@ namespace pdfpc {
             this.stop();
             if (this.temp != "") {
                 if (FileUtils.unlink(this.temp) != 0) {
-                    warning("Problem deleting temp file %s", this.temp);
+                    GLib.printerr("Problem deleting temp file %s\n", this.temp);
                 }
             }
         }
@@ -532,7 +532,7 @@ namespace pdfpc {
                     throw new PipelineError.Linking("Could not link pipeline.");
                 }
             } catch (PipelineError err) {
-                warning(@"Error creating control pipeline: $(err.message)");
+                GLib.printerr("Error creating control pipeline: %s\n", err.message);
                 return source;
             }
 
