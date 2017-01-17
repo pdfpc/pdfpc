@@ -35,10 +35,11 @@ namespace pdfpc {
         /**
          * Set a note for a given slide
          */
-        public void set_note( string note, int slide_number ) {
+        public void set_note(string note, int slide_number) {
             if (slide_number != -1) {
-                if (notes.length <= slide_number)
+                if (notes.length <= slide_number) {
                     notes.resize(slide_number+1);
+                }
                 notes[slide_number] = note;
             }
         }
@@ -46,11 +47,12 @@ namespace pdfpc {
         /**
          * Return the text of a note
          */
-        public string get_note_for_slide( int number ) {
-            if (number >= notes.length || notes[number] == null)
+        public string get_note_for_slide(int number) {
+            if (number >= notes.length || notes[number] == null) {
                 return "";
-            else
+            } else {
                 return notes[number];
+            }
         }
 
         /**
