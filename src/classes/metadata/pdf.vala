@@ -229,7 +229,7 @@ namespace pdfpc.Metadata {
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
             } catch (Error e) {
-                GLib.printerr("%s\n", e.message);
+                GLib.printerr("Failed to store metadata on disk: %s\nThe metadata was:\n\n%s", e.message, contents);
                 Process.exit(1);
             }
         }
