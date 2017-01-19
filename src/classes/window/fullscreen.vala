@@ -24,7 +24,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * We use pure C functions for detecting the gdk backend, since
+ * we have no access to the C macros for finding the GDK backend in
+ * vala.
+ */
+extern bool pdfpc_helper_display_is_wayland(Gdk.Display display);
+extern bool pdfpc_helper_display_is_x11(Gdk.Display display);
+
 namespace pdfpc.Window {
+    public enum GdkBackend {
+        WAYLAND,
+        X11,
+        UNKNOWN
+    }
+
     /**
      * Window extension implementing all the needed functionality, to be
      * displayed fullscreen.
@@ -68,8 +82,16 @@ namespace pdfpc.Window {
          */
         protected int gdk_scale = 1;
 
+        /**
+         * The GDK backend which is currently used. We need this for
+         * backend specific code
+         */
+        protected GdkBackend gdk_backend;
+
         public Fullscreen(int screen_num, int width = -1, int height = -1) {
             Gdk.Screen screen;
+
+            this.gdk_backend = this.get_gdk_backend();
 
             int screen_num_to_use;
             if (screen_num >= 0) {
@@ -194,6 +216,26 @@ namespace pdfpc.Window {
             this.restart_hide_cursor_timer();
 
             return false;
+        }
+
+        /**
+         * Return the GDK backend
+         */
+        protected GdkBackend get_gdk_backend() {
+            GdkBackend backend = GdkBackend.UNKNOWN;
+
+            if (pdfpc_helper_display_is_wayland(Gdk.Display.get_default())) {
+                backend = GdkBackend.WAYLAND;
+            } else if (pdfpc_helper_display_is_x11(Gdk.Display.get_default())) {
+                backend = GdkBackend.X11;
+            }
+
+            // if we can't detect the backend, behave like X11
+            if (backend == GdkBackend.UNKNOWN) {
+                backend = GdkBackend.X11;
+            }
+
+            return backend;
         }
 
         /**

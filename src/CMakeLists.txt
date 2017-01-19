@@ -20,6 +20,10 @@ if (MOVIES)
     )
 endif ()
 
+# compile the pdfpc helper functions (pure C code)
+
+add_library(PdfpcHelper pdfpc-helper.c)
+
 set(CFLAGS
     ${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
     ${GIO_CFLAGS} ${GIO_CFLAGS_OTHER}
@@ -97,6 +101,7 @@ add_executable(pdfpc
 
 # explicitly add libraries (needed e.g. for Fedora 13+)
 target_link_libraries(pdfpc -lm)
+target_link_libraries(pdfpc PdfpcHelper)
 
 install(TARGETS
     pdfpc
