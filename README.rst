@@ -59,7 +59,7 @@ requirements need to be met:
 
 On Ubuntu systems, you can install these dependencies with::
 
-    sudo apt-get install cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgee-0.8-dev librsvg2-dev libpoppler-glib-dev libgtk2.0-dev libgtk-3-dev valac
+    sudo apt-get install cmake valac libgee-0.8-dev libpoppler-glib-dev libgtk-3-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 
 and you should consider installing all the available gstreamer codecs::
 
