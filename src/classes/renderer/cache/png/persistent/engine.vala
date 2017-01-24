@@ -44,14 +44,8 @@ namespace pdfpc.Renderer.Cache {
             cache_instance_counter++;
             cache_instance_id = cache_instance_counter;
 
-            var environment = GLib.Environ.get();
-            var cache_home = GLib.Environ.get_variable(environment, "XDG_CACHE_HOME");
-            if (cache_home == null) {
-                var home_dir =  GLib.Environ.get_variable(environment, "HOME");
-                cache_directory = Path.build_filename(home_dir, ".cache", "pdfpc");
-            } else {
-                cache_directory = Path.build_filename(cache_home, "pdfpc");
-            }
+            var cache_base_directory = GLib.Environment.get_user_cache_dir();
+            this.cache_directory = Path.build_filename(cache_base_directory, "pdfpc");
 
             try {
                 var pdf_file = File.new_for_uri(metadata.get_url());
