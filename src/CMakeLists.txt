@@ -3,7 +3,7 @@ pkg_check_modules(GOBJECT REQUIRED gobject-2.0)
 pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(GEE REQUIRED gee-0.8)
 pkg_check_modules(POPPLER REQUIRED poppler-glib)
-pkg_check_modules(GTK REQUIRED gtk+-3.0)
+pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.18)
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
 if (MOVIES)
     pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
@@ -19,6 +19,10 @@ if (MOVIES)
         gdk-x11-3.0
     )
 endif ()
+
+# compile the pdfpc helper functions (pure C code)
+
+add_library(PdfpcHelper pdfpc-helper.c)
 
 set(CFLAGS
     ${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
@@ -97,6 +101,7 @@ add_executable(pdfpc
 
 # explicitly add libraries (needed e.g. for Fedora 13+)
 target_link_libraries(pdfpc -lm)
+target_link_libraries(pdfpc PdfpcHelper)
 
 install(TARGETS
     pdfpc

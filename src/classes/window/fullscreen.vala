@@ -24,7 +24,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * We use pure C functions for detecting the gdk backend, since
+ * we have no access to the C macros for finding the GDK backend in
+ * vala.
+ */
+extern bool pdfpc_helper_display_is_wayland(Gdk.Display display);
+extern bool pdfpc_helper_display_is_x11(Gdk.Display display);
+
 namespace pdfpc.Window {
+    public enum GdkBackend {
+        WAYLAND,
+        X11,
+        UNKNOWN
+    }
+
     /**
      * Window extension implementing all the needed functionality, to be
      * displayed fullscreen.
@@ -68,27 +82,42 @@ namespace pdfpc.Window {
          */
         protected int gdk_scale = 1;
 
-        public Fullscreen(int screen_num, int width = -1, int height = -1) {
-            Gdk.Screen screen;
+        /**
+         * The GDK backend which is currently used. We need this for
+         * backend specific code
+         */
+        protected GdkBackend gdk_backend;
 
-            int screen_num_to_use;
+        /**
+         * The screen this window appears on
+         */
+        protected Gdk.Screen screen_to_use;
+
+        /**
+         * The screen num this window appears on
+         */
+        protected int screen_num_to_use;
+
+        public Fullscreen(int screen_num, int width = -1, int height = -1) {
+            this.gdk_backend = this.get_gdk_backend();
+
             if (screen_num >= 0) {
-                screen_num_to_use = screen_num;
+                this.screen_num_to_use = screen_num;
 
                 // Start in the given monitor
-                screen = Gdk.Screen.get_default();
-                screen.get_monitor_geometry(screen_num_to_use, out this.screen_geometry);
+                this.screen_to_use = Gdk.Screen.get_default();
+                this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
             } else {
                 // Start in the monitor the cursor is in
                 var display = Gdk.Display.get_default().get_device_manager().get_client_pointer();
                 int pointerx, pointery;
-                display.get_position(out screen, out pointerx, out pointery);
+                display.get_position(out screen_to_use, out pointerx, out pointery);
 
-                screen_num_to_use = screen.get_monitor_at_point(pointerx, pointery);
-                screen.get_monitor_geometry(screen_num_to_use, out this.screen_geometry);
+                this.screen_num_to_use = this.screen_to_use.get_monitor_at_point(pointerx, pointery);
+                this.screen.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
             }
 
-            this.gdk_scale = screen.get_monitor_scale_factor(screen_num_to_use);
+            this.gdk_scale = screen.get_monitor_scale_factor(this.screen_num_to_use);
 
             this.fixed_layout = new Gtk.Fixed();
 
@@ -104,13 +133,22 @@ namespace pdfpc.Window {
                 // This movement is done here and after mapping, to minimize flickering
                 // with window managers, which correctly handle the movement command,
                 // before the window is mapped.
-                this.move(this.screen_geometry.x, this.screen_geometry.y);
-
-                // As certain window-managers like Xfwm4 ignore movement request
-                // before the window is initially moved and set up we need to
-                // listen to this event.
-                this.size_allocate.connect(this.on_size_allocate);
-                this.configure_event.connect(this.on_configure);
+                //
+                // Only move in X11 sessions
+                // Wayland has a implementation for
+                // fullscreen_on_monitor, note that a X11 implementation for this
+                // was recently added to Gtk (see https://git.gnome.org/browse/gtk%2B/commit/?id=b8fc4c2)
+                // until then, we need to have different code paths
+                if (this.gdk_backend == GdkBackend.X11) {
+                    this.move(this.screen_geometry.x, this.screen_geometry.y);
+                    // As certain window-managers like Xfwm4 ignore movement request
+                    // before the window is initially moved and set up we need to
+                    // listen to this event.
+                    this.size_allocate.connect(this.on_size_allocate);
+                    this.configure_event.connect(this.on_configure);
+                } else if (this.gdk_backend == GdkBackend.WAYLAND) {
+                    this.fullscreen_on_monitor(this.screen_to_use, this.screen_num_to_use);
+                }
             }
             else {
                 if (width > 0 && height > 0) {
@@ -194,6 +232,26 @@ namespace pdfpc.Window {
             this.restart_hide_cursor_timer();
 
             return false;
+        }
+
+        /**
+         * Return the GDK backend
+         */
+        protected GdkBackend get_gdk_backend() {
+            GdkBackend backend = GdkBackend.UNKNOWN;
+
+            if (pdfpc_helper_display_is_wayland(Gdk.Display.get_default())) {
+                backend = GdkBackend.WAYLAND;
+            } else if (pdfpc_helper_display_is_x11(Gdk.Display.get_default())) {
+                backend = GdkBackend.X11;
+            }
+
+            // if we can't detect the backend, behave like X11
+            if (backend == GdkBackend.UNKNOWN) {
+                backend = GdkBackend.X11;
+            }
+
+            return backend;
         }
 
         /**
