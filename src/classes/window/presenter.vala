@@ -301,6 +301,8 @@ namespace pdfpc.Window {
             this.slide_count = metadata.get_slide_count();
 
             this.overview = new Overview(this.metadata, this.presentation_controller, this);
+            this.overview.vexpand = true;
+            this.overview.hexpand = true;
             this.overview.set_n_slides(this.presentation_controller.user_n_slides);
             this.presentation_controller.set_overview(this.overview);
             this.presentation_controller.register_controllable(this);
@@ -341,9 +343,6 @@ namespace pdfpc.Window {
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
             nextViewWithNotes.pack_start(notes_sw, true, true, 5);
             slide_views.pack_start(nextViewWithNotes, true, true, 0);
-
-            this.overview.halign = Gtk.Align.CENTER;
-            this.overview.valign = Gtk.Align.CENTER;
 
             this.slide_stack = new Gtk.Stack();
             this.slide_stack.add_named(slide_views, "slides");

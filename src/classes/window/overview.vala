@@ -131,6 +131,7 @@ namespace pdfpc.Window {
             this.slides = new Gtk.ListStore(1, typeof(int));
             this.slides_view = new Gtk.IconView.with_model(this.slides);
             this.slides_view.selection_mode = Gtk.SelectionMode.SINGLE;
+            this.slides_view.halign = Gtk.Align.CENTER;
             this.renderer = new CellRendererHighlight();
             this.renderer.metadata = metadata;
             this.slides_view.pack_start(renderer, true);
@@ -234,14 +235,13 @@ namespace pdfpc.Window {
             } else {
                 this.slides_view.columns = tc;
             }
-            this.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            this.set_policy(Gtk.PolicyType.ALWAYS, Gtk.PolicyType.ALWAYS);
             this.target_height = (int)Math.round(this.target_width / aspect_ratio);
             rows = (int)Math.ceil((float)this.n_slides / this.slides_view.columns);
             int full_height = rows*(this.target_height + 2*padding + 2*row_spacing) + 2*margin;
             if (full_height > this.max_height) {
                 full_height = this.max_height;
             }
-            this.set_size_request(-1, full_height);
 
             this.last_structure_n_slides = this.n_slides;
 
