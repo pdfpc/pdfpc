@@ -7,7 +7,7 @@
  * Copyright 2011, 2012 David Vilar
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2014,2016 Andy Barry
- * Copyright 2015 Andreas Bilke
+ * Copyright 2015,2017 Andreas Bilke
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,27 +68,34 @@ namespace pdfpc.Window {
          */
         protected int gdk_scale = 1;
 
-        public Fullscreen(int screen_num, int width = -1, int height = -1) {
-            Gdk.Screen screen;
+        /**
+         * The screen we want this window to be shown
+         */
+        protected Gdk.Screen screen_to_use;
 
-            int screen_num_to_use;
+        /**
+         * The monitor number we want to show the window
+         */
+        protected int screen_num_to_use;
+
+        public Fullscreen(int screen_num, int width = -1, int height = -1) {
             if (screen_num >= 0) {
-                screen_num_to_use = screen_num;
+                this.screen_num_to_use = screen_num;
 
                 // Start in the given monitor
-                screen = Gdk.Screen.get_default();
-                screen.get_monitor_geometry(screen_num_to_use, out this.screen_geometry);
+                this.screen_to_use = Gdk.Screen.get_default();
+                this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
             } else {
                 // Start in the monitor the cursor is in
                 var display = Gdk.Display.get_default().get_device_manager().get_client_pointer();
                 int pointerx, pointery;
-                display.get_position(out screen, out pointerx, out pointery);
+                display.get_position(out this.screen_to_use, out pointerx, out pointery);
 
-                screen_num_to_use = screen.get_monitor_at_point(pointerx, pointery);
-                screen.get_monitor_geometry(screen_num_to_use, out this.screen_geometry);
+                this.screen_num_to_use = this.screen_to_use.get_monitor_at_point(pointerx, pointery);
+                this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
             }
 
-            this.gdk_scale = screen.get_monitor_scale_factor(screen_num_to_use);
+            this.gdk_scale = this.screen_to_use.get_monitor_scale_factor(this.screen_num_to_use);
 
             this.fixed_layout = new Gtk.Fixed();
 
@@ -100,19 +107,9 @@ namespace pdfpc.Window {
             this.resizable = true;
 
             if (!Options.windowed) {
-                // Move to the correct monitor
-                // This movement is done here and after mapping, to minimize flickering
-                // with window managers, which correctly handle the movement command,
-                // before the window is mapped.
-                this.move(this.screen_geometry.x, this.screen_geometry.y);
-
-                // As certain window-managers like Xfwm4 ignore movement request
-                // before the window is initially moved and set up we need to
-                // listen to this event.
-                this.size_allocate.connect(this.on_size_allocate);
-                this.configure_event.connect(this.on_configure);
-            }
-            else {
+                // start moving and fullscreening after the window was shown initially
+                this.map_event.connect(this.on_mapped);
+            } else {
                 if (width > 0 && height > 0) {
                         this.screen_geometry.width = width;
                         this.screen_geometry.height = height;
@@ -123,6 +120,8 @@ namespace pdfpc.Window {
                 this.resizable = false;
             }
 
+            this.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
+
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect(this.on_mouse_move);
 
@@ -131,57 +130,36 @@ namespace pdfpc.Window {
             this.restart_hide_cursor_timer();
         }
 
-        // We got to fullscreen once we have moved
-        protected bool on_configure(Gdk.EventConfigure e) {
-            this.fullscreen();
-            this.configure_event.disconnect(this.on_configure);
-            return false;
-        }
-
         /**
-         * Called if window size is allocated
-         *
-         * This method is needed, because certain window manager (eg. Xfwm4) ignore
-         * movement commands before the window has been displayed for the first
-         * time.
+         * Move/fullscreen after the window was shown for the first time.
+         * Some WM ignore move requests before the window was shown initally so
+         * we wait until the window has been shown.
          */
-        protected void on_size_allocate(Gtk.Allocation allocation) {
-            if (this.get_mapped()) {
-                // We are only interested to handle this event AFTER the window has
-                // been mapped.
-
-                // Remove the signal handler, as we only want to handle this once
-                this.size_allocate.disconnect(this.on_size_allocate);
-
-                // We only need to do all this, if the window is not at the
-                // correct position. Otherwise it would only cause flickering
-                // without any effect.
-                int x, y;
-                this.get_position(out x, out y);
-                if (x == this.screen_geometry.x && y == this.screen_geometry.y) {
-                    return;
-                }
-
-                // The first movement might not have worked as expected, because of
-                // the before mentioned maximized window problem. Therefore it is
-                // done again
-                this.move(this.screen_geometry.x, this.screen_geometry.y);
-
-                this.fullscreen();
-
-                // Check to see if that move was successful
-                this.get_position(out x, out y);
-                if (x == this.screen_geometry.x && y == this.screen_geometry.y) {
-                    return;
-                }
-
-                // That move failed.  Now unfullscreen in case the window
-                // is too large for the other screen, preventing a
-                // successful move to that screen and try again.
-                this.unfullscreen();
-                this.move(this.screen_geometry.x, this.screen_geometry.y);
-                this.fullscreen();
+        protected bool on_mapped(Gdk.EventAny event) {
+            if (event.type != Gdk.EventType.MAP) {
+                return false;
             }
+
+            // move does not work on wayland sessions correctly, since wayland
+            // has no concept of global coordinates. For X11, this does the
+            // right thing.  On Wayland, the window is "somewhere", but we do
+            // not care, since the next call should fix it.
+            this.move(this.screen_geometry.x, this.screen_geometry.y);
+            #if GTK_LEGACY
+            // GTK version prior to 3.18 do not have fullscreen_on_monitor API.
+            // probably, they might have no wayland, so no problem to use just
+            // fullscreen()
+            this.fullscreen();
+            #else
+            // In wayland sessions we should end up on the correct monitor in
+            // fullscreen state. In X11, this API call is not implemented
+            // correctly until gtk 3.22. For X11 with gtk < 3.22, this call is
+            // just switching to fullscreen on the current screen. Since we
+            // moved it to the correct screen anyways, we should be safe here.
+            this.fullscreen_on_monitor(this.screen_to_use, this.screen_num_to_use);
+            #endif
+
+            return true;
         }
 
         /**

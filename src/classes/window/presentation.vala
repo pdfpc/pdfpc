@@ -63,28 +63,17 @@ namespace pdfpc.Window {
             this.presentation_controller = presentation_controller;
             this.presentation_controller.update_request.connect(this.update);
 
-            fixed_layout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
-            this.add(fixed_layout);
-
             Gdk.Rectangle scale_rect;
-
-            if (width < 0) {
-                width = this.screen_geometry.width;
-            }
-
-            if (height < 0) {
-                height = this.screen_geometry.height;
-            }
-
-            this.view = new View.Pdf.from_metadata(metadata, width, height, Metadata.Area.CONTENT,
-                Options.black_on_end, true, this.presentation_controller, this.gdk_scale, out scale_rect);
+            this.view = new View.Pdf.from_metadata(
+                metadata, this.screen_geometry.width, this.screen_geometry.height, Metadata.Area.CONTENT,
+                Options.black_on_end, true, this.presentation_controller, this.gdk_scale, out scale_rect
+            );
 
             if (!Options.disable_caching) {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
-            // Center the scaled pdf on the monitor
-            // In most cases it will however fill the full screen
+            this.add(fixed_layout);
             fixed_layout.put(this.view, scale_rect.x, scale_rect.y);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);

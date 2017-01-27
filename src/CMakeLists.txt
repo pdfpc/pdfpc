@@ -20,6 +20,11 @@ if (MOVIES)
     )
 endif ()
 
+if ("${GTK_VERSION}" LESS 3.18)
+    message(WARNING "Using legacy GTK API")
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D GTK_LEGACY)
+endif ()
+
 set(CFLAGS
     ${GOBJECT_CFLAGS} ${GOBJECT_CFLAGS_OTHER}
     ${GIO_CFLAGS} ${GIO_CFLAGS_OTHER}
