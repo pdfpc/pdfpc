@@ -164,6 +164,13 @@ namespace pdfpc.Metadata {
                             notes.parse_lines(section_content.split("\n"));
                             break;
                         }
+                        case "[notes_position]": {
+                            // command line first
+                            if (Options.notes_position == null) {
+                                this.notes_position = NotesPosition.from_string(section_content);
+                            }
+                            break;
+                        }
                         case "[skip]": {
                             skip_line = section_content;
                             skips_by_user = true;
@@ -319,6 +326,9 @@ namespace pdfpc.Metadata {
             if (Options.end_time != null) {
                 contents += "[end_time]\n%s\n".printf(Options.end_time);
             }
+            if (this.notes_position != NotesPosition.NONE) {
+                contents += "[notes_position]\n%s\n".printf(this.notes_position.to_string());
+            }
             if (Options.last_minutes != 5) {
                 contents += "[last_minutes]\n%u\n".printf(Options.last_minutes);
             }
@@ -350,12 +360,12 @@ namespace pdfpc.Metadata {
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf(string fname, NotesPosition notes_position) {
+        public Pdf(string fname) {
             this.url = File.new_for_commandline_arg(fname).get_uri();
 
             this.action_mapping = new Gee.ArrayList<ActionMapping>();
 
-            this.notes_position = notes_position;
+            this.notes_position = NotesPosition.from_string(Options.notes_position);
 
             this.duration = Options.duration;
 
@@ -744,6 +754,23 @@ namespace pdfpc.Metadata {
                     return BOTTOM;
                 default:
                     return NONE;
+            }
+        }
+
+        public string to_string() {
+            switch (this) {
+                case NONE:
+                    return "NONE";
+                case TOP:
+                    return "TOP";
+                case BOTTOM:
+                    return "BOTTOM";
+                case RIGHT:
+                    return "RIGHT";
+                case LEFT:
+                    return "LEFT";
+                default:
+                    assert_not_reached();
             }
         }
     }

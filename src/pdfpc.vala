@@ -249,8 +249,7 @@ namespace pdfpc {
 
             GLib.Environment.set_current_dir(GLib.Path.get_dirname(pdfFilename));
 
-            pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
-            var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename), notes_position);
+            var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename));
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
