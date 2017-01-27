@@ -169,6 +169,13 @@ namespace pdfpc.Metadata {
                             skips_by_user = true;
                             break;
                         }
+                        case "[start_time]": {
+                            // command line first
+                            if (Options.start_time == null) {
+                                Options.start_time = section_content;
+                            }
+                            break;
+                        }
                         default: {
                             GLib.printerr("unknown section type %s\n", section_type);
                             break;
@@ -314,6 +321,9 @@ namespace pdfpc.Metadata {
             }
             if (Options.last_minutes != 5) {
                 contents += "[last_minutes]\n%u\n".printf(Options.last_minutes);
+            }
+            if (Options.start_time != null) {
+                contents += "[start_time]\n%s\n".printf(Options.start_time);
             }
 
             return contents;
