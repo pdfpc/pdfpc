@@ -313,7 +313,7 @@ namespace pdfpc.Metadata {
 
         protected string format_command_line_options() {
             string contents = "";
-            if (this.duration > 0) {
+            if (this.duration != uint.MAX) {
                 contents += "[duration]\n%u\n".printf(duration);
             }
             if (Options.end_time != null) {
