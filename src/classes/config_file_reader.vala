@@ -208,20 +208,20 @@ namespace pdfpc {
             }
 
             switch (fields[1]) {
-                case "current-size":
-                    Options.current_size = int.parse(fields[2]);
+                case "black-on-end":
+                    Options.black_on_end = bool.parse(fields[2]);
                     break;
                 case "current-height":
                     Options.current_height = int.parse(fields[2]);
+                    break;
+                case "current-size":
+                    Options.current_size = int.parse(fields[2]);
                     break;
                 case "next-height":
                     Options.next_height = int.parse(fields[2]);
                     break;
                 case "overview-min-size":
                     Options.min_overview_width = int.parse(fields[2]);
-                    break;
-                case "black-on-end":
-                    Options.black_on_end = bool.parse(fields[2]);
                     break;
                 case "switch-screens":
                     // ensure that the command line option switches screens
