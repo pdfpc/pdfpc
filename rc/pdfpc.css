@@ -4,6 +4,11 @@
     border: none;
     color: white;
     font-family: Verdana;
+    /* This will be deprecated in GTK 3.20,
+     * but the alternative of Widget's min-width
+     * does not work prior to 3.20
+     */
+    -GtkProgressBar-min-horizontal-bar-width: 1px;
 }
 
 scrolledwindow trough * {
