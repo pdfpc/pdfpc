@@ -247,6 +247,9 @@ namespace pdfpc.Window {
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);
             this.slide_progress.valign = Gtk.Align.END;
+            // reduce the width of Gtk.Entry. we reserve a width for
+            // 7 chars (i.e. maximal 999/999 for displaying)
+            this.slide_progress.width_chars = 7;
 
             this.prerender_progress = new Gtk.ProgressBar();
             this.prerender_progress.name = "prerenderProgress";
@@ -262,6 +265,7 @@ namespace pdfpc.Window {
             }
             this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
             this.prerender_progress.no_show_all = true;
+            this.prerender_progress.valign = Gtk.Align.END;
 
             int icon_height = (int)Math.round(bottom_height*0.9);;
 
@@ -324,7 +328,6 @@ namespace pdfpc.Window {
             current_view_and_stricts.pack_start(fixed_layout, false, false, 0);
             current_view_and_stricts.pack_start(strict_views, false, false, 0);
 
-
             slide_views.pack_start(current_view_and_stricts, true, true, 0);
 
             var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -360,15 +363,12 @@ namespace pdfpc.Window {
             this.timer.valign = Gtk.Align.END;
 
             var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            progress_alignment.expand = false;
-            progress_alignment.pack_end(this.slide_progress);
-            this.prerender_progress.vexpand = false;
-            this.prerender_progress.valign = Gtk.Align.END;
-            progress_alignment.pack_end(this.prerender_progress, true, true, 0);
+            progress_alignment.pack_start(this.prerender_progress);
+            progress_alignment.pack_end(this.slide_progress, false);
 
-            bottom_row.pack_start(status, true, true, 0);
-            bottom_row.pack_start(this.timer, true, true, 0);
-            bottom_row.pack_end(progress_alignment, true, true, 0);
+            bottom_row.pack_start(status);
+            bottom_row.pack_start(this.timer);
+            bottom_row.pack_end(progress_alignment);
 
             Gtk.Box full_layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             full_layout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
