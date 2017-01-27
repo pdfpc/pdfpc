@@ -107,7 +107,7 @@ Compiling on Windows
 --------------------
 
 On issue #106 there is a short tutorial on how to compile pdfpc on Windows.
-First a cygwin installation with the following depedencies is needed:
+First a cygwin installation with the following dependencies is needed:
 
 - cmake
 - automake
@@ -171,7 +171,7 @@ Windows do not appear on the correct screen.
 For tiling window managers, the movement and fullscreening of the windows do not work reliable.
 It is therefore important to tell your WM to force floating the pdfpc windows.
 
-If you are using i3-wm dd this to your config file::
+If you are using i3-wm add this to your config file::
 
     for_window [ title="^pdfpc - present" ] border none floating enable
 
@@ -179,7 +179,7 @@ Acknowledgements
 ================
 
 pdfpc has been developed by Jakob Westhoff, David Vilar, Robert Schroll, Andreas
-Bilke, Andy Barry, and others.  It was previously available at
+Bilke, Andy Barry, Phillip Berndt and others. It was previously available at
 https://github.com/davvil/pdfpc
 
 pdfpc is a fork of Pdf Presenter Console by Jakob Westhoff, available at

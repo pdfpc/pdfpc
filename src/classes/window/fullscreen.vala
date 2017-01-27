@@ -125,14 +125,14 @@ namespace pdfpc.Window {
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect(this.on_mouse_move);
 
-            // Start the 5 seconds timeout after which the mouse curosr is
+            // Start the 5 seconds timeout after which the mouse cursor is
             // hidden
             this.restart_hide_cursor_timer();
         }
 
         /**
          * Move/fullscreen after the window was shown for the first time.
-         * Some WM ignore move requests before the window was shown initally so
+         * Some WM ignore move requests before the window was shown initially so
          * we wait until the window has been shown.
          */
         protected bool on_mapped(Gdk.EventAny event) {
