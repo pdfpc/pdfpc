@@ -251,10 +251,6 @@ namespace pdfpc {
 
             pdfpc.Metadata.NotesPosition notes_position = pdfpc.Metadata.NotesPosition.from_string(Options.notes_position);
             var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename), notes_position);
-            if (Options.duration != uint.MAX) {
-                metadata.set_duration(Options.duration);
-            }
-
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.

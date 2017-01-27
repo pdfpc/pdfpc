@@ -126,7 +126,18 @@ namespace pdfpc.Metadata {
 
                     switch (section_type) {
                         case "[duration]": {
-                            this.duration = int.parse(section_content);
+                            // if duration was set via command line
+                            // ignore pdfpc file
+                            if (Options.duration == uint.MAX) {
+                                this.duration = int.parse(section_content);
+                            }
+                            break;
+                        }
+                        case "[end_time]": {
+                            // command line first
+                            if (Options.end_time == null) {
+                                Options.end_time = section_content;
+                            }
                             break;
                         }
                         case "[end_user_slide]": {
@@ -218,7 +229,7 @@ namespace pdfpc.Metadata {
          * with the notes or the skips)
          */
         public void save_to_disk() {
-            string contents =   format_duration()
+            string contents =   format_command_line_options()
                               + format_skips()
                               + format_end_user_slide()
                               + format_font_size()
@@ -285,10 +296,13 @@ namespace pdfpc.Metadata {
             return contents;
         }
 
-        protected string format_duration() {
+        protected string format_command_line_options() {
             string contents = "";
             if (this.duration > 0) {
                 contents += "[duration]\n%u\n".printf(duration);
+            }
+            if (Options.end_time != null) {
+                contents += "[end_time]\n%s\n".printf(Options.end_time);
             }
 
             return contents;
@@ -321,6 +335,8 @@ namespace pdfpc.Metadata {
             this.action_mapping = new Gee.ArrayList<ActionMapping>();
 
             this.notes_position = notes_position;
+
+            this.duration = Options.duration;
 
             fill_path_info(fname);
             notes = new slides_notes();
