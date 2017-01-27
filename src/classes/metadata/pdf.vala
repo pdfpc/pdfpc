@@ -125,15 +125,6 @@ namespace pdfpc.Metadata {
                     string section_content =  config_sections[i + 1].strip();
 
                     switch (section_type) {
-                        case "[file]": {
-                            this.pdf_fname = section_content;
-                            break;
-                        }
-                        case "[skip]": {
-                            skip_line = section_content;
-                            skips_by_user = true;
-                            break;
-                        }
                         case "[duration]": {
                             this.duration = int.parse(section_content);
                             break;
@@ -142,12 +133,21 @@ namespace pdfpc.Metadata {
                             this.end_user_slide = int.parse(section_content);
                             break;
                         }
-                        case "[notes]": {
-                            notes.parse_lines(section_content.split("\n"));
+                        case "[file]": {
+                            this.pdf_fname = section_content;
                             break;
                         }
                         case "[font_size]": {
                             this.font_size = int.parse(section_content);
+                            break;
+                        }
+                        case "[notes]": {
+                            notes.parse_lines(section_content.split("\n"));
+                            break;
+                        }
+                        case "[skip]": {
+                            skip_line = section_content;
+                            skips_by_user = true;
                             break;
                         }
                         default: {
