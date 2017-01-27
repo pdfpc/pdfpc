@@ -83,6 +83,13 @@ Disable the compression of slide images to trade memory consumption for speed.
 .BI "\-Z, \-\-size"
 Size of the presentation window in width:height format (forces windowed mode)
 
+.PP
+
+Some previous command line options (like black-on-end) where moved to permanent
+config file options. See
+.B pdfpcrc(5)
+for further details.
+
 .SH KEYBINDINGS
 These are the default keybindings for pdfpc:
 .TP
@@ -373,12 +380,17 @@ outside the selected region will be dimmed.
 
 .SS pdfpc Files
 .PP
-The notes and other additional information are stored in a file with the
-extension "pdfpc".
-When pdfpc is invoked with a PDF file, it
-automatically checks for and loads the associated pdfpc file, if it exists.
-This means that you normally do not have to deal with this kind of files
-explicitly.
+The several additional information are stored in a file with the extension
+"pdfpc".  When pdfpc is invoked with a PDF file, it automatically checks for
+and loads the associated pdfpc file, if it exists.  This means that you
+normally do not have to deal with this kind of files explicitly.
+.PP
+Beside internal configiration, the following user contributed command line
+options are stored within the pdfpc file for later usage:
+
+.IP \[bu] 2
+duration
+
 .PP
 There are however cases where you may want to edit the files manually.
 The most typical case is if you add or remove some slides after you have
@@ -402,7 +414,9 @@ locations where pdfpc is looking for files. The default location is
 @CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. A user can copy
 it to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and change the attributes as he likes.
 
-.SH INTEGRATION WITH OTHER TOOLS
+.SS Integration with other tools
+
+.PP
 Pdfpc provides a dbus interface that other tools can use to execute any
 action listed by \fB--list-actions\fR.  The interface appears on the session bus
 as \fI io.github.pdfpc\fR.

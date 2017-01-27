@@ -92,6 +92,15 @@ Add an additional black slide at the end of the presentation (bool, Default fals
 .B switch-screens
 Switch the presentation and the presenter screen. (bool, Default false)
 
+.PP
+
+To always activate the black-on-end option, one could add the following to the
+config file
+
+.RS
+option black-on-end true
+.RE
+
 .SH SEE ALSO
 .PP
 pdfpc(1)
