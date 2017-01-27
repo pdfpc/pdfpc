@@ -152,6 +152,14 @@ namespace pdfpc.Metadata {
                             this.font_size = int.parse(section_content);
                             break;
                         }
+                        case "[last_minutes]": {
+                            // command line first
+                            // 5 is the default value
+                            if (Options.last_minutes != 5) {
+                                Options.last_minutes = int.parse(section_content);
+                            }
+                            break;
+                        }
                         case "[notes]": {
                             notes.parse_lines(section_content.split("\n"));
                             break;
@@ -303,6 +311,9 @@ namespace pdfpc.Metadata {
             }
             if (Options.end_time != null) {
                 contents += "[end_time]\n%s\n".printf(Options.end_time);
+            }
+            if (Options.last_minutes != 5) {
+                contents += "[last_minutes]\n%u\n".printf(Options.last_minutes);
             }
 
             return contents;
