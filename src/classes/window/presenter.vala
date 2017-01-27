@@ -107,14 +107,6 @@ namespace pdfpc.Window {
         protected Gtk.Stack slide_stack;
 
         /**
-         * Number of slides inside the presentation
-         *
-         * This value is needed a lot of times therefore it is retrieved once
-         * and stored here for performance and readability reasons.
-         */
-        protected uint slide_count;
-
-        /**
          * Metadata of the slides
          */
         protected Metadata.Pdf metadata;
@@ -296,9 +288,6 @@ namespace pdfpc.Window {
             } catch (Error e) {
                 GLib.printerr("Warning: failed to set CSS for auto-sized bottom controls.\n");
             }
-
-            // Store the slide count once
-            this.slide_count = metadata.get_slide_count();
 
             this.overview = new Overview(this.metadata, this.presentation_controller, this);
             this.overview.vexpand = true;
