@@ -28,7 +28,6 @@ Installation
         sudo dnf install pdfpc
 
 - `Compiling from source <#compile-and-install>`_
-- `Compiling from github <#compiling-from-github>`_
 
 Sample presentations
 --------------------
