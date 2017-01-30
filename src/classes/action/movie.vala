@@ -213,6 +213,7 @@ namespace pdfpc {
             Poppler.Annot annot = mapping.annot;
             string uri;
             bool temp = false;
+            bool noprogress = false;
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents())) {
@@ -263,6 +264,7 @@ namespace pdfpc {
                 }
                 uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
+                noprogress = !movie.show_controls();
                 break;
 
             default:
@@ -271,7 +273,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, false, false, 0, 0, temp);
+            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, noprogress, false, 0, 0, temp);
             return new_obj;
         }
 
