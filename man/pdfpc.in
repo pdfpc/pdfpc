@@ -390,6 +390,14 @@ options are stored within the pdfpc file for later usage:
 
 .IP \[bu] 2
 duration
+.IP \[bu] 2
+end_time
+.IP \[bu] 2
+last_minutes
+.IP \[bu] 2
+notes (position)
+.IP \[bu] 2
+start_time
 
 .PP
 There are however cases where you may want to edit the files manually.
