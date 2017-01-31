@@ -208,11 +208,30 @@ namespace pdfpc {
             }
 
             switch (fields[1]) {
-                case "current-size":
-                    Options.current_size = int.parse(fields[2]);
+                case "black-on-end":
+                    Options.black_on_end = bool.parse(fields[2]);
                     break;
                 case "current-height":
                     Options.current_height = int.parse(fields[2]);
+                    break;
+                case "current-size":
+                    Options.current_size = int.parse(fields[2]);
+                    break;
+                case "disable-caching":
+                    bool disable_caching = bool.parse(fields[2]);
+                    // only propagate value, it it's true
+                    // pushing false makes no sense
+                    if (disable_caching) {
+                        Options.disable_caching = true;
+                    }
+                    break;
+                case "disable-compression":
+                    bool disable_compression = bool.parse(fields[2]);
+                    // only propagate value, it it's true
+                    // pushing false makes no sense
+                    if (disable_compression) {
+                        Options.disable_cache_compression = true;
+                    }
                     break;
                 case "next-height":
                     Options.next_height = int.parse(fields[2]);
@@ -220,16 +239,18 @@ namespace pdfpc {
                 case "overview-min-size":
                     Options.min_overview_width = int.parse(fields[2]);
                     break;
-                case "black-on-end":
-                    Options.black_on_end = bool.parse(fields[2]);
-                    break;
                 case "switch-screens":
-                    // ensure that the command line option switches screens
-                    // even if this is true (since the command line option
-                    // should toggle the screen, not set it true or false)
-                    bool config_file_display_switch = bool.parse(fields[2]);
-                    if (config_file_display_switch) {
-                        Options.display_switch = !Options.display_switch;
+                    bool switch_screens = bool.parse(fields[2]);
+                    if (switch_screens) {
+                        Options.display_switch = true;
+                    }
+                    break;
+                case "time-of-day":
+                    bool use_time_of_day = bool.parse(fields[2]);
+                    // only propagate value, it it's true
+                    // pushing false makes no sense
+                    if (use_time_of_day) {
+                        Options.use_time_of_day = true;
                     }
                     break;
                 default:

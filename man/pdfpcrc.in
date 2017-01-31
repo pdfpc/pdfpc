@@ -41,6 +41,52 @@ Unbinds a mouse button
 Unbinds all the mouse bindings
 
 .PP
+A list of all possible functions can be obtained
+via the \-L command line option if pdfpc(1).
+
+.SS Options
+.PP
+Some permanent changes can be configured via config file. The syntax is:
+.TP
+.B option <option_name> <option_value>
+
+.PP
+The following option_name are allowed:
+
+.TP
+.B black-on-end
+Add an additional black slide at the end of the presentation (bool, Default false)
+.TP
+.B current-height
+Percentage of the height of the presenter screen to be used for the current slide. (int, Default 80)
+.TP
+.BI disable-caching
+see
+.B pdfpcrc(5)
+.TP
+.BI disable-compression
+see
+.B pdfpcrc(5)
+.TP
+.B current-size
+Percentage of the presenter screen to be used for the current slide. (int, Default 60)
+.TP
+.B next-height
+Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
+.TP
+.B overview-min-size
+Minimum width for the overview miniatures, in pixels. (int, Default 150)
+.TP
+.B switch-screens
+Switch the presentation and the presenter screen. (bool, Default false)
+.TP
+.B time-of-day
+see
+.B pdfpcrc(5)
+
+.SH EXAMPLES
+
+.PP
 Key names can be obtained with the help of the xev utility. Note that
 names are case sensitive. Modifiers can be specified in the form
 <mod>+<key> where <mod> is one of S (for shift), C (for control) and
@@ -60,40 +106,8 @@ function, use
 bind R reset
 .RE
 
-.PP
-A list of all possible functions can be obtained
-via the \-L command line option if pdfpc(1).
-
-.SS Options
-.PP
-Some permanent changes can be configured via config file. The syntax is:
-.TP
-.B option <option_name> <option_value>
 
 .PP
-The following option_name are allowed:
-
-.TP
-.B current-size
-Percentage of the presenter screen to be used for the current slide. (int, Default 60)
-.TP
-.B current-height
-Percentage of the height of the presenter screen to be used for the current slide. (int, Default 80)
-.TP
-.B next-height
-Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
-.TP
-.B overview-min-size
-Minimum width for the overview miniatures, in pixels. (int, Default 150)
-.TP
-.B black-on-end
-Add an additional black slide at the end of the presentation (bool, Default false)
-.TP
-.B switch-screens
-Switch the presentation and the presenter screen. (bool, Default false)
-
-.PP
-
 To always activate the black-on-end option, one could add the following to the
 config file
 
