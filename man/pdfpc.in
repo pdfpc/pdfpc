@@ -432,12 +432,8 @@ as \fI io.github.pdfpc\fR.
 .SH BUGS
 
 .PP
-There may be a small memory leak in the program. I am trying to solve it. It
-should not be too important for up to some hundreds of slides.
-
-.PP
-Other bugs can be reported at
-.URL https://github.com/pdfpc/pdfpc/issues "the issue tracker" .
+Bugs can be reported at
+.URL https://github.com/pdfpc/pdfpc/issues "our issue tracker" .
 
 .SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by
