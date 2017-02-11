@@ -398,6 +398,22 @@ namespace pdfpc.Window {
                 cr.set_source_rgba(0, 0, 0, 0.4);
                 cr.fill();
             }
+
+            // draw slide number
+            Cairo.TextExtents extents;
+            cr.select_font_face ("Verdana", Cairo.FontSlant.NORMAL, Cairo.FontWeight.BOLD);
+            cr.set_font_size(50);
+            if ((flags & Gtk.CellRendererState.SELECTED) == 0) {
+                cr.set_source_rgba(0.7, 0.7, 0.7, 0.7);
+            } else {
+                cr.set_source_rgba(0.7, 0.7, 0.7, 0.2);
+            }
+            cr.text_extents(@"$(slide_id + 1)", out extents);
+            double x, y;
+            x = cell_area.x + (cell_area.width / 2) - (extents.width / 2 + extents.x_bearing);
+            y = cell_area.y + (cell_area.height / 2) - (extents.height / 2 + extents.y_bearing);
+            cr.move_to(x, y);
+            cr.show_text(@"$(slide_id + 1)");
         }
     }
 }
