@@ -44,15 +44,15 @@ GtkProgressBar * {
     }
  */
 
-pdfpcTimerLabel.pretalk {
+.pretalk {
     color: green;
 }
 
-pdfpcTimerLabel.last-minutes {
+.last-minutes {
     color: orange;
 }
 
-pdfpcTimerLabel.overtime {
+.overtime {
     color: red;
 }
 
