@@ -128,11 +128,18 @@ namespace pdfpc.Window {
          * Constructor
          */
         public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
+            this.get_style_context().add_class("overviewWindow");
+
             this.slides = new Gtk.ListStore(1, typeof(int));
             this.slides_view = new Gtk.IconView.with_model(this.slides);
             this.slides_view.selection_mode = Gtk.SelectionMode.SINGLE;
             this.renderer = new CellRendererHighlight();
             this.renderer.metadata = metadata;
+            Gtk.StyleContext style_context = this.get_style_context();
+            Pango.FontDescription font_description;
+            style_context.get(style_context.get_state(), "font", out font_description, null);
+            this.renderer.font_description = font_description;
+
             this.slides_view.pack_start(renderer, true);
             this.slides_view.add_attribute(renderer, "slide_id", 0);
             this.slides_view.set_item_padding(0);
@@ -363,6 +370,7 @@ namespace pdfpc.Window {
         public int slide_id { get; set; }
 
         public Renderer.Cache.Base? cache { get; set; }
+        public Pango.FontDescription font_description { get; set; }
         public Metadata.Pdf metadata { get; set; }
         public int slide_width { get; set; }
         public int slide_height { get; set; }
@@ -400,20 +408,23 @@ namespace pdfpc.Window {
             }
 
             // draw slide number
-            Cairo.TextExtents extents;
-            cr.select_font_face ("Verdana", Cairo.FontSlant.NORMAL, Cairo.FontWeight.BOLD);
-            cr.set_font_size(50);
+            var layout = Pango.cairo_create_layout(cr);
+            layout.set_font_description(this.font_description);
+            layout.set_text(@"$(slide_id + 1)", -1);
+            layout.set_width(cell_area.width);
+            layout.set_alignment(Pango.Alignment.CENTER);
+
+            Pango.Rectangle logical_extent;
+            layout.get_pixel_extents(null, out logical_extent);
+            cr.move_to(cell_area.x + (cell_area.width / 2), cell_area.y + (cell_area.height / 2) - (logical_extent.height / 2));
+
             if ((flags & Gtk.CellRendererState.SELECTED) == 0) {
                 cr.set_source_rgba(0.7, 0.7, 0.7, 0.7);
             } else {
                 cr.set_source_rgba(0.7, 0.7, 0.7, 0.2);
             }
-            cr.text_extents(@"$(slide_id + 1)", out extents);
-            double x, y;
-            x = cell_area.x + (cell_area.width / 2) - (extents.width / 2 + extents.x_bearing);
-            y = cell_area.y + (cell_area.height / 2) - (extents.height / 2 + extents.y_bearing);
-            cr.move_to(x, y);
-            cr.show_text(@"$(slide_id + 1)");
+
+            Pango.cairo_show_layout(cr, layout);
         }
     }
 }

@@ -55,6 +55,7 @@ requirements need to be met:
 - gee 0.8
 - poppler with glib bindings
 - gstreamer 1.0
+- pangocairo
 
 On Ubuntu systems, you can install these dependencies with::
 
