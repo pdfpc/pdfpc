@@ -56,3 +56,6 @@ GtkProgressBar * {
     color: red;
 }
 
+.overviewWindow {
+    font-size: 4em;
+}
