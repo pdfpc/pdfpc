@@ -2,6 +2,33 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.6
+=============
+
+*Released: February 2017*
+
+- New command line option: -P/--page jump to a specific page after
+  startup
+
+- HiDPI support. Respect GDK Hints about HiDPI screens.
+  This resolves an issue, where the slides where rendered blurry
+
+- Escape special characters in text nodes. This resolves an
+  issue where all text notes got lost if special characters where
+  used.
+
+- Allow more permanent config options per pdf/globally
+
+- Resolve unfullscreening/out of screen bugs in low resolution or HiDPI
+  scenarios
+
+- Better Wayland support
+
+- Overview slides contain the actual slide number to
+  find specific slides faster
+
+- Documentation improvements
+
 Version 4.0.5
 =============
 
