@@ -86,7 +86,7 @@ namespace pdfpc {
                     GLib.print("### %d\n%s\n", i, notes[i]);
                 }
 
-                GLib.printerr("Formating notes for pdfpc file failed.\n");
+                GLib.printerr("Formatting notes for pdfpc file failed.\n");
                 Process.exit(1);
             }
 
