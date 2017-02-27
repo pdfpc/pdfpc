@@ -82,6 +82,11 @@ namespace pdfpc.Window {
         protected Gtk.Image blank_icon;
 
         /**
+         * Indication that the presentation window is hidden
+         */
+        protected Gtk.Image hidden_icon;
+
+        /**
          * Indication that the presentation display is frozen
          */
         protected Gtk.Image frozen_icon;
@@ -262,6 +267,7 @@ namespace pdfpc.Window {
             int icon_height = (int)Math.round(bottom_height*0.9);;
 
             this.blank_icon = this.load_icon("blank.svg", icon_height);
+            this.hidden_icon = this.load_icon("hidden.svg", icon_height);
             this.frozen_icon = this.load_icon("snow.svg", icon_height);
             this.pause_icon = this.load_icon("pause.svg", icon_height);
 
@@ -344,6 +350,7 @@ namespace pdfpc.Window {
 
             var status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
             status.pack_start(this.blank_icon, false, false, 0);
+            status.pack_start(this.hidden_icon, false, false, 0);
             status.pack_start(this.frozen_icon, false, false, 0);
             status.pack_start(this.pause_icon, false, false, 0);
 
@@ -445,6 +452,12 @@ namespace pdfpc.Window {
                 this.blank_icon.show();
             else
                 this.blank_icon.hide();
+            if (this.presentation_controller.hidden) {
+                this.hidden_icon.show();
+                // Ensure the presenter window remains focused
+                this.present();
+            } else
+                this.hidden_icon.hide();
             if (this.presentation_controller.frozen)
                 this.frozen_icon.show();
             else

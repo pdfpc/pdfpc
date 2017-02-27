@@ -151,6 +151,9 @@ Exit pdfpc
 .B b
 Turn off the presentation view (i.e.  fill it with a black color)
 .TP
+.B h
+Hide the presentation vindow (i.e. make other windows on the other screen visible)
+.TP
 .B n
 Edit note for current slide
 .TP
