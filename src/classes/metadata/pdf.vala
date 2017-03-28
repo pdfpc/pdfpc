@@ -155,7 +155,7 @@ namespace pdfpc.Metadata {
                         case "[last_minutes]": {
                             // command line first
                             // 5 is the default value
-                            if (Options.last_minutes != 5) {
+                            if (Options.last_minutes == 5) {
                                 Options.last_minutes = int.parse(section_content);
                             }
                             break;
