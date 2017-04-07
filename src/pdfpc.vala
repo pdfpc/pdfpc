@@ -173,6 +173,18 @@ namespace pdfpc {
         }
 
         /**
+         * Reset screensaver (callback)
+         */
+        private bool resetScreensaver() {
+            try {
+                return Process.spawn_command_line_sync("xdg-screensaver reset");
+            } catch (SpawnError error) {
+                warning("Failed to spawn xdg-screensaver: %s", error.message);
+                return false;
+            }
+        }
+
+        /**
          * Main application function, which instantiates the windows and
          * initializes the Gtk system.
          */
@@ -300,6 +312,9 @@ namespace pdfpc {
                 GLib.printerr("Argument --page/-P must be between %d and %d\n", 1, metadata.get_end_user_slide());
                 Process.exit(1);
             }
+
+            // Start inhibition of the screensaver.
+            Timeout.add(30000, resetScreensaver);
 
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
