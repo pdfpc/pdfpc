@@ -21,7 +21,7 @@ if (MOVIES)
     )
 endif ()
 
-if ("${GTK_VERSION}" LESS 3.18)
+if ("${GTK_VERSION}" LESS 3.18 OR "${VALA_VERSION}" LESS 0.30)
     message(WARNING "Using legacy GTK API")
     set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D GTK_LEGACY)
 endif ()
