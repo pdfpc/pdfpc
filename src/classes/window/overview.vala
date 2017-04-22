@@ -299,7 +299,12 @@ namespace pdfpc.Window {
             this.n_slides = newn;
             var iter = Gtk.TreeIter();
             this.slides.get_iter_from_string(out iter, @"$(this.current_slide)");
+#if VALA_0_36
+            // Updated bindings in Vala 0.36: "iter" param of ListStore.remove() marked as ref
+            this.slides.remove(ref iter);
+#else
             this.slides.remove(iter);
+#endif
             if (this.current_slide >= this.n_slides) {
                 this.current_slide = this.n_slides - 1;
             }
