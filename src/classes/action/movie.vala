@@ -294,7 +294,17 @@ namespace pdfpc {
                 if (xid == null) {
                     break;
                 }
-                Gst.Element sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
+                Gst.Element sink;
+                // if the gstreamer OpenGL sink is installed (in gstreamer-plugins-bad), use it
+                // as it fixes video issues (cf pdfpc/pdfpc#197). Otherwise, fallback on
+                // default xvimagesink.
+                Gst.ElementFactory glimagesinkFactory = Gst.ElementFactory.find("glimagesink");
+                if(glimagesinkFactory != null) {
+                    sink = glimagesinkFactory.create(@"sink$n");
+                } else {
+                    GLib.printerr("gstreamer's OpenGL plugin glimagesink not available. Using xvimagesink instead.\n");
+                    sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
+                }
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue,sink);
                 tee.link(queue);

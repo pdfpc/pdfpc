@@ -163,7 +163,17 @@ FAQ
 Embedded video playback is not working.
 ---------------------------------------
 
-You likely have a ``gstreamer`` codec issue.  Try loading the video file you want to play with the following command: ``gst-launch-1.0 filesrc location=<your video> ! decodebin ! autovideosink``  If the video plays, go ahead and `submit an issue <https://github.com/pdfpc/pdfpc/issues>`_.  Otherwise, the command will likely output some good hints for why gstreamer cannot decode the video.
+You likely have a ``gstreamer`` codec issue.  First, try to install
+``gstreamer``'s 'bad' codecs (package ``libgstreamer-plugins-bad1.0-0`` on
+Debian/Ubuntu). By doing so, ``pdfpc`` will use ``gstreamer``'s OpenGL backend
+for rendering, which might solve your issue.
+
+If the problem persists, try loading the video file you want to play with the
+following command: ``gst-launch-1.0 filesrc location=<your video> ! decodebin !
+autovideosink``  If the video plays, go ahead and `submit an issue
+<https://github.com/pdfpc/pdfpc/issues>`_.  Otherwise, the command will likely
+output some good hints for why gstreamer cannot decode the video.
+
 
 Windows do not appear on the correct screen.
 ---------------------------------------------------
