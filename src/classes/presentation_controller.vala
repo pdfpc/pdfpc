@@ -11,6 +11,7 @@
  * Copyright 2012 Thomas Tschager
  * Copyright 2015 Andreas Bilke
  * Copyright 2015 Andy Barry
+ * Copyright 2017 Olivier Pantalé
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -496,6 +497,8 @@ namespace pdfpc {
             add_action("overlay", this.toggle_skip);
             add_action("note", this.controllables_edit_note);
             add_action("endSlide", this.set_end_user_slide);
+            add_action("lastSlide", this.set_last_saved_slide);
+            add_action("jumpLastSlide", this.goto_last_saved_slide);
 
             add_action("increaseFontSize", this.increase_font_size);
             add_action("decreaseFontSize", this.decrease_font_size);
@@ -539,6 +542,8 @@ namespace pdfpc {
                 "overlay", "Mark current slide as overlay slide",
                 "note", "Edit note for current slide",
                 "endSlide", "Set current slide as end slide",
+                "lastSlide", "Set last displayed slide",
+                "jumpLastSlide", "Goto last displayed slide",
                 "increaseFontSize", "Increase the current font size by 10%",
                 "decreaseFontSize", "Decrease the current font size by 10%",
                 "togglePointer", "Toggle pointer mode",
@@ -718,6 +723,23 @@ namespace pdfpc {
         public void set_end_user_slide_overview() {
             int user_selected = this.overview.current_slide;
             this.metadata.set_end_user_slide(user_selected + 1);
+        }
+
+        /**
+         * Set the last slide as defined by the user
+         */
+        public void set_last_saved_slide() {
+            this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
+            this.controllables_update();
+	    presenter.session_saved();
+        }
+
+        /**
+         * Set the last slide as defined by the user
+         */
+        public void set_last_saved_slide_overview() {
+            int user_selected = this.overview.current_slide;
+            this.metadata.set_last_saved_slide(user_selected + 1);
         }
 
         /**
@@ -947,6 +969,29 @@ namespace pdfpc {
                 this.faded_to_black = false;
             }
             this.controllables_update();
+        }
+
+        /**
+         * Go to the last displayed slide
+         */
+        public void goto_last_saved_slide() {
+
+            if (this.metadata.get_last_saved_slide() == -1) {
+                return;
+            }
+
+            // Start the timer
+            this.timer.start();
+
+            this.current_user_slide_number = this.metadata.get_last_saved_slide() - 1;
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+
+            if (!this.frozen) {
+                this.faded_to_black = false;
+            }
+
+            this.controllables_update();
+            presenter.session_loaded();
         }
 
         /**

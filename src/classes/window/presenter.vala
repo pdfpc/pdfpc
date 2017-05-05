@@ -10,6 +10,7 @@
  * Copyright 2013 Gabor Adam Toth
  * Copyright 2015-2016 Andy Barry
  * Copyright 2015 Jeremy Maitin-Shepard
+ * Copyright 2017 Olivier Pantalé
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +91,16 @@ namespace pdfpc.Window {
          * Indication that the timer is paused
          */
         protected Gtk.Image pause_icon;
+
+        /**
+         * Indication that the slide is saved
+         */
+        protected Gtk.Image saved_icon;
+
+        /**
+         * Indication that the slide position has been loaded
+         */
+        protected Gtk.Image loaded_icon;
 
         /**
          * Text box for displaying notes for the slides
@@ -264,6 +275,8 @@ namespace pdfpc.Window {
             this.blank_icon = this.load_icon("blank.svg", icon_height);
             this.frozen_icon = this.load_icon("snow.svg", icon_height);
             this.pause_icon = this.load_icon("pause.svg", icon_height);
+            this.saved_icon = this.load_icon("saved.svg", icon_height);
+            this.loaded_icon = this.load_icon("loaded.svg", icon_height);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
@@ -346,6 +359,8 @@ namespace pdfpc.Window {
             status.pack_start(this.blank_icon, false, false, 0);
             status.pack_start(this.frozen_icon, false, false, 0);
             status.pack_start(this.pause_icon, false, false, 0);
+            status.pack_start(this.saved_icon, false, false, 0);
+            status.pack_start(this.loaded_icon, false, false, 0);
 
             this.timer.halign = Gtk.Align.CENTER;
             this.timer.valign = Gtk.Align.END;
@@ -401,6 +416,14 @@ namespace pdfpc.Window {
             return icon;
         }
 
+        public void session_saved() {
+            this.saved_icon.show();
+        }
+
+        public void session_loaded() {
+            this.loaded_icon.show();
+        }
+
         /**
          * Update the slide count view
          */
@@ -450,6 +473,8 @@ namespace pdfpc.Window {
             else
                 this.frozen_icon.hide();
             this.faded_to_black = false;
+ 	    this.saved_icon.hide();
+ 	    this.loaded_icon.hide();
         }
 
         /**

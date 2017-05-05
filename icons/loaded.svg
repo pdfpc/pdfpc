@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="362"
+   height="342"
+   bbheight="341.57421875"
+   bbwidth="361.765625"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="loaded.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1416"
+     id="namedview79"
+     showgrid="false"
+     inkscape:zoom="1.050338"
+     inkscape:cx="-507.11844"
+     inkscape:cy="196.69141"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       orientation="0,1"
+       position="-34.274681,270.38915"
+       id="guide3948" />
+  </sodipodi:namedview>
+  <defs
+     id="defs4" />
+  <metadata
+     id="metadata7">image/svg+xml<rdf:RDF>
+  <cc:Work
+     rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type
+       rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+  </cc:Work>
+</rdf:RDF>
+</metadata>
+  <g
+     style="display:inline"
+     label="Layer 1"
+     id="layer1"
+     transform="translate(-14.802243,-81.746591)"
+     display="inline" />
+  <rect
+     style="fill:#ffffff;stroke-width:0.60000002;stroke-miterlimit:4;stroke-dashoffset:0"
+     id="rect3313"
+     width="313.09097"
+     height="247.18306"
+     x="22.871443"
+     y="46.521236"
+     stroke-miterlimit="4" />
+  <rect
+     style="fill:#000000;stroke-width:0.60000002;stroke-miterlimit:4;stroke-dashoffset:0"
+     id="rect3325"
+     width="274.9968"
+     height="200.1311"
+     x="41.918526"
+     y="69.610847"
+     stroke-miterlimit="4" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:16.74287224px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="57.740185"
+     y="178.25702"
+     id="text4140"
+     sodipodi:linespacing="125%"
+     transform="scale(0.92078637,1.0860282)"><tspan
+       sodipodi:role="line"
+       id="tspan4142"
+       x="57.740185"
+       y="178.25702"
+       style="font-size:75.3429184px;fill:#ffffff">Loaded</tspan></text>
+</svg>

@@ -11,6 +11,7 @@
  * Copyright 2013 Stefan Tauner
  * Copyright 2015 Maurizio Tomasi
  * Copyright 2015 endzone
+ * Copyright 2017 Olivier Pantalé
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +91,11 @@ namespace pdfpc.Metadata {
         private int end_user_slide = -1;
 
         /**
+         * The "last displayed" defined by the user
+         */
+        private int last_saved_slide = -1;
+
+        /**
          * Were the skips modified by the user?
          */
         protected bool skips_by_user;
@@ -150,6 +156,10 @@ namespace pdfpc.Metadata {
                         }
                         case "[font_size]": {
                             this.font_size = int.parse(section_content);
+                            break;
+                        }
+                        case "[last_saved_slide]": {
+                            this.last_saved_slide = int.parse(section_content);
                             break;
                         }
                         case "[last_minutes]": {
@@ -254,6 +264,7 @@ namespace pdfpc.Metadata {
             string contents =   format_command_line_options()
                               + format_skips()
                               + format_end_user_slide()
+			      + format_last_saved_slide()
                               + format_font_size()
                               + format_notes();
             try {
@@ -292,6 +303,15 @@ namespace pdfpc.Metadata {
             string contents = "";
             if (this.end_user_slide >= 0) {
                 contents += "[end_user_slide]\n%d\n".printf(this.end_user_slide);
+            }
+
+            return contents;
+        }
+
+        protected string format_last_saved_slide() {
+            string contents = "";
+            if (this.last_saved_slide >= 0) {
+                contents += "[last_saved_slide]\n%d\n".printf(this.last_saved_slide);
             }
 
             return contents;
@@ -446,6 +466,21 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Return the last displayed slide defined by the user. It may be different as
+         * get_user_slide_count()!
+         */
+        public int get_last_saved_slide() {
+            return this.last_saved_slide;
+        }
+
+        /**
+         * Set the last slide defined by the user
+         */
+        public void set_last_saved_slide(int slide) {
+            this.last_saved_slide = slide;
+        }
+
+         /**
          * Toggle the skip flag for one slide
          *
          * We require to be provided also with the user_slide_number, as this
