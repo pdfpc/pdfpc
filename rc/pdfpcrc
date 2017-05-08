@@ -47,6 +47,8 @@ bind f         freeze
 bind n         note
 bind o         overlay
 bind e         endSlide
+bind S+s       lastSlide
+bind S+r       jumpLastSlide
 
 # Font scaling
 bind plus      increaseFontSize

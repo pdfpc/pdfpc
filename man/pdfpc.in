@@ -170,6 +170,16 @@ Reset presentation (reset timer and go back to first slide)
 .TP
 .B e
 Define end slide
+.TP
+.B R
+Restore last saved session. Goto the slide which was saved with
+.B S
+before
+.TP
+.B S
+Save the current session. Store the current slide in the
+.B .pdfpc
+file for later usage
 
 .P
 Within overview mode the following key bindings are used
