@@ -177,6 +177,9 @@ namespace pdfpc {
          * initializes the Gtk system.
          */
         public void run(string[] args) {
+#if X11
+            X.init_threads();
+#endif
             Gtk.init(ref args);
 
             string pdfFilename = this.parse_command_line_options(ref args);
