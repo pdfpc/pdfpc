@@ -65,6 +65,8 @@ namespace pdfpc {
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
+            { "current-height", 'U', 0, OptionArg.INT, ref Options.current_height, "Percentage of the presenter screen height to be used for the current slide.", "N" },
+            { "current-width", 'u', 0, OptionArg.INT, ref Options.current_size, "Percentage of the presenter screen width to be used for the current slide.", "N" },
             { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
