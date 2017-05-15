@@ -30,7 +30,7 @@
 
 [DBus (name = "org.freedesktop.ScreenSaver")]
 public interface ScreenSaver : Object {
-    public abstract uint32 inhibit(string application_name, string reason) throws IOError;
+    public abstract async uint32 inhibit(string application_name, string reason) throws IOError;
     public abstract void un_inhibit(uint32 cookie) throws IOError;
 }
 
@@ -276,11 +276,21 @@ namespace pdfpc {
             this.add_actions();
 
             try {
-                this.screensaver = Bus.get_proxy_sync(BusType.SESSION, "org.freedesktop.ScreenSaver",
-                    "/org/freedesktop/ScreenSaver");
-                this.screensaver_cookie = this.screensaver.inhibit("pdfpc",
-                    "Showing a presentation");
-                GLib.print("Screensaver inhibited\n");
+                Bus.get_proxy.begin<ScreenSaver>(BusType.SESSION, "org.freedesktop.ScreenSaver", "/org/freedesktop/ScreenSaver", 0, null, (obj, res) => {
+                    try {
+                        this.screensaver = Bus.get_proxy.end(res);
+                        this.screensaver.inhibit.begin("pdfpc", "Showing a presentation", (obj, res) => {
+                            try {
+                                this.screensaver_cookie = this.screensaver.inhibit.end(res);
+                                GLib.print("Screensaver inhibited\n");
+                            } catch (Error error) {
+                                // pass
+                            }
+                        });
+                    } catch (Error error) {
+                        // pass
+                    }
+                });
             } catch (Error error) {
                 // pass
             }
