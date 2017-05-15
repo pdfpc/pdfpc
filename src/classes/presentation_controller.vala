@@ -311,9 +311,6 @@ namespace pdfpc {
             presentation_allocation = a;
             presentation_surface = new Gtk.DrawingArea();
             presentation_surface.set_size_request(a.width, a.height);
-            var transparent = Gdk.RGBA ();
-            transparent.alpha=0;
-            this.presentation_surface.override_background_color(Gtk.StateFlags.NORMAL, transparent);
             this.presentation_surface.draw.connect ((context) => {
                     draw_pointer(context, presentation_allocation);
                     return true;
@@ -325,9 +322,6 @@ namespace pdfpc {
             presenter_allocation = a;
             presenter_surface = new Gtk.DrawingArea();
             presenter_surface.set_size_request(a.width, a.height);
-            var transparent = Gdk.RGBA ();
-            transparent.alpha=0;
-            this.presenter_surface.override_background_color(Gtk.StateFlags.NORMAL, transparent);
             this.presenter_surface.draw.connect ((context) => {
                     draw_pointer(context, presenter_allocation);
                     return true;
