@@ -760,8 +760,7 @@ namespace pdfpc {
                 if (this.drag_was_playing || this.eos) {
                     this.eos = false;
                     this.play();
-                }
-                else {
+                } else {
                     this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
                 }
             }
