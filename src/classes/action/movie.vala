@@ -714,8 +714,7 @@ namespace pdfpc {
             this.set_mouse_in(event.x, event.y, out x, out y);
             if (this.mouse_drag) {
                 this.mouse_seek(x, y);
-            }
-            else if (this.paused_at >= 0 || this.eos) {
+            } else if (this.paused_at >= 0 || this.eos) {
                 this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.paused_at);
             }
             return false;
