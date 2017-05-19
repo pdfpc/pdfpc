@@ -481,17 +481,16 @@ namespace pdfpc {
         protected double seek_bar_padding = 2;
 
         /**
-         * A timeout signal is used to update the GUI when the movie is paused,
-         * since we won't get new frames.
-         */
-        protected uint refresh_timeout = 0;
-
-        /**
          * Flags about the current state of mouse interaction.
          */
         protected bool in_seek_bar = false;
         protected bool mouse_drag = false;
         protected bool drag_was_playing;
+
+        /**
+         * The position where we switched to pause mode
+         */
+        protected int64 paused_at = -1;
 
         /**
          * Basic constructor does nothing.
@@ -701,6 +700,9 @@ namespace pdfpc {
             }
             int64 seek_time = (int64) (seek_fraction * this.duration);
             this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
+            if (this.paused_at >= 0) {
+                this.paused_at = seek_time;
+            }
             return seek_time;
         }
 
@@ -712,6 +714,9 @@ namespace pdfpc {
             this.set_mouse_in(event.x, event.y, out x, out y);
             if (this.mouse_drag) {
                 this.mouse_seek(x, y);
+            }
+            else if (this.paused_at >= 0 || this.eos) {
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.paused_at);
             }
             return false;
         }
@@ -739,7 +744,6 @@ namespace pdfpc {
                 this.drag_was_playing = (this.pipeline.current_state == Gst.State.PLAYING);
                 this.pause();
                 this.mouse_seek(x, y);
-                this.stop_refresh();
             }
             return true;
         }
@@ -756,9 +760,9 @@ namespace pdfpc {
                 if (this.drag_was_playing || this.eos) {
                     this.eos = false;
                     this.play();
-                } else {
-                    // Otherwise, time resets to 0 (don't know why).
-                    this.start_refresh_time(seek_time);
+                }
+                else {
+                    this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
                 }
             }
             this.mouse_drag = false;
@@ -766,62 +770,22 @@ namespace pdfpc {
         }
 
         /**
-         * Start a timeout event to refresh the GUI every 50ms.  To be used when
-         * the movie is paused, so that the controls can still be updated.
-         */
-        public void start_refresh() {
-            if (this.refresh_timeout != 0) {
-                return;
-            }
-            int64 curr_time;
-            var tformat = Gst.Format.TIME;
-            this.pipeline.query_position(tformat, out curr_time);
-            this.start_refresh_time(curr_time);
-        }
-
-        /**
-         * In the timeout, we seek to the current time, which is enough to force
-         * gstreamer to redraw the current frame.
-         */
-        public void start_refresh_time(int64 curr_time) {
-            if (this.eos) {
-                // Seeking to the very end won't refresh the output.
-                curr_time -= 1;
-            }
-            if (this.refresh_timeout != 0) {
-                Source.remove(this.refresh_timeout);
-            }
-            this.refresh_timeout = Timeout.add(50, () => {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, curr_time);
-                return true;
-            } );
-        }
-
-        /**
-         * Stop the refresh timeout.
-         */
-        public void stop_refresh() {
-            if (this.refresh_timeout == 0) {
-                return;
-            }
-            Source.remove(this.refresh_timeout);
-            this.refresh_timeout = 0;
-        }
-
-        /**
-         * Stop the refresh timeout when we start playing.
+         * Store that we are no longer pausing
          */
         public override void play() {
-            this.stop_refresh();
+            this.paused_at = -1;
             base.play();
         }
 
         /**
-         * Start the refresh timeout when we pause.
+         * Store that we are pausing
          */
         public override void pause() {
             base.pause();
-            this.start_refresh();
+            this.pipeline.query_position(Gst.Format.TIME, out this.paused_at);
+            if (this.eos) {
+                this.paused_at -= 1;
+            }
         }
     }
 }
