@@ -4,6 +4,14 @@ pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(GEE REQUIRED gee-0.8)
 pkg_check_modules(POPPLER REQUIRED poppler-glib)
 pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.10)
+list (FIND GTK_STATIC_LIBRARIES "X11" _index)
+if (${_index} GREATER -1)
+    set(WITH_X11 1)
+    message(STATUS "GTK is compiled with X11 -- enabling X11 support")
+    pkg_check_modules(X11 REQUIRED x11)
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D X11)
+    set(X11_PACKAGE x11)
+endif ()
 pkg_check_modules(GTHREAD REQUIRED gthread-2.0)
 pkg_check_modules(PANGOCAIRO REQUIRED pangocairo)
 if (MOVIES)
@@ -39,7 +47,6 @@ set(CFLAGS
     ${GSTVIDEO_CFLAGS} ${GSTVIDEO_CFLAGS_OTHER}
     ${GDKX11_CFLAGS} ${GDKX11_CFLAGS_OTHER}
 )
-add_definitions(${CFLAGS})
 
 set(LIBS
     ${GOBJECT_LIBRARIES}
@@ -54,7 +61,6 @@ set(LIBS
     ${GSTVIDEO_LIBRARIES}
     ${GDKX11_LIBRARIES}
 )
-link_libraries(${LIBS})
 
 set(LIB_PATHS
     ${GOBJECT_LIBRARY_DIRS}
@@ -69,6 +75,15 @@ set(LIB_PATHS
     ${GSTVIDEO_LIBRARY_DIRS}
     ${GDKX11_LIBRARY_DIRS}
 )
+
+if(${WITH_X11})
+    set(CFLAGS ${CFLAGS} ${X11_CFLAGS} ${X11_CFLAGS_OTHER})
+    set(LIBS ${LIBS} ${X11_LIBRARIES})
+    set(LIB_PATH ${LIB_PATH} ${X11_LIBRARY_DIRS})
+endif()
+
+add_definitions(${CFLAGS})
+link_libraries(${LIBS})
 link_directories(${LIB_PATHS})
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_SOURCE_DIR}/paths.vala)
@@ -86,6 +101,7 @@ PACKAGES
     gio-2.0
     gee-0.8
     poppler-glib
+    ${X11_PACKAGE}
     gtk+-3.0
     pangocairo
     posix
