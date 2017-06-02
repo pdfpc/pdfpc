@@ -124,6 +124,10 @@ Go to the last slide
 .B Backspace
 Go back in history. Note that history is defined by "jump" commands, not by normal slide movement.
 .TP
+.B j / k
+Go to the next / previous slide, skipping over overlays that have already been
+viewed, but at most one user slide.
+.TP
 .B Tab / Middle mouse button
 Overview mode
 .TP
