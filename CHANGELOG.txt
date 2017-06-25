@@ -2,6 +2,26 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.7
+=============
+
+*Released: June 2017*
+
+- Small bug fixes
+    - Store last_minute correctly in pdfpc file
+    - Use a new default gstreamer sink for video playing
+      (fixes an issue where the sound work, but the video not)
+    - High CPU usage for some videos when the video is paused
+    - Fixed a crash for some video drivers
+
+- Works with vala 0.36
+
+- PDFPC can now store the last viewed slide to restore it
+  at a later session
+
+- A user can now skip already viewed overlays (and jump
+  to the full slide directly)
+
 Version 4.0.6
 =============
 
