@@ -79,7 +79,7 @@ set(LIB_PATHS
 if(${WITH_X11})
     set(CFLAGS ${CFLAGS} ${X11_CFLAGS} ${X11_CFLAGS_OTHER})
     set(LIBS ${LIBS} ${X11_LIBRARIES})
-    set(LIB_PATH ${LIB_PATH} ${X11_LIBRARY_DIRS})
+    set(LIB_PATHS ${LIB_PATHS} ${X11_LIBRARY_DIRS})
 endif()
 
 add_definitions(${CFLAGS})
