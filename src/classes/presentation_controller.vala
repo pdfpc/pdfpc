@@ -39,7 +39,6 @@ namespace pdfpc {
      * Controller handling all the triggered events/signals
      */
     public class PresentationController : Object {
-
         /**
          * The currently displayed slide
          */
@@ -1368,6 +1367,70 @@ namespace pdfpc {
             rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
             gdk_scale = view.scale_factor;
             return (uint*) ((Gdk.X11.Window) view.get_window()).get_xid();
+        }
+
+        /**
+         * Create a widget corresponding to the Poppler.Rectangle for the nth
+         * controllable's main view, and return it. The widget is automatically
+         * destroyed when the slide changes. Note that the widget might not
+         * have been realized yet right after creation.
+         */
+        public Gtk.Widget overlay_widget(int n, Poppler.Rectangle area) {
+            Controllable c = (n < this.controllables.size) ? this.controllables.get(n) : null;
+            View.Pdf view = c.main_view;
+            Gdk.Rectangle rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
+
+            var widget = new Gtk.EventBox();
+            widget.set_size_request(rect.width, rect.height);
+            widget.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
+
+            // Find the fixed view that the view belongs to; this could be
+            // improved by refactoring the API. Then add the widget to it.
+            Gtk.Container parent = view.parent;
+            while(parent != null && !(parent is Gtk.Fixed)) {
+                parent = parent.parent;
+            }
+            if(parent == null) {
+                printerr("Warning: Unhandled case in presentation_controller.overlay_pos(): View is not contained in a Gtk.Fixed\n");
+            }
+            else {
+                var allocation = Gtk.Allocation();
+                view.get_allocation(out allocation);
+                (parent as Gtk.Fixed).put(widget, rect.x + allocation.x, rect.y + allocation.y);
+
+                // Pass events on to the underlying view
+                widget.motion_notify_event.connect((event) => {
+                    event.x += allocation.x + rect.x;
+                    event.y += allocation.y + rect.y;
+                    view.motion_notify_event(event);
+                    return true;
+                });
+                widget.button_press_event.connect((event) => {
+                    event.x += allocation.x + rect.x;
+                    event.y += allocation.y + rect.y;
+                    view.button_press_event(event);
+                    return true;
+                });
+                widget.button_release_event.connect((event) => {
+                    event.x += allocation.x + rect.x;
+                    event.y += allocation.y + rect.y;
+                    view.button_release_event(event);
+                    return true;
+                });
+            }
+
+            // Set up automated removal of the widget
+            ulong handler_id = 0;
+            int slide_at_setup = this.current_slide_number;
+            handler_id = this.update_request.connect(() => {
+                if(this.current_slide_number != slide_at_setup) {
+                    widget.destroy();
+                    this.disconnect(handler_id);
+                }
+            });
+
+            widget.show();
+            return widget;
         }
 #endif
     }

@@ -311,12 +311,25 @@ namespace pdfpc {
                 Gst.Element ad_element = this.link_additional(n, queue, bin, rect);
                 ad_element.link(sink);
                 sink.set("force_aspect_ratio", false);
-
                 Gst.Video.Overlay xoverlay = (Gst.Video.Overlay) sink;
-                xoverlay.set_window_handle(xid);
+
+                if(glimagesinkFactory != null) {
+                    var overlay_widget = this.controller.overlay_widget(n, this.area);
+                    if (overlay_widget.get_realized()) {
+                        xoverlay.set_window_handle((uint*)((Gdk.X11.Window) overlay_widget.get_window()).get_xid());
+                    }
+                    else {
+                        overlay_widget.realize.connect((event) => {
+                            xoverlay.set_window_handle((uint*)((Gdk.X11.Window) overlay_widget.get_window()).get_xid());
+                        });
+                    }
+                }
+                else {
+                    xoverlay.set_window_handle(xid);
+                    xoverlay.set_render_rectangle(rect.x*gdk_scale, rect.y*gdk_scale,
+                                                  rect.width*gdk_scale, rect.height*gdk_scale);
+                }
                 xoverlay.handle_events(false);
-                xoverlay.set_render_rectangle(rect.x*gdk_scale, rect.y*gdk_scale,
-                                              rect.width*gdk_scale, rect.height*gdk_scale);
                 n++;
             }
 
