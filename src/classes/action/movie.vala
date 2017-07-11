@@ -265,6 +265,9 @@ namespace pdfpc {
                 uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
                 noprogress = !movie.show_controls();
+                #if NEW_POPPLER
+                loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
+                #endif
                 break;
 
             default:
