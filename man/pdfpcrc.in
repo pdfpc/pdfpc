@@ -60,6 +60,9 @@ Add an additional black slide at the end of the presentation (bool, Default fals
 .B current-height
 Percentage of the height of the presenter screen to be used for the current slide. (int, Default 80)
 .TP
+.B current-size
+Percentage of the presenter screen to be used for the current slide. (int, Default 60)
+.TP
 .BI disable-caching
 see
 .B pdfpcrc(5)
@@ -68,8 +71,9 @@ see
 see
 .B pdfpcrc(5)
 .TP
-.B current-size
-Percentage of the presenter screen to be used for the current slide. (int, Default 60)
+.B gstreamer-pipeline
+Video rendering methods. Valid values are \fIxvimagesink\fR and \fIglimagesink\fR. (Default
+xvimagesink)
 .TP
 .B next-height
 Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
