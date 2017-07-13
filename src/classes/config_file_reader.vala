@@ -253,6 +253,19 @@ namespace pdfpc {
                         Options.use_time_of_day = true;
                     }
                     break;
+                case "gstreamer-pipeline":
+                    switch(fields[2]) {
+                        case "xvimagesink":
+                            Options.gstreamer_pipeline = Options.GstreamerPipeline.XVIMAGESINK;
+                            break;
+                        case "glimagesink":
+                            Options.gstreamer_pipeline = Options.GstreamerPipeline.GLIMAGESINK;
+                            break;
+                        default:
+                            GLib.printerr("Invalid value for option gstreamer-pipeline, only xvimagesink and glimagesink are supported\n");
+                            break;
+                    }
+                    break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
                     break;
