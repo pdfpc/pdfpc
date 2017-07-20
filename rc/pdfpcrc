@@ -66,6 +66,9 @@ bind 8 togglePointer
 bind 7 decreasePointer
 bind 9 increasePointer
 
+# Drawing
+bind 5 toggleDrawing
+
 #### Mouse bindings
 mouse 1        next
 mouse S+1      next10

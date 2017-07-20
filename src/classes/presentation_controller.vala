@@ -307,6 +307,21 @@ namespace pdfpc {
             DBusServer.start_server(this, this.metadata);
         }
 
+        private Drawing overlay_drawing;
+        private bool drawing_enabled = false;
+        private bool drawing_present = false;
+        private double drawing_last_x;
+        private double drawing_last_y;
+        private bool drawing_have_last = false;
+
+        private void continue_drawing(double x, double y) {
+            if (this.drawing_have_last) {
+                overlay_drawing.add_line(this.drawing_last_x, this.drawing_last_y, x, y);
+                this.drawing_last_x = x;
+                this.drawing_last_y = y;
+            }
+        }
+
         private Gtk.Allocation presenter_allocation;
         private Gtk.Allocation presentation_allocation;
         private uint pointer_size = 10;
@@ -326,6 +341,7 @@ namespace pdfpc {
             presentation_allocation = a;
             presentation_surface = new Gtk.DrawingArea();
             presentation_surface.set_size_request(a.width, a.height);
+            overlay_drawing = new Drawing(a.width, a.height);
             this.presentation_surface.draw.connect ((context) => {
                     draw_pointer(context, presentation_allocation);
                     return true;
@@ -345,15 +361,31 @@ namespace pdfpc {
             drag_y=-1;
             this.presenter_surface.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.presenter_surface.button_press_event.connect((event) => {
-                    drag_x=event.x/presenter_allocation.width;
-                    drag_y=event.y/presenter_allocation.height;
-                    highlight_w=0;
-                    highlight_h=0;
+                    if (drawing_enabled) {
+                        drawing_last_x = event.x / presenter_allocation.width;
+                        drawing_last_y = event.y / presenter_allocation.height;
+                        drawing_have_last = true;
+                    } else {
+                        drag_x=event.x/presenter_allocation.width;
+                        drag_y=event.y/presenter_allocation.height;
+                        highlight_w=0;
+                        highlight_h=0;
+                    }
                     return true;
                 });
             this.presenter_surface.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
             this.presenter_surface.button_release_event.connect((event) => {
-                    update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
+                    if (drawing_enabled) {
+                        if (drawing_have_last) {
+                            continue_drawing(
+                                event.x / presenter_allocation.width,
+                                event.y / presenter_allocation.height
+                            );
+                        }
+                    } else {
+                        update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
+                    }
+                    drawing_have_last = false;
                     drag_x=-1;
                     drag_y=-1;
                     return true;
@@ -370,6 +402,13 @@ namespace pdfpc {
         }
 
         public void move_pointer(double percent_x, double percent_y) {
+            if (drawing_enabled) {
+                if (drawing_have_last) {
+                    continue_drawing(
+                        percent_x, percent_y
+                    );
+                }
+            }
             pointer_y = percent_y;
             pointer_x = percent_x;
             if (presenter!=null) presenter_surface.queue_draw();
@@ -424,12 +463,24 @@ namespace pdfpc {
                     context.fill();
                 }
             }
+            if (drawing_enabled) {
+                Cairo.Surface drawing = overlay_drawing.render_to_surface();
+                int base_width = overlay_drawing.width;
+                int base_height = overlay_drawing.height;
+                Cairo.Matrix old_xform = context.get_matrix();
+                context.scale(
+                    (double) a.width / base_width,
+                    (double) a.height / base_height
+                );
+                context.set_source_surface(drawing, 0, 0);
+                context.paint();
+            }
         }
 
 
         public void toggle_pointers() {
             pointer_enabled = !pointer_enabled;
-            if (pointer_enabled) {
+            if (pointer_enabled || drawing_present) {
                 if (presenter!=null) presenter_surface.show();
                 if (presentation!=null) presentation_surface.show();
             } else {
@@ -437,6 +488,14 @@ namespace pdfpc {
                 if (presentation!=null) presentation_surface.hide();
             }
         }
+
+        public void toggle_drawing() {
+            drawing_enabled = !drawing_enabled;
+            drawing_present = true;
+            if (presenter!=null) presenter_surface.show();
+            if (presentation!=null) presentation_surface.show();
+        }
+
 
         public void inc_pointer() {
             if (pointer_size<1000) pointer_size+=pointer_step;
@@ -473,6 +532,7 @@ namespace pdfpc {
 
         protected void add_actions() {
             add_action("togglePointer", this.toggle_pointers);
+            add_action("toggleDrawing", this.toggle_drawing);
             add_action("increasePointer", this.inc_pointer);
             add_action("decreasePointer", this.dec_pointer);
 
