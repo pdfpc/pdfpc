@@ -537,40 +537,62 @@ namespace pdfpc {
          */
         protected override Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
                 Gdk.Rectangle rect) {
-            if (n != 0) {
-                return source;
-            }
-
-            this.rect = rect;
-
-            dynamic Gst.Element overlay;
-            Gst.Element adaptor2;
-            try {
-                Gst.Element scale = gst_element_make("videoscale", "scale");
-                Gst.Element rate = gst_element_make("videorate", "rate");
-                Gst.Element adaptor1 = gst_element_make("videoconvert", "adaptor1");
-                adaptor2 = gst_element_make("videoconvert", "adaptor2");
-                overlay = gst_element_make("cairooverlay", "overlay");
-                Gst.Caps caps = Gst.Caps.from_string(
-                    "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
-                    "framerate=[25/1,2147483647/1]," + // At least 25 fps
-                    @"width=$(rect.width),height=$(rect.height)"
-                );
-                Gst.Element filter = gst_element_make("capsfilter", "filter");
-                filter.set("caps", caps);
-                bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
-                if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2)) {
-                    throw new PipelineError.Linking("Could not link pipeline.");
+            // setup overlay (video controls) for the presenter
+            if (n == 0) {
+                dynamic Gst.Element overlay;
+                Gst.Element adaptor2;
+                try {
+                    var scale = gst_element_make("videoscale", null);
+                    var rate = gst_element_make("videorate", null);
+                    var adaptor1 = gst_element_make("videoconvert", null);
+                    adaptor2 = gst_element_make("videoconvert", null);
+                    overlay = gst_element_make("cairooverlay", null);
+                    var caps = Gst.Caps.from_string(
+                        "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
+                        "framerate=[25/1,2147483647/1]," + // At least 25 fps
+                        @"width=$(rect.width),height=$(rect.height)"
+                    );
+                    var filter = gst_element_make("capsfilter", null);
+                    filter.set("caps", caps);
+                    bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
+                    if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2)) {
+                        throw new PipelineError.Linking("Could not link pipeline.");
+                    }
+                } catch (PipelineError err) {
+                    GLib.printerr("Error creating control pipeline: %s\n", err.message);
+                    return source;
                 }
-            } catch (PipelineError err) {
-                GLib.printerr("Error creating control pipeline: %s\n", err.message);
-                return source;
+
+                this.rect = rect;
+                overlay.draw.connect(this.on_draw);
+                overlay.caps_changed.connect(this.on_prepare);
+
+                return adaptor2;
+            } else { // for the rest, set the proper resolution
+                Gst.Element adaptor2;
+                try {
+                    var scale = gst_element_make("videoscale", null);
+                    var rate = gst_element_make("videorate", null);
+                    var adaptor1 = gst_element_make("videoconvert", null);
+                    adaptor2 = gst_element_make("videoconvert", null);
+                    var caps = Gst.Caps.from_string(
+                        "video/x-raw," +
+                        "framerate=[25/1,2147483647/1]," + // At least 25 fps
+                        @"width=$(rect.width),height=$(rect.height)"
+                    );
+                    var filter = gst_element_make("capsfilter", null);
+                    filter.set("caps", caps);
+                    bin.add_many(adaptor1, adaptor2, scale, rate, filter);
+                    if (!source.link_many(rate, scale, adaptor1, filter, adaptor2)) {
+                        throw new PipelineError.Linking("Could not link pipeline.");
+                    }
+                } catch (PipelineError err) {
+                    GLib.printerr("Error creating control pipeline: %s\n", err.message);
+                    return source;
+                }
+
+                return adaptor2;
             }
-
-            overlay.draw.connect(this.on_draw);
-            overlay.caps_changed.connect(this.on_prepare);
-
-            return adaptor2;
         }
 
         /**
