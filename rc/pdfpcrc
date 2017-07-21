@@ -68,6 +68,8 @@ bind 9 increasePointer
 
 # Drawing
 bind 5 toggleDrawing
+bind 6 clearDrawing
+bind 4 hideDrawing
 
 #### Mouse bindings
 mouse 1        next

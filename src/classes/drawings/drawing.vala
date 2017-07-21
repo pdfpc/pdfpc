@@ -46,7 +46,7 @@ namespace pdfpc {
             this.pen_blue = 0.0;
             this.pen_alpha = 1.0;
             this.context = new Cairo.Context(this.surface);
-            this.context.set_operator(CAIRO_OPERATOR_OVER);
+            this.context.set_operator(Cairo.Operator.OVER);
         }
 
         public Cairo.ImageSurface render_to_surface() {
@@ -60,6 +60,12 @@ namespace pdfpc {
             this.context.move_to(x1 * width, y1 * height);
             this.context.line_to(x2 * width, y2 * height);
             this.context.stroke();
+        }
+
+        public void clear() {
+            this.context.set_operator(Cairo.Operator.CLEAR);
+            this.context.paint();
+            this.context.set_operator(Cairo.Operator.OVER);
         }
     }
 }

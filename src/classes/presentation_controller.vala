@@ -337,6 +337,21 @@ namespace pdfpc {
         private double pointer_x;
         private double pointer_y;
 
+        private void hide_or_show_surfaces() {
+            if (pointer_enabled || drawing_present) {
+                if (presenter!=null) presenter_surface.show();
+                if (presentation!=null) presentation_surface.show();
+            } else {
+                if (presenter!=null) presenter_surface.hide();
+                if (presentation!=null) presentation_surface.hide();
+            }
+        }
+
+        private void queue_surface_draws() {
+            if (presenter!=null) presenter_surface.queue_draw();
+            if (presentation!=null) presentation_surface.queue_draw();
+        }
+
         protected void init_presentation_pointer(Gtk.Allocation a) {
             presentation_allocation = a;
             presentation_surface = new Gtk.DrawingArea();
@@ -411,8 +426,7 @@ namespace pdfpc {
             }
             pointer_y = percent_y;
             pointer_x = percent_x;
-            if (presenter!=null) presenter_surface.queue_draw();
-            if (presentation!=null) presentation_surface.queue_draw();
+            queue_surface_draws();
         }
 
         /**
@@ -432,8 +446,7 @@ namespace pdfpc {
                 highlight_h=Math.fabs(drag_y-y);
                 highlight_x=(drag_x<x?drag_x:x);
                 highlight_y=(drag_y<y?drag_y:y);
-                if (presenter!=null) presenter_surface.queue_draw();
-                if (presentation!=null) presentation_surface.queue_draw();
+                queue_surface_draws();
             }
         }
 
@@ -463,7 +476,7 @@ namespace pdfpc {
                     context.fill();
                 }
             }
-            if (drawing_enabled) {
+            if (drawing_present) {
                 Cairo.Surface drawing = overlay_drawing.render_to_surface();
                 int base_width = overlay_drawing.width;
                 int base_height = overlay_drawing.height;
@@ -480,33 +493,40 @@ namespace pdfpc {
 
         public void toggle_pointers() {
             pointer_enabled = !pointer_enabled;
-            if (pointer_enabled || drawing_present) {
-                if (presenter!=null) presenter_surface.show();
-                if (presentation!=null) presentation_surface.show();
-            } else {
-                if (presenter!=null) presenter_surface.hide();
-                if (presentation!=null) presentation_surface.hide();
-            }
+            hide_or_show_surfaces();
         }
 
         public void toggle_drawing() {
             drawing_enabled = !drawing_enabled;
-            drawing_present = true;
-            if (presenter!=null) presenter_surface.show();
-            if (presentation!=null) presentation_surface.show();
+            if (drawing_enabled) {
+                drawing_present = true;
+            }
+            hide_or_show_surfaces();
+            queue_surface_draws();
         }
 
+        public void hide_drawing() {
+            drawing_present = false;
+            drawing_enabled = false;
+            hide_or_show_surfaces();
+            queue_surface_draws();
+        }
+
+        public void clear_drawing() {
+            if (drawing_enabled) {
+                overlay_drawing.clear();
+                queue_surface_draws();
+            }
+        }
 
         public void inc_pointer() {
             if (pointer_size<1000) pointer_size+=pointer_step;
-            if (presenter!=null) presenter_surface.queue_draw();
-            if (presentation!=null) presentation_surface.queue_draw();
+            queue_surface_draws();
         }
 
         public void dec_pointer() {
             if (pointer_size>pointer_step) pointer_size-=pointer_step;
-            if (presenter!=null) presenter_surface.queue_draw();
-            if (presentation!=null) presentation_surface.queue_draw();
+            queue_surface_draws();
         }
 
 
@@ -533,6 +553,8 @@ namespace pdfpc {
         protected void add_actions() {
             add_action("togglePointer", this.toggle_pointers);
             add_action("toggleDrawing", this.toggle_drawing);
+            add_action("clearDrawing", this.clear_drawing);
+            add_action("hideDrawing", this.hide_drawing);
             add_action("increasePointer", this.inc_pointer);
             add_action("decreasePointer", this.dec_pointer);
 
