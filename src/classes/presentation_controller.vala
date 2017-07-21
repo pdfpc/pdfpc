@@ -308,6 +308,8 @@ namespace pdfpc {
         }
 
         private Drawing overlay_drawing;
+        private DrawingTool? current_mouse_tool = null;
+        private DrawingTool? current_drawing_tool = null;
         private bool drawing_enabled = false;
         private bool drawing_present = false;
         private double drawing_last_x;
@@ -316,7 +318,7 @@ namespace pdfpc {
 
         private void continue_drawing(double x, double y) {
             if (this.drawing_have_last) {
-                overlay_drawing.add_line(this.drawing_last_x, this.drawing_last_y, x, y);
+                overlay_drawing.add_line(this.current_drawing_tool, this.drawing_last_x, this.drawing_last_y, x, y);
                 this.drawing_last_x = x;
                 this.drawing_last_y = y;
             }
@@ -336,6 +338,16 @@ namespace pdfpc {
         private bool pointer_enabled = false;
         private double pointer_x;
         private double pointer_y;
+
+        public void toggle_eraser() {
+            if (current_mouse_tool == overlay_drawing.pen) {
+                current_mouse_tool = overlay_drawing.eraser;
+            } else {
+                current_mouse_tool = overlay_drawing.pen;
+            }
+            // don't allow drawing to continue
+            drawing_have_last = false;
+        }
 
         private void hide_or_show_surfaces() {
             if (pointer_enabled || drawing_present) {
@@ -357,6 +369,8 @@ namespace pdfpc {
             presentation_surface = new Gtk.DrawingArea();
             presentation_surface.set_size_request(a.width, a.height);
             overlay_drawing = new Drawing(a.width, a.height);
+            current_mouse_tool = overlay_drawing.pen;
+            current_drawing_tool = overlay_drawing.pen;
             this.presentation_surface.draw.connect ((context) => {
                     draw_pointer(context, presentation_allocation, presenter_surface == null);
                     return true;
@@ -434,6 +448,16 @@ namespace pdfpc {
          * them to the presentation controller
          */
         protected bool on_move( Gtk.Widget source, Gdk.EventMotion move ) {
+            if (drawing_enabled) {
+                Gdk.InputSource source_type  = move.get_source_device().get_source();
+                if (source_type == Gdk.InputSource.ERASER) {
+                    current_drawing_tool = overlay_drawing.eraser;
+                } else if (source_type == Gdk.InputSource.PEN) {
+                    current_drawing_tool = overlay_drawing.pen;
+                } else { // MOUSE, CURSOR, TOUCHPAD, TRACKPOINT, ....
+                    current_drawing_tool = current_mouse_tool;
+                }
+            }
             move_pointer(move.x / (double) presenter_allocation.width, move.y / (double) presenter_allocation.height);
             update_highlight(move.x/presenter_allocation.width, move.y/presenter_allocation.height);
             return true;
@@ -488,21 +512,21 @@ namespace pdfpc {
                 context.set_source_surface(drawing_surface, 0, 0);
                 context.paint();
                 context.set_matrix(old_xform);
-                if (for_presenter && !pointer_enabled) {
-                    context.new_path();
-                    context.set_source_rgba(1.0, 1.0, 1.0, 1.0);
-                    context.set_operator(Cairo.Operator.DIFFERENCE);
-                    context.arc(x, y, overlay_drawing.pen_width_on(a.width) / 2.0, 0, 2*Math.PI);
-                    context.fill();
+                if (for_presenter && drawing_enabled) {
+                    double width_adjustment = (double) a.width / base_width;
                     context.set_operator(Cairo.Operator.OVER);
                     context.set_line_width(2.0);
                     context.set_source_rgba(
-                        overlay_drawing.pen_red,
-                        overlay_drawing.pen_green,
-                        overlay_drawing.pen_blue,
+                        current_drawing_tool.red,
+                        current_drawing_tool.green,
+                        current_drawing_tool.blue,
                         1.0
                     );
-                    context.arc(x, y, overlay_drawing.pen_width_on(a.width) / 2.0, 0, 2*Math.PI);
+                    double arc_radius = current_drawing_tool.width * width_adjustment / 2.0;
+                    if (arc_radius < 1.0) {
+                        arc_radius = 1.0;
+                    }
+                    context.arc(x, y, arc_radius, 0, 2*Math.PI);
                     context.stroke();
                 }
             }
@@ -518,6 +542,7 @@ namespace pdfpc {
             drawing_enabled = !drawing_enabled;
             if (drawing_enabled) {
                 drawing_present = true;
+                current_drawing_tool = overlay_drawing.pen;
             }
             hide_or_show_surfaces();
             queue_surface_draws();

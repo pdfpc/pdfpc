@@ -25,32 +25,59 @@
 
 namespace pdfpc {
 
+    public class DrawingTool {
+        public double red {get; set;}
+        public double green {get; set;}
+        public double blue {get; set;}
+        public double alpha {get; set;}
+        public double width {get; set;}
+
+        public bool is_eraser {get; set;}
+        
+        public DrawingTool() {
+            this.red = 1.0;
+            this.green = 0.0;
+            this.blue = 0.0;
+            this.alpha = 1.0;
+            this.width = 1.0;
+            this.is_eraser = false;
+        }
+
+        public void add_line(Cairo.Context context, double x1, double y1, double x2, double y2) {
+            if (this.is_eraser) {
+                context.set_operator(Cairo.Operator.CLEAR);
+            } else {
+                context.set_operator(Cairo.Operator.OVER);
+                context.set_source_rgba(this.red, this.green, this.blue, this.alpha);
+            }
+            context.set_line_width(this.width);
+            context.move_to(x1, y1);
+            context.line_to(x2, y2);
+            context.stroke();
+        }
+    }
+
     public class Drawing : Object {
         public int width { get; protected set; }
         public int height { get; protected set; }
         private Cairo.ImageSurface surface { get; protected set; }
         private Cairo.Context context { get; protected set; }
 
-        public double pen_red {get; set;}
-        public double pen_green {get; set;}
-        public double pen_blue {get; set;}
-        public double pen_alpha {get; set;}
-        private double pen_width {get; set;}
+        public DrawingTool pen {get; protected set;}
+        public DrawingTool eraser {get; protected set;}
 
-        public double pen_width_on(int actual_width) {
-            return this.pen_width * actual_width;
-        }
 
         public Drawing(int width, int height) {
             this.width = width;
             this.height = height;
 
             this.surface = new Cairo.ImageSurface(Cairo.Format.ARGB32, this.width, this.height);
-            this.pen_red = 1.0;
-            this.pen_green = 0.0;
-            this.pen_blue = 0.0;
-            this.pen_alpha = 1.0;
-            this.pen_width = 1.0 / 640.0;
+            this.pen = new DrawingTool();
+            this.pen.width = this.width / 640.0;
+            this.eraser = new DrawingTool();
+            this.eraser.is_eraser = true;
+            this.eraser.red = this.eraser.blue = this.eraser.green = 0;
+            this.eraser.width = this.width / 64.0;
             this.context = new Cairo.Context(this.surface);
             this.context.set_operator(Cairo.Operator.OVER);
         }
@@ -61,12 +88,11 @@ namespace pdfpc {
 
         // FIXME: should do smoother drawing?
         // x and y are always in range [0, 1]
-        public void add_line(double x1, double y1, double x2, double y2) {
-            this.context.set_source_rgba(this.pen_red, this.pen_green, this.pen_blue, this.pen_alpha);
-            this.context.set_line_width(this.pen_width * width);
-            this.context.move_to(x1 * this.width, y1 * this.height);
-            this.context.line_to(x2 * this.width, y2 * this.height);
-            this.context.stroke();
+        public void add_line(DrawingTool tool, double x1, double y1, double x2, double y2) {
+            tool.add_line(this.context,
+                x1 * this.width, y1 * this.height,
+                x2 * this.width, y2 * this.height
+            );
         }
 
         public void clear() {
