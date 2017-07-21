@@ -358,7 +358,7 @@ namespace pdfpc {
             presentation_surface.set_size_request(a.width, a.height);
             overlay_drawing = new Drawing(a.width, a.height);
             this.presentation_surface.draw.connect ((context) => {
-                    draw_pointer(context, presentation_allocation);
+                    draw_pointer(context, presentation_allocation, presenter_surface == null);
                     return true;
                 });
             presentation.add_to_fixed(presentation_surface, a.x, a.y);
@@ -369,7 +369,7 @@ namespace pdfpc {
             presenter_surface = new Gtk.DrawingArea();
             presenter_surface.set_size_request(a.width, a.height);
             this.presenter_surface.draw.connect ((context) => {
-                    draw_pointer(context, presenter_allocation);
+                    draw_pointer(context, presenter_allocation, true);
                     return true;
                 });
             drag_x=-1;
@@ -450,10 +450,10 @@ namespace pdfpc {
             }
         }
 
-        protected void draw_pointer(Cairo.Context context, Gtk.Allocation a) {
+        protected void draw_pointer(Cairo.Context context, Gtk.Allocation a, bool for_presenter) {
+            int x = (int)(a.width*pointer_x);
+            int y = (int)(a.height*pointer_y);
             if (pointer_enabled) {
-                int x = (int)(a.width*pointer_x);
-                int y = (int)(a.height*pointer_y);
                 int r = (int)(a.height*0.001*pointer_size);
 
                 if (highlight_w>0) {
@@ -477,7 +477,7 @@ namespace pdfpc {
                 }
             }
             if (drawing_present) {
-                Cairo.Surface drawing = overlay_drawing.render_to_surface();
+                Cairo.Surface drawing_surface = overlay_drawing.render_to_surface();
                 int base_width = overlay_drawing.width;
                 int base_height = overlay_drawing.height;
                 Cairo.Matrix old_xform = context.get_matrix();
@@ -485,8 +485,26 @@ namespace pdfpc {
                     (double) a.width / base_width,
                     (double) a.height / base_height
                 );
-                context.set_source_surface(drawing, 0, 0);
+                context.set_source_surface(drawing_surface, 0, 0);
                 context.paint();
+                context.set_matrix(old_xform);
+                if (for_presenter && !pointer_enabled) {
+                    context.new_path();
+                    context.set_source_rgba(1.0, 1.0, 1.0, 1.0);
+                    context.set_operator(Cairo.Operator.DIFFERENCE);
+                    context.arc(x, y, overlay_drawing.pen_width_on(a.width) / 2.0, 0, 2*Math.PI);
+                    context.fill();
+                    context.set_operator(Cairo.Operator.OVER);
+                    context.set_line_width(2.0);
+                    context.set_source_rgba(
+                        overlay_drawing.pen_red,
+                        overlay_drawing.pen_green,
+                        overlay_drawing.pen_blue,
+                        1.0
+                    );
+                    context.arc(x, y, overlay_drawing.pen_width_on(a.width) / 2.0, 0, 2*Math.PI);
+                    context.stroke();
+                }
             }
         }
 

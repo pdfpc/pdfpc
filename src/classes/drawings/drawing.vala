@@ -31,10 +31,15 @@ namespace pdfpc {
         private Cairo.ImageSurface surface { get; protected set; }
         private Cairo.Context context { get; protected set; }
 
-        private double pen_red; 
-        private double pen_green;
-        private double pen_blue;
-        private double pen_alpha;
+        public double pen_red {get; set;}
+        public double pen_green {get; set;}
+        public double pen_blue {get; set;}
+        public double pen_alpha {get; set;}
+        private double pen_width {get; set;}
+
+        public double pen_width_on(int actual_width) {
+            return this.pen_width * actual_width;
+        }
 
         public Drawing(int width, int height) {
             this.width = width;
@@ -45,6 +50,7 @@ namespace pdfpc {
             this.pen_green = 0.0;
             this.pen_blue = 0.0;
             this.pen_alpha = 1.0;
+            this.pen_width = 1.0 / 640.0;
             this.context = new Cairo.Context(this.surface);
             this.context.set_operator(Cairo.Operator.OVER);
         }
@@ -57,8 +63,9 @@ namespace pdfpc {
         // x and y are always in range [0, 1]
         public void add_line(double x1, double y1, double x2, double y2) {
             this.context.set_source_rgba(this.pen_red, this.pen_green, this.pen_blue, this.pen_alpha);
-            this.context.move_to(x1 * width, y1 * height);
-            this.context.line_to(x2 * width, y2 * height);
+            this.context.set_line_width(this.pen_width * width);
+            this.context.move_to(x1 * this.width, y1 * this.height);
+            this.context.line_to(x2 * this.width, y2 * this.height);
             this.context.stroke();
         }
 
