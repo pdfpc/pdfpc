@@ -23,7 +23,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-namespace pdfpc {
+namespace pdfpc.Drawings {
 
     public class DrawingTool {
         public double red {get; set;}
@@ -61,46 +61,86 @@ namespace pdfpc {
     public class Drawing : Object {
         public int width { get; protected set; }
         public int height { get; protected set; }
-        private Cairo.ImageSurface surface { get; protected set; }
+        private Cairo.ImageSurface surface;
         private Cairo.Context context { get; protected set; }
 
         public DrawingTool pen {get; protected set;}
         public DrawingTool eraser {get; protected set;}
 
+        private int current_slide {get; set;}
+        private Drawings.Storage.Base storage {get; protected set;}
 
-        public Drawing(int width, int height) {
+        protected void set_surface(Cairo.ImageSurface surface) {
+            this.surface = surface;
+            this.context = new Cairo.Context(this.surface);
+        }
+
+        private void set_new_surface() {
+            set_surface(new Cairo.ImageSurface(Cairo.Format.ARGB32, this.width, this.height));
+        }
+
+        public Drawing(Drawings.Storage.Base storage, int width, int height) {
+            this.storage = storage;
             this.width = width;
             this.height = height;
 
-            this.surface = new Cairo.ImageSurface(Cairo.Format.ARGB32, this.width, this.height);
             this.pen = new DrawingTool();
             this.pen.width = this.width / 640.0;
             this.eraser = new DrawingTool();
             this.eraser.is_eraser = true;
             this.eraser.red = this.eraser.blue = this.eraser.green = 0;
             this.eraser.width = this.width / 64.0;
-            this.context = new Cairo.Context(this.surface);
-            this.context.set_operator(Cairo.Operator.OVER);
+
+            this.current_slide == -1;
         }
 
-        public Cairo.ImageSurface render_to_surface() {
+        public Cairo.ImageSurface? render_to_surface() {
             return this.surface;
         }
 
-        // FIXME: should do smoother drawing?
-        // x and y are always in range [0, 1]
+        /*
+         * Draw a line from (x1, y1) to (x2, y2).
+         * x and y coordinates are always in range [0, 1].
+         */
         public void add_line(DrawingTool tool, double x1, double y1, double x2, double y2) {
+            // FIXME: should do smoother drawing?
             tool.add_line(this.context,
                 x1 * this.width, y1 * this.height,
                 x2 * this.width, y2 * this.height
             );
         }
 
+        /*
+         * Clear the current drawing.
+         */
         public void clear() {
             this.context.set_operator(Cairo.Operator.CLEAR);
             this.context.paint();
             this.context.set_operator(Cairo.Operator.OVER);
         }
+
+        /*
+         * Switch to slide, based on number. Ordinarily drawing slide numbers should be
+         * the number of the first slide of an overly set, so all slides in an overlay set
+         * share the same drawing.
+         */
+        public void switch_to_slide(int slide_number) {
+            if (slide_number != this.current_slide) {
+                storage.store(this.current_slide, this.surface);
+                Cairo.ImageSurface? from_storage = storage.retrieve(slide_number);
+                if (from_storage == null) {
+                    set_new_surface();
+                } else {
+                    set_surface(from_storage);
+                }
+                this.current_slide = slide_number;
+            }
+        }
+    }
+
+    public Drawing create(Metadata.Pdf metadata, int width, int height) {
+        Drawings.Storage.Base storage = Drawings.Storage.create(metadata);
+        return new Drawing(storage, width, height);
     }
 }
 

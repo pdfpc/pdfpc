@@ -307,9 +307,9 @@ namespace pdfpc {
             DBusServer.start_server(this, this.metadata);
         }
 
-        private Drawing overlay_drawing;
-        private DrawingTool? current_mouse_tool = null;
-        private DrawingTool? current_drawing_tool = null;
+        private Drawings.Drawing overlay_drawing;
+        private Drawings.DrawingTool? current_mouse_tool = null;
+        private Drawings.DrawingTool? current_drawing_tool = null;
         private uint drawing_step = 2;
         private bool drawing_enabled = false;
         private bool drawing_present = false;
@@ -379,7 +379,7 @@ namespace pdfpc {
             presentation_allocation = a;
             presentation_surface = new Gtk.DrawingArea();
             presentation_surface.set_size_request(a.width, a.height);
-            overlay_drawing = new Drawing(a.width, a.height);
+            overlay_drawing = Drawings.create(metadata, a.width, a.height);
             current_mouse_tool = overlay_drawing.pen;
             current_drawing_tool = overlay_drawing.pen;
             this.presentation_surface.draw.connect ((context) => {
@@ -387,6 +387,13 @@ namespace pdfpc {
                     return true;
                 });
             presentation.add_to_fixed(presentation_surface, a.x, a.y);
+        }
+
+        protected void update_overlay_drawing() {
+            overlay_drawing.switch_to_slide(
+                this.metadata.user_slide_to_real_slide(this.current_user_slide_number)
+            );
+            this.queue_surface_draws();
         }
 
         protected void init_presenter_pointer(Gtk.Allocation a) {
@@ -437,6 +444,7 @@ namespace pdfpc {
             if (w != null) {
                 w.set_cursor(new Gdk.Cursor.from_name(Gdk.Display.get_default(), "none"));
             }
+            this.update_request.connect(this.update_overlay_drawing);
             //presenter_surface.show();
 
         }
@@ -512,33 +520,35 @@ namespace pdfpc {
                 }
             }
             if (drawing_present) {
-                Cairo.Surface drawing_surface = overlay_drawing.render_to_surface();
-                int base_width = overlay_drawing.width;
-                int base_height = overlay_drawing.height;
-                Cairo.Matrix old_xform = context.get_matrix();
-                context.scale(
-                    (double) a.width / base_width,
-                    (double) a.height / base_height
-                );
-                context.set_source_surface(drawing_surface, 0, 0);
-                context.paint();
-                context.set_matrix(old_xform);
-                if (for_presenter && drawing_enabled) {
-                    double width_adjustment = (double) a.width / base_width;
-                    context.set_operator(Cairo.Operator.OVER);
-                    context.set_line_width(2.0);
-                    context.set_source_rgba(
-                        current_drawing_tool.red,
-                        current_drawing_tool.green,
-                        current_drawing_tool.blue,
-                        1.0
+                Cairo.Surface? drawing_surface = overlay_drawing.render_to_surface();
+                if (drawing_surface != null) {
+                    int base_width = overlay_drawing.width;
+                    int base_height = overlay_drawing.height;
+                    Cairo.Matrix old_xform = context.get_matrix();
+                    context.scale(
+                        (double) a.width / base_width,
+                        (double) a.height / base_height
                     );
-                    double arc_radius = current_drawing_tool.width * width_adjustment / 2.0;
-                    if (arc_radius < 1.0) {
-                        arc_radius = 1.0;
+                    context.set_source_surface(drawing_surface, 0, 0);
+                    context.paint();
+                    context.set_matrix(old_xform);
+                    if (for_presenter && drawing_enabled) {
+                        double width_adjustment = (double) a.width / base_width;
+                        context.set_operator(Cairo.Operator.OVER);
+                        context.set_line_width(2.0);
+                        context.set_source_rgba(
+                            current_drawing_tool.red,
+                            current_drawing_tool.green,
+                            current_drawing_tool.blue,
+                            1.0
+                        );
+                        double arc_radius = current_drawing_tool.width * width_adjustment / 2.0;
+                        if (arc_radius < 1.0) {
+                            arc_radius = 1.0;
+                        }
+                        context.arc(x, y, arc_radius, 0, 2*Math.PI);
+                        context.stroke();
                     }
-                    context.arc(x, y, arc_radius, 0, 2*Math.PI);
-                    context.stroke();
                 }
             }
         }
