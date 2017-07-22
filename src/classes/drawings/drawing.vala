@@ -51,6 +51,7 @@ namespace pdfpc {
                 context.set_source_rgba(this.red, this.green, this.blue, this.alpha);
             }
             context.set_line_width(this.width);
+            context.set_line_cap(Cairo.LineCap.ROUND);
             context.move_to(x1, y1);
             context.line_to(x2, y2);
             context.stroke();

@@ -71,6 +71,10 @@ bind 5 toggleDrawing
 bind 6 clearDrawing
 bind 4 hideDrawing
 
+bind 1 increasePen
+bind 2 toggleEraser
+bind 3 decreasePen
+
 #### Mouse bindings
 mouse 1        next
 mouse S+1      next10

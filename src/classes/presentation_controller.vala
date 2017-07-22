@@ -310,6 +310,7 @@ namespace pdfpc {
         private Drawing overlay_drawing;
         private DrawingTool? current_mouse_tool = null;
         private DrawingTool? current_drawing_tool = null;
+        private uint drawing_step = 2;
         private bool drawing_enabled = false;
         private bool drawing_present = false;
         private double drawing_last_x;
@@ -347,6 +348,16 @@ namespace pdfpc {
             }
             // don't allow drawing to continue
             drawing_have_last = false;
+        }
+
+        public void increase_drawing_pen() {
+            if (current_drawing_tool.width < 500) current_drawing_tool.width += drawing_step;
+            queue_surface_draws();
+        }
+
+        public void decrease_drawing_pen() {
+            if (current_drawing_tool.width > drawing_step) current_drawing_tool.width -= drawing_step;
+            queue_surface_draws();
         }
 
         private void hide_or_show_surfaces() {
@@ -594,13 +605,16 @@ namespace pdfpc {
         }
 
         protected void add_actions() {
-            add_action("togglePointer", this.toggle_pointers);
             add_action("toggleDrawing", this.toggle_drawing);
             add_action("clearDrawing", this.clear_drawing);
             add_action("hideDrawing", this.hide_drawing);
+            add_action("increasePen", this.increase_drawing_pen);
+            add_action("decreasePen", this.decrease_drawing_pen);
+
+            add_action("togglePointer", this.toggle_pointers);
+            add_action("toggleEraser", this.toggle_eraser);
             add_action("increasePointer", this.inc_pointer);
             add_action("decreasePointer", this.dec_pointer);
-
 
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
