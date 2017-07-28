@@ -310,6 +310,7 @@ namespace pdfpc {
         private Drawings.Drawing overlay_drawing;
         private Drawings.DrawingTool? current_mouse_tool = null;
         private Drawings.DrawingTool? current_drawing_tool = null;
+        private bool mouse_tool_is_eraser = false;
         private uint drawing_step = 2;
         private bool drawing_enabled = false;
         private bool drawing_present = false;
@@ -340,14 +341,28 @@ namespace pdfpc {
         private double pointer_x;
         private double pointer_y;
 
+        public bool is_eraser_active() {
+            return drawing_enabled && current_mouse_tool == overlay_drawing.eraser;
+        }
+
+        public bool is_pen_active() {
+            return drawing_enabled && current_mouse_tool == overlay_drawing.pen;
+        }
+
+        public bool is_pointer_active() {
+            return pointer_enabled;
+        }
+
         public void toggle_eraser() {
-            if (current_mouse_tool == overlay_drawing.pen) {
+            if (!mouse_tool_is_eraser) {
                 current_mouse_tool = overlay_drawing.eraser;
             } else {
                 current_mouse_tool = overlay_drawing.pen;
             }
+            mouse_tool_is_eraser = !mouse_tool_is_eraser;
             // don't allow drawing to continue
             drawing_have_last = false;
+            this.controllables_update();
         }
 
         public void increase_drawing_pen() {
@@ -387,6 +402,7 @@ namespace pdfpc {
                     return true;
                 });
             presentation.add_to_fixed(presentation_surface, a.x, a.y);
+            this.controllables_update();
         }
 
         protected void update_overlay_drawing() {
@@ -557,6 +573,7 @@ namespace pdfpc {
         public void toggle_pointers() {
             pointer_enabled = !pointer_enabled;
             hide_or_show_surfaces();
+            this.controllables_update();
         }
 
         public void toggle_drawing() {
@@ -567,6 +584,7 @@ namespace pdfpc {
             }
             hide_or_show_surfaces();
             queue_surface_draws();
+            this.controllables_update();
         }
 
         public void hide_drawing() {
@@ -574,6 +592,7 @@ namespace pdfpc {
             drawing_enabled = false;
             hide_or_show_surfaces();
             queue_surface_draws();
+            this.controllables_update();
         }
 
         public void clear_drawing() {

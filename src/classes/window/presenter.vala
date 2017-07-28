@@ -108,6 +108,21 @@ namespace pdfpc.Window {
         protected Gtk.TextView notes_view;
 
         /**
+         * Indication that the hilight tool is selected
+         */
+        protected Gtk.Image hilight_icon;
+
+        /**
+         * Indication that the pen tool is selected
+         */
+        protected Gtk.Image pen_icon;
+
+        /**
+         * Indication that the eraser tool is selected
+         */
+        protected Gtk.Image eraser_icon;
+
+        /**
          * The overview of slides
          */
         protected Overview overview = null;
@@ -278,6 +293,10 @@ namespace pdfpc.Window {
             this.saved_icon = this.load_icon("saved.svg", icon_height);
             this.loaded_icon = this.load_icon("loaded.svg", icon_height);
 
+            this.hilight_icon = this.load_icon("hilgiht.svg", icon_height);
+            this.pen_icon = this.load_icon("pen.svg", icon_height);
+            this.eraser_icon = this.load_icon("eraser.svg", icon_height);
+
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.add_events(Gdk.EventMask.SCROLL_MASK);
@@ -361,6 +380,9 @@ namespace pdfpc.Window {
             status.pack_start(this.pause_icon, false, false, 0);
             status.pack_start(this.saved_icon, false, false, 0);
             status.pack_start(this.loaded_icon, false, false, 0);
+            status.pack_start(this.hilight_icon, false, false, 0);
+            status.pack_start(this.pen_icon, false, false, 0);
+            status.pack_start(this.eraser_icon, false, false, 0);
 
             this.timer.halign = Gtk.Align.CENTER;
             this.timer.valign = Gtk.Align.END;
@@ -472,6 +494,18 @@ namespace pdfpc.Window {
                 this.frozen_icon.show();
             else
                 this.frozen_icon.hide();
+            if (this.presentation_controller.is_pointer_active())
+                this.hilight_icon.show();
+            else
+                this.hilight_icon.hide();
+            if (this.presentation_controller.is_eraser_active())
+                this.eraser_icon.show();
+            else
+                this.eraser_icon.hide();
+            if (this.presentation_controller.is_pen_active())
+                this.pen_icon.show();
+            else
+                this.pen_icon.hide();
             this.faded_to_black = false;
  	    this.saved_icon.hide();
  	    this.loaded_icon.hide();
