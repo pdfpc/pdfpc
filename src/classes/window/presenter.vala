@@ -293,7 +293,7 @@ namespace pdfpc.Window {
             this.saved_icon = this.load_icon("saved.svg", icon_height);
             this.loaded_icon = this.load_icon("loaded.svg", icon_height);
 
-            this.hilight_icon = this.load_icon("hilgiht.svg", icon_height);
+            this.hilight_icon = this.load_icon("hilight.svg", icon_height);
             this.pen_icon = this.load_icon("pen.svg", icon_height);
             this.eraser_icon = this.load_icon("eraser.svg", icon_height);
 

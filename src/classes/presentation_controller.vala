@@ -208,6 +208,7 @@ namespace pdfpc {
         protected TimerLabel timer;
 
         protected delegate void callback();
+        protected delegate void callback_with_parameter(GLib.Variant? parameter);
         protected SimpleActionGroup action_group = new SimpleActionGroup();
 
         protected class KeyDef : GLib.Object, Gee.Hashable<KeyDef> {
@@ -228,9 +229,20 @@ namespace pdfpc {
                 return this.keycode == other.keycode && this.modMask == other.modMask;
             }
         }
-        protected Gee.HashMap<KeyDef, Action> keyBindings = new Gee.HashMap<KeyDef, Action>();
+
+        protected class ActionAndParameter : GLib.Object {
+            public GLib.Action action { get; set; }
+            public GLib.Variant? parameter { get; set; }
+
+            public ActionAndParameter(GLib.Action action, GLib.Variant? parameter) {
+                this.action = action;
+                this.parameter = parameter;
+            }
+        }
+
+        protected Gee.HashMap<KeyDef, ActionAndParameter> keyBindings = new Gee.HashMap<KeyDef, ActionAndParameter>();
         // We abuse the KeyDef structure
-        protected Gee.HashMap<KeyDef, Action> mouseBindings = new Gee.HashMap<KeyDef, Action>();
+        protected Gee.HashMap<KeyDef, ActionAndParameter> mouseBindings = new Gee.HashMap<KeyDef, ActionAndParameter>();
 
         /*
          * "Main" view of current slide
@@ -633,12 +645,23 @@ namespace pdfpc {
             this.overview = o;
         }
 
+        public void set_pen_color_to_string(Variant? color_variant) {
+            if (overlay_drawing != null) {
+                Gdk.RGBA color = Gdk.RGBA();
+                color.parse(color_variant.get_string());
+                overlay_drawing.pen.set_rgba(color);
+                queue_surface_draws();
+            }
+        }
+
         protected void add_actions() {
             add_action("toggleDrawing", this.toggle_drawing);
             add_action("clearDrawing", this.clear_drawing);
             add_action("hideDrawing", this.hide_drawing);
             add_action("increasePen", this.increase_drawing_pen);
             add_action("decreasePen", this.decrease_drawing_pen);
+
+            add_action_with_parameter("setPenColor", GLib.VariantType.STRING, this.set_pen_color_to_string);
 
             add_action("togglePointer", this.toggle_pointers);
             add_action("toggleEraser", this.toggle_eraser);
@@ -692,6 +715,12 @@ namespace pdfpc {
             this.action_group.add_action(action);
         }
 
+        protected void add_action_with_parameter(string name, GLib.VariantType param_type, callback_with_parameter func) {
+            SimpleAction action = new SimpleAction(name, param_type);
+            action.activate.connect((param) => func(param));
+            this.action_group.add_action(action);
+        }
+
         /**
          * Gets an array wit all function names
          *
@@ -729,7 +758,8 @@ namespace pdfpc {
                 "increasePointer", "Increase pointer size",
                 "decreasePointer", "Decrease pointer size",
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
-                "quit", "Exit pdfpc"
+                "quit", "Exit pdfpc",
+                "setPenColor", "Change pen color (requires argument)",
             };
         }
 
@@ -743,10 +773,11 @@ namespace pdfpc {
         /**
          * Bind the (user-defined) keys
          */
-        public void bind(uint keycode, uint modMask, string action_name) {
+        public void bind(uint keycode, uint modMask, string action_name, GLib.Variant? parameter) {
             Action? action = this.action_group.lookup_action(action_name);
             if (action != null) {
-                this.keyBindings.set(new KeyDef(keycode, modMask), action);
+                this.keyBindings.set(new KeyDef(keycode, modMask),
+                    new ActionAndParameter(action, parameter));
             } else {
                 GLib.printerr("Unknown action %s\n", action_name);
             }
@@ -769,10 +800,11 @@ namespace pdfpc {
         /**
          * Bind the (user-defined) keys
          */
-        public void bindMouse(uint button, uint modMask, string action_name) {
+        public void bindMouse(uint button, uint modMask, string action_name, Variant? parameter) {
             Action? action = this.action_group.lookup_action(action_name);
             if (action != null) {
-                this.mouseBindings.set(new KeyDef(button, modMask), action);
+                this.mouseBindings.set(new KeyDef(button, modMask),
+                    new ActionAndParameter(action, parameter));
             } else {
                 GLib.printerr("Unknown action %s\n", action_name);
             }
@@ -805,11 +837,11 @@ namespace pdfpc {
                 if (this.overview_shown && this.overview.key_press_event(key))
                     return true;
 
-                var action = this.keyBindings.get(new KeyDef(key.keyval,
+                var action_with_parameter = this.keyBindings.get(new KeyDef(key.keyval,
                     key.state & this.accepted_key_mods));
 
-                if (action != null)
-                    action.activate(null);
+                if (action_with_parameter != null)
+                    action_with_parameter.action.activate(action_with_parameter.parameter);
                 return true;
             } else {
                 return false;
@@ -823,10 +855,10 @@ namespace pdfpc {
             if (!ignore_mouse_events && button.type == Gdk.EventType.BUTTON_PRESS ) {
                 // Prevent double or triple clicks from triggering additional
                 // click events
-                var action = this.mouseBindings.get(new KeyDef(button.button,
+                var action_with_parameter = this.mouseBindings.get(new KeyDef(button.button,
                     button.state & this.accepted_key_mods));
-                if (action != null)
-                    action.activate(null);
+                if (action_with_parameter != null)
+                    action_with_parameter.action.activate(action_with_parameter.parameter);
                 return true;
             } else {
                 return false;
@@ -967,7 +999,11 @@ namespace pdfpc {
         private void readKeyBindings() {
             foreach (var bt in Options.key_bindings) {
                 if (bt.type == "bind") {
-                    bind(bt.keyCode, bt.modMask, bt.actionName);
+                    if (bt.actionArg != null) {
+                        bind(bt.keyCode, bt.modMask, bt.actionName, new GLib.Variant.string(bt.actionArg));
+                    } else {
+                        bind(bt.keyCode, bt.modMask, bt.actionName, null);
+                    }
                 } else if (bt.type == "unbind") {
                     unbind(bt.keyCode, bt.modMask);
                 } else if (bt.type == "unbindall") {
@@ -979,7 +1015,11 @@ namespace pdfpc {
         private void readMouseBindings() {
             foreach (var bt in Options.mouse_bindings) {
                 if (bt.type == "bind") {
-                    bindMouse(bt.keyCode, bt.modMask, bt.actionName);
+                    if (bt.actionArg != null) {
+                        bindMouse(bt.keyCode, bt.modMask, bt.actionName, new GLib.Variant.string(bt.actionArg));
+                    } else {
+                        bindMouse(bt.keyCode, bt.modMask, bt.actionName, null);
+                    }
                 } else if (bt.type == "unbind") {
                     unbindMouse(bt.keyCode, bt.modMask);
                 } else if (bt.type == "unbindall") {

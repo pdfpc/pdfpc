@@ -33,6 +33,22 @@ namespace pdfpc.Drawings {
         public double width {get; set;}
 
         public bool is_eraser {get; set;}
+
+        public Gdk.RGBA get_rgba() {
+            Gdk.RGBA result = Gdk.RGBA();
+            result.red = this.red;
+            result.green = this.green;
+            result.blue = this.blue;
+            result.alpha= this.alpha;
+            return result;
+        }
+
+        public void set_rgba(Gdk.RGBA color) {
+            this.red = color.red;
+            this.green = color.green;
+            this.blue = color.blue;
+            this.alpha = color.alpha;
+        }
         
         public DrawingTool() {
             this.red = 1.0;
@@ -61,7 +77,7 @@ namespace pdfpc.Drawings {
     public class Drawing : Object {
         public int width { get; protected set; }
         public int height { get; protected set; }
-        private Cairo.ImageSurface surface;
+        private Cairo.ImageSurface? surface;
         private Cairo.Context context { get; protected set; }
 
         public DrawingTool pen {get; protected set;}
@@ -92,6 +108,8 @@ namespace pdfpc.Drawings {
             this.eraser.width = this.width / 64.0;
 
             this.current_slide == -1;
+
+            this.set_new_surface();
         }
 
         public Cairo.ImageSurface? render_to_surface() {
@@ -126,6 +144,7 @@ namespace pdfpc.Drawings {
          */
         public void switch_to_slide(int slide_number) {
             if (slide_number != this.current_slide) {
+                if (this.surface != null) 
                 storage.store(this.current_slide, this.surface);
                 Cairo.ImageSurface? from_storage = storage.retrieve(slide_number);
                 if (from_storage == null) {

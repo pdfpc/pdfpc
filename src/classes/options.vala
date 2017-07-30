@@ -172,6 +172,7 @@ namespace pdfpc {
             public uint keyCode;
             public uint modMask;
             public string actionName;
+            public string? actionArg;
         }
 
         /**
