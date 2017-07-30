@@ -16,7 +16,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 r15371"
-   sodipodi:docname="eraser2.svg">
+   sodipodi:docname="eraser.svg">
   <defs
      id="defs2">
     <linearGradient
@@ -36,8 +36,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="9.828125"
-     inkscape:cx="65.322734"
-     inkscape:cy="51.845976"
+     inkscape:cx="36.426073"
+     inkscape:cy="68.125785"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -47,7 +47,8 @@
      inkscape:window-height="1417"
      inkscape:window-x="1920"
      inkscape:window-y="21"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="true">
     <inkscape:grid
        type="xygrid"
        id="grid4485" />
@@ -70,13 +71,13 @@
      id="layer1"
      transform="translate(0,-263.13332)">
     <path
-       style="fill:#434343;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#e0e0e0;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 0,263.13332 v 7.9375 l 7.9375,16.66875 14.2875,-7.9375 -8.995833,-16.66875 z"
        id="path4489"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccc" />
     <path
-       style="fill:#5c5c5c;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#808080;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 7.9375,287.73957 3.439583,6.87917 14.816667,-8.20209 -3.96875,-6.61458 z"
        id="path4495"
        inkscape:connector-curvature="0"
@@ -89,7 +90,7 @@
        x="-1.3229166"
        y="263.13333" />
     <rect
-       style="fill:none;fill-opacity:1;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke:#000000;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke-width:0.52916664;stroke-miterlimit:4;stroke-dasharray:none;stroke:#f9f9f9;stroke-opacity:1"
        id="rect4499"
        width="33.866665"
        height="33.866657"
