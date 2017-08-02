@@ -22,8 +22,8 @@ set, it uses $HOME/.config .
 .PP
 Following commands are aceepted:
 .TP
-.B bind <key> <func>
-Bind a key to a function
+.B bind <key> <func> [<arg>]
+Bind a key to a function, passing a specified argument for functions which require one
 .TP
 .B unbind <key>
 Unbinds the given key
