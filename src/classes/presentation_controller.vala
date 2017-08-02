@@ -592,7 +592,14 @@ namespace pdfpc {
             drawing_enabled = !drawing_enabled;
             if (drawing_enabled) {
                 drawing_present = true;
+                if (this._presenter != null) {
+                    this._presenter.get_window().set_event_compression(false);
+                }
                 current_drawing_tool = overlay_drawing.pen;
+            } else {
+                if (this._presenter != null) {
+                    this.presenter.get_window().set_event_compression(true);
+                }
             }
             hide_or_show_surfaces();
             queue_surface_draws();
