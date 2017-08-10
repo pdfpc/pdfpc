@@ -9,7 +9,7 @@
  * Copyright 2012 Matthias Larisch
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2012 Thomas Tschager
- * Copyright 2015 Andreas Bilke
+ * Copyright 2015,2017 Andreas Bilke
  * Copyright 2015 Andy Barry
  * Copyright 2017 Olivier Pantalé
  *
@@ -113,8 +113,8 @@ namespace pdfpc {
         public Gtk.Image presenter_pointer;
         public Gtk.Image presentation_pointer;
 
-        public Gtk.DrawingArea presenter_surface;
-        public Gtk.DrawingArea presentation_surface;
+        public Gtk.DrawingArea? presenter_surface;
+        public Gtk.DrawingArea? presentation_surface;
 
         /**
          * Key modifiers that we support
@@ -324,63 +324,73 @@ namespace pdfpc {
 
         protected void init_presentation_pointer(Gtk.Allocation a) {
             presentation_allocation = a;
-            presentation_surface = new Gtk.DrawingArea();
-            presentation_surface.set_size_request(a.width, a.height);
+
+            this.presentation_surface = presentation.drawing_surface;
+
             this.presentation_surface.draw.connect ((context) => {
-                    draw_pointer(context, presentation_allocation);
-                    return true;
-                });
-            presentation.add_to_fixed(presentation_surface, a.x, a.y);
+                draw_pointer(context, presentation_allocation);
+                return true;
+            });
         }
 
         protected void init_presenter_pointer(Gtk.Allocation a) {
             presenter_allocation = a;
-            presenter_surface = new Gtk.DrawingArea();
-            presenter_surface.set_size_request(a.width, a.height);
+
+            this.presenter_surface = presenter.drawing_surface;
+            this.presenter_surface.hide();
+
             this.presenter_surface.draw.connect ((context) => {
-                    draw_pointer(context, presenter_allocation);
-                    return true;
-                });
+                draw_pointer(context, presenter_allocation);
+                return true;
+            });
+
             drag_x=-1;
             drag_y=-1;
-            this.presenter_surface.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.presenter_surface.button_press_event.connect((event) => {
-                    drag_x=event.x/presenter_allocation.width;
-                    drag_y=event.y/presenter_allocation.height;
-                    highlight_w=0;
-                    highlight_h=0;
-                    return true;
-                });
-            this.presenter_surface.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
+                drag_x=event.x/presenter_allocation.width;
+                drag_y=event.y/presenter_allocation.height;
+                highlight_w=0;
+                highlight_h=0;
+
+                return true;
+            });
             this.presenter_surface.button_release_event.connect((event) => {
-                    update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
-                    drag_x=-1;
-                    drag_y=-1;
-                    return true;
-                });
-            this.presenter_surface.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
+                update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
+                drag_x=-1;
+                drag_y=-1;
+
+                return true;
+            });
             this.presenter_surface.motion_notify_event.connect(on_move);
-            presenter.add_to_fixed(presenter_surface, a.x, a.y);
+
+            this.presenter_surface.set_events(
+                  Gdk.EventMask.BUTTON_PRESS_MASK
+                | Gdk.EventMask.BUTTON_RELEASE_MASK
+                | Gdk.EventMask.POINTER_MOTION_MASK
+            );
+
             var w = presenter_surface.get_window();
             if (w != null) {
                 w.set_cursor(new Gdk.Cursor.from_name(Gdk.Display.get_default(), "none"));
             }
-            //presenter_surface.show();
-
         }
 
         public void move_pointer(double percent_x, double percent_y) {
             pointer_y = percent_y;
             pointer_x = percent_x;
-            if (presenter!=null) presenter_surface.queue_draw();
-            if (presentation!=null) presentation_surface.queue_draw();
+            if (presenter != null) {
+                presenter_surface.queue_draw();
+            }
+            if (presentation != null) {
+                presentation_surface.queue_draw();
+            }
         }
 
         /**
          * Handle mouse scrolling events on the window and, if neccessary send
          * them to the presentation controller
          */
-        protected bool on_move( Gtk.Widget source, Gdk.EventMotion move ) {
+        protected bool on_move(Gtk.Widget source, Gdk.EventMotion move) {
             move_pointer(move.x / (double) presenter_allocation.width, move.y / (double) presenter_allocation.height);
             update_highlight(move.x/presenter_allocation.width, move.y/presenter_allocation.height);
             return true;
@@ -430,11 +440,19 @@ namespace pdfpc {
         public void toggle_pointers() {
             pointer_enabled = !pointer_enabled;
             if (pointer_enabled) {
-                if (presenter!=null) presenter_surface.show();
-                if (presentation!=null) presentation_surface.show();
+                if (presenter != null) {
+                    presenter_surface.show();
+                }
+                if (presentation != null) {
+                    presentation_surface.show();
+                }
             } else {
-                if (presenter!=null) presenter_surface.hide();
-                if (presentation!=null) presentation_surface.hide();
+                if (presenter != null) {
+                    presenter_surface.hide();
+                }
+                if (presentation != null) {
+                    presentation_surface.hide();
+                }
             }
         }
 
@@ -1348,89 +1366,25 @@ namespace pdfpc {
 #if MOVIES
         /**
          * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
-         * controllable's main view.  Also, return the XID for the view's window,
-         * useful for overlays.
+         * controllable's main view.
          */
-        public uint* overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect, out int gdk_scale) {
+        public void overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect, out int gdk_scale, out Window.Fullscreen window) {
+            window = null;
+
             Controllable c = (n < this.controllables.size) ? this.controllables.get(n) : null;
             // default scale, and make the compiler happy
             gdk_scale = 1;
             if (c == null) {
                 rect = Gdk.Rectangle();
-                return null;
+                return;
             }
-            View.Pdf view = c.main_view;
-            if (view == null) {
+            window = c as Window.Fullscreen;
+            if (c.main_view == null) {
                 rect = Gdk.Rectangle();
-                return null;
+                return;
             }
-            rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
-            gdk_scale = view.scale_factor;
-            return (uint*) ((Gdk.X11.Window) view.get_window()).get_xid();
-        }
-
-        /**
-         * Create a widget corresponding to the Poppler.Rectangle for the nth
-         * controllable's main view, and return it. The widget is automatically
-         * destroyed when the slide changes. Note that the widget might not
-         * have been realized yet right after creation.
-         */
-        public Gtk.Widget overlay_widget(int n, Poppler.Rectangle area) {
-            Controllable c = (n < this.controllables.size) ? this.controllables.get(n) : null;
-            View.Pdf view = c.main_view;
-            Gdk.Rectangle rect = view.convert_poppler_rectangle_to_gdk_rectangle(area);
-
-            var widget = new Gtk.EventBox();
-            widget.set_size_request(rect.width, rect.height);
-            widget.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
-
-            // Find the fixed view that the view belongs to; this could be
-            // improved by refactoring the API. Then add the widget to it.
-            Gtk.Container parent = view.parent;
-            while(parent != null && !(parent is Gtk.Fixed)) {
-                parent = parent.parent;
-            }
-            if(parent == null) {
-                printerr("Warning: Unhandled case in presentation_controller.overlay_pos(): View is not contained in a Gtk.Fixed\n");
-            }
-            else {
-                var allocation = Gtk.Allocation();
-                view.get_allocation(out allocation);
-                (parent as Gtk.Fixed).put(widget, rect.x + allocation.x, rect.y + allocation.y);
-
-                // Pass events on to the underlying view
-                widget.motion_notify_event.connect((event) => {
-                    event.x += allocation.x + rect.x;
-                    event.y += allocation.y + rect.y;
-                    view.motion_notify_event(event);
-                    return true;
-                });
-                widget.button_press_event.connect((event) => {
-                    event.x += allocation.x + rect.x;
-                    event.y += allocation.y + rect.y;
-                    view.button_press_event(event);
-                    return true;
-                });
-                widget.button_release_event.connect((event) => {
-                    event.x += allocation.x + rect.x;
-                    event.y += allocation.y + rect.y;
-                    view.button_release_event(event);
-                    return true;
-                });
-            }
-
-            // Set up automated removal of the widget
-            ulong handler_id = 0;
-            int slide_at_setup = this.current_slide_number;
-            handler_id = this.update_request.connect(() => {
-                if(this.current_slide_number != slide_at_setup) {
-                    widget.destroy();
-                    this.disconnect(handler_id);
-                }
-            });
-
-            widget.show();
-            return widget;
+            rect = c.main_view.convert_poppler_rectangle_to_gdk_rectangle(area);
+            gdk_scale = c.main_view.scale_factor;
         }
 #endif
     }

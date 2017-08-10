@@ -323,13 +323,20 @@ namespace pdfpc.Window {
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
-            this.current_view.halign = Gtk.Align.CENTER;
-            this.current_view.valign = Gtk.Align.CENTER;
+            this.overlay_layout.halign = Gtk.Align.CENTER;
+            this.overlay_layout.valign = Gtk.Align.CENTER;
+            this.overlay_layout.add(this.current_view);
+            this.overlay_layout.add_overlay(this.video_surface);
+            this.overlay_layout.add_overlay(this.drawing_surface);
 
-            fixed_layout.put(current_view, 0, 0);
+            this.overlay_layout.set_size_request(
+                this.main_view.get_renderer().width,
+                this.main_view.get_renderer().height
+            );
+            this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
 
             var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            current_view_and_stricts.pack_start(fixed_layout, false, false, 0);
+            current_view_and_stricts.pack_start(overlay_layout, false, false, 0);
             current_view_and_stricts.pack_start(strict_views, false, false, 0);
 
             slide_views.pack_start(current_view_and_stricts, true, true, 0);
