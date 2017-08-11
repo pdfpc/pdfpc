@@ -742,7 +742,7 @@ namespace pdfpc {
         public void set_last_saved_slide() {
             this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
             this.controllables_update();
-	    presenter.session_saved();
+            presenter.session_saved();
         }
 
         /**

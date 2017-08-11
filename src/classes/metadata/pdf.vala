@@ -264,7 +264,7 @@ namespace pdfpc.Metadata {
             string contents =   format_command_line_options()
                               + format_skips()
                               + format_end_user_slide()
-			      + format_last_saved_slide()
+                              + format_last_saved_slide()
                               + format_font_size()
                               + format_notes();
             try {

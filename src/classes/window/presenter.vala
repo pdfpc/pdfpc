@@ -473,8 +473,8 @@ namespace pdfpc.Window {
             else
                 this.frozen_icon.hide();
             this.faded_to_black = false;
- 	    this.saved_icon.hide();
- 	    this.loaded_icon.hide();
+            this.saved_icon.hide();
+            this.loaded_icon.hide();
         }
 
         /**
