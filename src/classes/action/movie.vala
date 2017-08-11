@@ -173,6 +173,8 @@ namespace pdfpc {
                 movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
                 movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, movie.starttime * Gst.SECOND);
 
+                movie.hide();
+
                 if (autostart) {
                     movie.play();
                 }
@@ -350,6 +352,15 @@ namespace pdfpc {
         }
 
         /**
+         * Hide all video widegts (but receive events for it)
+         */
+        public void hide() {
+            foreach (var sink in this.sinks) {
+                sink.set_opacity(0);
+            }
+        }
+
+        /**
          * If we click outside of the progress bar, toggle the playing state.
          * Inside the progress bar, pause or stop the timeout, and start the
          * drag state.
@@ -478,6 +489,15 @@ namespace pdfpc {
             this.vheight = height;
 
             overlay.query_duration(Gst.Format.TIME, out duration);
+        }
+
+        /**
+         * Show all video widgets
+         */
+        public void show() {
+            foreach (var sink in this.sinks) {
+                sink.set_opacity(1);
+            }
         }
 
         protected void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
@@ -721,6 +741,9 @@ namespace pdfpc {
          * end.
          */
         protected void play() {
+            // force showing the widgets
+            this.show();
+
             this.paused_at = -1;
 
             if (this.eos) {
