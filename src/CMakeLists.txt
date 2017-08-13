@@ -127,7 +127,6 @@ CUSTOM_VAPIS
 
 add_executable(pdfpc
     ${VALA_C}
-    ${VALA_PATHS_C}
 )
 
 # explicitly add libraries (needed e.g. for Fedora 13+)
