@@ -19,13 +19,11 @@ if (MOVIES)
     pkg_check_modules(GSTBASE REQUIRED gstreamer-base-1.0)
     pkg_check_modules(GSTAUDIO REQUIRED gstreamer-audio-1.0)
     pkg_check_modules(GSTVIDEO REQUIRED gstreamer-video-1.0)
-    pkg_check_modules(GDKX11 REQUIRED gdk-x11-3.0)
     set(MOVIE_PACKAGES
         gstreamer-1.0
         gstreamer-base-1.0
         gstreamer-audio-1.0
         gstreamer-video-1.0
-        gdk-x11-3.0
     )
 endif ()
 
@@ -49,7 +47,6 @@ set(CFLAGS
     ${GSTREAMER_CFLAGS} ${GSTREAMER_CFLAGS_OTHER}
     ${GSTINTERFACES_CFLAGS} ${GSTINTERFACES_CFLAGS_OTHER}
     ${GSTVIDEO_CFLAGS} ${GSTVIDEO_CFLAGS_OTHER}
-    ${GDKX11_CFLAGS} ${GDKX11_CFLAGS_OTHER}
 )
 
 set(LIBS
@@ -63,7 +60,6 @@ set(LIBS
     ${GSTREAMER_LIBRARIES}
     ${GSTINTERFACES_LIBRARIES}
     ${GSTVIDEO_LIBRARIES}
-    ${GDKX11_LIBRARIES}
 )
 
 set(LIB_PATHS
@@ -77,7 +73,6 @@ set(LIB_PATHS
     ${GSTREAMER_LIBRARY_DIRS}
     ${GSTINTERFACES_LIBRARY_DIRS}
     ${GSTVIDEO_LIBRARY_DIRS}
-    ${GDKX11_LIBRARY_DIRS}
 )
 
 if(${WITH_X11})
