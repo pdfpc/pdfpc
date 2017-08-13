@@ -90,9 +90,10 @@ add_definitions(${CFLAGS})
 link_libraries(${LIBS})
 link_directories(${LIB_PATHS})
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_SOURCE_DIR}/paths.vala)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_BINARY_DIR}/paths.vala)
 
 file (GLOB_RECURSE VALA_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.vala)
+list(REMOVE_ITEM VALA_SRC paths.vala)
 if (MOVIES)
     set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D MOVIES)
 else ()
@@ -119,10 +120,14 @@ GENERATE_HEADER
     presenter
 GENERATE_VAPI
     presenter
+CUSTOM_VAPIS
+    ${CMAKE_CURRENT_BINARY_DIR}/paths.vala
 )
+
 
 add_executable(pdfpc
     ${VALA_C}
+    ${VALA_PATHS_C}
 )
 
 # explicitly add libraries (needed e.g. for Fedora 13+)
