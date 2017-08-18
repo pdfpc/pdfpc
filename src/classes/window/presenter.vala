@@ -330,8 +330,8 @@ namespace pdfpc.Window {
             this.overlay_layout.add_overlay(this.drawing_surface);
 
             this.overlay_layout.set_size_request(
-                this.main_view.get_renderer().width,
-                this.main_view.get_renderer().height
+                this.main_view.get_renderer().width / this.gdk_scale,
+                this.main_view.get_renderer().height / this.gdk_scale
             );
             this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
 
