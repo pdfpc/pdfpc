@@ -66,9 +66,37 @@ bind 8 togglePointer
 bind 7 decreasePointer
 bind 9 increasePointer
 
+# Drawing
+bind 5 toggleDrawing
+bind 6 clearDrawing
+bind 4 hideDrawing
+
+bind 1 increasePen
+bind 2 toggleEraser
+bind 3 decreasePen
+
 #### Mouse bindings
 mouse 1        next
 mouse S+1      next10
 mouse 2        overview
 mouse 3        prev
 mouse S+3      prev10
+
+# pen colors
+bind S+exclam     setPenColor red
+bind S+at         setPenColor orange
+bind S+numbersign setPenColor yellow
+bind S+dollar     setPenColor green
+bind S+percent    setPenColor blue
+bind S+asciicircum setPenColor violet
+bind S+ampersand  setPenColor black
+bind S+asterisk   setPenColor white
+
+bind S+1 setPenColor red
+bind S+2 setPenColor orange
+bind S+3 setPenColor yellow
+bind S+4 setPenColor green
+bind S+5 setPenColor blue
+bind S+6 setPenColor violet
+bind S+7 setPenColor black
+bind S+8 setPenColor white

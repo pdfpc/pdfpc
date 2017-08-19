@@ -58,7 +58,12 @@ namespace pdfpc.Window {
         /**
          * Drawing area for pointer mode
          */
-        public Gtk.DrawingArea drawing_surface { get; protected set; }
+        public Gtk.DrawingArea pointer_drawing_surface { get; protected set; }
+
+        /**
+         * Drawing area for pen mode
+         */
+        public Gtk.DrawingArea pen_drawing_surface { get; protected set; }
 
         /**
          * Video area for playback. All videos are added to this surface.
@@ -105,11 +110,15 @@ namespace pdfpc.Window {
             this.gdk_scale = this.screen_to_use.get_monitor_scale_factor(this.screen_num_to_use);
 
             this.overlay_layout = new Gtk.Overlay();
-            this.drawing_surface = new Gtk.DrawingArea();
+            this.pointer_drawing_surface = new Gtk.DrawingArea();
+            this.pen_drawing_surface = new Gtk.DrawingArea();
             this.video_surface = new View.Video();
 
-            this.drawing_surface.halign = Gtk.Align.FILL;
-            this.drawing_surface.valign = Gtk.Align.FILL;
+            this.pointer_drawing_surface.halign = Gtk.Align.FILL;
+            this.pointer_drawing_surface.valign = Gtk.Align.FILL;
+
+            this.pen_drawing_surface.halign = Gtk.Align.FILL;
+            this.pen_drawing_surface.valign = Gtk.Align.FILL;
 
             this.video_surface.halign = Gtk.Align.FILL;
             this.video_surface.valign = Gtk.Align.FILL;

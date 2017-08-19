@@ -149,6 +149,24 @@ Decrease pointer size
 .B 9
 Increase pointer size
 .TP
+.B 5
+Toggle Drawing mode
+.TP
+.B 6
+Clear the current drawing
+.TP
+.B 4
+Temporarily hide the current drawing and exit drawing mode
+.TP
+.B 1
+Increase the pen or eraser size for drawing
+.TP
+.B 3
+Decrease the pen or eraser size for drawing
+.TP
+.B 2
+Toggle between the pen and eraser tool for drawing
+.TP
 .B Escape / q
 Exit pdfpc
 .TP
@@ -391,6 +409,25 @@ It is also possible to increase and decrease the pointer size. Additionally
 when the pointer is enabled it is possible to drag & drop some area of the
 presenter screen causing it to be highlighted in both views as well. Area
 outside the selected region will be dimmed.
+
+.SS Drawing Mode
+.PP
+It is possible to turn on a mode which allows drawing over slides with the mouse
+cursor or a connected tablet.  When drawing mode is enabled, drawings can be made on
+the presenter screen. A seperate drawing will be kept in memory for each slide
+(based on user slide numbers, so consolidating overlay slides). Drawings are presently not
+saved between sessions.
+
+In drawing mode, there are two drawing tools, a pen and eraser. An indicator in the
+bottom-left of the presenter screen will indicate which is active. When in pen mode,
+the color and size of the pen will be indicated by the cursor. The pen size can be increased
+or decreased using hot keys specified in the key bindings. When the eraser tool is active,
+the size of the cursor indiates the amount to erase.
+
+The color of the pen can be changed through key or mouse bindings.
+
+If you are using a tablet, the pen or eraser tool will be selected based on whether the tablet
+reports a pen or eraser input device is being used, overriding the normal selection of drawing tool.
 
 .SS pdfpc Files
 .PP
