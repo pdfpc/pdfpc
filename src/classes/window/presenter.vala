@@ -490,30 +490,36 @@ namespace pdfpc.Window {
             }
             this.update_slide_count();
             this.update_note();
-            if (this.timer.is_paused())
+            if (this.timer.is_paused()) {
                 this.pause_icon.show();
-            else
+            } else {
                 this.pause_icon.hide();
-            if (this.presentation_controller.faded_to_black)
+            }
+            if (this.presentation_controller.faded_to_black) {
                 this.blank_icon.show();
-            else
+            } else {
                 this.blank_icon.hide();
-            if (this.presentation_controller.frozen)
+            }
+            if (this.presentation_controller.frozen) {
                 this.frozen_icon.show();
-            else
+            } else {
                 this.frozen_icon.hide();
-            if (this.presentation_controller.is_pointer_active())
+            }
+            if (this.presentation_controller.is_pointer_active()) {
                 this.hilight_icon.show();
-            else
+            } else {
                 this.hilight_icon.hide();
-            if (this.presentation_controller.is_eraser_active())
+            }
+            if (this.presentation_controller.is_eraser_active()) {
                 this.eraser_icon.show();
-            else
+            } else {
                 this.eraser_icon.hide();
-            if (this.presentation_controller.is_pen_active())
+            }
+            if (this.presentation_controller.is_pen_active()) {
                 this.pen_icon.show();
-            else
+            } else {
                 this.pen_icon.hide();
+            }
             this.faded_to_black = false;
             this.saved_icon.hide();
             this.loaded_icon.hide();
