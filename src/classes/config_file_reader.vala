@@ -67,7 +67,7 @@ namespace pdfpc {
         }
 
         private void bindKey(string wholeLine, string[] fields) {
-            if (fields.length != 3) {
+            if (fields.length != 3 && fields.length != 4) {
                 GLib.printerr("Bad key specification: %s\n", wholeLine);
                 return;
             }
@@ -82,6 +82,9 @@ namespace pdfpc {
                 bt.keyCode = keycode;
                 bt.modMask = modMask;
                 bt.actionName = fields[2];
+                if (fields.length > 3) {
+                    bt.actionArg = fields[3];
+                }
                 Options.key_bindings.add(bt);
             }
         }
