@@ -264,7 +264,7 @@ namespace pdfpc.Metadata {
             string contents =   format_command_line_options()
                               + format_skips()
                               + format_end_user_slide()
-			      + format_last_saved_slide()
+                              + format_last_saved_slide()
                               + format_font_size()
                               + format_notes();
             try {
@@ -544,7 +544,24 @@ namespace pdfpc.Metadata {
             }
         }
 
+        /**
+         * The user slide corresponding to a real slide.
+         *
+         * If number is larger than the number of real slides return the
+         * number of user slides.
+         */
         public int real_slide_to_user_slide(int number) {
+
+            // is this not a valid page?
+            if (number > this.page_count) {
+                return (int)this.get_user_slide_count();
+            }
+
+            // is number a real page of the last user page?
+            if (number >= this.user_view_indexes[this.get_user_slide_count()-1]) {
+                return (int)this.get_user_slide_count()-1;
+            }
+
             // Here we could do a binary search
             int user_slide = 0;
             for (int u = 0; u < this.get_user_slide_count(); ++u) {

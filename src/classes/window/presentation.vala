@@ -6,7 +6,7 @@
  * Copyright (C) 2010-2011 Jakob Westhoff <jakob@westhoffswelt.de>
  * Copyright 2011-2012 David Vilar
  * Copyright 2012, 2015 Robert Schroll
- * Copyright 2012, 2015 Andreas Bilke
+ * Copyright 2012, 2015, 2017 Andreas Bilke
  * Copyright 2013 Gabor Adam Toth
  * Copyright 2014 Andy Barry
  *
@@ -73,8 +73,19 @@ namespace pdfpc.Window {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
-            this.add(fixed_layout);
-            fixed_layout.put(this.view, scale_rect.x, scale_rect.y);
+            this.overlay_layout.halign = Gtk.Align.CENTER;
+            this.overlay_layout.valign = Gtk.Align.CENTER;
+            this.overlay_layout.add(this.view);
+            this.overlay_layout.add_overlay(this.video_surface);
+            this.overlay_layout.add_overlay(this.pen_drawing_surface);
+            this.overlay_layout.add_overlay(this.pointer_drawing_surface);
+
+            this.overlay_layout.set_size_request(
+                this.main_view.get_renderer().width,
+                this.main_view.get_renderer().height
+            );
+
+            this.add(overlay_layout);
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);

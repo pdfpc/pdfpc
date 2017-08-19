@@ -71,10 +71,6 @@ see
 see
 .B pdfpcrc(5)
 .TP
-.B gstreamer-pipeline
-Video rendering methods. Valid values are \fIxvimagesink\fR and \fIglimagesink\fR. (Default
-xvimagesink)
-.TP
 .B next-height
 Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
 .TP

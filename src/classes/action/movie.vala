@@ -5,7 +5,7 @@
  *
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2014-2015 Séverin Lemaignan
- * Copyright 2015 Andreas Bilke
+ * Copyright 2015,2017 Andreas Bilke
  * Copyright 2016 Andy Barry
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,16 @@ namespace pdfpc {
     }
 
     /**
+     * Datatype to hold video configuration (like size, pos, parent window)
+     */
+    public class VideoConf : Object {
+        public int display_num { get; set; }
+        public Gdk.Rectangle rect { get; set; }
+        public Window.Fullscreen window { get; set; }
+        public int gdk_scale { get; set; }
+    }
+
+    /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
     public Gst.Element gst_element_make(string factoryname, string? name) throws PipelineError {
@@ -45,13 +55,19 @@ namespace pdfpc {
     }
 
     /**
-     * A movie with basic controls -- click to start and stop.
+     * A Movie with overlaid controls; specifically a draggable progress bar.
      */
-    public class Movie: ActionMapping {
+    public class ControlledMovie: ActionMapping {
         /**
          * The gstreamer pipeline for playback.
          */
-        public Gst.Element pipeline;
+        protected Gst.Element pipeline;
+
+        /**
+         * Stores the gtk sink widgets for later removal from
+         * the layout
+         */
+        protected Gee.List<Gtk.Widget> sinks;
 
         /**
          * A flag to indicate when we've reached the End Of Stream, so we
@@ -86,32 +102,67 @@ namespace pdfpc {
          * file, whose name we store here.  If not, this will be the blank string.
          */
         protected string temp;
+        /**
+         * The screen rectangle associated with the movie.
+         */
+        protected Gdk.Rectangle rect;
 
         /**
-         * Base constructor does nothing.
+         * Data on how the movie playback must fit on the page.
          */
-        public Movie() {
-            base();
+        protected double scalex;
+        protected double scaley;
+        protected int vheight;
+
+        /**
+         * The length of the movie, in nanoseconds (!).
+         */
+        protected int64 duration;
+
+        /**
+         * Settings for the appearance of the progress bar.
+         */
+        protected double seek_bar_height = 20;
+        protected double seek_bar_padding = 2;
+
+        /**
+         * Flags about the current state of mouse interaction.
+         */
+        protected bool in_seek_bar = false;
+        protected bool mouse_drag = false;
+        protected bool drag_was_playing;
+
+        /**
+         * The position where we switched to pause mode
+         */
+        protected int64 paused_at = -1;
+
+        construct {
+            this.sinks = new Gee.ArrayList<Gtk.Widget>();
         }
 
+        ~ControlledMovie() {
+            if (this.pipeline != null) {
+                this.pipeline.set_state(Gst.State.NULL);
+            }
+        }
+
+
         /**
-         * This initializer is odd -- it's called from an other object from the
-         * one your are initializing.  This is so subclasses can override this
-         * to do custom initialization without having to implement the new_from_...
-         * methods.  This can't be a good way to handle this, but I've yet to figure
-         * out a better one.
+         * Inits  the movie
          */
-        public virtual void init_other(ActionMapping other, Poppler.Rectangle area,
+        public void init_movie(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
                 string uri, bool autostart, bool loop, bool noprogress, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
             other.init(area, controller, document);
-            Movie movie = (Movie) other;
+            ControlledMovie movie = (ControlledMovie) other;
             movie.loop = loop;
             movie.noprogress = noprogress;
             movie.noaudio = noaudio;
             movie.starttime = start;
             movie.stoptime = stop;
             movie.temp = temp ? uri.substring(7) : "";
+
             GLib.Idle.add( () => {
                 movie.establish_pipeline(uri);
 
@@ -121,6 +172,8 @@ namespace pdfpc {
                 // waits until the pipeline is actually in PAUSED mode
                 movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
                 movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, movie.starttime * Gst.SECOND);
+
+                movie.hide();
 
                 if (autostart) {
                     movie.play();
@@ -183,7 +236,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, autostart, loop, noprogress, noaudio, start, stop);
+            this.init_movie(new_obj, mapping.area, controller, document, uri, autostart, loop, noprogress, noaudio, start, stop);
             return new_obj;
         }
 
@@ -214,6 +267,7 @@ namespace pdfpc {
             string uri;
             bool temp = false;
             bool noprogress = false;
+            bool loop = false;
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents())) {
@@ -276,188 +330,8 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_other(new_obj, mapping.area, controller, document, uri, false, false, noprogress, false, 0, 0, temp);
+            this.init_movie(new_obj, mapping.area, controller, document, uri, false, loop, noprogress, false, 0, 0, temp);
             return new_obj;
-        }
-
-        /**
-         * Set up the gstreamer pipeline.
-         */
-        protected void establish_pipeline(string uri) {
-            Gst.Bin bin = new Gst.Bin("bin");
-            Gst.Element tee = Gst.ElementFactory.make("tee", "tee");
-            bin.add_many(tee);
-            bin.add_pad(new Gst.GhostPad("sink", tee.get_static_pad("sink")));
-            Gdk.Rectangle rect;
-            int n = 0;
-            uint* xid;
-            int gdk_scale;
-            while (true) {
-                xid = this.controller.overlay_pos(n, this.area, out rect, out gdk_scale);
-                if (xid == null) {
-                    break;
-                }
-                Gst.Element sink;
-
-                switch(Options.gstreamer_pipeline) {
-                    case Options.GstreamerPipeline.XVIMAGESINK:
-                        sink = Gst.ElementFactory.make("xvimagesink", @"sink$n");
-                        break;
-                    case Options.GstreamerPipeline.GLIMAGESINK:
-                        sink = Gst.ElementFactory.make("glimagesink", @"sink$n");
-                        break;
-                    default:
-                        GLib.printerr("Invalid gstreamer-pipeline selected. Falling back to autovideosink.\n");
-                        sink = Gst.ElementFactory.make("autovideosink", @"sink$n");
-                        break;
-                }
-
-                Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
-                bin.add_many(queue,sink);
-                tee.link(queue);
-                Gst.Element ad_element = this.link_additional(n, queue, bin, rect);
-                ad_element.link(sink);
-                sink.set("force_aspect_ratio", false);
-                Gst.Video.Overlay xoverlay = (Gst.Video.Overlay) sink;
-
-                if(Options.gstreamer_pipeline == Options.GstreamerPipeline.GLIMAGESINK) {
-                    var overlay_widget = this.controller.overlay_widget(n, this.area);
-                    if (overlay_widget.get_realized()) {
-                        xoverlay.set_window_handle((uint*)((Gdk.X11.Window) overlay_widget.get_window()).get_xid());
-                    }
-                    else {
-                        overlay_widget.realize.connect((event) => {
-                            xoverlay.set_window_handle((uint*)((Gdk.X11.Window) overlay_widget.get_window()).get_xid());
-                        });
-                    }
-                }
-                else if(Options.gstreamer_pipeline == Options.GstreamerPipeline.XVIMAGESINK) {
-                    xoverlay.set_window_handle(xid);
-                    xoverlay.set_render_rectangle(rect.x*gdk_scale, rect.y*gdk_scale,
-                                                  rect.width*gdk_scale, rect.height*gdk_scale);
-                }
-                xoverlay.handle_events(false);
-                n++;
-            }
-
-            this.pipeline = Gst.ElementFactory.make("playbin", "playbin");
-            this.pipeline.set("uri", uri);
-            this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
-            this.pipeline.set("video_sink", bin);
-            this.pipeline.set("mute", this.noaudio);
-            Gst.Bus bus = this.pipeline.get_bus();
-            bus.add_signal_watch();
-            bus.message["error"] += this.on_message;
-            bus.message["eos"] += this.on_eos;
-        }
-
-        /**
-         * Provides a place for subclasses to hook additional elements into
-         * the pipeline.  n is which output we're dealing with; 0 is where
-         * specialized controls should appear.  Additional elements should
-         * be added to bin and linked from source.  The last element linked
-         * should be returned, so that the tail end of the pipeline can be
-         * attached.
-         *
-         * This stub does nothing.
-         */
-        protected virtual Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
-                                                      Gdk.Rectangle rect) {
-            return source;
-        }
-
-        /**
-         * Utility function for converting filenames to uris. If file
-         * is not an absolute path, use the pdf file location as a base
-         * directory.
-         */
-        public string filename_to_uri(string file, string pdf_fname) {
-            Regex uriRE = null;
-            try {
-                uriRE = new Regex("^[a-z]*://");
-            } catch (Error error) {
-                // Won't happen
-            }
-            if (uriRE.match(file)) {
-                return file;
-            }
-            if (GLib.Path.is_absolute(file)) {
-                return "file://" + file;
-            }
-
-            string dirname = GLib.Path.get_dirname(pdf_fname);
-            return "file://" + Posix.realpath(GLib.Path.build_filename(dirname, file));
-        }
-
-        /**
-         * Play the movie, rewinding to the beginning if we had reached the
-         * end.
-         */
-        public virtual void play() {
-            if (this.eos) {
-                this.eos = false;
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
-            }
-            this.pipeline.set_state(Gst.State.PLAYING);
-        }
-
-        /**
-         * Pause playback.
-         */
-        public virtual void pause() {
-            this.pipeline.set_state(Gst.State.PAUSED);
-        }
-
-        /**
-         * Stop playback.
-         */
-        public virtual void stop() {
-            this.pipeline.set_state(Gst.State.NULL);
-        }
-
-        /**
-         * Pause if playing, as vice versa.
-         */
-        public virtual void toggle_play() {
-            Gst.State state;
-            Gst.ClockTime time = Gst.Util.get_timestamp();
-            this.pipeline.get_state(out state, null, time);
-            if (state == Gst.State.PLAYING) {
-                this.pause();
-            } else {
-                this.play();
-            }
-        }
-
-        /**
-         * Basic printout of error messages on the pipeline.
-         */
-        public virtual void on_message(Gst.Bus bus, Gst.Message message) {
-            GLib.Error err;
-            string debug;
-            message.parse_error(out err, out debug);
-            GLib.printerr("Gstreamer error %s\n", err.message);
-        }
-
-        /**
-         * Mark reaching the end of stream, and set state to paused.
-         */
-        public virtual void on_eos(Gst.Bus bus, Gst.Message message) {
-            if (this.loop) {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
-            } else {
-                // Can't seek to beginning w/o updating output, so mark to seek later
-                this.eos = true;
-                this.pause();
-            }
-        }
-
-        /**
-         * Play and pause on mouse clicks.
-         */
-        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
-            this.toggle_play();
-            return true;
         }
 
         /**
@@ -470,145 +344,66 @@ namespace pdfpc {
                     GLib.printerr("Problem deleting temp file %s\n", this.temp);
                 }
             }
-        }
-    }
 
-    /**
-     * A Movie with overlaid controls; specifically a draggable progress bar.
-     */
-    public class ControlledMovie: Movie {
-        /**
-         * The screen rectangle associated with the movie.
-         */
-        protected Gdk.Rectangle rect;
-
-        /**
-         * Data on how the movie playback must fit on the page.
-         */
-        protected double scalex;
-        protected double scaley;
-        protected int vheight;
-
-        /**
-         * The length of the movie, in nanoseconds (!).
-         */
-        protected int64 duration;
-
-        /**
-         * Settings for the appearance of the progress bar.
-         */
-        protected double seek_bar_height = 20;
-        protected double seek_bar_padding = 2;
-
-        /**
-         * Flags about the current state of mouse interaction.
-         */
-        protected bool in_seek_bar = false;
-        protected bool mouse_drag = false;
-        protected bool drag_was_playing;
-
-        /**
-         * The position where we switched to pause mode
-         */
-        protected int64 paused_at = -1;
-
-        /**
-         * Basic constructor does nothing.
-         */
-        public ControlledMovie() {
-            base();
-        }
-
-        /**
-         * The initialization unique to this class.  See the documentation for
-         * Movie.init_other that attempts to justify this ugliness.
-         */
-        public override void init_other(ActionMapping other, Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document, string file,
-                bool autostart, bool loop, bool noprogress, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
-            base.init_other(other, area, controller, document, file, autostart, loop, noprogress, noaudio, start, stop, temp);
-            ControlledMovie movie = (ControlledMovie) other;
-            controller.main_view.motion_notify_event.connect(movie.on_motion);
-            controller.main_view.button_release_event.connect(movie.on_button_release);
-        }
-
-        /**
-         * Hook up the elements to draw the controls to the first output leg.
-         */
-        protected override Gst.Element link_additional(int n, Gst.Element source, Gst.Bin bin,
-                Gdk.Rectangle rect) {
-            // setup overlay (video controls) for the presenter
-            if (n == 0) {
-                dynamic Gst.Element overlay;
-                Gst.Element adaptor2;
-                try {
-                    var scale = gst_element_make("videoscale", null);
-                    var rate = gst_element_make("videorate", null);
-                    var adaptor1 = gst_element_make("videoconvert", null);
-                    adaptor2 = gst_element_make("videoconvert", null);
-                    overlay = gst_element_make("cairooverlay", null);
-                    var caps = Gst.Caps.from_string(
-                        "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
-                        "framerate=[25/1,2147483647/1]," + // At least 25 fps
-                        @"width=$(rect.width),height=$(rect.height)"
-                    );
-                    var filter = gst_element_make("capsfilter", null);
-                    filter.set("caps", caps);
-                    bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
-                    if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2)) {
-                        throw new PipelineError.Linking("Could not link pipeline.");
-                    }
-                } catch (PipelineError err) {
-                    GLib.printerr("Error creating control pipeline: %s\n", err.message);
-                    return source;
-                }
-
-                this.rect = rect;
-                overlay.draw.connect(this.on_draw);
-                overlay.caps_changed.connect(this.on_prepare);
-
-                return adaptor2;
-            } else { // for the rest, set the proper resolution
-                Gst.Element adaptor2;
-                try {
-                    var scale = gst_element_make("videoscale", null);
-                    var rate = gst_element_make("videorate", null);
-                    var adaptor1 = gst_element_make("videoconvert", null);
-                    adaptor2 = gst_element_make("videoconvert", null);
-                    var caps = Gst.Caps.from_string(
-                        "video/x-raw," +
-                        "framerate=[25/1,2147483647/1]," + // At least 25 fps
-                        @"width=$(rect.width),height=$(rect.height)"
-                    );
-                    var filter = gst_element_make("capsfilter", null);
-                    filter.set("caps", caps);
-                    bin.add_many(adaptor1, adaptor2, scale, rate, filter);
-                    if (!source.link_many(rate, scale, adaptor1, filter, adaptor2)) {
-                        throw new PipelineError.Linking("Could not link pipeline.");
-                    }
-                } catch (PipelineError err) {
-                    GLib.printerr("Error creating control pipeline: %s\n", err.message);
-                    return source;
-                }
-
-                return adaptor2;
+            foreach (var sink in this.sinks) {
+                var parent = sink.parent as View.Video;
+                parent.remove_video(sink);
             }
         }
 
         /**
-         * When we find out the properties of the movie, we can work out how it
-         * needs to be scaled to fit in the alloted area.  (This is only important
-         * for the view with the controls.)
+         * Hide all video widegts (but receive events for it)
          */
-        public void on_prepare(Gst.Element overlay, Gst.Caps caps) {
-            var info = new Gst.Video.Info();
-            info.from_caps(caps);
-            int width = info.width, height = info.height;
-            this.scalex = (double) width / rect.width;
-            this.scaley = (double) height / rect.height;
-            this.vheight = height;
+        public void hide() {
+            foreach (var sink in this.sinks) {
+                sink.set_opacity(0);
+            }
+        }
 
-            overlay.query_duration(Gst.Format.TIME, out duration);
+        /**
+         * If we click outside of the progress bar, toggle the playing state.
+         * Inside the progress bar, pause or stop the timeout, and start the
+         * drag state.
+         */
+        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+            Gst.State state;
+            Gst.ClockTime time = Gst.Util.get_timestamp();
+            this.pipeline.get_state(out state, null, time);
+            if (state == Gst.State.NULL) {
+                this.toggle_play();
+                return true;
+            }
+
+            this.set_mouse_in(event.x, event.y);
+            if (!this.in_seek_bar) {
+                this.toggle_play();
+            } else {
+                this.mouse_drag = true;
+                this.drag_was_playing = (this.pipeline.current_state == Gst.State.PLAYING);
+                this.pause();
+                this.mouse_seek(event.x, event.y);
+            }
+
+            return true;
+        }
+
+        /**
+         * Stop the drag state and restart either playback or the timeout,
+         * depending on the previous state.
+         */
+        public bool on_button_release(Gdk.EventButton event) {
+            this.set_mouse_in(event.x, event.y);
+            if (this.mouse_drag) {
+                var seek_time = this.mouse_seek(event.x, event.y);
+                if (this.drag_was_playing || this.eos) {
+                    this.eos = false;
+                    this.play();
+                } else {
+                    this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
+                }
+            }
+            this.mouse_drag = false;
+            return false;
         }
 
         /**
@@ -643,8 +438,69 @@ namespace pdfpc {
 
         }
 
+        /**
+         * Mark reaching the end of stream, and set state to paused.
+         */
+        public void on_eos(Gst.Bus bus, Gst.Message message) {
+            if (this.loop) {
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+            } else {
+                // Can't seek to beginning w/o updating output, so mark to seek later
+                this.eos = true;
+                this.pause();
+            }
+        }
 
-        private void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
+        /**
+         * Basic printout of error messages on the pipeline.
+         */
+        public void on_message(Gst.Bus bus, Gst.Message message) {
+            GLib.Error err;
+            string debug;
+            message.parse_error(out err, out debug);
+            GLib.printerr("Gstreamer error %s\n", err.message);
+        }
+
+        /**
+         * Seek if we're dragging the progress bar.
+         */
+        public bool on_motion(Gdk.EventMotion event) {
+            this.set_mouse_in(event.x, event.y);
+            if (this.mouse_drag) {
+                this.mouse_seek(event.x, event.y);
+            } else if (this.paused_at >= 0 || this.eos) {
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.paused_at);
+            }
+
+            return false;
+        }
+
+        /**
+         * When we find out the properties of the movie, we can work out how it
+         * needs to be scaled to fit in the alloted area.  (This is only important
+         * for the view with the controls.)
+         */
+        public void on_prepare(Gst.Element overlay, Gst.Caps caps) {
+            var info = new Gst.Video.Info();
+            info.from_caps(caps);
+            int width = info.width, height = info.height;
+            this.scalex = (double) width / rect.width;
+            this.scaley = (double) height / rect.height;
+            this.vheight = height;
+
+            overlay.query_duration(Gst.Format.TIME, out duration);
+        }
+
+        /**
+         * Show all video widgets
+         */
+        public void show() {
+            foreach (var sink in this.sinks) {
+                sink.set_opacity(1);
+            }
+        }
+
+        protected void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
             double start = (double) this.starttime*Gst.SECOND / this.duration;
             double stop = (double) this.stoptime*Gst.SECOND / this.duration;
 
@@ -720,18 +576,151 @@ namespace pdfpc {
         }
 
         /**
-         * Set a flag about whether the mouse is currently in the progress bar.
+         * Set up the gstreamer pipeline.
          */
-        private void set_mouse_in(double mx, double my, out double x, out double y) {
-            x = mx - rect.x;
-            y = rect.y + rect.height - my;
-            this.in_seek_bar = (x > 0 && x < rect.width && y > 0 && y < seek_bar_height);
+        protected void establish_pipeline(string uri) {
+            Gst.Bin bin = new Gst.Bin("bin");
+            Gst.Element tee = Gst.ElementFactory.make("tee", "tee");
+            bin.add_many(tee);
+            bin.add_pad(new Gst.GhostPad("sink", tee.get_static_pad("sink")));
+            int n = 0;
+
+            Gee.List<VideoConf> video_confs = new Gee.ArrayList<VideoConf>();
+            while (true) {
+                Gdk.Rectangle rect;
+                int gdk_scale;
+                Window.Fullscreen window;
+                this.controller.overlay_pos(n, this.area, out rect, out gdk_scale, out window);
+                if (window == null) {
+                    break;
+                }
+                VideoConf conf = new VideoConf() {
+                    display_num = n,
+                    rect = rect,
+                    window = window,
+                    gdk_scale = gdk_scale
+                };
+                video_confs.add(conf);
+
+                n++;
+            }
+            video_confs.sort((a, b) => {
+                if (a.rect.width == b.rect.width) {
+                    return 0;
+                } else if (a.rect.width < b.rect.width) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            });
+
+            var largest_rect = video_confs.last().rect;
+
+            foreach (var conf in video_confs) {
+                Gst.Element sink = Gst.ElementFactory.make("gtksink", @"sink$n");
+                Gtk.Widget video_area;
+                sink.get("widget", out video_area);
+                Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
+                bin.add_many(queue, sink);
+                tee.link(queue);
+                if (conf.display_num == 0) {
+                    Gst.Element ad_element = this.add_video_control(queue, bin, conf.rect, largest_rect);
+                    ad_element.link(sink);
+
+                    video_area.add_events(
+                          Gdk.EventMask.BUTTON_PRESS_MASK
+                        | Gdk.EventMask.BUTTON_RELEASE_MASK
+                        | Gdk.EventMask.POINTER_MOTION_MASK
+                    );
+                    video_area.motion_notify_event.connect(this.on_motion);
+                    video_area.button_press_event.connect(this.on_button_press);
+                    video_area.button_release_event.connect(this.on_button_release);
+                } else {
+                    queue.link(sink);
+                }
+                sink.set("force_aspect_ratio", false);
+
+                conf.window.video_surface.add_video(video_area, conf.rect);
+                this.sinks.add(video_area);
+
+                n++;
+            }
+
+            this.pipeline = Gst.ElementFactory.make("playbin", "playbin");
+            this.pipeline.set("uri", uri);
+            this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
+            this.pipeline.set("video_sink", bin);
+            this.pipeline.set("mute", this.noaudio);
+            Gst.Bus bus = this.pipeline.get_bus();
+            bus.add_signal_watch();
+            bus.message["error"] += this.on_message;
+            bus.message["eos"] += this.on_eos;
+
+            Gst.Debug.bin_to_dot_file(bin, Gst.DebugGraphDetails.ALL, "pipeline");
+        }
+
+        /**
+         * Utility function for converting filenames to uris. If file
+         * is not an absolute path, use the pdf file location as a base
+         * directory.
+         */
+        protected string filename_to_uri(string file, string pdf_fname) {
+            Regex uriRE = null;
+            try {
+                uriRE = new Regex("^[a-z]*://");
+            } catch (Error error) {
+                // Won't happen
+            }
+            if (uriRE.match(file)) {
+                return file;
+            }
+            if (GLib.Path.is_absolute(file)) {
+                return "file://" + file;
+            }
+
+            string dirname = GLib.Path.get_dirname(pdf_fname);
+            return "file://" + Posix.realpath(GLib.Path.build_filename(dirname, file));
+        }
+
+        /**
+         * Hook up the elements to draw the controls to the first output leg.
+         */
+        protected Gst.Element add_video_control(Gst.Element source, Gst.Bin bin, Gdk.Rectangle rect, Gdk.Rectangle video_size_rect) {
+            dynamic Gst.Element overlay;
+            Gst.Element adaptor2;
+            try {
+                var scale = gst_element_make("videoscale", null);
+                var rate = gst_element_make("videorate", null);
+                var adaptor1 = gst_element_make("videoconvert", null);
+                adaptor2 = gst_element_make("videoconvert", null);
+                overlay = gst_element_make("cairooverlay", null);
+                var caps = Gst.Caps.from_string(
+                    "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
+                    "framerate=[25/1,2147483647/1]," + // At least 25 fps
+                    @"width=$(video_size_rect.width),height=$(video_size_rect.height)"
+                );
+                var filter = gst_element_make("capsfilter", null);
+                filter.set("caps", caps);
+                bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
+                if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2)) {
+                    throw new PipelineError.Linking("Could not link pipeline.");
+                }
+            } catch (PipelineError err) {
+                GLib.printerr("Error creating control pipeline: %s\n", err.message);
+                return source;
+            }
+
+            this.rect = rect;
+            overlay.draw.connect(this.on_draw);
+            overlay.caps_changed.connect(this.on_prepare);
+
+            return adaptor2;
         }
 
         /**
          * Seek to the time indicated by the mouse's position on the progress bar.
          */
-        public int64 mouse_seek(double x, double y) {
+        protected int64 mouse_seek(double x, double y) {
             double seek_fraction = (x - this.seek_bar_padding) / (rect.width -
                 2 * this.seek_bar_padding);
             if (seek_fraction < 0) {
@@ -747,84 +736,60 @@ namespace pdfpc {
             }
             return seek_time;
         }
-
         /**
-         * Seek if we're dragging the progress bar.
+         * Play the movie, rewinding to the beginning if we had reached the
+         * end.
          */
-        public bool on_motion(Gdk.EventMotion event) {
-            double x, y;
-            this.set_mouse_in(event.x, event.y, out x, out y);
-            if (this.mouse_drag) {
-                this.mouse_seek(x, y);
-            } else if (this.paused_at >= 0 || this.eos) {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.paused_at);
-            }
-            return false;
-        }
+        protected void play() {
+            // force showing the widgets
+            this.show();
 
-        /**
-         * If we click outside of the progress bar, toggle the playing state.
-         * Inside the progress bar, pause or stop the timeout, and start the
-         * drag state.
-         */
-        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
-            Gst.State state;
-            Gst.ClockTime time = Gst.Util.get_timestamp();
-            this.pipeline.get_state(out state, null, time);
-            if (state == Gst.State.NULL || widget != this.controller.main_view) {
-                this.toggle_play();
-                return true;
-            }
-
-            double x, y;
-            this.set_mouse_in(event.x, event.y, out x, out y);
-            if (!this.in_seek_bar) {
-                this.toggle_play();
-            } else {
-                this.mouse_drag = true;
-                this.drag_was_playing = (this.pipeline.current_state == Gst.State.PLAYING);
-                this.pause();
-                this.mouse_seek(x, y);
-            }
-            return true;
-        }
-
-        /**
-         * Stop the drag state and restart either playback or the timeout,
-         * depending on the previous state.
-         */
-        public bool on_button_release(Gdk.EventButton event) {
-            double x, y;
-            this.set_mouse_in(event.x, event.y, out x, out y);
-            if (this.mouse_drag) {
-                var seek_time = this.mouse_seek(x, y);
-                if (this.drag_was_playing || this.eos) {
-                    this.eos = false;
-                    this.play();
-                } else {
-                    this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, seek_time);
-                }
-            }
-            this.mouse_drag = false;
-            return false;
-        }
-
-        /**
-         * Store that we are no longer pausing
-         */
-        public override void play() {
             this.paused_at = -1;
-            base.play();
+
+            if (this.eos) {
+                this.eos = false;
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+            }
+            this.pipeline.set_state(Gst.State.PLAYING);
         }
 
         /**
-         * Store that we are pausing
+         * Pause playback.
          */
-        public override void pause() {
-            base.pause();
+        protected void pause() {
+            this.pipeline.set_state(Gst.State.PAUSED);
+
             this.pipeline.query_position(Gst.Format.TIME, out this.paused_at);
             if (this.eos) {
                 this.paused_at -= 1;
+            }
+        }
+
+        /**
+         * Set a flag about whether the mouse is currently in the progress bar.
+         */
+        private void set_mouse_in(double x, double y) {
+            this.in_seek_bar = (x > 0 && x < rect.width && (rect.height - y) > 0 && (rect.height - y) < seek_bar_height);
+        }
+
+        /**
+         * Stop playback.
+         */
+        public virtual void stop() {
+            this.pipeline.set_state(Gst.State.NULL);
+        }
+
+        /**
+         * Pause if playing, as vice versa.
+         */
+        protected void toggle_play() {
+            Gst.State state;
+            Gst.ClockTime time = Gst.Util.get_timestamp();
+            this.pipeline.get_state(out state, null, time);
+            if (state == Gst.State.PLAYING) {
+                this.pause();
+            } else {
+                this.play();
             }
         }
     }

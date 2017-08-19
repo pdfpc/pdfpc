@@ -50,13 +50,25 @@ namespace pdfpc.Window {
         protected bool faded_to_black = false;
 
         /**
-         * Fixed layout
+         * Overlay layout. Holds all drawing layers (like the pdf,
+         * the pointer mode etc)
          */
-        protected Gtk.Fixed fixed_layout;
+        protected Gtk.Overlay overlay_layout;
 
-        public void add_to_fixed(Gtk.Widget w, int x, int y) {
-            this.fixed_layout.put(w, x, y);
-        }
+        /**
+         * Drawing area for pointer mode
+         */
+        public Gtk.DrawingArea pointer_drawing_surface { get; protected set; }
+
+        /**
+         * Drawing area for pen mode
+         */
+        public Gtk.DrawingArea pen_drawing_surface { get; protected set; }
+
+        /**
+         * Video area for playback. All videos are added to this surface.
+         */
+        public View.Video video_surface { get; protected set; }
 
         /**
          * Stores if the view is frozen
@@ -97,7 +109,19 @@ namespace pdfpc.Window {
 
             this.gdk_scale = this.screen_to_use.get_monitor_scale_factor(this.screen_num_to_use);
 
-            this.fixed_layout = new Gtk.Fixed();
+            this.overlay_layout = new Gtk.Overlay();
+            this.pointer_drawing_surface = new Gtk.DrawingArea();
+            this.pen_drawing_surface = new Gtk.DrawingArea();
+            this.video_surface = new View.Video();
+            
+            this.pointer_drawing_surface.halign = Gtk.Align.FILL;
+            this.pointer_drawing_surface.valign = Gtk.Align.FILL;
+
+            this.pen_drawing_surface.halign = Gtk.Align.FILL;
+            this.pen_drawing_surface.valign = Gtk.Align.FILL;
+
+            this.video_surface.halign = Gtk.Align.FILL;
+            this.video_surface.valign = Gtk.Align.FILL;
 
             // Make the window resizable to allow the window manager
             // to correctly fit it to the screen. (Note: allegedly

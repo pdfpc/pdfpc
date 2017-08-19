@@ -1,5 +1,4 @@
 * {
-    background-color: black;
     background-image: none;
     border: none;
     color: white;
@@ -33,6 +32,14 @@ GtkProgressBar {
 
 GtkProgressBar * {
     background-color: blue;
+}
+
+GtkEntry, GtkIconView, GtkTextView, GtkWindow {
+    background-color: black;
+}
+
+entry, iconview, textview *, window {
+    background-color: black;
 }
 
 /* The bottom text is automatically sized based on the resolution of
