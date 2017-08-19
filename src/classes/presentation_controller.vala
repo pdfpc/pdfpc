@@ -55,6 +55,11 @@ namespace pdfpc {
         public bool faded_to_black { get; protected set; default = false; }
 
         /**
+         * Stores if the view is hidden
+         */
+        public bool hidden { get; protected set; default = false; }
+
+        /**
          * Stores if the view is frozen
          */
         public bool frozen { get; protected set; default = false; }
@@ -522,6 +527,7 @@ namespace pdfpc {
                 if (!this.frozen)
                     this.toggle_freeze();
                 });
+            add_action("hide", this.hide_presentation);
 
             add_action("overlay", this.toggle_skip);
             add_action("note", this.controllables_edit_note);
@@ -1258,6 +1264,14 @@ namespace pdfpc {
          */
         protected void fade_to_black() {
             this.faded_to_black = !this.faded_to_black;
+            this.controllables_update();
+        }
+
+        /**
+         * Hide the presentation window
+         */
+        protected void hide_presentation() {
+            this.hidden = !this.hidden;
             this.controllables_update();
         }
 
