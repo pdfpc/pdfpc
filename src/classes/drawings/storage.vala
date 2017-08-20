@@ -30,7 +30,7 @@ namespace pdfpc.Drawings.Storage {
      * them.
      */
     public abstract class Base {
-        /** 
+        /**
          * Metadata object to provide drawing storage for
          */
         protected Metadata.Pdf metadata;
@@ -43,12 +43,12 @@ namespace pdfpc.Drawings.Storage {
          * Store an overlay drawing with the given index as an identifier.
          */
         public abstract void store(uint index, Cairo.ImageSurface surface);
-       
+
         /**
          * Retrieve an overlay drawing from storage, or null if none was made.
          *
          * The returned reference can be modified without modifying the storage.
-         */ 
+         */
         public abstract Cairo.ImageSurface? retrieve(uint index);
     }
 
@@ -62,7 +62,7 @@ namespace pdfpc.Drawings.Storage {
          * Initialize the storage
          */
         public MemoryUncompressed( Metadata.Pdf metadata ) {
-            base( metadata );
+            base(metadata);
             // This is more slots than we might need, but prevents us from being out
             // of bounds if the number of user slides is changed due to overlay marking
             // changing.
@@ -72,7 +72,7 @@ namespace pdfpc.Drawings.Storage {
         public override void store(uint index, Cairo.ImageSurface surface) {
             storage[index] = surface;
         }
-        
+
         public override Cairo.ImageSurface? retrieve(uint index) {
             Cairo.ImageSurface? result = storage[index];
             storage[index] = null;

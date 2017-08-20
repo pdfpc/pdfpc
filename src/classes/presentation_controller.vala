@@ -682,6 +682,7 @@ namespace pdfpc {
                 queue_pointer_surface_draws();
             }
         }
+
         protected void draw_pointer(Cairo.Context context, Gtk.Allocation a) {
             int x = (int)(a.width*pointer_x);
             int y = (int)(a.height*pointer_y);
