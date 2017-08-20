@@ -46,7 +46,7 @@ namespace pdfpc.Drawings {
             this.blue = color.blue;
             this.alpha = color.alpha;
         }
-        
+
         public DrawingTool() {
             this.red = 1.0;
             this.green = 0.0;
@@ -118,7 +118,6 @@ namespace pdfpc.Drawings {
          * x and y coordinates are always in range [0, 1].
          */
         public void add_line(DrawingTool tool, double x1, double y1, double x2, double y2) {
-            // FIXME: should do smoother drawing?
             tool.add_line(this.context,
                 x1 * this.width, y1 * this.height,
                 x2 * this.width, y2 * this.height
@@ -141,8 +140,10 @@ namespace pdfpc.Drawings {
          */
         public void switch_to_slide(int slide_number) {
             if (slide_number != this.current_slide) {
-                if (this.surface != null) 
-                storage.store(this.current_slide, this.surface);
+                if (this.surface != null) {
+                    storage.store(this.current_slide, this.surface);
+                }
+
                 Cairo.ImageSurface? from_storage = storage.retrieve(slide_number);
                 if (from_storage == null) {
                     set_new_surface();
