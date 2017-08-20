@@ -71,9 +71,9 @@ bind 5 toggleDrawing
 bind 6 clearDrawing
 bind 4 hideDrawing
 
-bind 1 increasePen
+bind 1 decreasePen
 bind 2 toggleEraser
-bind 3 decreasePen
+bind 3 increasePen
 
 #### Mouse bindings
 mouse 1        next
