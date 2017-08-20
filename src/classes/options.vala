@@ -162,7 +162,21 @@ namespace pdfpc {
             public uint keyCode;
             public uint modMask;
             public string actionName;
-            public string? actionArg;
+
+            private string? _actionArg;
+            public string? actionArg {
+                get {
+                    return _actionArg;
+                }
+            }
+
+            public void setActionArg(string? actionArg) throws ConfigFileError {
+                if (this.actionName != "setPenColor") {
+                    throw new ConfigFileError.INVALID_BIND("Only 'setPenColor' accepts an action argument");
+                }
+
+                this._actionArg = actionArg;
+            }
         }
 
         /**
