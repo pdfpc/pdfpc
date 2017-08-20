@@ -25,6 +25,10 @@
  */
 
 namespace pdfpc {
+    public errordomain ConfigFileError {
+        INVALID_BIND
+    }
+
     class ConfigFileReader {
         public ConfigFileReader() { }
 
@@ -77,15 +81,19 @@ namespace pdfpc {
             if (keycode == 0x0) {
                 GLib.printerr("Warning: Unknown key: %s\n", fields[1]);
             } else {
-                Options.BindTuple bt = new Options.BindTuple();
-                bt.type = "bind";
-                bt.keyCode = keycode;
-                bt.modMask = modMask;
-                bt.actionName = fields[2];
-                if (fields.length > 3) {
-                    bt.actionArg = fields[3];
+                try {
+                    Options.BindTuple bt = new Options.BindTuple();
+                    bt.type = "bind";
+                    bt.keyCode = keycode;
+                    bt.modMask = modMask;
+                    bt.actionName = fields[2];
+                    if (fields.length > 3) {
+                        bt.setActionArg(fields[3]);
+                    }
+                    Options.key_bindings.add(bt);
+                } catch (ConfigFileError e) {
+                    GLib.printerr("Line '%s' contains errors. Reason: %s\n", wholeLine, e.message);
                 }
-                Options.key_bindings.add(bt);
             }
         }
 
@@ -125,15 +133,19 @@ namespace pdfpc {
             if (button == 0x0) {
                 GLib.printerr("Warning: Unknown button: %s\n", fields[1]);
             } else {
-                Options.BindTuple bt = new Options.BindTuple();
-                bt.type = "bind";
-                bt.keyCode = button;
-                bt.modMask = modMask;
-                bt.actionName = fields[2];
-                if (fields.length > 3) {
-                    bt.actionArg = fields[3];
+                try {
+                    Options.BindTuple bt = new Options.BindTuple();
+                    bt.type = "bind";
+                    bt.keyCode = button;
+                    bt.modMask = modMask;
+                    bt.actionName = fields[2];
+                    if (fields.length > 3) {
+                        bt.setActionArg(fields[3]);
+                    }
+                    Options.mouse_bindings.add(bt);
+                } catch (ConfigFileError e) {
+                    GLib.printerr("Line '%s' contains errors. Reason: %s\n", wholeLine, e.message);
                 }
-                Options.mouse_bindings.add(bt);
             }
         }
 
