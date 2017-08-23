@@ -27,7 +27,7 @@ Installation
 
         sudo dnf install pdfpc
         
-- On Windows 10 (with *Windows Subsystem for Linux (WSL)* - see issue #241)::
+- On Windows 10 (with *Windows Subsystem for Linux (WSL)*)::
 
         Install:
         1. Windows: Activate WSL: https://msdn.microsoft.com/en-us/commandline/wsl/install_guide
@@ -120,7 +120,6 @@ can be removed by compiling without support for movie playback by passing
 Compiling on Windows
 --------------------
 
-On issue #106 there is a short tutorial on how to compile pdfpc on Windows.
 First a cygwin installation with the following dependencies is needed:
 
 - cmake
