@@ -26,7 +26,21 @@ Installation
 - On Fedora::
 
         sudo dnf install pdfpc
+        
+- On Windows 10 (with *Windows Subsystem for Linux (WSL)* - see issue #241)::
 
+        Install:
+        1. Windows: Activate WSL: https://msdn.microsoft.com/en-us/commandline/wsl/install_guide
+        2. Windows: Open CMD and run: 'bash' in order to start the WSL-bash
+        3. WSL-Bash: run: 'sudo apt-get install pdf-presenter-console'
+        
+        Run:
+        1. Windows: Install a Windows X-Server like VcXsrv: https://sourceforge.net/projects/vcxsrv
+        2. Windows: Make the presentation screen your secondary screen and disable the taskbar on that screen
+        3. Windows: Start the X-Server with: 'vcxsrv -nodecoration -screen 0 @1 -screen 1 @2 +xinerama'
+        4. Windows: Open CMD and run: 'bash' in order to start the WSL-bash
+        5. WSL-Bash: run: 'DISPLAY=:0 pdfpc <your PDF file>' to open your presentation with pdfpc
+       
 - `Compiling from source <#compile-and-install>`_
 
 Sample presentations
