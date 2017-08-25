@@ -159,10 +159,10 @@ Clear the current drawing
 Temporarily hide the current drawing and exit drawing mode
 .TP
 .B 1
-Increase the pen or eraser size for drawing
+Decrease the pen or eraser size for drawing
 .TP
 .B 3
-Decrease the pen or eraser size for drawing
+Increase the pen or eraser size for drawing
 .TP
 .B 2
 Toggle between the pen and eraser tool for drawing
