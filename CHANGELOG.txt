@@ -2,6 +2,19 @@
 pdfpc Changelog
 ===============
 
+Version 4.0.8
+=============
+
+*Released: August 2017*
+
+- Bug fixes
+    - Respects playmode for movies embedded with multimedia package
+    - More reliable movie playback (needs gstreamer-plguins-bad now!)
+    - Fix bug in overlay detection
+
+- Pen drawing mode (allows user to draw on slides)
+
+
 Version 4.0.7
 =============
 
