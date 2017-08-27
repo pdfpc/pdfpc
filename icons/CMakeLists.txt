@@ -4,6 +4,9 @@ install(FILES
     pause.svg
     saved.svg
     loaded.svg
+    highlight.svg
+    pen.svg
+    eraser.svg
 DESTINATION
     share/pixmaps/pdfpc
 )
