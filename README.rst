@@ -26,7 +26,11 @@ Installation
 - On Fedora::
 
         sudo dnf install pdfpc
-        
+
+- On archlinux::
+
+        sudo pacman -S pdfpc
+
 - On Windows 10 (with *Windows Subsystem for Linux (WSL)*)::
 
         Install:
