@@ -970,7 +970,7 @@ namespace pdfpc {
         /**
          * Handle keypresses to each of the controllables
          *
-         * This seperate handling is needed because keypresses from any of the
+         * This separate handling is needed because keypresses from any of the
          * window have implications on the behaviour of both of them. Therefore
          * this controller is needed to take care of the needed actions.
          */
