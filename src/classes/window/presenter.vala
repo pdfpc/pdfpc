@@ -245,7 +245,13 @@ namespace pdfpc.Window {
             if (this.metadata.font_size >= 0) {
                 Pango.FontDescription font_desc = get_notes_font_description();
 
-                font_desc.set_size(this.metadata.font_size);
+                // LEGCAY font size detection
+                // Before, we had the font size in absolute (device) units.
+                // These where typically larger then 1000
+                if (this.metadata.font_size >= 1000) {
+                    this.metadata.font_size /= Pango.SCALE;
+                }
+                font_desc.set_size(this.metadata.font_size * Pango.SCALE);
                 this.notes_view.override_font(font_desc);
             }
 
@@ -646,8 +652,9 @@ namespace pdfpc.Window {
         public void increase_font_size() {
             Pango.FontDescription font_desc = get_notes_font_description();
 
-            int font_size = (int)(font_desc.get_size()*1.1);
-            font_desc.set_size(font_size);
+            int font_size = font_desc.get_size() / Pango.SCALE;
+            font_size += 2;
+            font_desc.set_size(font_size * Pango.SCALE);
             this.metadata.font_size = font_size;
             this.notes_view.override_font(font_desc);
         }
@@ -658,8 +665,9 @@ namespace pdfpc.Window {
         public void decrease_font_size() {
             Pango.FontDescription font_desc = get_notes_font_description();
 
-            int font_size = (int)(font_desc.get_size()/1.1);
-            font_desc.set_size(font_size);
+            int font_size = font_desc.get_size() / Pango.SCALE;
+            font_size = (int)GLib.Math.fmax(font_size - 2, 0);
+            font_desc.set_size(font_size * Pango.SCALE);
             this.metadata.font_size = font_size;
             this.notes_view.override_font(font_desc);
         }
