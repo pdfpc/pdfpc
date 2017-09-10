@@ -171,7 +171,7 @@ namespace pdfpc {
         private void unbindMouseAll() {
             Options.BindTuple bt = new Options.BindTuple();
             bt.type = "unbindall";
-            Options.key_bindings.add(bt);
+            Options.mouse_bindings.add(bt);
         }
 
 
