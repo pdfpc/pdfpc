@@ -26,32 +26,32 @@ Following commands are aceepted:
 Bind a key to a function, passing a specified argument for functions which require one
 .TP
 .B unbind <key>
-Unbinds the given key
+Unbind the given key
 .TP
 .B unbind_all
-Unbinds all the keybindings
+Clear all the key bindings
 .TP
 .B mouse <button> <func>
-Binds a mouse button to a function
+Bind a mouse button to a function
 .TP
 .B unmouse <button>
-Unbinds a mouse button
+Unbind a mouse button
 .TP
 .B unmouse_all
-Unbinds all the mouse bindings
+Clear all the mouse bindings
 
 .PP
 A list of all possible functions can be obtained
-via the \-L command line option if pdfpc(1).
+via the \-L command line option of pdfpc(1).
 
 .SS Options
 .PP
-Some permanent changes can be configured via config file. The syntax is:
+Some permanent changes can be configured via the config file. The syntax is:
 .TP
 .B option <option_name> <option_value>
 
 .PP
-The following option_name are allowed:
+The following option_name's are recognized:
 
 .TP
 .B black-on-end
@@ -65,11 +65,11 @@ Percentage of the presenter screen to be used for the current slide. (int, Defau
 .TP
 .BI disable-caching
 see
-.B pdfpcrc(5)
+.B pdfpc(1)
 .TP
 .BI disable-compression
 see
-.B pdfpcrc(5)
+.B pdfpc(1)
 .TP
 .B next-height
 Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
@@ -82,7 +82,7 @@ Switch the presentation and the presenter screen. (bool, Default false)
 .TP
 .B time-of-day
 see
-.B pdfpcrc(5)
+.B pdfpc(1)
 
 .SH EXAMPLES
 
