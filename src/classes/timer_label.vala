@@ -234,7 +234,6 @@ namespace pdfpc {
                         context.add_class("last-minutes");
                 } else {
                     // Time is over!
-                    context.remove_class("last-minutes");
                     context.add_class("overtime");
                     timeInSecs = this.time - duration;
 
