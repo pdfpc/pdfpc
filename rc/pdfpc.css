@@ -63,6 +63,14 @@ entry, iconview, textview *, window {
     color: red;
 }
 
+.too-fast {
+    color: steelblue;
+}
+
+.too-slow {
+    color: orange;
+}
+
 .overviewWindow {
     font-size: 4em;
 }

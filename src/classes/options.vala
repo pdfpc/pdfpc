@@ -123,6 +123,12 @@ namespace pdfpc {
         public static bool use_time_of_day = false;
 
         /**
+         * Use the new coloring mode of the timer according to the actual
+         * progress
+         */
+        public static bool timer_pace_color = false;
+
+        /**
          * Time the talk should end
          */
         public static string? end_time = null;
