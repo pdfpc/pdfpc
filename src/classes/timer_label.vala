@@ -55,7 +55,7 @@ namespace pdfpc {
         if (Options.end_time != null) {
             end_time = parseTime(Options.end_time);
         }
-        
+
         if (Options.use_time_of_day) {
             return new TimeOfDayTimer(controller);
         } else if (end_time > 0) {
@@ -260,21 +260,19 @@ namespace pdfpc {
                     if (Options.timer_pace_color) {
                         // New indication of too slow/fast pace independently
                         // of the time left.
-                        
                         int current_slide_number =
                             this.controller.current_user_slide_number;
                         int slide_count = this.controller.user_n_slides;
-                        
+
                         // Assuming we're in the middle of the current slide
                         double expected_progress =
                             (current_slide_number + 0.5)/slide_count;
-                        
+
                         int expected_time = (int) (duration*expected_progress);
-                        
+
                         if (this.time > expected_time + 60) {
                             context.add_class("too-slow");
-                        } else 
-                        if (this.time < expected_time - 60) {
+                        } else if (this.time < expected_time - 60) {
                             context.add_class("too-fast");
                         } else {
                             context.remove_class("too-fast");
@@ -363,7 +361,7 @@ namespace pdfpc {
         public TimeOfDayTimer(PresentationController controller) {
             base(controller);
         }
-        
+
         /**
          * Just start the timer if is not running
          */
