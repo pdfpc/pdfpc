@@ -28,17 +28,38 @@
 namespace pdfpc {
 
     /**
+     * Parse the given time string to a Time object
+     */
+    time_t parseTime(string t) {
+        var tm = Time.local(time_t());
+        tm.strptime(t + ":00", "%H:%M:%S");
+        return tm.mktime();
+    }
+
+    /**
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-    TimerLabel getTimerLabel(PresentationController controller,
-        int duration, time_t end_time, uint last_minutes = 0,
-        time_t start_time = 0, bool clock_time = false) {
+    TimerLabel getTimerLabel(PresentationController controller, int duration) {
+
+        uint last_minutes = Options.last_minutes;
+
+        // Calculate the countdown to display until the presentation has to
+        // start
+        time_t start_time = 0;
+        if (Options.start_time != null) {
+            start_time = parseTime(Options.start_time);
+        }
+        // The same again for end_time
+        time_t end_time = 0;
+        if (Options.end_time != null) {
+            end_time = parseTime(Options.end_time);
+        }
         
-        if (clock_time) {
+        if (Options.use_time_of_day) {
             return new TimeOfDayTimer(controller);
         } else if (end_time > 0) {
-            return new EndTimeTimer(controller, end_time, last_minutes, start_time);
+            return new EndTimeTimer(controller, end_time, -last_minutes, start_time);
         } else if (duration > 0) {
             return new CountdownTimer(controller, duration, last_minutes, start_time);
         } else {
