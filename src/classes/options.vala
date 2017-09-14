@@ -126,7 +126,7 @@ namespace pdfpc {
          * Use the new coloring mode of the timer according to the actual
          * progress
          */
-        public static bool timer_pace_color = false;
+        public static bool timer_pace_color = true;
 
         /**
          * Time the talk should end
