@@ -273,9 +273,7 @@ namespace pdfpc {
                     break;
                 case "timer-pace-color":
                     bool timer_pace_color = bool.parse(fields[2]);
-                    if (timer_pace_color) {
-                        Options.timer_pace_color = true;
-                    }
+                    Options.timer_pace_color = timer_pace_color;
                     break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
