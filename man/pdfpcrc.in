@@ -83,6 +83,12 @@ Switch the presentation and the presenter screen. (bool, Default false)
 .B time-of-day
 see
 .B pdfpcrc(5)
+.TP
+.B timer-pace-color
+Enable color hints of the timer, continuously indicating whether the
+presentation is progressing according to the expected pace (bool, Default true).
+See the timer operation description in
+.B pdfpc(1).
 
 .SH EXAMPLES
 
