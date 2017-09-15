@@ -28,18 +28,42 @@
 namespace pdfpc {
 
     /**
+     * Parse the given time string to a Time object
+     */
+    time_t parseTime(string t) {
+        var tm = Time.local(time_t());
+        tm.strptime(t + ":00", "%H:%M:%S");
+        return tm.mktime();
+    }
+
+    /**
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-    TimerLabel getTimerLabel(int duration, time_t end_time, uint last_minutes = 0, time_t start_time = 0, bool clock_time = false) {
-        if (clock_time) {
-            return new TimeOfDayTimer();
+    TimerLabel getTimerLabel(PresentationController controller, int duration) {
+
+        uint last_minutes = Options.last_minutes;
+
+        // Calculate the countdown to display until the presentation has to
+        // start
+        time_t start_time = 0;
+        if (Options.start_time != null) {
+            start_time = parseTime(Options.start_time);
+        }
+        // The same again for end_time
+        time_t end_time = 0;
+        if (Options.end_time != null) {
+            end_time = parseTime(Options.end_time);
+        }
+
+        if (Options.use_time_of_day) {
+            return new TimeOfDayTimer(controller);
         } else if (end_time > 0) {
-            return new EndTimeTimer(end_time, last_minutes, start_time);
+            return new EndTimeTimer(controller, end_time, -last_minutes, start_time);
         } else if (duration > 0) {
-            return new CountdownTimer(duration, last_minutes, start_time);
+            return new CountdownTimer(controller, duration, last_minutes, start_time);
         } else {
-            return new CountupTimer(start_time);
+            return new CountupTimer(controller, start_time);
         }
     }
 
@@ -47,6 +71,8 @@ namespace pdfpc {
      * Specialized label, which is capable of easily displaying a timer
      */
     public abstract class TimerLabel: Gtk.Label {
+
+        protected PresentationController controller;
 
         /**
          * Time in seconds the presentation has been running. A negative value
@@ -68,7 +94,8 @@ namespace pdfpc {
          * Default constructor taking the initial time as argument, as well as
          * the time to countdown until the talk actually starts.
          */
-        public TimerLabel(time_t start_time = 0) {
+        public TimerLabel(PresentationController controller, time_t start_time = 0) {
+            this.controller = controller;
             this.start_time = start_time;
         }
 
@@ -199,8 +226,8 @@ namespace pdfpc {
          */
         protected uint last_minutes = 5;
 
-        public CountdownTimer(int duration, uint last_minutes, time_t start_time = 0) {
-            base(start_time);
+        public CountdownTimer(PresentationController controller, int duration, uint last_minutes, time_t start_time = 0) {
+            base(controller, start_time);
             this.duration = duration;
             this.last_minutes = last_minutes;
         }
@@ -230,11 +257,34 @@ namespace pdfpc {
                 if (this.time < this.duration) {
                     timeInSecs = duration - this.time;
                     // Still on presentation time
-                    if (timeInSecs < this.last_minutes * 60)
-                        context.add_class("last-minutes");
+                    if (Options.timer_pace_color) {
+                        // New indication of too slow/fast pace independently
+                        // of the time left.
+                        int current_slide_number =
+                            this.controller.current_user_slide_number;
+                        int slide_count = this.controller.user_n_slides;
+
+                        // Assuming we're in the middle of the current slide
+                        double expected_progress =
+                            (current_slide_number + 0.5)/slide_count;
+
+                        int expected_time = (int) (duration*expected_progress);
+
+                        if (this.time > expected_time + 60) {
+                            context.add_class("too-slow");
+                        } else if (this.time < expected_time - 60) {
+                            context.add_class("too-fast");
+                        } else {
+                            context.remove_class("too-fast");
+                            context.remove_class("too-slow");
+                        }
+                    } else {
+                        // Old "last-minutes" warning
+                        if (timeInSecs < this.last_minutes * 60)
+                            context.add_class("last-minutes");
+                    }
                 } else {
                     // Time is over!
-                    context.remove_class("last-minutes");
                     context.add_class("overtime");
                     timeInSecs = this.time - duration;
 
@@ -252,8 +302,8 @@ namespace pdfpc {
         protected time_t end_time;
         protected GLib.Time end_time_object;
 
-        public EndTimeTimer(time_t end_time, uint last_minutes, time_t start_time = 0) {
-            base(1000, last_minutes, start_time);
+        public EndTimeTimer(PresentationController controller, time_t end_time, uint last_minutes, time_t start_time = 0) {
+            base(controller, 1000, last_minutes, start_time);
             this.end_time = end_time;
             this.end_time_object = GLib.Time.local(end_time);
         }
@@ -277,8 +327,8 @@ namespace pdfpc {
     }
 
     public class CountupTimer : TimerLabel {
-        public CountupTimer(time_t start_time = 0) {
-            base(start_time);
+        public CountupTimer(PresentationController controller, time_t start_time = 0) {
+            base(controller, start_time);
         }
 
         /**
@@ -308,6 +358,10 @@ namespace pdfpc {
     }
 
     public class TimeOfDayTimer : TimerLabel {
+        public TimeOfDayTimer(PresentationController controller) {
+            base(controller);
+        }
+
         /**
          * Just start the timer if is not running
          */

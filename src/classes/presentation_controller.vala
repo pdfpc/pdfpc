@@ -268,21 +268,13 @@ namespace pdfpc {
             this.history = new Gee.ArrayQueue<int>();
             this.user_slide_progress = new int[metadata.get_user_slide_count()];
 
-            // Calculate the countdown to display until the presentation has to
-            // start
-            time_t start_time = 0;
-            if (Options.start_time != null) {
-                start_time = this.parseTime(Options.start_time);
-            }
-            // The same again for end_time
-            time_t end_time = 0;
+            // If end_time is set, reset duration to 0
             if (Options.end_time != null) {
-                end_time = this.parseTime(Options.end_time);
                 Options.duration = 0;
                 this.metadata.set_duration(0);
             }
-            this.timer = getTimerLabel((int) this.metadata.get_duration() * 60,
-                end_time, Options.last_minutes, start_time, Options.use_time_of_day);
+            this.timer = getTimerLabel(this,
+                (int) this.metadata.get_duration() * 60);
             this.timer.reset();
 
             this.n_slides = (int) this.metadata.get_slide_count();
@@ -1684,15 +1676,6 @@ namespace pdfpc {
             if (this.timer.is_paused()) {
                 this.toggle_pause();
             }
-        }
-
-        /**
-         * Parse the given time string to a Time object
-         */
-        private time_t parseTime(string t) {
-            var tm = Time.local(time_t());
-            tm.strptime(t + ":00", "%H:%M:%S");
-            return tm.mktime();
         }
 
 
