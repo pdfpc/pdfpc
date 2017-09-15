@@ -266,20 +266,40 @@ If a duration is given (\-d option), the timer will show a countdown with the
 given parameters.  If no duration is specified (or if a value of 0 is given to
 the \-d option), the timer will show how much time has been spent.  The duration
 is stored automatically, so you do not need to repeat it for every invocation.
-
 .PP
 The timer is started if you are navigating away from the first page for the
 first time.  This feature is quite useful as you may want to show the title page
 of your presentation while people are still entering the room and the
 presentation has not really begun yet.  If you want to start over you can
 use the \[aq]r\[aq] key which will make the presenter reset the timer.
-
 .PP
-If a duration is given, at the moment the timer reaches the defined
-last-minutes value it will change color to indicate your talk is nearing its
-end.  As soon as the timer reaches the zero mark (00:00:00) it will turn red
-and count further down showing a negative time, to provide information on how
-many minutes you are overtime.
+If a duration is given, the timer also provides hints aiding the presenter to
+judge whether the talk would end on time.  There are two modes in which pdfpc
+can operate.  In the old (and the only one available up to, and including
+pdfpc-4.0.8) mode, at the moment the timer reaches the defined last-minutes
+value it will change color to indicate your talk is nearing its end, thus
+mimicking a chairman frantically pantomiming in front of you with five (four,
+three, ...) fingers up.  A drawback of this approach is it is often
+too late at that moment to alter the presentation pace without ruining to some
+extent the rest of the talk.  On the other hand, the warning indication provides
+an unnecessary distraction if you have been perfectly conveying the talk and the
+remaining time is adequate.
+.PP
+Contrary to that, in the new (default) mode, pdfpc tracks your progress
+continuously, calculating the expected time as
+(talk_duration)*(current_user_slide_number - 0.5)/(total_number_of_user_slides)
+and comparing it to the actual wall time since beginning of the talk.  If
+these two numbers differ by more than 60 seconds, the timer changes its color to
+either orange (indicating you need to speed up) or a blueish one (need to slow
+down).  Once the optimal progress is recovered, the timer becomes white again.
+In this mode, the last-minutes option (-l) has no effect.  The previous
+behavior can be restored by setting the 'timer-pace-color' option to 'false' in
+the configuration file, see
+.B pdfpcrc(5).
+.PP
+In any case, as soon as the timer reaches the zero mark (00:00:00), it will turn
+red and count further down showing a negative time, to provide information on
+how many minutes you are overtime.
 
 .SS Notes
 

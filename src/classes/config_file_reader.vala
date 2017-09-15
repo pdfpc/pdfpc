@@ -271,6 +271,10 @@ namespace pdfpc {
                         Options.use_time_of_day = true;
                     }
                     break;
+                case "timer-pace-color":
+                    bool timer_pace_color = bool.parse(fields[2]);
+                    Options.timer_pace_color = timer_pace_color;
+                    break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
                     break;
