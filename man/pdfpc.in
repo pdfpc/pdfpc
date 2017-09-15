@@ -47,7 +47,7 @@ End time of the presentation. (Format: HH:MM (24h))
 Disable auto detection of overlay groups. (Default: enabled)
 .TP
 .BI "\-h, \-\-help"
-Shows the help
+Show this help
 .TP
 .BI "\-l, \-\-last\-minutes"=N
 Time in minutes, from which on the timer changes its color. (Default: 5 minutes)
@@ -62,7 +62,7 @@ Position of notes on the PDF page. Position can be either left, right, top or bo
 Persist the PNG cache on disk for faster startup.
 .TP
 .BI "\-P, \-\-page"
-Goto a specific page directly after startup. In case of overlays, the first slide will be displayed.
+Go to a specific page directly after startup. In case of overlays, the first slide will be displayed.
 .TP
 .BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
@@ -85,7 +85,7 @@ Size of the presentation window in width:height format (forces windowed mode)
 
 .PP
 
-Some previous command line options (like black-on-end) where moved to permanent
+Some previous command-line options (like black-on-end) were moved to permanent
 config file options. See
 .B pdfpcrc(5)
 for further details.
@@ -111,7 +111,7 @@ Go back one slide
 Go back 10 slides
 .TP
 .B Up cursor key
-Go back one "user slide" (see
+Go back one user slide (see
 .B Overlays
 below)
 .TP
@@ -135,13 +135,13 @@ Overview mode
 Input a slide number to jump to
 .TP
 .B Plus / Equal / KP_Add / Bracket Left
-Increase Notes Font Size
+Increase font size of notes
 .TP
 .B Minus / KP_Substract / Bracket Right
-Decrease Notes Font Size
+Decrease font size of notes
 .TP
 .B 8
-Toggle Pointer Mode
+Toggle pointer mode
 .TP
 .B 7
 Decrease pointer size
@@ -150,7 +150,7 @@ Decrease pointer size
 Increase pointer size
 .TP
 .B 5
-Toggle Drawing mode
+Toggle drawing mode
 .TP
 .B 6
 Clear the current drawing
@@ -194,7 +194,7 @@ Reset presentation (reset timer and go back to first slide)
 Define end slide
 .TP
 .B R
-Restore last saved session. Goto the slide which was saved with
+Restore last saved session. Go to the slide which was saved with
 .B S
 before
 .TP
@@ -204,13 +204,13 @@ Save the current session. Store the current slide in the
 file for later usage
 
 .P
-Within overview mode the following key bindings are used
+Within overview mode the following key bindings are used:
 .TP
 .B Return / Left mouse button
-Goto currently selected page (last page of overlay)
+Go to currently selected page (last page of overlay)
 .TP
 .B Shift + Return / Shift + Left mouse button
-Goto currently selected page (first page of overlay)
+Go to currently selected page (first page of overlay)
 .TP
 .B Cursor left / Page up
 Select previous slide
@@ -233,7 +233,7 @@ pages are pre-rendered to memory.  The progress bar on the bottom of the
 presenter screen indicates how many percent of the slides have been
 pre-rendered already.  During the initial rendering phase this will slow down
 slide changes, as most CPU power is used for the rendering process in the
-background.  After the cache is fully primed however the changing of slides
+background.  After the cache is fully primed, however, the changing of slides
 should be much faster, as with normal PDF viewers.
 
 .PP
@@ -242,23 +242,23 @@ As the pre-rendering takes a lot of memory it can be disabled using the
 
 .PP
 It it also possible to store the pre-rendered slides on the disk (see
-\-\-persist-cache).  This speeds up the start of the program if the slide-set
-is used for a second
-time.
+\-\-persist-cache).  This speeds up the start of the program if the slide set
+is used next time unchanged.
 
 .SS Cache compression
 
 .PP
 The pre-rendered and cached slides can be compressed in memory to save up some
 memory.  Without compression a set of about 100 PDF pages can easily grow up to
-about 1.5 GB size.  Netbooks with only 1 GB of memory would swap themselves to
-death if pre-rendering is enabled in such a situation.  The compression is
+about 1.5 GB size.  Netbooks with only 1 GB of memory would swap heavily
+if pre-rendering is enabled in such a situation.  The compression is
 enabled by default as it does not harm rendering speed in a noticeable way on
-most systems.  It does however slow down pre-rendering by about a factor of two.
-If you have got enough memory and want to ensure the fastest possible
+most systems. It does, however, slow down pre-rendering by about a factor of
+two. If you have got enough memory and want to ensure the fastest possible
 pre-rendering you can disable slide compression by using the \-z switch. But be
-warned using the uncompressed pre-rendering storage will use about 30 times the
-memory the new compressed storage utilizes (e.g. 50 MB will become about 1.5 GB).
+warned that using the uncompressed pre-rendering storage will use about 30 times
+the memory the new compressed storage utilizes (e.g. 50 MB will become about
+1.5 GB).
 
 .SS Timer
 .PP
@@ -273,6 +273,7 @@ of your presentation while people are still entering the room and the
 presentation has not really begun yet.  If you want to start over you can
 use the \[aq]r\[aq] key which will make the presenter reset the timer.
 .PP
+
 If a duration is given, the timer also provides hints aiding the presenter to
 judge whether the talk would end on time.  There are two modes in which pdfpc
 can operate.  In the old (and the only one available up to, and including
@@ -297,16 +298,16 @@ behavior can be restored by setting the 'timer-pace-color' option to 'false' in
 the configuration file, see
 .B pdfpcrc(5).
 .PP
-In any case, as soon as the timer reaches the zero mark (00:00:00), it will turn
-red and count further down showing a negative time, to provide information on
-how many minutes you are overtime.
+In any case as soon as the timer reaches the zero mark (00:00:00), it will turn red
+and count further down showing a negative time, to provide information on how
+many minutes you are overtime.
 
 .SS Notes
 
 .PP
-Textual notes can be displayed for each slide.  While in the presentation,
+Textual notes can be displayed for each slide.  While in the presentation mode,
 pressing \[aq]n\[aq] will allow you to take notes for the screen.  To go out of
-editing mode, press the Escape key.  Note that while editing a note the
+the editing mode, press the Escape key.  Note that while editing a note the
 keybindings stop working, i.e.  you are not able to change slides.
 
 .PP
@@ -316,17 +317,17 @@ also from outside the program.  See the section about the pdfpc format below.
 .SS Overview mode
 
 .PP
-Pressing tab you can enter the overview mode, where miniatures for the slides
-are shown.  You can select one slide to jump to with the mouse or with the
-arrow keys.  You can also define overlays and the end slide (see next sections)
-in this mode.
+Pressing the Tab key enters the overview mode, where thumbnails of the slides
+are shown in a grid.  You can select a slide to jump to with the mouse or with
+the arrow keys.  You can also define overlays and the end slide (see next
+sections) in this mode.
 
 .SS Overlays
 
 .PP
 Many slide preparation systems allow for overlays, i.e.  sets of slides that
 are logically grouped together as a single, changing slide.  Examples include
-enumerations where the single items are displayed one after another or rough
+enumerations where bullet items are displayed one after another, or rough
 "animations", where parts of a picture change from slide to slide. Pdfpc
 includes facilities for dealing with such overlays.
 
@@ -334,24 +335,24 @@ includes facilities for dealing with such overlays.
 In this description, we will differentiate between slides (i.e.  pages in the
 PDF document) and "user slides", that are the logical slides.  The standard
 forward movement command (page down, enter, etc.) moves through one slide at a
-time, as expected.  That means that every step in the overlay is traversed.
-The backward movement command works differently depending if the current and
-previous slides are part of an overlay:
+time, as expected.  This means that every step in the overlay is traversed.
+The backward movement command works differently depending on whether the
+current and previous slides are part of an overlay:
 
 .IP \[bu] 2
 If the current slide is part of an overlay we just jump to the previous slide.
-That means that we are in the middle of an overlay we can jump forward and
+That means that we are in the middle of an overlay and can jump forward and
 backward through the single steps of it
 .IP \[bu] 2
 If the current slide is not part of an overlay (or if it is the first one), but
 the previous slides are, we jump to the previous user slide.  This means that
 when going back in the presentation you do not have to go through every step of
-the overlay, pdfpc just shows the first slide of the each
-overlay.  As you normally only go back in a presentation when looking for a
+the overlay, pdfpc just shows the first slide of each
+overlay.  As one typically goes back in a presentation only when looking for a
 concrete slide, this is more convenient.
 
 .PP
-The up and down cursor keys work on a user slide basis.
+The up and down cursor keys work on the "user slide" basis.
 You can use them to skip the rest of an overlay or to jump to the
 previous user slide, ignoring the state of the current slide.
 
@@ -421,16 +422,16 @@ See
 .URL http://pdfpc.github.io/demo/pdfpc-video-example.zip "our website"
 for a full example.
 
-.SS Pointer Mode
+.SS Pointer mode
 .PP
-If needed it is possible to turn on a pointer which draws a red dot in the
+If needed, it is possible to turn on a pointer which draws a red dot in the
 place pointed by mouse cursor on both - presenter and presentation screens.
-It is also possible to increase and decrease the pointer size. Additionally
-when the pointer is enabled it is possible to drag & drop some area of the
-presenter screen causing it to be highlighted in both views as well. Area
+It is also possible to increase and decrease the pointer size. Additionally,
+when the pointer is enabled, it is possible to highlight some area of the
+current slide using the drag mouse motion. The area
 outside the selected region will be dimmed.
 
-.SS Drawing Mode
+.SS Drawing mode
 .PP
 It is possible to turn on a mode which allows drawing over slides with the mouse
 cursor or a connected tablet.  When drawing mode is enabled, drawings can be made on
@@ -438,8 +439,8 @@ the presenter screen. A separate drawing will be kept in memory for each slide
 (based on user slide numbers, so consolidating overlay slides). Drawings are presently not
 saved between sessions.
 
-In drawing mode, there are two drawing tools, a pen and eraser. An indicator in the
-bottom-left of the presenter screen will indicate which is active. When in pen mode,
+In the drawing mode, there are two drawing tools, a pen and an eraser. An indicator in the
+bottom-left corner of the presenter screen will indicate which is active. When in the pen mode,
 the color and size of the pen will be indicated by the cursor. The pen size can be increased
 or decreased using hot keys specified in the key bindings. When the eraser tool is active,
 the size of the cursor indicates the amount to erase.
@@ -447,16 +448,16 @@ the size of the cursor indicates the amount to erase.
 The color of the pen can be changed through key or mouse bindings.
 
 If you are using a tablet, the pen or eraser tool will be selected based on whether the tablet
-reports a pen or eraser input device is being used, overriding the normal selection of drawing tool.
+reports a pen or eraser input device is being used, overriding the normal selection of the drawing tool.
 
-.SS pdfpc Files
+.SS pdfpc files
 .PP
-The several additional information are stored in a file with the extension
+Some additional information is stored in a file with the extension
 "pdfpc".  When pdfpc is invoked with a PDF file, it automatically checks for
-and loads the associated pdfpc file, if it exists.  This means that you
+and loads the associated .pdfpc file, if it exists.  This means that you
 normally do not have to deal with this kind of files explicitly.
 .PP
-Beside internal configiration, the following user contributed command line
+Beside internal configuration, the following command-line
 options are stored within the pdfpc file for later usage:
 
 .IP \[bu] 2
@@ -471,7 +472,7 @@ notes (position)
 start_time
 
 .PP
-There are however cases where you may want to edit the files manually.
+There are, however, cases where you may want to edit this file manually.
 The most typical case is if you add or remove some slides after you have
 edited notes or defined overlays.
 It may be quicker to edit the pdfpc file than to re-enter the whole
@@ -490,8 +491,8 @@ Slide indexes start at 1
 .PP
 With GTK3 it is possible to modify the appearance of pdfpc. There are two
 locations where pdfpc is looking for files. The default location is
-@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. A user can copy
-it to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and change the attributes as he likes.
+@CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. It can be copied
+to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and modifed to user's liking.
 
 .SS Integration with other tools
 
