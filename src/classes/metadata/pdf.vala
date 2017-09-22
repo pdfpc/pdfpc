@@ -370,6 +370,10 @@ namespace pdfpc.Metadata {
                     var a = am.annot;
                     switch(a.get_annot_type()) {
                         case Poppler.AnnotType.TEXT:
+                        case Poppler.AnnotType.FREE_TEXT:
+                        case Poppler.AnnotType.HIGHLIGHT:
+                        case Poppler.AnnotType.UNDERLINE:
+                        case Poppler.AnnotType.SQUIGGLY:
                             this.notes.set_note(a.get_contents(), real_slide_to_user_slide(i));
                             break;
                     }
