@@ -373,6 +373,7 @@ namespace pdfpc.Metadata {
                     continue;
                 }
 
+                string note_text = "";
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
@@ -382,11 +383,14 @@ namespace pdfpc.Metadata {
                         case Poppler.AnnotType.HIGHLIGHT:
                         case Poppler.AnnotType.UNDERLINE:
                         case Poppler.AnnotType.SQUIGGLY:
-                            this.notes.set_note(a.get_contents(),
-                                user_slide, true);
+                            if (note_text.length > 0) {
+                                note_text += "\n";
+                            }
+                            note_text += a.get_contents();
                             break;
                     }
                 }
+                this.notes.set_note(note_text, user_slide, true);
             }
         }
 
