@@ -365,15 +365,14 @@ namespace pdfpc.Metadata {
         private void notes_from_document() {
             for (int i = 0; i < this.page_count; i++) {
                 var page = this.document.get_page(i);
-                var user_slide = real_slide_to_user_slide(i);
-                var page_note = this.notes.get_note_for_slide(user_slide);
+                int user_slide = real_slide_to_user_slide(i);
+                string note_text = this.notes.get_note_for_slide(user_slide);
 
                 // We never overwrite existing notes
-                if (page_note != "") {
+                if (note_text != "") {
                     continue;
                 }
 
-                string note_text = "";
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
@@ -390,7 +389,9 @@ namespace pdfpc.Metadata {
                             break;
                     }
                 }
-                this.notes.set_note(note_text, user_slide, true);
+                if (note_text != "") {
+                    this.notes.set_note(note_text, user_slide, true);
+                }
             }
         }
 
