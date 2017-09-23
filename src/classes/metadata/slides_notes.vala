@@ -49,6 +49,8 @@ namespace pdfpc {
             if (slide_number != -1) {
                 if (notes.length <= slide_number) {
                     notes.resize(slide_number+1);
+                }
+                if (notes[slide_number] == null) {
                     notes[slide_number] = new slide_note();
                 }
                 notes[slide_number].note_text = note_text;
@@ -64,6 +66,14 @@ namespace pdfpc {
                 return "";
             } else {
                 return notes[number].note_text;
+            }
+        }
+
+        public bool is_note_native(int number) {
+            if (number >= notes.length || number < 0 || notes[number] == null) {
+                return false;
+            } else {
+                return notes[number].is_native;
             }
         }
 

@@ -579,10 +579,25 @@ namespace pdfpc.Window {
             }
         }
 
+        private void blink_lock_icon() {
+            this.blank_icon.show();
+            GLib.Timeout.add(1000, () => {
+                    this.blank_icon.hide();
+                    return false;
+                });
+        }
+
         /**
          * Edit a note. Basically give focus to notes_view
          */
         public void edit_note() {
+            // Disallow editing notes imported from PDF annotations
+            int number = this.presentation_controller.current_user_slide_number;
+            if (this.metadata.get_notes().is_note_native(number)) {
+                blink_lock_icon();
+                return;
+            }
+
             this.notes_view.editable = true;
             this.notes_view.cursor_visible = true;
             this.notes_view.grab_focus();
