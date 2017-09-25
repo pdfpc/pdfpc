@@ -163,6 +163,11 @@ namespace pdfpc {
          */
         public static bool version = false;
 
+        /**
+         * Location of specific, user-chosen pdfpcrc file
+         */
+        public static string? pdfpc_location = null;
+
         public class BindTuple {
             public string type;
             public uint keyCode;
