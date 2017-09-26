@@ -318,7 +318,9 @@ i.e. you are not able to change slides. These notes are stored in the .pdfpc
 file in a plain text format, easy to edit also from outside the program; see
 the section about the pdfpc format below.  These notes take precedence over the
 native PDF annotations, i.e., if a user-proveded note exists for a given slide,
-any PDF annotations on that page will be silently ignored.  Although mixing the
+any PDF annotations on that page will be silently ignored.
+.PP
+Although mixing the
 two types of notes is possible, for a given presentation one will likely want to
 have either only the "native" notes (produced by the same PDF authoring software
 used for making the slides), or only the "pdfpc" ones.
