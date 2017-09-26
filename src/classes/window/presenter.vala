@@ -103,6 +103,11 @@ namespace pdfpc.Window {
         protected Gtk.Image loaded_icon;
 
         /**
+         * Indication that the notes are read-only (coming from PDF annotations)
+         */
+        protected Gtk.Image locked_icon;
+
+        /**
          * Text box for displaying notes for the slides
          */
         protected Gtk.TextView notes_view;
@@ -298,6 +303,7 @@ namespace pdfpc.Window {
             this.pause_icon = this.load_icon("pause.svg", icon_height);
             this.saved_icon = this.load_icon("saved.svg", icon_height);
             this.loaded_icon = this.load_icon("loaded.svg", icon_height);
+            this.locked_icon = this.load_icon("locked.svg", icon_height);
 
             this.highlight_icon = this.load_icon("highlight.svg", icon_height);
             this.pen_icon = this.load_icon("pen.svg", icon_height);
@@ -394,6 +400,7 @@ namespace pdfpc.Window {
             status.pack_start(this.pause_icon, false, false, 0);
             status.pack_start(this.saved_icon, false, false, 0);
             status.pack_start(this.loaded_icon, false, false, 0);
+            status.pack_start(this.locked_icon, false, false, 0);
             status.pack_start(this.highlight_icon, false, false, 0);
             status.pack_start(this.pen_icon, false, false, 0);
             status.pack_start(this.eraser_icon, false, false, 0);
@@ -529,6 +536,7 @@ namespace pdfpc.Window {
             this.faded_to_black = false;
             this.saved_icon.hide();
             this.loaded_icon.hide();
+            this.locked_icon.hide();
         }
 
         /**
@@ -580,9 +588,9 @@ namespace pdfpc.Window {
         }
 
         private void blink_lock_icon() {
-            this.blank_icon.show();
+            this.locked_icon.show();
             GLib.Timeout.add(1000, () => {
-                    this.blank_icon.hide();
+                    this.locked_icon.hide();
                     return false;
                 });
         }
