@@ -64,6 +64,9 @@ Persist the PNG cache on disk for faster startup.
 .BI "\-P, \-\-page"
 Go to a specific page directly after startup. In case of overlays, the first slide will be displayed.
 .TP
+.BI "\-R, \-\-pdfpc\-location"=LOCATION
+Use custom pdfpc file.
+.TP
 .BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
 .TP

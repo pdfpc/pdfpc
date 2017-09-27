@@ -150,10 +150,6 @@ namespace pdfpc.Metadata {
                             this.end_user_slide = int.parse(section_content);
                             break;
                         }
-                        case "[file]": {
-                            this.pdf_fname = section_content;
-                            break;
-                        }
                         case "[font_size]": {
                             this.font_size = int.parse(section_content);
                             break;
@@ -231,18 +227,18 @@ namespace pdfpc.Metadata {
         /**
          * Fill the path information starting from the user provided filename
          */
-        void fill_path_info(string fname) {
-            int l = fname.length;
-
-            if (l < 6 || fname[l-6:l] != ".pdfpc") {
+        void fill_path_info(string fname, string? fpcname = null) {
+            if (fpcname != null) {
+                this.pdfpc_fname = fpcname;
+                this.pdf_fname = fname;
+            } else {
                 this.pdf_fname = fname;
                 int extension_index = fname.last_index_of(".");
-                if (extension_index > -1)
+                if (extension_index > -1) {
                     this.pdfpc_fname = fname[0:extension_index] + ".pdfpc";
-                else
+                } else {
                     this.pdfpc_fname = fname + ".pdfpc";
-            } else {
-                this.pdfpc_fname = fname;
+                }
             }
         }
 
@@ -269,7 +265,6 @@ namespace pdfpc.Metadata {
                               + format_notes();
             try {
                 if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
-                    contents = "[file]\n" + this.pdf_fname + "\n" + contents;
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
             } catch (Error e) {
@@ -398,7 +393,7 @@ namespace pdfpc.Metadata {
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf(string fname) {
+        public Pdf(string fname, string? fpcname = null) {
             this.url = File.new_for_commandline_arg(fname).get_uri();
 
             this.action_mapping = new Gee.ArrayList<ActionMapping>();
@@ -407,7 +402,8 @@ namespace pdfpc.Metadata {
 
             this.duration = Options.duration;
 
-            fill_path_info(fname);
+            fill_path_info(fname, fpcname);
+
             notes = new slides_notes();
             skips_by_user = false;
             string? skip_line = null;

@@ -62,6 +62,7 @@ namespace pdfpc {
             { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
             { "persist-cache", 'p', 0, 0, ref Options.persist_cache, "Persist the PNG cache on disk for faster startup.", null },
             { "page", 'P', 0, OptionArg.INT, ref Options.page, "Goto a specific page directly after startup", "PAGE" },
+            { "pdfpc-location", 'R', 0, OptionArg.STRING, ref Options.pdfpc_location, "Full path location to a pdfpc file (e.g. ./build/withnotes.pdfpc).", "LOCATION"},
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
@@ -250,9 +251,21 @@ namespace pdfpc {
                 Options.windowed = true;
             }
 
-            GLib.Environment.set_current_dir(GLib.Path.get_dirname(pdfFilename));
+            string cwd = GLib.Environment.get_current_dir();
+            if (!GLib.Path.is_absolute(pdfFilename)) {
+                pdfFilename = GLib.Path.build_filename(cwd, pdfFilename);
+            }
+            var pdfpc_location = Options.pdfpc_location;
+            if (pdfpc_location != null && !GLib.Path.is_absolute(pdfpc_location)) {
+                pdfpc_location = GLib.Path.build_filename(cwd, pdfpc_location);
+            }
 
-            var metadata = new Metadata.Pdf(GLib.Path.get_basename(pdfFilename));
+            if (pdfpc_location != null && !GLib.FileUtils.test(pdfpc_location, (GLib.FileTest.IS_REGULAR))) {
+                GLib.printerr("Can't find custom pdfpc file at %s\n", pdfpc_location);
+                Process.exit(1);
+            }
+
+            var metadata = new Metadata.Pdf(pdfFilename, pdfpc_location);
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
