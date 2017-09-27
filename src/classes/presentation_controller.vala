@@ -1004,7 +1004,7 @@ namespace pdfpc {
          * Notify each of the controllables of mouse scrolling
          */
         public bool scroll(Gdk.EventScroll scroll) {
-            if (!this.ignore_mouse_events) {
+            if (!this.ignore_mouse_events && !Options.disable_scrolling) {
                 switch (scroll.direction) {
                     case Gdk.ScrollDirection.UP:
                     case Gdk.ScrollDirection.LEFT:
