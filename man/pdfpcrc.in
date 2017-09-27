@@ -71,6 +71,9 @@ see
 see
 .B pdfpc(1)
 .TP
+.BI disable-scrolling
+Disable scrolling events on the presenter window (bool, Default false)
+.TP
 .B next-height
 Percentage of the height of the presenter screen to be used for the next slide. (int, Default 70)
 .TP

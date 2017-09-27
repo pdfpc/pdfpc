@@ -251,6 +251,9 @@ namespace pdfpc {
                         Options.disable_cache_compression = true;
                     }
                     break;
+                case "disable-scrolling":
+                    Options.disable_scrolling = bool.parse(fields[2]);
+                    break;
                 case "next-height":
                     Options.next_height = int.parse(fields[2]);
                     break;
