@@ -9,18 +9,15 @@
 .SH NAME
 pdfpcrc \- pdfpc configuration file
 
-.SH SYNOPSIS
-.B @SYSCONFDIR@/pdfpcrc / $XDG_CONFIG_DIR/pdfpc/pdfpcrc
-
 .SH DESCRIPTION
 .PP
-pdfpc(1) reads its configuration file from @SYSCONFDIR@/pdfpcrc. It also reads,
-if present, the file $XDG_CONFIG_DIR/pdfpc/pdfpcrc. If $XDG_CONFIG_DIR is not
-set, it uses $HOME/.config .
+pdfpc(1) reads its configuration from @SYSCONFDIR@/pdfpcrc.  It also reads
+$XDG_CONFIG_DIR/pdfpc/pdfpcrc if this file exists (if $XDG_CONFIG_DIR is not
+set, $HOME/.config will be used).
 
 .SS Keybindings
 .PP
-Following commands are aceepted:
+The following commands are accepted:
 .TP
 .B bind <key> <func> [<arg>]
 Bind a key to a function, passing a specified argument for functions which require one
@@ -85,7 +82,6 @@ Switch the presentation and the presenter screen. (bool, Default false)
 .TP
 .B time-of-day
 see
-
 .B pdfpc(1)
 .TP
 .B timer-pace-color
@@ -115,7 +111,6 @@ function, use
 .RS
 bind R reset
 .RE
-
 
 .PP
 To always activate the black-on-end option, one could add the following to the
