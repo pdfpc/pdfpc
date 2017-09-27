@@ -363,16 +363,34 @@ namespace pdfpc.Metadata {
          * Fill the slide notes from pdf text annotations.
          */
         private void notes_from_document() {
-            for(int i = 0; i < this.page_count; i++) {
+            for (int i = 0; i < this.page_count; i++) {
                 var page = this.document.get_page(i);
+                int user_slide = real_slide_to_user_slide(i);
+                string note_text = this.notes.get_note_for_slide(user_slide);
+
+                // We never overwrite existing notes
+                if (note_text != "") {
+                    continue;
+                }
+
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
-                    switch(a.get_annot_type()) {
+                    switch (a.get_annot_type()) {
                         case Poppler.AnnotType.TEXT:
-                            this.notes.set_note(a.get_contents(), real_slide_to_user_slide(i));
+                        case Poppler.AnnotType.FREE_TEXT:
+                        case Poppler.AnnotType.HIGHLIGHT:
+                        case Poppler.AnnotType.UNDERLINE:
+                        case Poppler.AnnotType.SQUIGGLY:
+                            if (note_text.length > 0) {
+                                note_text += "\n";
+                            }
+                            note_text += a.get_contents();
                             break;
                     }
+                }
+                if (note_text != "") {
+                    this.notes.set_note(note_text, user_slide, true);
                 }
             }
         }

@@ -23,6 +23,15 @@
  */
 
 namespace pdfpc {
+    protected class slide_note: Object {
+        public string note_text = null;
+
+        /**
+         * Native PDF annotation flag
+         */
+        public bool is_native = false;
+    }
+
     /**
      * Class for providing storage for the notes associate with a presentation
      */
@@ -30,17 +39,22 @@ namespace pdfpc {
         /**
          * The array where we will store the text of the notes
          */
-        protected string?[] notes = null;
+        protected slide_note?[] notes = null;
 
         /**
          * Set a note for a given slide
          */
-        public void set_note(string note, int slide_number) {
+        public void set_note(string note_text, int slide_number,
+            bool is_native = false) {
             if (slide_number != -1) {
                 if (notes.length <= slide_number) {
                     notes.resize(slide_number+1);
                 }
-                notes[slide_number] = note;
+                if (notes[slide_number] == null) {
+                    notes[slide_number] = new slide_note();
+                }
+                notes[slide_number].note_text = note_text;
+                notes[slide_number].is_native = is_native;
             }
         }
 
@@ -51,15 +65,31 @@ namespace pdfpc {
             if (number >= notes.length || notes[number] == null) {
                 return "";
             } else {
-                return notes[number];
+                return notes[number].note_text;
+            }
+        }
+
+        public bool is_note_native(int number) {
+            if (number >= notes.length || number < 0 || notes[number] == null) {
+                return false;
+            } else {
+                return notes[number].is_native;
             }
         }
 
         /**
-         * Does the user want notes?
+         * Are there user-defined notes?
          */
         public bool has_notes() {
-            return notes != null;
+            if (notes != null) {
+                for (int i = 0; i < notes.length; ++i) {
+                    if (notes[i] != null && notes[i].is_native == false) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /**
@@ -71,11 +101,12 @@ namespace pdfpc {
                 // match for ether [, ] or #
                 var escape_regex = new Regex("[\\[\\]#]");
                 for (int i = 0; i < notes.length; ++i) {
-                    if (notes[i] != null) {
+                    if (notes[i] != null && notes[i].is_native == false) {
                         builder.append(@"### $(i+1)\n");
                         // match [,],# and replace it with \[ etc. \0 is the whole match (respectively just [,],#)
                         // escaping escape characters is fun!
-                        var escaped_text = escape_regex.replace(notes[i], notes[i].length, 0, "\\\\\\0");
+                        var note_text = notes[i].note_text;
+                        var escaped_text = escape_regex.replace(note_text, note_text.length, 0, "\\\\\\0");
                         builder.append(escaped_text);
                     }
                 }
@@ -83,7 +114,7 @@ namespace pdfpc {
                 // we failed in formatting the notes for disk storage. put a
                 // raw dump to stderr.
                 for (int i = 0; i < notes.length; ++i) {
-                    GLib.print("### %d\n%s\n", i, notes[i]);
+                    GLib.print("### %d\n%s\n", i, notes[i].note_text);
                 }
 
                 GLib.printerr("Formatting notes for pdfpc file failed.\n");

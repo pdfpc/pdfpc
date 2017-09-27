@@ -4,6 +4,7 @@ install(FILES
     pause.svg
     saved.svg
     loaded.svg
+    locked.svg
     highlight.svg
     pen.svg
     eraser.svg

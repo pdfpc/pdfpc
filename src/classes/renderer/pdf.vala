@@ -120,7 +120,8 @@ namespace pdfpc {
             cr.scale(this.scaling_factor, this.scaling_factor);
             cr.translate(-metadata.get_horizontal_offset(this.area),
                 -metadata.get_vertical_offset(this.area));
-            page.render(cr);
+            page.render_for_printing_with_options(cr,
+                Poppler.PrintFlags.DOCUMENT);
 
             // If the cache is enabled store the newly rendered pixmap
             if (this.cache != null) {
