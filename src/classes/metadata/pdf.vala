@@ -231,7 +231,10 @@ namespace pdfpc.Metadata {
         void parse_notes_file() {
             try {
                 string content;
-                string full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
+                string full_notes_include = this.notes_include;
+                if (!GLib.Path.is_absolute(this.notes_include)) {
+                    full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
+                }
                 GLib.FileUtils.get_contents(full_notes_include, out content);
                 if (content.substring(0, "[notes]".len()) == "[notes]") {
                     var notes_content = content.substring("[notes]".len() + 1);
@@ -323,7 +326,11 @@ namespace pdfpc.Metadata {
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
                 }
 
-                string full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
+                string full_notes_include = this.notes_include;
+                if (!GLib.Path.is_absolute(this.notes_include)) {
+                    full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
+                }
+
                 if (notes_contents != "" || GLib.FileUtils.test(full_notes_include, (GLib.FileTest.IS_REGULAR))) {
                     GLib.FileUtils.set_contents(full_notes_include, notes_contents);
                 }
