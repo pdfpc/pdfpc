@@ -493,6 +493,14 @@ It may be quicker to edit the pdfpc file than to re-enter the whole
 information.
 
 .PP
+There is also the possibility of include notes from a different file.
+If pdfpc encounters a [notes_include] section with the .pdfpc file
+it reads the notes
+.B
+only
+from the included file and will also store them there.
+
+.PP
 The files are plain-text files that should be fairly self-explanatory.
 A couple of things to note:
 .IP \[bu] 2
