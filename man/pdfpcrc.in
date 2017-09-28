@@ -9,9 +9,6 @@
 .SH NAME
 pdfpcrc \- pdfpc configuration file
 
-.SH SYNOPSIS
-.B @SYSCONFDIR@/pdfpcrc / $XDG_CONFIG_DIR/pdfpc/pdfpcrc
-
 .SH DESCRIPTION
 .PP
 pdfpc(1) reads its configuration from @SYSCONFDIR@/pdfpcrc.  It also reads
