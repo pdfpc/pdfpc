@@ -210,12 +210,8 @@ namespace pdfpc.Metadata {
 
                 if (this.notes_include != null) {
                     parse_notes_file();
-
-                    // if we have a notes include option, completly ignore the [notes] section
-                    if (notes_content != null) {
-                        GLib.printerr("Found [notes_include] and [notes] section. Ignoring [notes]\n");
-                    }
-                } else if (notes_content != null) {
+                }
+                if (notes_content != null) {
                     notes.parse_lines(notes_content.split("\n"));
                 }
             } catch (Error e) {
@@ -238,7 +234,7 @@ namespace pdfpc.Metadata {
                 GLib.FileUtils.get_contents(full_notes_include, out content);
                 if (content.substring(0, "[notes]".len()) == "[notes]") {
                     var notes_content = content.substring("[notes]".len() + 1);
-                    notes.parse_lines(notes_content.split("\n"));
+                    notes.parse_lines(notes_content.split("\n"), true);
                 } else {
                     GLib.printerr("File %s does not start with [notes]\n", this.notes_include);
                     Process.exit(1);
@@ -310,29 +306,12 @@ namespace pdfpc.Metadata {
                               + format_end_user_slide()
                               + format_last_saved_slide()
                               + format_font_size()
-                              + format_notes_include();
-
-            string notes_contents = "";
-
-            // If the notes does not come from the include_file, write them to the main pdfpc file
-            if (this.notes_include == null) {
-                contents += format_notes();
-            } else  {
-                notes_contents = format_notes();
-            }
+                              + format_notes_include()
+                              + format_notes();
 
             try {
                 if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
-                }
-
-                string full_notes_include = this.notes_include;
-                if (!GLib.Path.is_absolute(this.notes_include)) {
-                    full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
-                }
-
-                if (notes_contents != "" || GLib.FileUtils.test(full_notes_include, (GLib.FileTest.IS_REGULAR))) {
-                    GLib.FileUtils.set_contents(full_notes_include, notes_contents);
                 }
             } catch (Error e) {
                 GLib.printerr("Failed to store metadata on disk: %s\nThe metadata was:\n\n%s", e.message, contents);
