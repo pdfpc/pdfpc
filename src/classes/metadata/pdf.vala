@@ -503,7 +503,7 @@ namespace pdfpc.Metadata {
          * Returns the offset to move the current user_slide_number
          */
         public int toggle_skip(int slide_number, int user_slide_number) {
-            if (slide_number == 0) {
+            if (slide_number == 0 || user_slide_number == 0) {
                 return 0; // We cannot skip the first slide
             }
             int l = this.user_view_indexes.length;
