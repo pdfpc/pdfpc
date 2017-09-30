@@ -110,6 +110,8 @@ namespace pdfpc.Window {
          * Update the display
          */
         public void update() {
+            this.visible = !this.presentation_controller.hidden;
+
             if (this.presentation_controller.faded_to_black) {
                 this.view.fade_to_black();
                 return;
