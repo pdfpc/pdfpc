@@ -71,7 +71,7 @@ namespace pdfpc {
          * Return the text of a note
          */
         public string get_note_for_slide(int number) {
-            if (number >= notes.length || notes[number] == null) {
+            if (number >= notes.length || number < 0 || notes[number] == null) {
                 return "";
             } else {
                 return notes[number].note_text;

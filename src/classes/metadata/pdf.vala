@@ -562,13 +562,16 @@ namespace pdfpc.Metadata {
          * Returns the offset to move the current user_slide_number
          */
         public int toggle_skip(int slide_number, int user_slide_number) {
-            if (slide_number == 0) {
+            if (slide_number == 0 || user_slide_number == 0) {
                 return 0; // We cannot skip the first slide
+            }
+            int l = this.user_view_indexes.length;
+            if (l < 2) {
+                return 0; // Can no longer skip...
             }
             skips_by_user = true;
             int converted_user_slide = user_slide_to_real_slide(user_slide_number);
             int offset;
-            int l = this.user_view_indexes.length;
             if (converted_user_slide == slide_number) { // Activate skip
                 int[] new_indexes = new int[ l-1 ];
                 for (int i = 0; i < user_slide_number; ++i) {
