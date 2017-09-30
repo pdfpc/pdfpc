@@ -30,6 +30,11 @@ namespace pdfpc {
          * Native PDF annotation flag
          */
         public bool is_native = false;
+
+        /**
+         * Notes from [notes_include] secion flag
+         */
+        public bool is_remote = false;
     }
 
     /**
@@ -45,16 +50,20 @@ namespace pdfpc {
          * Set a note for a given slide
          */
         public void set_note(string note_text, int slide_number,
-            bool is_native = false) {
+            bool is_native = false, bool is_remote = false) {
             if (slide_number != -1) {
                 if (notes.length <= slide_number) {
                     notes.resize(slide_number+1);
                 }
                 if (notes[slide_number] == null) {
                     notes[slide_number] = new slide_note();
+                } else {
+                    GLib.printerr("Found conflicting notes for slide %d\n", slide_number + 1);
+                    GLib.printerr("Using '%s' instead of '%s'\n", note_text.strip(), notes[slide_number].note_text.strip());
                 }
                 notes[slide_number].note_text = note_text;
                 notes[slide_number].is_native = is_native;
+                notes[slide_number].is_remote = is_remote;
             }
         }
 
@@ -69,11 +78,11 @@ namespace pdfpc {
             }
         }
 
-        public bool is_note_native(int number) {
+        public bool is_note_read_only(int number) {
             if (number >= notes.length || number < 0 || notes[number] == null) {
                 return false;
             } else {
-                return notes[number].is_native;
+                return notes[number].is_native || notes[number].is_remote;
             }
         }
 
@@ -83,7 +92,9 @@ namespace pdfpc {
         public bool has_notes() {
             if (notes != null) {
                 for (int i = 0; i < notes.length; ++i) {
-                    if (notes[i] != null && notes[i].is_native == false) {
+                    if (   notes[i] != null
+                        && !notes[i].is_native
+                        && !notes[i].is_remote) {
                         return true;
                     }
                 }
@@ -101,7 +112,9 @@ namespace pdfpc {
                 // match for ether [, ] or #
                 var escape_regex = new Regex("[\\[\\]#]");
                 for (int i = 0; i < notes.length; ++i) {
-                    if (notes[i] != null && notes[i].is_native == false) {
+                    if (   notes[i] != null
+                        && !notes[i].is_native
+                        && !notes[i].is_remote) {
                         builder.append(@"### $(i+1)\n");
                         // match [,],# and replace it with \[ etc. \0 is the whole match (respectively just [,],#)
                         // escaping escape characters is fun!
@@ -127,7 +140,7 @@ namespace pdfpc {
         /**
          * Parse the notes line of the pdfpc file
          */
-        public void parse_lines(string[] lines) {
+        public void parse_lines(string[] lines, bool is_remote = false) {
             string long_line = string.joinv("\n", lines);
             string[] notes_sections = long_line.split("### ");
 
@@ -146,7 +159,7 @@ namespace pdfpc {
                     var notes_unescaped = unescape_regex.replace(notes, notes.length, 0, "\\1");
 
                     int slide_number = int.parse(header_string);
-                    set_note(notes_unescaped, slide_number - 1);
+                    set_note(notes_unescaped, slide_number - 1, false, is_remote);
 
                 }
             } catch (RegexError e) {

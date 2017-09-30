@@ -176,6 +176,9 @@ Exit pdfpc
 .B b
 Turn off the presentation view (i.e.  fill it with a black color)
 .TP
+.B h
+Hide the presentation vindow (i.e. make other windows on the other screen visible)
+.TP
 .B n
 Edit note for current slide
 .TP
@@ -491,6 +494,14 @@ The most typical case is if you add or remove some slides after you have
 edited notes or defined overlays.
 It may be quicker to edit the pdfpc file than to re-enter the whole
 information.
+
+.PP
+There is also the possibility of including notes from a different file.
+If pdfpc encounters a [notes_include] section with the .pdfpc file
+it reads the notes
+.B
+only
+from the included file. Changing notes within pdfpc is then forbidden.
 
 .PP
 The files are plain-text files that should be fairly self-explanatory.

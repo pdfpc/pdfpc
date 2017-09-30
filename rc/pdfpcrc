@@ -44,6 +44,7 @@ bind R         reset
 bind b         blank
 bind period    blank
 bind f         freeze
+bind h         hide
 
 # Presentation properties
 bind n         note
