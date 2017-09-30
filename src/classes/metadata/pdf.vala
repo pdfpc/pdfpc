@@ -7,7 +7,7 @@
  * Copyright 2012, 2015 Robert Schroll
  * Copyright 2012 Pascal Germroth
  * Copyright 2012 David Vilar
- * Copyright 2012, 2015 Andreas Bilke
+ * Copyright 2012, 2015, 2017 Andreas Bilke
  * Copyright 2013 Stefan Tauner
  * Copyright 2015 Maurizio Tomasi
  * Copyright 2015 endzone
@@ -112,6 +112,12 @@ namespace pdfpc.Metadata {
         private int _font_size = -1;
         public int font_size { get { return _font_size; } set { _font_size = value; } }
 
+
+        /**
+         * A file to read additional notes from
+         */
+        private string? notes_include = null;
+
         /**
          * Parse the given pdfpc file
          */
@@ -121,6 +127,8 @@ namespace pdfpc.Metadata {
                 string content;
                 GLib.FileUtils.get_contents(this.pdfpc_fname, out content);
                 GLib.Regex regex = new GLib.Regex("(\\[[A-Za-z_]+\\])");
+
+                string? notes_content = null;
 
                 string[] config_sections = regex.split_full(content);
                 // config_sections[0] is empty
@@ -167,7 +175,11 @@ namespace pdfpc.Metadata {
                             break;
                         }
                         case "[notes]": {
-                            notes.parse_lines(section_content.split("\n"));
+                            notes_content = section_content;
+                            break;
+                        }
+                        case "[notes_include]": {
+                            this.notes_include = section_content;
                             break;
                         }
                         case "[notes_position]": {
@@ -194,6 +206,38 @@ namespace pdfpc.Metadata {
                             break;
                         }
                     }
+                }
+
+                if (this.notes_include != null) {
+                    parse_notes_file();
+                }
+                if (notes_content != null) {
+                    notes.parse_lines(notes_content.split("\n"));
+                }
+            } catch (Error e) {
+                GLib.printerr("%s\n", e.message);
+                Process.exit(1);
+            }
+        }
+
+
+        /**
+         * Parse an additonal notes file
+         */
+        void parse_notes_file() {
+            try {
+                string content;
+                string full_notes_include = this.notes_include;
+                if (!GLib.Path.is_absolute(this.notes_include)) {
+                    full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
+                }
+                GLib.FileUtils.get_contents(full_notes_include, out content);
+                if (content.substring(0, "[notes]".len()) == "[notes]") {
+                    var notes_content = content.substring("[notes]".len() + 1);
+                    notes.parse_lines(notes_content.split("\n"), true);
+                } else {
+                    GLib.printerr("File %s does not start with [notes]\n", this.notes_include);
+                    Process.exit(1);
                 }
             } catch (Error e) {
                 GLib.printerr("%s\n", e.message);
@@ -262,7 +306,9 @@ namespace pdfpc.Metadata {
                               + format_end_user_slide()
                               + format_last_saved_slide()
                               + format_font_size()
+                              + format_notes_include()
                               + format_notes();
+
             try {
                 if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                     GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
@@ -271,6 +317,19 @@ namespace pdfpc.Metadata {
                 GLib.printerr("Failed to store metadata on disk: %s\nThe metadata was:\n\n%s", e.message, contents);
                 Process.exit(1);
             }
+        }
+
+        /**
+         * Format the [note_include] section
+         */
+        protected string format_notes_include() {
+            string contents = "";
+
+            if (this.notes_include != null) {
+                contents += "[notes_include]\n" + this.notes_include;
+            }
+
+            return contents;
         }
 
         /**

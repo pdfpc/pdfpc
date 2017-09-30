@@ -615,7 +615,7 @@ namespace pdfpc.Window {
         public void edit_note() {
             // Disallow editing notes imported from PDF annotations
             int number = this.presentation_controller.current_user_slide_number;
-            if (this.metadata.get_notes().is_note_native(number)) {
+            if (this.metadata.get_notes().is_note_read_only(number)) {
                 blink_lock_icon();
                 return;
             }
