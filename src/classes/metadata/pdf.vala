@@ -232,8 +232,8 @@ namespace pdfpc.Metadata {
                     full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
                 }
                 GLib.FileUtils.get_contents(full_notes_include, out content);
-                if (content.substring(0, "[notes]".len()) == "[notes]") {
-                    var notes_content = content.substring("[notes]".len() + 1);
+                if (content.substring(0, "[notes]".length) == "[notes]") {
+                    var notes_content = content.substring("[notes]".length + 1);
                     notes.parse_lines(notes_content.split("\n"), true);
                 } else {
                     GLib.printerr("File %s does not start with [notes]\n", this.notes_include);
