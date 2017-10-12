@@ -289,25 +289,21 @@ namespace pdfpc {
 
             this.add_actions();
 
-            try {
-                Bus.get_proxy.begin<ScreenSaver>(BusType.SESSION, "org.freedesktop.ScreenSaver", "/org/freedesktop/ScreenSaver", 0, null, (obj, res) => {
-                    try {
-                        this.screensaver = Bus.get_proxy.end(res);
-                        this.screensaver.inhibit.begin("pdfpc", "Showing a presentation", (obj, res) => {
-                            try {
-                                this.screensaver_cookie = this.screensaver.inhibit.end(res);
-                                GLib.print("Screensaver inhibited\n");
-                            } catch (Error error) {
-                                // pass
-                            }
-                        });
-                    } catch (Error error) {
-                        // pass
-                    }
-                });
-            } catch (Error error) {
-                // pass
-            }
+            Bus.get_proxy.begin<ScreenSaver>(BusType.SESSION, "org.freedesktop.ScreenSaver", "/org/freedesktop/ScreenSaver", 0, null, (obj, res) => {
+                try {
+                    this.screensaver = Bus.get_proxy.end(res);
+                    this.screensaver.inhibit.begin("pdfpc", "Showing a presentation", (obj, res) => {
+                        try {
+                            this.screensaver_cookie = this.screensaver.inhibit.end(res);
+                            GLib.print("Screensaver inhibited\n");
+                        } catch (GLib.IOError error) {
+                            // pass
+                        }
+                    });
+                } catch (GLib.IOError error) {
+                    // pass
+                }
+            });
 
             readKeyBindings();
             readMouseBindings();
