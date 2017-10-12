@@ -384,6 +384,41 @@ namespace pdfpc.Window {
             this.next_view.halign = Gtk.Align.CENTER;
             this.next_view.valign = Gtk.Align.CENTER;
             nextViewWithNotes.pack_start(next_view, false, false, 0);
+
+            var panel_rc = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            panel_rc.halign = Gtk.Align.END;
+            var pbut = new Gtk.Button();
+            var image = new Gtk.Image.from_icon_name("applications-utilities",
+                Gtk.IconSize.LARGE_TOOLBAR);
+            image.show();
+            pbut.add(image);
+            var revealer = new Gtk.Revealer();
+            panel_rc.pack_end(pbut);
+            panel_rc.pack_end(revealer);
+
+            pbut.clicked.connect (() => {
+                    revealer.set_reveal_child(!revealer.get_child_revealed());
+		});
+
+            var button_panel = new Gtk.Grid();
+            button_panel.set_column_homogeneous(true);
+            button_panel.set_column_spacing(0);
+
+            for (int i = 0; i < 10; i++) {
+                var b = new Gtk.Button();
+                var image1 = new Gtk.Image.from_icon_name("applications-other",
+                    Gtk.IconSize.LARGE_TOOLBAR);
+                image1.show();
+                b.add(image1);
+                button_panel.attach(b, i, 0, 1, 1);
+            }
+
+            revealer.add(button_panel);
+            revealer.set_reveal_child(false);
+            revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_LEFT);
+
+            nextViewWithNotes.pack_start(panel_rc, false, false, 5);
+
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.set_size_request(this.next_allocated_width, -1);
             notes_sw.add(this.notes_view);
