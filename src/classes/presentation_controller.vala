@@ -296,11 +296,11 @@ namespace pdfpc {
                         try {
                             this.screensaver_cookie = this.screensaver.inhibit.end(res);
                             GLib.print("Screensaver inhibited\n");
-                        } catch (GLib.IOError error) {
+                        } catch (GLib.Error error) {
                             // pass
                         }
                     });
-                } catch (GLib.IOError error) {
+                } catch (GLib.Error error) {
                     // pass
                 }
             });
