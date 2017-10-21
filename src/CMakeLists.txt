@@ -57,6 +57,7 @@ endif()
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_BINARY_DIR}/paths.vala)
 
+file (GLOB_RECURSE C_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
 file (GLOB_RECURSE VALA_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.vala)
 list(REMOVE_ITEM VALA_SRC paths.vala)
 if (MOVIES)
@@ -87,11 +88,12 @@ GENERATE_VAPI
     presenter
 CUSTOM_VAPIS
     ${CMAKE_CURRENT_BINARY_DIR}/paths.vala
+    ${CMAKE_CURRENT_SOURCE_DIR}/custom_binding.vapi
 )
-
 
 add_executable(pdfpc
     ${VALA_C}
+    ${C_SRC}
 )
 
 # explicitly add libraries (needed e.g. for Fedora 13+)
