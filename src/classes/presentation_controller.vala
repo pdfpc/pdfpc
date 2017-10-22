@@ -12,6 +12,7 @@
  * Copyright 2015,2017 Andreas Bilke
  * Copyright 2015 Andy Barry
  * Copyright 2017 Olivier Pantalé
+ * Copyright 2017 Philipp Berndt
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

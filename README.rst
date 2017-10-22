@@ -37,7 +37,7 @@ Installation
         1. Windows: Activate WSL: https://msdn.microsoft.com/en-us/commandline/wsl/install_guide
         2. Windows: Open CMD and run: 'bash' in order to start the WSL-bash
         3. WSL-Bash: run: 'sudo apt-get install pdf-presenter-console'
-        
+
         Run:
         1. Windows: Install a Windows X-Server like VcXsrv: https://sourceforge.net/projects/vcxsrv
         2. Windows: Make the presentation screen your secondary screen and disable the taskbar on that screen
@@ -198,9 +198,7 @@ If you are using i3-wm add this to your config file::
 Acknowledgements
 ================
 
-pdfpc has been developed by Jakob Westhoff, David Vilar, Robert Schroll, Andreas
-Bilke, Andy Barry, Phillip Berndt and others. It was previously available at
-https://github.com/davvil/pdfpc
+pdfpc was initially developed as pdfpc-presenter-console by Jakob Westhoff
+(https://github.com/jakobwesthoff/Pdf-Presenter-Console)
+then further extended by davvil (https://github.com/davvil/pdfpc).
 
-pdfpc is a fork of Pdf Presenter Console by Jakob Westhoff, available at
-https://github.com/jakobwesthoff/Pdf-Presenter-Console

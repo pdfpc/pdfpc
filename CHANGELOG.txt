@@ -2,6 +2,27 @@
 pdfpc Changelog
 ===============
 
+Version 4.1
+=============
+
+*Released: October 2017*
+
+- Time pace color (adaptive color changes of the timer depending on the
+  presenters speed)
+
+- PDF annotations can be used as slide notes
+
+- The .pdfpc file can now be located at different locations
+
+- The .pdfpc file allows a notes include file
+
+- Main window can be hidden during the talk
+
+- Bug fixes
+    - Font increasing/decreasing of notes works more reliable
+    - Fix segfault if all slides are marked as overlays
+    - Wayland with HiDPI setting should have the correct window size
+
 Version 4.0.8
 =============
 

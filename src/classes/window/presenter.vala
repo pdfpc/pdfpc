@@ -11,6 +11,7 @@
  * Copyright 2015-2016 Andy Barry
  * Copyright 2015 Jeremy Maitin-Shepard
  * Copyright 2017 Olivier Pantalé
+ * Copyright 2017 Evgeny Stambulchik
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
