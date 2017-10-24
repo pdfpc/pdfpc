@@ -517,7 +517,7 @@ Slide indexes start at 1
 With GTK3 it is possible to modify the appearance of pdfpc. There are two
 locations where pdfpc is looking for files. The default location is
 @CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. It can be copied
-to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and modifed to user's liking.
+to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and modified to the user's liking.
 
 .SS Integration with other tools
 
