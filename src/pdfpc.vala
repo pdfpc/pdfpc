@@ -103,10 +103,8 @@ namespace pdfpc {
          * Print version string and copyright statement
          */
         private void print_version() {
-            GLib.print("pdfpc v4.0.8\n"
-                     + "(C) 2015-2017 Robert Schroll, Andreas Bilke, Andy Barry, Phillip Berndt and others\n"
-                     + "(C) 2012 David Vilar\n"
-                     + "(C) 2009-2011 Jakob Westhoff\n\n"
+            GLib.print("pdfpc v4.1\n"
+                     + "Copyright (C) 2010-2017 see CONTRIBUTORS\n\n"
                      + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"
                      + "This is free software: you are free to change and redistribute it.\n"
                      + "There is NO WARRANTY, to the extent permitted by law.\n");

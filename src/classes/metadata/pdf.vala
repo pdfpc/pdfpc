@@ -12,6 +12,8 @@
  * Copyright 2015 Maurizio Tomasi
  * Copyright 2015 endzone
  * Copyright 2017 Olivier Pantalé
+ * Copyright 2017 Evgeny Stambulchik
+ * Copyright 2017 Philipp Berndt
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
