@@ -50,8 +50,22 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+link_directories(
+    ${GOBJECT_LIBRARY_DIRS}
+    ${GIO_LIBRARY_DIRS}
+    ${GEE_LIBRARY_DIRS}
+    ${POPPLER_LIBRARY_DIRS}
+    ${GTK_LIBRARY_DIRS}
+    ${GTHREAD_LIBRARY_DIRS}
+    ${PANGOCAIRO_LIBRARY_DIRS}
+    ${GSTREAMER_LIBRARY_DIRS}
+    ${GSTINTERFACES_LIBRARY_DIRS}
+    ${GSTVIDEO_LIBRARY_DIRS}
+)
+
 if(${WITH_X11})
     include_directories(${X11_INCLUDE_DIRS})
+    link_directories(${X11_LIBRARY_DIRS})
     set(ADDITIONAL_LIBS ${X11_LIBRARIES})
 endif()
 
