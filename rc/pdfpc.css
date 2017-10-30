@@ -1,4 +1,4 @@
-* {
+*:not(GtkButton) {
     background-image: none;
     border: none;
     color: white;
@@ -36,6 +36,10 @@ GtkProgressBar * {
 
 GtkEntry, GtkIconView, GtkTextView, GtkWindow {
     background-color: black;
+}
+
+GtkButton * {
+    background-color: gray;
 }
 
 entry, iconview, textview *, window {

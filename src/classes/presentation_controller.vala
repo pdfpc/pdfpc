@@ -1583,7 +1583,7 @@ namespace pdfpc {
         /**
          * Fill the presentation display with black
          */
-        protected void fade_to_black() {
+        public void fade_to_black() {
             this.faded_to_black = !this.faded_to_black;
             this.controllables_update();
         }
@@ -1591,7 +1591,7 @@ namespace pdfpc {
         /**
          * Hide the presentation window
          */
-        protected void hide_presentation() {
+        public void hide_presentation() {
             this.hidden = !this.hidden;
             this.controllables_update();
         }
@@ -1619,7 +1619,7 @@ namespace pdfpc {
         /**
          * Freeze the display
          */
-        protected void toggle_freeze() {
+        public void toggle_freeze() {
             this.frozen = !this.frozen;
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1656,7 +1656,7 @@ namespace pdfpc {
         /**
          * Pause the timer
          */
-        protected void toggle_pause() {
+        public void toggle_pause() {
             this.timer.pause();
             this.controllables_update();
         }

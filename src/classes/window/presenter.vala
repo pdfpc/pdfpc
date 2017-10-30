@@ -143,6 +143,16 @@ namespace pdfpc.Window {
         protected Gtk.Stack slide_stack;
 
         /**
+         * The toolbox with action buttons
+         */
+        protected Gtk.Box toolbox;
+
+        /**
+         * Fixed layout container.
+         */
+        protected Gtk.Fixed fixed;
+
+        /**
          * Metadata of the slides
          */
         protected Metadata.Pdf metadata;
@@ -151,6 +161,47 @@ namespace pdfpc.Window {
          * Width of next/notes area
          **/
         protected int next_allocated_width;
+
+        /**
+         * Coordinates of the click event at the beginning of toolbox dragging
+         **/
+        private int toolbox_x0;
+        private int toolbox_y0;
+
+        protected bool on_button_press(Gtk.Widget pbut, Gdk.EventButton event) {
+	    if (event.button == 1 ) {
+                var w = this.get_window();
+
+                w.get_position(out this.toolbox_x0, out this.toolbox_y0);
+
+                this.toolbox_x0 += (int) event.x;
+	        this.toolbox_y0 += (int) event.y;
+            }
+
+	    return true;
+        }
+
+        protected bool on_move_pointer(Gtk.Widget pbut, Gdk.EventMotion event) {
+            int x = (int) event.x_root - this.toolbox_x0;
+            int y = (int) event.y_root - this.toolbox_y0;
+
+            if (true) {
+                this.fixed.move(toolbox, x, y);
+            }
+
+            return true;
+        }
+
+        protected Gtk.Button add_toolbox_button(Gtk.Box panel,
+            string icon_fname) {
+            var bimage = this.load_icon(icon_fname, 30);
+            bimage.show();
+            var button = new Gtk.Button();
+            button.add(bimage);
+            panel.pack_start(button);
+
+            return button;
+        }
 
         /**
          * Base constructor instantiating a new presenter window
@@ -301,7 +352,7 @@ namespace pdfpc.Window {
             this.prerender_progress.no_show_all = true;
             this.prerender_progress.valign = Gtk.Align.END;
 
-            int icon_height = (int)Math.round(bottom_height*0.9);;
+            int icon_height = (int)Math.round(bottom_height*0.9);
 
             this.blank_icon = this.load_icon("blank.svg", icon_height);
             this.hidden_icon = this.load_icon("hidden.svg", icon_height);
@@ -385,40 +436,6 @@ namespace pdfpc.Window {
             this.next_view.valign = Gtk.Align.CENTER;
             nextViewWithNotes.pack_start(next_view, false, false, 0);
 
-            var panel_rc = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            panel_rc.halign = Gtk.Align.END;
-            var pbut = new Gtk.Button();
-            var image = new Gtk.Image.from_icon_name("applications-utilities",
-                Gtk.IconSize.LARGE_TOOLBAR);
-            image.show();
-            pbut.add(image);
-            var revealer = new Gtk.Revealer();
-            panel_rc.pack_end(pbut);
-            panel_rc.pack_end(revealer);
-
-            pbut.clicked.connect (() => {
-                    revealer.set_reveal_child(!revealer.get_child_revealed());
-		});
-
-            var button_panel = new Gtk.Grid();
-            button_panel.set_column_homogeneous(true);
-            button_panel.set_column_spacing(0);
-
-            for (int i = 0; i < 10; i++) {
-                var b = new Gtk.Button();
-                var image1 = new Gtk.Image.from_icon_name("applications-other",
-                    Gtk.IconSize.LARGE_TOOLBAR);
-                image1.show();
-                b.add(image1);
-                button_panel.attach(b, i, 0, 1, 1);
-            }
-
-            revealer.add(button_panel);
-            revealer.set_reveal_child(false);
-            revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_LEFT);
-
-            nextViewWithNotes.pack_start(panel_rc, false, false, 5);
-
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.set_size_request(this.next_allocated_width, -1);
             notes_sw.add(this.notes_view);
@@ -463,7 +480,81 @@ namespace pdfpc.Window {
             full_layout.pack_start(this.slide_stack, true, true, 0);
             full_layout.pack_end(bottom_row, false, false, 0);
 
-            this.add(full_layout);
+            Gtk.Overlay full_overlay = new Gtk.Overlay();
+            full_overlay.add_overlay(full_layout);
+
+
+            this.toolbox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            this.toolbox.halign = Gtk.Align.START;
+            this.toolbox.valign = Gtk.Align.START;
+
+            /* Toolbox handle consisting of an image + eventbox */
+            var himage = this.load_icon("move.svg", 30);
+            himage.show();
+
+            var heventbox = new Gtk.EventBox();
+            heventbox.button_press_event.connect(on_button_press);
+            heventbox.motion_notify_event.connect(on_move_pointer);
+            heventbox.add(himage);
+            heventbox.set_events(
+                  Gdk.EventMask.BUTTON_PRESS_MASK |
+                  Gdk.EventMask.BUTTON1_MOTION_MASK
+            );
+            this.toolbox.pack_start(heventbox);
+
+            Gtk.Button tb;
+            tb = add_toolbox_button(this.toolbox, "settings.svg");
+
+            /* Toolbox panel that contains the buttons */
+            var button_panel = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            button_panel.set_spacing(0);
+            button_panel.set_child_visible(false);
+            this.toolbox.pack_start(button_panel);
+
+            tb.clicked.connect(() => {
+                    var state = button_panel.get_child_visible();
+                    button_panel.set_child_visible(!state);
+		});
+
+            tb = add_toolbox_button(button_panel, "highlight.svg");
+            tb.set_tooltip_text("Toggle pointer");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.toggle_pointers();
+		});
+            tb = add_toolbox_button(button_panel, "pen.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.toggle_pen_drawing();
+		});
+            tb = add_toolbox_button(button_panel, "eraser.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.toggle_eraser();
+		});
+            tb = add_toolbox_button(button_panel, "snow.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.toggle_freeze();
+		});
+            tb = add_toolbox_button(button_panel, "blank.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.fade_to_black();
+		});
+            tb = add_toolbox_button(button_panel, "hidden.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.hide_presentation();
+		});
+            tb = add_toolbox_button(button_panel, "pause.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.toggle_pause();
+		});
+
+            this.fixed = new Gtk.Fixed();
+
+            full_overlay.add_overlay(this.fixed);
+            full_overlay.set_overlay_pass_through(this.fixed, true);
+            int tb_offset = (int) Math.round(0.1*next_scale_rect.height);
+            this.fixed.put(toolbox, next_scale_rect.width + tb_offset,
+                                    current_scale_rect.height + tb_offset);
+
+            this.add(full_overlay);
         }
 
         public override void show() {
