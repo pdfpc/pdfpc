@@ -194,12 +194,16 @@ namespace pdfpc.Window {
         }
 
         protected Gtk.Button add_toolbox_button(Gtk.Box panel,
-            string icon_fname) {
+            bool tbox_inverse, string icon_fname) {
             var bimage = this.load_icon(icon_fname, 30);
             bimage.show();
             var button = new Gtk.Button();
             button.add(bimage);
-            panel.pack_start(button);
+            if (tbox_inverse) {
+                panel.pack_end(button);
+            } else {
+                panel.pack_start(button);
+            }
 
             return button;
         }
@@ -484,8 +488,27 @@ namespace pdfpc.Window {
             Gtk.Overlay full_overlay = new Gtk.Overlay();
             full_overlay.add_overlay(full_layout);
 
-
-            this.toolbox = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            Gtk.Orientation toolbox_orientation = Gtk.Orientation.HORIZONTAL;
+            bool tbox_inverse = false;
+            switch (Options.toolbox_direction) {
+                case Options.ToolboxDirection.TtoB:
+                    toolbox_orientation = Gtk.Orientation.VERTICAL;
+                    tbox_inverse = false;
+                    break;
+                case Options.ToolboxDirection.BtoT:
+                    toolbox_orientation = Gtk.Orientation.VERTICAL;
+                    tbox_inverse = true;
+                    break;
+                case Options.ToolboxDirection.LtoR:
+                    toolbox_orientation = Gtk.Orientation.HORIZONTAL;
+                    tbox_inverse = false;
+                    break;
+                case Options.ToolboxDirection.RtoL:
+                    toolbox_orientation = Gtk.Orientation.HORIZONTAL;
+                    tbox_inverse = true;
+                    break;
+            }
+            this.toolbox = new Gtk.Box(toolbox_orientation, 0);
             this.toolbox.halign = Gtk.Align.START;
             this.toolbox.valign = Gtk.Align.START;
 
@@ -501,48 +524,56 @@ namespace pdfpc.Window {
                   Gdk.EventMask.BUTTON_PRESS_MASK |
                   Gdk.EventMask.BUTTON1_MOTION_MASK
             );
-            this.toolbox.pack_start(heventbox);
+            if (tbox_inverse) {
+                this.toolbox.pack_end(heventbox);
+            } else {
+                this.toolbox.pack_start(heventbox);
+            }
 
             Gtk.Button tb;
-            tb = add_toolbox_button(this.toolbox, "settings.svg");
+            tb = add_toolbox_button(this.toolbox, tbox_inverse, "settings.svg");
 
             /* Toolbox panel that contains the buttons */
-            var button_panel = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            var button_panel = new Gtk.Box(toolbox_orientation, 0);
             button_panel.set_spacing(0);
             button_panel.set_child_visible(false);
-            this.toolbox.pack_start(button_panel);
+            if (tbox_inverse) {
+                this.toolbox.pack_end(button_panel);
+            } else {
+                this.toolbox.pack_start(button_panel);
+            }
 
             tb.clicked.connect(() => {
                     var state = button_panel.get_child_visible();
                     button_panel.set_child_visible(!state);
 		});
 
-            tb = add_toolbox_button(button_panel, "highlight.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
             tb.set_tooltip_text("Toggle pointer");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pointers();
 		});
-            tb = add_toolbox_button(button_panel, "pen.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pen_drawing();
 		});
-            tb = add_toolbox_button(button_panel, "eraser.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_eraser();
 		});
-            tb = add_toolbox_button(button_panel, "snow.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_freeze();
 		});
-            tb = add_toolbox_button(button_panel, "blank.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "blank.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.fade_to_black();
 		});
-            tb = add_toolbox_button(button_panel, "hidden.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "hidden.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.hide_presentation();
 		});
-            tb = add_toolbox_button(button_panel, "pause.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pause();
 		});
