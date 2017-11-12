@@ -361,12 +361,7 @@ namespace pdfpc.Window {
             strict_views.pack_start(this.strict_prev_view, false, false, 0);
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
-            this.overlay_layout.halign = Gtk.Align.CENTER;
-            this.overlay_layout.valign = Gtk.Align.CENTER;
             this.overlay_layout.add(this.current_view);
-            this.overlay_layout.add_overlay(this.video_surface);
-            this.overlay_layout.add_overlay(this.pen_drawing_surface);
-            this.overlay_layout.add_overlay(this.pointer_drawing_surface);
 
             this.overlay_layout.set_size_request(
                 this.main_view.get_renderer().width / this.gdk_scale,

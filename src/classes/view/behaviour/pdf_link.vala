@@ -131,6 +131,14 @@ namespace pdfpc.View.Behaviour {
          * further requests and checks.
          */
         public void on_entering_slide(View.Pdf source, int page_number) {
+            // if target is not mapped (ie. the size is not known) post pone
+            // the mapping calculatation since the results wouldn't be correct
+            if (!target.get_mapped()) {
+                target.realize.connect(() => {
+                    this.on_entering_slide(source, page_number);
+                });
+            }
+
             // Get the link mapping table
             bool in_range = true;
             Metadata.Pdf metadata = source.get_renderer().metadata;

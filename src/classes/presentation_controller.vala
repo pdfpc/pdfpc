@@ -340,6 +340,7 @@ namespace pdfpc {
         protected void init_presentation_pen() {
             init_pen_drawing_if_needed(presentation_allocation);
             this.presentation_pen_surface = presentation.pen_drawing_surface;
+            this.presentation_pen_surface.hide();
             this.presentation_pen_surface.draw.connect ((context) => {
                 draw_pen_surface(context, presentation_allocation, false);
                 return true;
