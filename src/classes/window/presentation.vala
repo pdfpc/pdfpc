@@ -73,12 +73,7 @@ namespace pdfpc.Window {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
-            this.overlay_layout.halign = Gtk.Align.CENTER;
-            this.overlay_layout.valign = Gtk.Align.CENTER;
             this.overlay_layout.add(this.view);
-            this.overlay_layout.add_overlay(this.video_surface);
-            this.overlay_layout.add_overlay(this.pen_drawing_surface);
-            this.overlay_layout.add_overlay(this.pointer_drawing_surface);
 
             this.overlay_layout.set_size_request(
                 this.main_view.get_renderer().width / this.gdk_scale,
@@ -86,10 +81,6 @@ namespace pdfpc.Window {
             );
 
             this.add(overlay_layout);
-
-            this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
-            this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
-            this.add_events(Gdk.EventMask.SCROLL_MASK);
 
             this.key_press_event.connect(this.presentation_controller.key_press);
             this.button_press_event.connect(this.presentation_controller.button_press);

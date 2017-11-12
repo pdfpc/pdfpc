@@ -116,9 +116,26 @@ namespace pdfpc.Window {
             }
 
             this.overlay_layout = new Gtk.Overlay();
+            this.overlay_layout.halign = Gtk.Align.CENTER;
+            this.overlay_layout.valign = Gtk.Align.CENTER;
+
             this.pointer_drawing_surface = new Gtk.DrawingArea();
             this.pen_drawing_surface = new Gtk.DrawingArea();
             this.video_surface = new View.Video();
+
+            this.overlay_layout.add_overlay(this.video_surface);
+            this.overlay_layout.add_overlay(this.pen_drawing_surface);
+            this.overlay_layout.add_overlay(this.pointer_drawing_surface);
+
+            this.video_surface.realize.connect(() => {
+                this.set_widget_event_pass_though(this.video_surface, true);
+            });
+            this.pen_drawing_surface.realize.connect(() => {
+                this.set_widget_event_pass_though(this.pen_drawing_surface, true);
+            });
+            this.pointer_drawing_surface.realize.connect(() => {
+                this.set_widget_event_pass_though(this.pointer_drawing_surface, true);
+            });
 
             this.pointer_drawing_surface.halign = Gtk.Align.FILL;
             this.pointer_drawing_surface.valign = Gtk.Align.FILL;
@@ -235,6 +252,16 @@ namespace pdfpc.Window {
                 // another five seconds.
                 return true;
             }
+        }
+
+        /**
+         * Set the widget passthrough.
+         *
+         * If set to true, the widget will not receive events and they will be forwarded to the
+         * underlying widgets within the Gtk.Overlay
+         */
+        protected void set_widget_event_pass_though(Gtk.Widget w, bool pass_through) {
+            this.overlay_layout.set_overlay_pass_through(w, pass_through);
         }
     }
 }
