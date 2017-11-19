@@ -255,6 +255,8 @@ namespace pdfpc {
                 context.remove_class("pretalk");
                 context.remove_class("last-minutes");
                 context.remove_class("overtime");
+                context.remove_class("too-slow");
+                context.remove_class("too-fast");
                 if (this.time < this.duration) {
                     timeInSecs = duration - this.time;
                     // Still on presentation time
