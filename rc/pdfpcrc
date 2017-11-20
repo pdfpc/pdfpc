@@ -12,7 +12,7 @@ bind S+Return  next10
 bind S+Right   next10
 bind S+space   next10
 bind S+Down    next10
-bind k         nextUnseen
+bind j         nextUnseen
 
 # Back movement
 bind Left      prev
@@ -21,7 +21,7 @@ bind Up        prevOverlay
 bind S+Left    prev10
 bind S+Prior   prev10
 bind S+Up      prev10
-bind j         prevSeen
+bind k         prevSeen
 
 # "Jumps"
 bind Home      gotoFirst
