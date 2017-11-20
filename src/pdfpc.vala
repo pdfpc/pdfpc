@@ -194,10 +194,6 @@ namespace pdfpc {
                 GLib.printerr("--notes option detected. Disable auto grouping.\n");
             }
 
-            if (Pdfpc.is_Wayland_backend() && !Options.wayland_workaround) {
-                GLib.printerr("If you have wrong scaling of the windows, consider using --wayland-workaround\n");
-            }
-
             ConfigFileReader configFileReader = new ConfigFileReader();
             configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
             configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
