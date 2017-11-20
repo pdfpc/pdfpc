@@ -108,7 +108,7 @@ namespace pdfpc.Window {
             }
 
             this.gdk_scale = this.screen_to_use.get_monitor_scale_factor(this.screen_num_to_use);
-            if (Pdfpc.is_Wayland_backend()) {
+            if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
                 // See issue 214. Wayland is doing some double scaling therefore
                 // we are lying about the actual screen size
                 this.screen_geometry.width /= this.gdk_scale;
