@@ -8,7 +8,7 @@ Scaling issues with Wayland
 If you encounter wrong scaling of PDFs within the presenter and presentation
 window, you can try the::
 
-    --wayland-workound
+    --wayland-workaround
 
 flag. See issue #312 and #214 for more informations.
 

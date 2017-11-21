@@ -76,7 +76,7 @@ Force to use only one screen
 .BI "\-t, \-\-start\-time"=T
 Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 .TP
-.BI "\-W, \-\-wayland-workaround"
+.BI "\-W, \-\-wayland\-workaround"
 Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
 .TP
 .BI "\-w, \-\-windowed"
