@@ -617,14 +617,21 @@ namespace pdfpc {
 
             var largest_rect = video_confs.last().rect;
 
+            bool notes_mode = (Options.notes_position != null) ? true : false;
+            n = 0;
             foreach (var conf in video_confs) {
+                // if --notes passed, hide the video on the presenter screen
+                if (notes_mode && conf.display_num == 0) {
+                    continue;
+                }
+
                 Gst.Element sink = Gst.ElementFactory.make("gtksink", @"sink$n");
                 Gtk.Widget video_area;
                 sink.get("widget", out video_area);
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue, sink);
                 tee.link(queue);
-                if (conf.display_num == 0) {
+                if ((conf.display_num == 0 && !notes_mode) || (conf.display_num != 0 && notes_mode)) {
                     Gst.Element ad_element = this.add_video_control(queue, bin, conf.rect, largest_rect);
                     ad_element.link(sink);
 
