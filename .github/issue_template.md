@@ -1,3 +1,5 @@
+### I read the SUPPORT.md file (yes/no)
+
 ### Expected Behaviour
 
 ### Actual Behaviour
