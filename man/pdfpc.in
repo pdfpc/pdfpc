@@ -442,6 +442,9 @@ See
 .URL http://pdfpc.github.io/demo/pdfpc-video-example.zip "our website"
 for a full example.
 
+.PP
+See the bugs section for further informations.
+
 .SS Pointer mode
 .PP
 If needed, it is possible to turn on a pointer which draws a red dot in the
@@ -534,6 +537,11 @@ as \fI io.github.pdfpc\fR.
 .PP
 Bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "our issue tracker" .
+
+.PP
+The LaTeX package "hyperref" produces buggy results when using with
+beamer notes. It is recommended to use the "multimedia" package
+instead.
 
 .SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by
