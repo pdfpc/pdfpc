@@ -2,8 +2,20 @@
 pdfpc Changelog
 ===============
 
-Version 4.1
+Version 4.1.1
 =============
+
+*Released: Mai 2018*
+
+- Bug fixes
+    - Linking paths for some operation systems
+    - Correctly clickable links in PDF
+    - Color hints in timer
+    - Disable wayland scaling workaround by default
+    - Hide video if used with beamer notes
+
+Version 4.1
+===========
 
 *Released: October 2017*
 
