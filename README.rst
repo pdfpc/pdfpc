@@ -31,6 +31,10 @@ Installation
 
         sudo pacman -S pdfpc
 
+- On FreeBSD::
+
+        It's available under graphics/pdfpc. A pre built binary is also available.
+
 - On Windows 10 (with *Windows Subsystem for Linux (WSL)*)::
 
         Install:
