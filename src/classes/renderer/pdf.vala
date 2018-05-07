@@ -120,8 +120,12 @@ namespace pdfpc {
             cr.scale(this.scaling_factor, this.scaling_factor);
             cr.translate(-metadata.get_horizontal_offset(this.area),
                 -metadata.get_vertical_offset(this.area));
-            page.render_for_printing_with_options(cr,
-                Poppler.PrintFlags.DOCUMENT);
+
+            if (this.metadata.get_notes().is_note_native(slide_number)) {
+                page.render_for_printing_with_options(cr, Poppler.PrintFlags.DOCUMENT);
+            } else {
+                page.render(cr);
+            }
 
             // If the cache is enabled store the newly rendered pixmap
             if (this.cache != null) {

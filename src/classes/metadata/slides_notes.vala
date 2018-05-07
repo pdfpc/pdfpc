@@ -79,6 +79,14 @@ namespace pdfpc {
             }
         }
 
+        public bool is_note_native(int number) {
+            if (number >= notes.length || number < 0 || notes[number] == null) {
+                return false;
+            } else {
+                return notes[number].is_native;
+            }
+        }
+
         public bool is_note_read_only(int number) {
             if (number >= notes.length || number < 0 || notes[number] == null) {
                 return false;
