@@ -444,6 +444,8 @@ namespace pdfpc.Metadata {
                             note_text += a.get_contents();
                             break;
                     }
+                    // Remove the annotation to avoid its rendering
+                    page.remove_annot(a);
                 }
                 if (note_text != "") {
                     this.notes.set_note(note_text, user_slide, true);
