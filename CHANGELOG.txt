@@ -2,10 +2,18 @@
 pdfpc Changelog
 ===============
 
+Version 4.1.2
+=============
+
+*Released: May 2018*
+
+- Quick bug fix: restore good pixel rendering quality for non-annotated PDFs
+- Fix version string for pdfpc --version
+
 Version 4.1.1
 =============
 
-*Released: Mai 2018*
+*Released: May 2018*
 
 - Bug fixes
     - Linking paths for some operation systems
