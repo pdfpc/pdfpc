@@ -10,7 +10,7 @@ window, you can try the::
 
     --wayland-workaround
 
-flag. See issue #312 and #214 for more informations.
+flag. See issue #312 and #214 for more information.
 
 Embedded video playback is not working.
 =======================================
