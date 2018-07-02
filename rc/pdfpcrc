@@ -90,6 +90,7 @@ bind S+numbersign setPenColor yellow
 bind S+dollar     setPenColor green
 bind S+percent    setPenColor blue
 bind S+asciicircum setPenColor violet
+bind S+dead_circumflex setPenColor violet
 bind S+ampersand  setPenColor black
 bind S+asterisk   setPenColor white
 
