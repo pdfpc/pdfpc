@@ -1,4 +1,4 @@
-# Config file for Logitech Wireless Presetners
+# Config file for Logitech Wireless Presenters
 
 bind Escape exitState
 bind period blank
