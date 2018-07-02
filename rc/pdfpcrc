@@ -63,18 +63,27 @@ bind KP_Subtract decreaseFontSize
 bind bracketright decreaseFontSize
 
 # Pointer
-bind 8 togglePointer
-bind 7 decreasePointer
-bind 9 increasePointer
+bind 8         togglePointer
+bind KP_8      togglePointer
+bind 7         decreasePointer
+bind KP_7      decreasePointer
+bind 9         increasePointer
+bind KP_9      increasePointer
 
 # Drawing
-bind 5 toggleDrawing
-bind 6 clearDrawing
-bind 4 hideDrawing
+bind 5         toggleDrawing
+bind KP_5      toggleDrawing
+bind 6         clearDrawing
+bind KP_6      clearDrawing
+bind 4         hideDrawing
+bind KP_4      hideDrawing
 
-bind 1 decreasePen
-bind 2 toggleEraser
-bind 3 increasePen
+bind 1         decreasePen
+bind KP_1      decreasePen
+bind 2         toggleEraser
+bind KP_2      toggleEraser
+bind 3         increasePen
+bind KP_3      increasePen
 
 #### Mouse bindings
 mouse 1        next
@@ -94,11 +103,19 @@ bind S+dead_circumflex setPenColor violet
 bind S+ampersand  setPenColor black
 bind S+asterisk   setPenColor white
 
-bind S+1 setPenColor red
-bind S+2 setPenColor orange
-bind S+3 setPenColor yellow
-bind S+4 setPenColor green
-bind S+5 setPenColor blue
-bind S+6 setPenColor violet
-bind S+7 setPenColor black
-bind S+8 setPenColor white
+bind S+1          setPenColor red
+bind S+KP_1       setPenColor red
+bind S+2          setPenColor orange
+bind S+KP_2       setPenColor orange
+bind S+3          setPenColor yellow
+bind S+KP_3       setPenColor yellow
+bind S+4          setPenColor green
+bind S+KP_4       setPenColor green
+bind S+5          setPenColor blue
+bind S+KP_5       setPenColor blue
+bind S+6          setPenColor violet
+bind S+KP_6       setPenColor violet
+bind S+7          setPenColor black
+bind S+KP_7       setPenColor black
+bind S+8          setPenColor white
+bind S+KP_8       setPenColor white
