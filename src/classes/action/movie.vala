@@ -166,6 +166,9 @@ namespace pdfpc {
 
             GLib.Idle.add( () => {
                 movie.establish_pipeline(uri);
+                if (movie.pipeline == null) {
+                    return false;
+                }
 
                 // initial seek to set the starting point. *Cause the video to
                 // be displayed on the page*.
@@ -367,6 +370,10 @@ namespace pdfpc {
          * drag state.
          */
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+            if (this.pipeline == null) {
+                return false;
+            }
+
             Gst.State state;
             Gst.ClockTime time = Gst.Util.get_timestamp();
             this.pipeline.get_state(out state, null, time);
@@ -580,6 +587,8 @@ namespace pdfpc {
          * Set up the gstreamer pipeline.
          */
         protected void establish_pipeline(string uri) {
+            this.pipeline = null;
+
             Gst.Bin bin = new Gst.Bin("bin");
             Gst.Element tee = Gst.ElementFactory.make("tee", "tee");
             bin.add_many(tee);
@@ -625,7 +634,15 @@ namespace pdfpc {
                     continue;
                 }
 
-                Gst.Element sink = Gst.ElementFactory.make("gtksink", @"sink$n");
+                Gst.Element sink;
+                try {
+                    sink = gst_element_make("gtksink", @"sink$n");
+                } catch (PipelineError e) {
+                    GLib.printerr("Error creating video sink: %s\n", e.message);
+                    GLib.printerr("Gstreamer installation may be incomplete.\n");
+                    return;
+                }
+
                 Gtk.Widget video_area;
                 sink.get("widget", out video_area);
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
@@ -784,7 +801,9 @@ namespace pdfpc {
          * Stop playback.
          */
         public virtual void stop() {
-            this.pipeline.set_state(Gst.State.NULL);
+            if (this.pipeline != null) {
+                this.pipeline.set_state(Gst.State.NULL);
+            }
         }
 
         /**
