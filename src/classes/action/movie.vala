@@ -148,13 +148,39 @@ namespace pdfpc {
             }
         }
 
+        /**
+         * Auxiliary part of init_movie() that can be called asynchronously
+         * via GLib.Idle.add()
+         */
+        protected void init_movie2(ControlledMovie movie,
+                string uri, bool autostart) {
+            movie.establish_pipeline(uri);
+            if (movie.pipeline == null) {
+                return;
+            }
+
+            // initial seek to set the starting point. *Cause the video to
+            // be displayed on the page*.
+            movie.pipeline.set_state(Gst.State.PAUSED);
+            // waits until the pipeline is actually in PAUSED mode
+            movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
+            movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                movie.starttime * Gst.SECOND);
+
+            movie.hide();
+
+            if (autostart) {
+                movie.play();
+            }
+        }
 
         /**
          * Inits  the movie
          */
         public void init_movie(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, bool noprogress, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
+                string uri, bool autostart, bool loop, bool noprogress,
+                bool noaudio, int start = 0, int stop = 0, bool temp = false) {
             other.init(area, controller, document);
             ControlledMovie movie = (ControlledMovie) other;
             movie.loop = loop;
@@ -164,26 +190,14 @@ namespace pdfpc {
             movie.stoptime = stop;
             movie.temp = temp ? uri.substring(7) : "";
 
+#if MOVIE_LOAD_ASYNC
             GLib.Idle.add( () => {
-                movie.establish_pipeline(uri);
-                if (movie.pipeline == null) {
-                    return false;
-                }
-
-                // initial seek to set the starting point. *Cause the video to
-                // be displayed on the page*.
-                movie.pipeline.set_state(Gst.State.PAUSED);
-                // waits until the pipeline is actually in PAUSED mode
-                movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
-                movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, movie.starttime * Gst.SECOND);
-
-                movie.hide();
-
-                if (autostart) {
-                    movie.play();
-                }
+                this.init_movie2(movie, uri, autostart);
                 return false;
             } );
+#else
+            this.init_movie2(movie, uri, autostart);
+#endif
         }
 
         /**
