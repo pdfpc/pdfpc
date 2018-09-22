@@ -414,6 +414,20 @@ namespace pdfpc {
             return false;
         }
 
+        public override void on_freeze(bool frozen) {
+            // if a video was forcefully hidden but we're no longer in the
+            // freeze mode, show it and clear the respective flag
+            foreach (var sink in this.sinks) {
+                bool sink_is_frozen = sink.get_data("pdfpc_frozen");
+                if (!frozen && sink_is_frozen) {
+                    sink.set_opacity(1);
+                    sink.set_data("pdfpc_frozen", false);
+                }
+            }
+
+            return;
+        }
+
         /**
          * Everytime we get a new frame, update the progress bar.
          */
@@ -500,11 +514,14 @@ namespace pdfpc {
         }
 
         /**
-         * Show all video widgets
+         * Show all video widgets except those created while the view was frozen
          */
         public void show() {
             foreach (var sink in this.sinks) {
-                sink.set_opacity(1);
+                bool sink_is_frozen = sink.get_data("pdfpc_frozen");
+                if (!sink_is_frozen) {
+                    sink.set_opacity(1);
+                }
             }
         }
 
@@ -664,6 +681,12 @@ namespace pdfpc {
                     queue.link(sink);
                 }
                 sink.set("force_aspect_ratio", false);
+
+                // mark the video widget on the "frozen" presentation screen
+                // with a custom flag
+                if (conf.display_num == 1 && controller.frozen) {
+                    video_area.set_data("pdfpc_frozen", true);
+                }
 
                 conf.window.video_surface.add_video(video_area, conf.rect);
                 this.sinks.add(video_area);
