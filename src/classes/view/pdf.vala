@@ -74,6 +74,11 @@ namespace pdfpc {
         public signal void prerendering_started();
 
         /**
+         * Signal emitted on toggling the freeze state
+         */
+        public signal void freeze_toggled(bool frozen);
+
+        /**
          * The currently displayed slide
          */
         protected int current_slide_number;

@@ -61,6 +61,7 @@ namespace pdfpc.View.Behaviour {
             view.motion_notify_event.connect(this.on_mouse_move);
             view.entering_slide.connect(this.on_entering_slide);
             view.leaving_slide.connect(this.on_leaving_slide);
+            view.freeze_toggled.connect(this.on_freeze_toggle);
         }
 
         /**
@@ -171,6 +172,15 @@ namespace pdfpc.View.Behaviour {
         public void on_leaving_slide(View.Pdf source, int from, int to) {
             // Free memory of precalculated rectangles
             this.precalculated_mapping_rectangles = null;
+        }
+
+        /**
+         * Update the mappings on freeze toggle
+         */
+        public void on_freeze_toggle(View.Pdf source, bool frozen) {
+            foreach(var mapping in this.page_link_mappings) {
+                mapping.on_freeze(frozen);
+            }
         }
     }
 }

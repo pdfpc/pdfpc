@@ -109,6 +109,13 @@ namespace pdfpc {
         public abstract bool on_button_press(Gtk.Widget widget, Gdk.EventButton event);
 
         /**
+         * Override this method to get notified of the freeze toggle events.
+         */
+        public virtual void on_freeze(bool frozen) {
+            return;
+        }
+
+        /**
          * Called when leaving the page.  Override to clean up after yourself.
          */
         public virtual void deactivate() {
