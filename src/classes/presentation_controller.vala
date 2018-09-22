@@ -1629,6 +1629,7 @@ namespace pdfpc {
                 this.faded_to_black = false;
             }
             this.controllables_update();
+            main_view.freeze_toggled(this.frozen);
         }
 
         /**
