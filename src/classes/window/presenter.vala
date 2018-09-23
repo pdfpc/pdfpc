@@ -148,6 +148,9 @@ namespace pdfpc.Window {
          */
         protected Gtk.Box toolbox;
 
+        /**
+         * Drawing color selector button of the toolbox
+         */
         protected Gtk.ColorButton color_button;
 
         /**
@@ -565,10 +568,6 @@ namespace pdfpc.Window {
             tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pen_drawing();
-                    var rgba = this.presentation_controller.pen_drawing.pen.get_rgba();
-                    color_button.set_rgba(rgba);
-                    var state = color_button.get_child_visible();
-                    color_button.set_child_visible(!state);
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
             tb.clicked.connect(() => {
@@ -665,6 +664,13 @@ namespace pdfpc.Window {
             this.slide_progress.set_text("%d/%u".printf(current, total));
         }
 
+        protected void update_toolbox() {
+            var controller = this.presentation_controller;
+            var rgba = controller.pen_drawing.pen.get_rgba();
+            color_button.set_rgba(rgba);
+            color_button.set_child_visible(controller.is_pen_active());
+        }
+
         public void update() {
             int current_slide_number = this.presentation_controller.current_slide_number;
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
@@ -730,6 +736,8 @@ namespace pdfpc.Window {
             this.saved_icon.hide();
             this.loaded_icon.hide();
             this.locked_icon.hide();
+
+            this.update_toolbox();
         }
 
         /**
