@@ -316,7 +316,7 @@ namespace pdfpc {
         /* pen mode state */
         public Gtk.DrawingArea? presenter_pen_surface;
         public Gtk.DrawingArea? presentation_pen_surface;
-        private Drawings.Drawing pen_drawing;
+        public Drawings.Drawing pen_drawing;
         private Drawings.DrawingTool? current_mouse_tool = null;
         private Drawings.DrawingTool? current_pen_drawing_tool = null;
         private bool mouse_tool_is_eraser = false;
@@ -437,7 +437,7 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
-        private void queue_pen_surface_draws() {
+        public void queue_pen_surface_draws() {
             if (presenter != null) {
                 presenter_pen_surface.queue_draw();
             }

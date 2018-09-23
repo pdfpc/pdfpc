@@ -148,6 +148,8 @@ namespace pdfpc.Window {
          */
         protected Gtk.Box toolbox;
 
+        protected Gtk.ColorButton color_button;
+
         /**
          * Fixed layout container.
          */
@@ -199,6 +201,18 @@ namespace pdfpc.Window {
             bimage.show();
             var button = new Gtk.Button();
             button.add(bimage);
+            if (tbox_inverse) {
+                panel.pack_end(button);
+            } else {
+                panel.pack_start(button);
+            }
+
+            return button;
+        }
+
+        protected Gtk.ColorButton add_toolbox_cbutton(Gtk.Box panel,
+            bool tbox_inverse) {
+            var button = new Gtk.ColorButton();
             if (tbox_inverse) {
                 panel.pack_end(button);
             } else {
@@ -556,6 +570,10 @@ namespace pdfpc.Window {
             tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pen_drawing();
+                    var rgba = this.presentation_controller.pen_drawing.pen.get_rgba();
+                    color_button.set_rgba(rgba);
+                    var state = color_button.get_child_visible();
+                    color_button.set_child_visible(!state);
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
             tb.clicked.connect(() => {
@@ -576,6 +594,14 @@ namespace pdfpc.Window {
             tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pause();
+		});
+
+            color_button = add_toolbox_cbutton(button_panel, tbox_inverse);
+            color_button.set_child_visible(false);
+            color_button.color_set.connect(() => {
+                    var rgba = color_button.rgba;
+                    this.presentation_controller.pen_drawing.pen.set_rgba(rgba);
+                    this.presentation_controller.queue_pen_surface_draws();
 		});
 
             this.fixed = new Gtk.Fixed();
