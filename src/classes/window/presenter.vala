@@ -174,6 +174,11 @@ namespace pdfpc.Window {
         private int toolbox_x0;
         private int toolbox_y0;
 
+        /**
+         * Size of the toolbox button icons
+         **/
+        private int toolbox_icon_height;
+
         protected bool on_button_press(Gtk.Widget pbut, Gdk.EventButton event) {
 	    if (event.button == 1 ) {
                 var w = this.get_window();
@@ -200,7 +205,7 @@ namespace pdfpc.Window {
 
         protected Gtk.Button add_toolbox_button(Gtk.Box panel,
             bool tbox_inverse, string icon_fname) {
-            var bimage = this.load_icon(icon_fname, 30);
+            var bimage = this.load_icon(icon_fname, toolbox_icon_height);
             bimage.show();
             var button = new Gtk.Button();
             button.add(bimage);
@@ -499,6 +504,9 @@ namespace pdfpc.Window {
 
             Gtk.Overlay full_overlay = new Gtk.Overlay();
             full_overlay.add_overlay(full_layout);
+
+            // maybe should be calculated based on screen dimensions?
+            this.toolbox_icon_height = 36;
 
             Gtk.Orientation toolbox_orientation = Gtk.Orientation.HORIZONTAL;
             bool tbox_inverse = false;
