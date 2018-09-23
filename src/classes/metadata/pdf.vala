@@ -442,6 +442,10 @@ namespace pdfpc.Metadata {
                                 note_text += "\n";
                             }
                             note_text += a.get_contents();
+
+                            // Remove the annotation to avoid its rendering
+                            page.remove_annot(a);
+
                             break;
                     }
                 }

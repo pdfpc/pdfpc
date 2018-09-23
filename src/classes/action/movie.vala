@@ -148,13 +148,39 @@ namespace pdfpc {
             }
         }
 
+        /**
+         * Auxiliary part of init_movie() that can be called asynchronously
+         * via GLib.Idle.add()
+         */
+        protected void init_movie2(ControlledMovie movie,
+                string uri, bool autostart) {
+            movie.establish_pipeline(uri);
+            if (movie.pipeline == null) {
+                return;
+            }
+
+            // initial seek to set the starting point. *Cause the video to
+            // be displayed on the page*.
+            movie.pipeline.set_state(Gst.State.PAUSED);
+            // waits until the pipeline is actually in PAUSED mode
+            movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
+            movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                movie.starttime * Gst.SECOND);
+
+            movie.hide();
+
+            if (autostart) {
+                movie.play();
+            }
+        }
 
         /**
          * Inits  the movie
          */
         public void init_movie(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, bool noprogress, bool noaudio, int start = 0, int stop = 0, bool temp=false) {
+                string uri, bool autostart, bool loop, bool noprogress,
+                bool noaudio, int start = 0, int stop = 0, bool temp = false) {
             other.init(area, controller, document);
             ControlledMovie movie = (ControlledMovie) other;
             movie.loop = loop;
@@ -164,23 +190,14 @@ namespace pdfpc {
             movie.stoptime = stop;
             movie.temp = temp ? uri.substring(7) : "";
 
+#if MOVIE_LOAD_ASYNC
             GLib.Idle.add( () => {
-                movie.establish_pipeline(uri);
-
-                // initial seek to set the starting point. *Cause the video to
-                // be displayed on the page*.
-                movie.pipeline.set_state(Gst.State.PAUSED);
-                // waits until the pipeline is actually in PAUSED mode
-                movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
-                movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, movie.starttime * Gst.SECOND);
-
-                movie.hide();
-
-                if (autostart) {
-                    movie.play();
-                }
+                this.init_movie2(movie, uri, autostart);
                 return false;
             } );
+#else
+            this.init_movie2(movie, uri, autostart);
+#endif
         }
 
         /**
@@ -367,6 +384,10 @@ namespace pdfpc {
          * drag state.
          */
         public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+            if (this.pipeline == null) {
+                return false;
+            }
+
             Gst.State state;
             Gst.ClockTime time = Gst.Util.get_timestamp();
             this.pipeline.get_state(out state, null, time);
@@ -405,6 +426,20 @@ namespace pdfpc {
             }
             this.mouse_drag = false;
             return false;
+        }
+
+        public override void on_freeze(bool frozen) {
+            // if a video was forcefully hidden but we're no longer in the
+            // freeze mode, show it and clear the respective flag
+            foreach (var sink in this.sinks) {
+                bool sink_is_frozen = sink.get_data("pdfpc_frozen");
+                if (!frozen && sink_is_frozen) {
+                    sink.set_opacity(1);
+                    sink.set_data("pdfpc_frozen", false);
+                }
+            }
+
+            return;
         }
 
         /**
@@ -493,11 +528,14 @@ namespace pdfpc {
         }
 
         /**
-         * Show all video widgets
+         * Show all video widgets except those created while the view was frozen
          */
         public void show() {
             foreach (var sink in this.sinks) {
-                sink.set_opacity(1);
+                bool sink_is_frozen = sink.get_data("pdfpc_frozen");
+                if (!sink_is_frozen) {
+                    sink.set_opacity(1);
+                }
             }
         }
 
@@ -580,6 +618,8 @@ namespace pdfpc {
          * Set up the gstreamer pipeline.
          */
         protected void establish_pipeline(string uri) {
+            this.pipeline = null;
+
             Gst.Bin bin = new Gst.Bin("bin");
             Gst.Element tee = Gst.ElementFactory.make("tee", "tee");
             bin.add_many(tee);
@@ -617,14 +657,29 @@ namespace pdfpc {
 
             var largest_rect = video_confs.last().rect;
 
+            bool notes_mode = (Options.notes_position != null) ? true : false;
+            n = 0;
             foreach (var conf in video_confs) {
-                Gst.Element sink = Gst.ElementFactory.make("gtksink", @"sink$n");
+                // if --notes passed, hide the video on the presenter screen
+                if (notes_mode && conf.display_num == 0) {
+                    continue;
+                }
+
+                Gst.Element sink;
+                try {
+                    sink = gst_element_make("gtksink", @"sink$n");
+                } catch (PipelineError e) {
+                    GLib.printerr("Error creating video sink: %s\n", e.message);
+                    GLib.printerr("Gstreamer installation may be incomplete.\n");
+                    return;
+                }
+
                 Gtk.Widget video_area;
                 sink.get("widget", out video_area);
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue, sink);
                 tee.link(queue);
-                if (conf.display_num == 0) {
+                if ((conf.display_num == 0 && !notes_mode) || (conf.display_num != 0 && notes_mode)) {
                     Gst.Element ad_element = this.add_video_control(queue, bin, conf.rect, largest_rect);
                     ad_element.link(sink);
 
@@ -640,6 +695,12 @@ namespace pdfpc {
                     queue.link(sink);
                 }
                 sink.set("force_aspect_ratio", false);
+
+                // mark the video widget on the "frozen" presentation screen
+                // with a custom flag
+                if (conf.display_num == 1 && controller.frozen) {
+                    video_area.set_data("pdfpc_frozen", true);
+                }
 
                 conf.window.video_surface.add_video(video_area, conf.rect);
                 this.sinks.add(video_area);
@@ -777,7 +838,9 @@ namespace pdfpc {
          * Stop playback.
          */
         public virtual void stop() {
-            this.pipeline.set_state(Gst.State.NULL);
+            if (this.pipeline != null) {
+                this.pipeline.set_state(Gst.State.NULL);
+            }
         }
 
         /**

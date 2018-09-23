@@ -76,6 +76,9 @@ Force to use only one screen
 .BI "\-t, \-\-start\-time"=T
 Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 .TP
+.BI "\-W, \-\-wayland\-workaround"
+Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
+.TP
 .BI "\-w, \-\-windowed"
 Run in windowed mode
 .TP
@@ -140,35 +143,40 @@ Input a slide number to jump to
 .B Plus / Equal / KP_Add / Bracket Left
 Increase font size of notes
 .TP
-.B Minus / KP_Substract / Bracket Right
+.B Minus / KP_Subtract / Bracket Right
 Decrease font size of notes
 .TP
-.B 8
+.B 8 / KP_8
 Toggle pointer mode
 .TP
-.B 7
+.B 7 / KP_7
 Decrease pointer size
 .TP
-.B 9
+.B 9 / KP_9
 Increase pointer size
 .TP
-.B 5
+.B 5 / KP_5
 Toggle drawing mode
 .TP
-.B 6
+.B 6 / KP_6
 Clear the current drawing
 .TP
-.B 4
+.B 4 / KP_4
 Temporarily hide the current drawing and exit drawing mode
 .TP
-.B 1
+.B 1 / KP_1
 Decrease the pen or eraser size for drawing
 .TP
-.B 3
+.B 3 / KP_3
 Increase the pen or eraser size for drawing
 .TP
-.B 2
+.B 2 / KP_2
 Toggle between the pen and eraser tool for drawing
+.TP
+.B Shift-1 / Shift-KP_2 ... Shift-8 / Shift-KP_8
+Switch the drawing color to red/orange/yellow/green/blue/violet/black/white,
+respectively. (Depending on your keyboard layout, not all options will work
+in the main section of the keyboard.)
 .TP
 .B Escape / q
 Exit pdfpc
@@ -439,6 +447,9 @@ See
 .URL http://pdfpc.github.io/demo/pdfpc-video-example.zip "our website"
 for a full example.
 
+.PP
+See the bugs section for further information.
+
 .SS Pointer mode
 .PP
 If needed, it is possible to turn on a pointer which draws a red dot in the
@@ -531,6 +542,11 @@ as \fI io.github.pdfpc\fR.
 .PP
 Bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "our issue tracker" .
+
+.PP
+The LaTeX package "hyperref" produces buggy results when using with
+beamer notes. It is recommended to use the "multimedia" package
+instead.
 
 .SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by

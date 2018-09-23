@@ -61,6 +61,7 @@ namespace pdfpc.View.Behaviour {
             view.motion_notify_event.connect(this.on_mouse_move);
             view.entering_slide.connect(this.on_entering_slide);
             view.leaving_slide.connect(this.on_leaving_slide);
+            view.freeze_toggled.connect(this.on_freeze_toggle);
         }
 
         /**
@@ -131,6 +132,14 @@ namespace pdfpc.View.Behaviour {
          * further requests and checks.
          */
         public void on_entering_slide(View.Pdf source, int page_number) {
+            // if target is not mapped (ie. the size is not known) post pone
+            // the mapping calculatation since the results wouldn't be correct
+            if (!target.get_mapped()) {
+                target.realize.connect(() => {
+                    this.on_entering_slide(source, page_number);
+                });
+            }
+
             // Get the link mapping table
             bool in_range = true;
             Metadata.Pdf metadata = source.get_renderer().metadata;
@@ -163,6 +172,15 @@ namespace pdfpc.View.Behaviour {
         public void on_leaving_slide(View.Pdf source, int from, int to) {
             // Free memory of precalculated rectangles
             this.precalculated_mapping_rectangles = null;
+        }
+
+        /**
+         * Update the mappings on freeze toggle
+         */
+        public void on_freeze_toggle(View.Pdf source, bool frozen) {
+            foreach(var mapping in this.page_link_mappings) {
+                mapping.on_freeze(frozen);
+            }
         }
     }
 }

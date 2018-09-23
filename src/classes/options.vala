@@ -53,6 +53,11 @@ namespace pdfpc {
         public static bool windowed = false;
 
         /**
+         * Commandline option to enable Wayland specific scaling workarounds
+         */
+        public static bool wayland_workaround = false;
+
+        /**
          * Commandline option which allows the complete disabling of slide caching
          */
         public static bool disable_caching = false;

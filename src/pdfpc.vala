@@ -68,6 +68,7 @@ namespace pdfpc {
             { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
             { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
+            { "wayland-workaround", 'W', 0, 0, ref Options.wayland_workaround, "Enable Wayland-specific workaround. This might fix HiDPI scaling problems", null},
             { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
             { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presentation window in width:height format (forces windowed mode)", null},
             { null }
@@ -103,8 +104,8 @@ namespace pdfpc {
          * Print version string and copyright statement
          */
         private void print_version() {
-            GLib.print("pdfpc v4.1\n"
-                     + "Copyright (C) 2010-2017 see CONTRIBUTORS\n\n"
+            GLib.print("pdfpc v4.1.2\n"
+                     + "Copyright (C) 2010-2018 see CONTRIBUTORS\n\n"
                      + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"
                      + "This is free software: you are free to change and redistribute it.\n"
                      + "There is NO WARRANTY, to the extent permitted by law.\n");

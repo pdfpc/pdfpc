@@ -122,6 +122,10 @@ namespace pdfpc {
                         var note_text = notes[i].note_text;
                         var escaped_text = escape_regex.replace(note_text, note_text.length, 0, "\\\\\\0");
                         builder.append(escaped_text);
+                        // ensure there is a line break before the next comment start mark
+                        if (!escaped_text.has_suffix("\n")) {
+                            builder.append("\n");
+                        }
                     }
                 }
             } catch (RegexError e) {

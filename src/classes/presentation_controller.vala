@@ -227,8 +227,10 @@ namespace pdfpc {
             }
 
             public uint hash() {
-                var uintHashFunc = Gee.Functions.get_hash_func_for(Type.from_name("uint"));
-                return uintHashFunc(this.keycode | this.modMask); // | is probable the best combinator, but for this small application it should suffice
+                // see gdk/gdkkeysyms.h modMask is usally in the form of
+                // 0xFF??. Keycodes are usally 0x??. We shift modMask by 8 bits
+                // to combine both codes.
+                return (this.modMask << 8) | this.keycode;
             }
 
             public bool equal_to(KeyDef other) {
@@ -340,6 +342,7 @@ namespace pdfpc {
         protected void init_presentation_pen() {
             init_pen_drawing_if_needed(presentation_allocation);
             this.presentation_pen_surface = presentation.pen_drawing_surface;
+            this.presentation_pen_surface.hide();
             this.presentation_pen_surface.draw.connect ((context) => {
                 draw_pen_surface(context, presentation_allocation, false);
                 return true;
@@ -1624,6 +1627,7 @@ namespace pdfpc {
                 this.faded_to_black = false;
             }
             this.controllables_update();
+            main_view.freeze_toggled(this.frozen);
         }
 
         /**
