@@ -693,10 +693,8 @@ namespace pdfpc {
 
                 //cursor
                 context.new_path();
-                context.set_source_rgba(255,0,0,0.5);
-                context.arc(x, y, r, 0, 2*Math.PI);
-                context.fill();
-            } else {
+            }
+            if (drag_x == -1) {
                 context.set_source_rgba(255,0,0,0.5);
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
