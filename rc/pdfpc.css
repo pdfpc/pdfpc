@@ -1,4 +1,4 @@
-*:not(GtkButton) {
+*:not(button):not(label) {
     background-image: none;
     border: none;
     color: white;
@@ -26,24 +26,16 @@ progressbar trough {
     background-color: white;
 }
 
-GtkProgressBar {
-    background-color: white;
-}
-
-GtkProgressBar * {
-    background-color: blue;
-}
-
-GtkEntry, GtkIconView, GtkTextView, GtkWindow {
+entry, iconview, textview *, window {
     background-color: black;
 }
 
-GtkButton * {
+.toolbox button:not(.color) * {
     background-color: gray;
 }
 
-entry, iconview, textview *, window {
-    background-color: black;
+.overviewWindow {
+    font-size: 4em;
 }
 
 /* The bottom text is automatically sized based on the resolution of
@@ -73,8 +65,4 @@ entry, iconview, textview *, window {
 
 .too-slow {
     color: orange;
-}
-
-.overviewWindow {
-    font-size: 4em;
 }

@@ -529,6 +529,7 @@ namespace pdfpc.Window {
                     break;
             }
             this.toolbox = new Gtk.Box(toolbox_orientation, 0);
+            this.toolbox.get_style_context().add_class("toolbox");
             this.toolbox.halign = Gtk.Align.START;
             this.toolbox.valign = Gtk.Align.START;
 
