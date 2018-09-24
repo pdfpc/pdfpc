@@ -1,7 +1,5 @@
 *:not(button):not(label) {
-    background-image: none;
     border: none;
-    color: white;
     font-family: Verdana;
     /* This will be deprecated in GTK 3.20,
      * but the alternative of Widget's min-width
@@ -19,6 +17,7 @@ scrolledwindow trough {
 }
 
 progressbar trough * {
+    background-image: none;
     background-color: blue;
 }
 
@@ -28,6 +27,7 @@ progressbar trough {
 
 entry, iconview, textview *, window {
     background-color: black;
+    color: white;
 }
 
 .toolbox button:not(.color) * {

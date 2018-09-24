@@ -440,6 +440,20 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
+        public void set_pen_size(double width) {
+            if (width > 500) {
+                width = 500;
+            } else
+            if (width < pen_step) {
+                width = pen_step;
+            }
+            current_pen_drawing_tool.width = width;
+        }
+
+        public double get_pen_size() {
+            return current_pen_drawing_tool.width;
+        }
+
         public void queue_pen_surface_draws() {
             if (presenter != null) {
                 presenter_pen_surface.queue_draw();

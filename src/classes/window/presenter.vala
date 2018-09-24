@@ -154,6 +154,11 @@ namespace pdfpc.Window {
         protected Gtk.ColorButton color_button;
 
         /**
+         * Drawing scale selector button of the toolbox
+         */
+        protected Gtk.ScaleButton scale_button;
+
+        /**
          * Fixed layout container.
          */
         protected Gtk.Fixed fixed;
@@ -230,7 +235,29 @@ namespace pdfpc.Window {
             return button;
         }
 
-        /**
+        protected Gtk.ScaleButton add_toolbox_sbutton(Gtk.Box panel,
+            bool tbox_inverse, string icon_fname) {
+            
+            var button = new Gtk.ScaleButton(Gtk.IconSize.DIALOG,
+                0, 50, 2, null);
+
+            var bimage = this.load_icon(icon_fname, toolbox_icon_height);
+            bimage.show();
+            button.set_image(bimage);
+
+            button.set_relief(Gtk.ReliefStyle.NORMAL);
+            button.get_adjustment().set_page_increment(4);
+
+            if (tbox_inverse) {
+                panel.pack_end(button);
+            } else {
+                panel.pack_start(button);
+            }
+
+            return button;
+        }
+
+       /**
          * Base constructor instantiating a new presenter window
          */
         public Presenter(Metadata.Pdf metadata, int screen_num,
@@ -557,6 +584,8 @@ namespace pdfpc.Window {
             /* Toolbox panel that contains the buttons */
             var button_panel = new Gtk.Box(toolbox_orientation, 0);
             button_panel.set_spacing(0);
+            button_panel.set_homogeneous(true);
+
             button_panel.set_child_visible(false);
             if (tbox_inverse) {
                 this.toolbox.pack_end(button_panel);
@@ -598,6 +627,13 @@ namespace pdfpc.Window {
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pause();
 		});
+
+            scale_button = add_toolbox_sbutton(button_panel, tbox_inverse,
+                "linewidth.svg");
+            scale_button.set_child_visible(false);
+            scale_button.value_changed.connect((val) => {
+                this.presentation_controller.set_pen_size(val);
+            });
 
             color_button = add_toolbox_cbutton(button_panel, tbox_inverse);
             color_button.set_child_visible(false);
@@ -675,9 +711,14 @@ namespace pdfpc.Window {
 
         protected void update_toolbox() {
             var controller = this.presentation_controller;
+
             var rgba = controller.pen_drawing.pen.get_rgba();
             color_button.set_rgba(rgba);
             color_button.set_child_visible(controller.is_pen_active());
+
+            scale_button.set_value(controller.get_pen_size());
+            scale_button.set_child_visible(controller.is_pen_active() ||
+                controller.is_eraser_active());
         }
 
         public void update() {
