@@ -144,6 +144,11 @@ namespace pdfpc.Window {
         protected Gtk.Stack slide_stack;
 
         /**
+         * Fixed layout - container of the toolbox.
+         */
+        protected Gtk.Fixed toolbox_container;
+
+        /**
          * The toolbox with action buttons
          */
         protected Gtk.Box toolbox;
@@ -159,9 +164,15 @@ namespace pdfpc.Window {
         protected Gtk.ScaleButton scale_button;
 
         /**
-         * Fixed layout container.
-         */
-        protected Gtk.Fixed fixed;
+         * Coordinates of the click event at the beginning of toolbox dragging
+         **/
+        private int toolbox_x0;
+        private int toolbox_y0;
+
+        /**
+         * Size of the toolbox button icons
+         **/
+        private int toolbox_icon_height;
 
         /**
          * Metadata of the slides
@@ -172,17 +183,6 @@ namespace pdfpc.Window {
          * Width of next/notes area
          **/
         protected int next_allocated_width;
-
-        /**
-         * Coordinates of the click event at the beginning of toolbox dragging
-         **/
-        private int toolbox_x0;
-        private int toolbox_y0;
-
-        /**
-         * Size of the toolbox button icons
-         **/
-        private int toolbox_icon_height;
 
         protected bool on_button_press(Gtk.Widget pbut, Gdk.EventButton event) {
 	    if (event.button == 1 ) {
@@ -202,7 +202,10 @@ namespace pdfpc.Window {
             int y = (int) event.y_root - this.toolbox_y0;
 
             if (true) {
-                this.fixed.move(toolbox, x, y);
+                int dest_x, dest_y;
+                toolbox.translate_coordinates(pbut, x, y,
+                    out dest_x, out dest_y);
+                this.toolbox_container.move(toolbox, dest_x, dest_y);
             }
 
             return true;
@@ -289,7 +292,7 @@ namespace pdfpc.Window {
             // should use as a percentage value. The maximal height is 90% of
             // the screen, as we need a place to display the timer and slide
             // count.
-            Gdk.Rectangle current_scale_rect;
+            Gdk.Rectangle current_slide_rect;
             int current_allocated_width = (int) Math.floor(
                 this.screen_geometry.width * Options.current_size / (double) 100);
             this.current_view = new View.Pdf.from_metadata(
@@ -301,7 +304,7 @@ namespace pdfpc.Window {
                 true,
                 this.presentation_controller,
                 this.gdk_scale,
-                out current_scale_rect
+                out current_slide_rect
             );
 
             // The next slide is right to the current one and takes up the
@@ -312,7 +315,7 @@ namespace pdfpc.Window {
             int next_allocated_width = (int)Math.fmax(this.screen_geometry.width - current_allocated_width - 4, 0);
             this.next_allocated_width = next_allocated_width;
             // We leave a bit of margin between the two views
-            Gdk.Rectangle next_scale_rect;
+            Gdk.Rectangle next_slide_rect;
             this.next_view = new View.Pdf.from_metadata(
                 metadata,
                 next_allocated_width,
@@ -322,9 +325,10 @@ namespace pdfpc.Window {
                 false,
                 this.presentation_controller,
                 this.gdk_scale,
-                out next_scale_rect
+                out next_slide_rect
             );
 
+            Gdk.Rectangle strict_next_slide_rect;
             this.strict_next_view = new View.Pdf.from_metadata(
                 metadata,
                 (int) Math.floor(0.5 * current_allocated_width),
@@ -334,8 +338,9 @@ namespace pdfpc.Window {
                 false,
                 this.presentation_controller,
                 this.gdk_scale,
-                out next_scale_rect
+                out strict_next_slide_rect
             );
+            Gdk.Rectangle strict_prev_slide_rect;
             this.strict_prev_view = new View.Pdf.from_metadata(
                 metadata,
                 (int) Math.floor(0.5 * current_allocated_width),
@@ -345,7 +350,7 @@ namespace pdfpc.Window {
                 false,
                 this.presentation_controller,
                 this.gdk_scale,
-                out next_scale_rect
+                out strict_prev_slide_rect
             );
 
             // TextView for notes in the slides
@@ -537,28 +542,39 @@ namespace pdfpc.Window {
 
             Gtk.Orientation toolbox_orientation = Gtk.Orientation.HORIZONTAL;
             bool tbox_inverse = false;
+            int tb_offset = (int) Math.round(0.1*strict_prev_slide_rect.height);
+
+            int tbox_x = 0, tbox_y = 0;
             switch (Options.toolbox_direction) {
-                case Options.ToolboxDirection.TtoB:
-                    toolbox_orientation = Gtk.Orientation.VERTICAL;
-                    tbox_inverse = false;
-                    break;
-                case Options.ToolboxDirection.BtoT:
-                    toolbox_orientation = Gtk.Orientation.VERTICAL;
-                    tbox_inverse = true;
-                    break;
                 case Options.ToolboxDirection.LtoR:
                     toolbox_orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = false;
+                    tbox_x = strict_prev_slide_rect.width + tb_offset;
+                    tbox_y = current_slide_rect.height + tb_offset;
                     break;
                 case Options.ToolboxDirection.RtoL:
                     toolbox_orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = true;
+                    tbox_x = strict_next_slide_rect.width - tb_offset;
+                    tbox_y = current_slide_rect.height + tb_offset;
+                    break;
+                case Options.ToolboxDirection.TtoB:
+                    toolbox_orientation = Gtk.Orientation.VERTICAL;
+                    tbox_inverse = false;
+                    tbox_x = current_slide_rect.width + tb_offset;
+                    tbox_y = next_slide_rect.height + tb_offset;
+                    break;
+                case Options.ToolboxDirection.BtoT:
+                    toolbox_orientation = Gtk.Orientation.VERTICAL;
+                    tbox_inverse = true;
+                    tbox_x = current_slide_rect.width + tb_offset;
+                    tbox_y = next_slide_rect.height + tb_offset;
                     break;
             }
-            this.toolbox = new Gtk.Box(toolbox_orientation, 0);
-            this.toolbox.get_style_context().add_class("toolbox");
-            this.toolbox.halign = Gtk.Align.START;
-            this.toolbox.valign = Gtk.Align.START;
+            toolbox = new Gtk.Box(toolbox_orientation, 0);
+            toolbox.get_style_context().add_class("toolbox");
+            toolbox.halign = Gtk.Align.START;
+            toolbox.valign = Gtk.Align.START;
 
             /* Toolbox handle consisting of an image + eventbox */
             var himage = this.load_icon("move.svg", 30);
@@ -599,7 +615,6 @@ namespace pdfpc.Window {
 		});
 
             tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
-            tb.set_tooltip_text("Toggle pointer");
             tb.clicked.connect(() => {
 		    this.presentation_controller.toggle_pointers();
 		});
@@ -643,13 +658,11 @@ namespace pdfpc.Window {
                     this.presentation_controller.queue_pen_surface_draws();
 		});
 
-            this.fixed = new Gtk.Fixed();
+            this.toolbox_container = new Gtk.Fixed();
+            this.toolbox_container.put(toolbox, tbox_x, tbox_y);
 
-            full_overlay.add_overlay(this.fixed);
-            full_overlay.set_overlay_pass_through(this.fixed, true);
-            int tb_offset = (int) Math.round(0.1*next_scale_rect.height);
-            this.fixed.put(toolbox, next_scale_rect.width + tb_offset,
-                                    current_scale_rect.height + tb_offset);
+            full_overlay.add_overlay(this.toolbox_container);
+            full_overlay.set_overlay_pass_through(this.toolbox_container, true);
 
             this.add(full_overlay);
         }
