@@ -241,9 +241,41 @@ namespace pdfpc {
         }
 
         /**
+         * Defines initial state of the toolbox
+         */
+        public enum ToolboxState {
+            Hidden,
+            Minimized,
+            Shown;
+
+            public static ToolboxState parse(string? state) {
+                if (state == null) {
+                    return Minimized;
+                }
+
+                switch (state.down()) {
+                    case "hidden":
+                        return Hidden;
+                    case "minimized":
+                        return Minimized;
+                    case "shown":
+                        return Shown;
+                    default:
+                        return Minimized;
+                }
+            }
+        }
+
+        /**
          * Direction of the toolbox
          */
         public static ToolboxDirection toolbox_direction =
             ToolboxDirection.LtoR;
+
+        /**
+         * State of the toolbox
+         */
+        public static ToolboxState toolbox_state =
+            ToolboxState.Minimized;
     }
 }
