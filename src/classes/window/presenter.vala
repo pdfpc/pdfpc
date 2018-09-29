@@ -581,6 +581,8 @@ namespace pdfpc.Window {
                     tbox_y = next_slide_rect.height + tb_offset;
                     break;
             }
+            tbox_x /= this.gdk_scale;
+            tbox_y /= this.gdk_scale;
             toolbox = new Gtk.Box(toolbox_orientation, 0);
             toolbox.get_style_context().add_class("toolbox");
             toolbox.halign = Gtk.Align.START;
