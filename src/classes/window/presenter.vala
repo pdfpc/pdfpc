@@ -257,6 +257,16 @@ namespace pdfpc.Window {
                 panel.pack_start(button);
             }
 
+            // ignore input events on the main window while the scale popup
+            // is active
+            var popup = button.get_popup();
+            popup.show.connect(() => {
+		    this.presentation_controller.set_ignore_input_events(true);
+		});
+            popup.hide.connect(() => {
+		    this.presentation_controller.set_ignore_input_events(false);
+		});
+
             return button;
         }
 
