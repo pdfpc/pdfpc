@@ -832,6 +832,8 @@ namespace pdfpc {
             add_action("increaseFontSize", this.increase_font_size);
             add_action("decreaseFontSize", this.decrease_font_size);
 
+            add_action("toggleToolbox", this.toggle_toolbox);
+
             add_action("exitState", this.exit_state);
             add_action("quit", this.quit);
         }
@@ -1691,6 +1693,14 @@ namespace pdfpc {
 
         protected void decrease_font_size() {
             this.decrease_font_size_request();
+        }
+
+        /**
+         * Toggle toolbox visibility
+         */
+        public void toggle_toolbox() {
+            Options.toolbox_shown = !Options.toolbox_shown;
+            this.controllables_update();
         }
 
         protected void exit_state() {

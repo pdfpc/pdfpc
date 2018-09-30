@@ -587,9 +587,7 @@ namespace pdfpc.Window {
             toolbox.get_style_context().add_class("toolbox");
             toolbox.halign = Gtk.Align.START;
             toolbox.valign = Gtk.Align.START;
-            if (Options.toolbox_state == Options.ToolboxState.Hidden) {
-                toolbox.set_child_visible(false);
-            }
+            toolbox.set_child_visible(Options.toolbox_shown);
 
             /* Toolbox handle consisting of an image + eventbox */
             var himage = this.load_icon("move.svg", 30);
@@ -617,7 +615,7 @@ namespace pdfpc.Window {
             button_panel.set_spacing(0);
             button_panel.set_homogeneous(true);
 
-            if (Options.toolbox_state == Options.ToolboxState.Minimized) {
+            if (Options.toolbox_minimized) {
                 button_panel.set_child_visible(false);
             }
             if (tbox_inverse) {
@@ -740,6 +738,8 @@ namespace pdfpc.Window {
         }
 
         protected void update_toolbox() {
+            toolbox.set_child_visible(Options.toolbox_shown);
+
             var controller = this.presentation_controller;
 
             var rgba = controller.pen_drawing.pen.get_rgba();

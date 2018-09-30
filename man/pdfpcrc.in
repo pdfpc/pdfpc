@@ -88,12 +88,15 @@ presentation is progressing according to the expected pace (bool, Default true).
 See the timer operation description in
 .B \fBpdfpc\fR(1).
 .TP
+.B toolbox
+Show the toolbox on startup (bool, Default false)
+.TP
 .B toolbox-direction
 Set the toolbox direction (LtoR, RtoL, TtoB, or BtoT for the left-to-right,
 right-to-left, top-to-bottom, or botton-to-top, respectively). Default is LtoR.
 .TP
-.B toolbox-state
-Set the toolbox state (Shown|Hidden|Minimized). Default is Minimized.
+.B toolbox-minimized
+Set the initial toolbox state minimized (bool, Default false)
 
 .SH EXAMPLES
 
