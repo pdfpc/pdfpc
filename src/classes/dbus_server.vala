@@ -75,11 +75,11 @@ namespace pdfpc {
                 }, () => {}, () => GLib.printerr("Could not acquire DBus bus.\n"));
         }
 
-        public void trigger_action(string name) {
+        public void trigger_action(string name) throws GLib.Error {
             this.controller.trigger_action(name);
         }
 
-        public string get_notes() {
+        public string get_notes() throws GLib.Error {
             return this.metadata.get_notes().get_note_for_slide(controller.current_user_slide_number);
         }
     }

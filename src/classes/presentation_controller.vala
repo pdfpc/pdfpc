@@ -31,8 +31,8 @@
 
 [DBus (name = "org.freedesktop.ScreenSaver")]
 public interface ScreenSaver : Object {
-    public abstract async uint32 inhibit(string application_name, string reason) throws IOError;
-    public abstract void un_inhibit(uint32 cookie) throws IOError;
+    public abstract async uint32 inhibit(string application_name, string reason) throws DBusError, IOError;
+    public abstract void un_inhibit(uint32 cookie) throws DBusError, IOError;
 }
 
 namespace pdfpc {
