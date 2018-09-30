@@ -80,6 +80,10 @@ else ()
     LIST(REMOVE_ITEM VALA_SRC classes/action/movie.vala)
 endif ()
 
+add_definitions("-Wno-discarded-qualifiers")
+add_definitions("-Wno-incompatible-pointer-types")
+add_definitions("-Wno-implicit-function-declaration")
+
 vala_precompile(VALA_C
     ${VALA_SRC}
 PACKAGES
