@@ -9,14 +9,10 @@
 .SH NAME
 pdfpcrc \- pdfpc configuration file
 
-.SH SYNOPSIS
-.B @SYSCONFDIR@/pdfpcrc / $XDG_CONFIG_DIR/pdfpc/pdfpcrc
-
 .SH DESCRIPTION
 .PP
-pdfpc(1) reads its configuration from @SYSCONFDIR@/pdfpcrc.  It also reads
-$XDG_CONFIG_DIR/pdfpc/pdfpcrc if this file exists (if $XDG_CONFIG_DIR is not
-set, $HOME/.config will be used).
+\fBpdfpc\fR(1) first reads its system-wide configuration file, followed by the
+user-specific one if it exists.
 
 .SS Keybindings
 .PP
@@ -42,7 +38,7 @@ Clear all the mouse bindings
 
 .PP
 A list of all possible functions can be obtained
-via the \-L command line option of pdfpc(1).
+via the \-L command line option of \fBpdfpc\fR(1).
 
 .SS Options
 .PP
@@ -65,11 +61,11 @@ Percentage of the presenter screen to be used for the current slide. (int, Defau
 .TP
 .BI disable-caching
 see
-.B pdfpc(1)
+.B \fBpdfpc\fR(1)
 .TP
 .BI disable-compression
 see
-.B pdfpc(1)
+.B \fBpdfpc\fR(1)
 .TP
 .BI disable-scrolling
 Disable scrolling events on the presenter window (bool, Default false)
@@ -84,14 +80,23 @@ Minimum width for the overview miniatures, in pixels. (int, Default 150)
 Switch the presentation and the presenter screen. (bool, Default false)
 .TP
 .B time-of-day
-see
-.B pdfpc(1)
+Display the current time instead of the timer
 .TP
 .B timer-pace-color
 Enable color hints of the timer, continuously indicating whether the
 presentation is progressing according to the expected pace (bool, Default true).
 See the timer operation description in
-.B pdfpc(1).
+.B \fBpdfpc\fR(1).
+.TP
+.B toolbox
+Show the toolbox on startup (bool, Default false)
+.TP
+.B toolbox-direction
+Set the toolbox direction (LtoR, RtoL, TtoB, or BtoT for the left-to-right,
+right-to-left, top-to-bottom, or botton-to-top, respectively). Default is LtoR.
+.TP
+.B toolbox-minimized
+Set the initial toolbox state minimized (bool, Default false)
 
 .SH EXAMPLES
 
@@ -123,6 +128,19 @@ config file
 option black-on-end true
 .RE
 
+.SH FILES
+.PP
+.B @SYSCONFDIR@/pdfpcrc
+.RS 4
+System-wide configuration file
+.RE
+.PP
+.B $XDG_CONFIG_DIR/pdfpc/pdfpcrc
+.RS 4
+User configuration file (if $XDG_CONFIG_DIR is not set, $HOME/.config will be
+used).
+
+
 .SH SEE ALSO
 .PP
-pdfpc(1)
+\fBpdfpc\fR(1)

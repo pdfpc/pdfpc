@@ -318,7 +318,7 @@ namespace pdfpc {
         /* pen mode state */
         public Gtk.DrawingArea? presenter_pen_surface;
         public Gtk.DrawingArea? presentation_pen_surface;
-        private Drawings.Drawing pen_drawing;
+        public Drawings.Drawing pen_drawing;
         private Drawings.DrawingTool? current_mouse_tool = null;
         private Drawings.DrawingTool? current_pen_drawing_tool = null;
         private bool mouse_tool_is_eraser = false;
@@ -440,7 +440,21 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
-        private void queue_pen_surface_draws() {
+        public void set_pen_size(double width) {
+            if (width > 500) {
+                width = 500;
+            } else
+            if (width < pen_step) {
+                width = pen_step;
+            }
+            current_pen_drawing_tool.width = width;
+        }
+
+        public double get_pen_size() {
+            return current_pen_drawing_tool.width;
+        }
+
+        public void queue_pen_surface_draws() {
             if (presenter != null) {
                 presenter_pen_surface.queue_draw();
             }
@@ -696,10 +710,8 @@ namespace pdfpc {
 
                 //cursor
                 context.new_path();
-                context.set_source_rgba(255,0,0,0.5);
-                context.arc(x, y, r, 0, 2*Math.PI);
-                context.fill();
-            } else {
+            }
+            if (drag_x == -1) {
                 context.set_source_rgba(255,0,0,0.5);
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
@@ -819,6 +831,8 @@ namespace pdfpc {
 
             add_action("increaseFontSize", this.increase_font_size);
             add_action("decreaseFontSize", this.decrease_font_size);
+
+            add_action("toggleToolbox", this.toggle_toolbox);
 
             add_action("exitState", this.exit_state);
             add_action("quit", this.quit);
@@ -1587,7 +1601,7 @@ namespace pdfpc {
         /**
          * Fill the presentation display with black
          */
-        protected void fade_to_black() {
+        public void fade_to_black() {
             this.faded_to_black = !this.faded_to_black;
             this.controllables_update();
         }
@@ -1595,7 +1609,7 @@ namespace pdfpc {
         /**
          * Hide the presentation window
          */
-        protected void hide_presentation() {
+        public void hide_presentation() {
             this.hidden = !this.hidden;
             this.controllables_update();
         }
@@ -1623,7 +1637,7 @@ namespace pdfpc {
         /**
          * Freeze the display
          */
-        protected void toggle_freeze() {
+        public void toggle_freeze() {
             this.frozen = !this.frozen;
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1661,7 +1675,7 @@ namespace pdfpc {
         /**
          * Pause the timer
          */
-        protected void toggle_pause() {
+        public void toggle_pause() {
             this.timer.pause();
             this.controllables_update();
         }
@@ -1679,6 +1693,14 @@ namespace pdfpc {
 
         protected void decrease_font_size() {
             this.decrease_font_size_request();
+        }
+
+        /**
+         * Toggle toolbox visibility
+         */
+        public void toggle_toolbox() {
+            Options.toolbox_shown = !Options.toolbox_shown;
+            this.controllables_update();
         }
 
         protected void exit_state() {

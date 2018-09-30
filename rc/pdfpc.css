@@ -1,7 +1,5 @@
-* {
-    background-image: none;
+*:not(button):not(label) {
     border: none;
-    color: white;
     font-family: Verdana;
     /* This will be deprecated in GTK 3.20,
      * but the alternative of Widget's min-width
@@ -19,6 +17,7 @@ scrolledwindow trough {
 }
 
 progressbar trough * {
+    background-image: none;
     background-color: blue;
 }
 
@@ -26,20 +25,17 @@ progressbar trough {
     background-color: white;
 }
 
-GtkProgressBar {
-    background-color: white;
-}
-
-GtkProgressBar * {
-    background-color: blue;
-}
-
-GtkEntry, GtkIconView, GtkTextView, GtkWindow {
-    background-color: black;
-}
-
 entry, iconview, textview *, window {
     background-color: black;
+    color: white;
+}
+
+.toolbox button:not(.color) * {
+    background-color: gray;
+}
+
+.overviewWindow {
+    font-size: 4em;
 }
 
 /* The bottom text is automatically sized based on the resolution of
@@ -69,8 +65,4 @@ entry, iconview, textview *, window {
 
 .too-slow {
     color: orange;
-}
-
-.overviewWindow {
-    font-size: 4em;
 }

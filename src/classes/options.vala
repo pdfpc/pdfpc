@@ -210,5 +210,46 @@ namespace pdfpc {
          * Used to post pone binding execution in presentation controller
          */
         public static Gee.List<BindTuple> mouse_bindings;
+
+        /**
+         * Defines direction/orientation of the toolbox
+         */
+        public enum ToolboxDirection {
+            LtoR,
+            RtoL,
+            TtoB,
+            BtoT;
+
+            public static ToolboxDirection parse(string? dir) {
+                if (dir == null) {
+                    return LtoR;
+                }
+
+                switch (dir.down()) {
+                    case "ltor":
+                        return LtoR;
+                    case "rtol":
+                        return RtoL;
+                    case "ttob":
+                        return TtoB;
+                    case "btot":
+                        return BtoT;
+                    default:
+                        return LtoR;
+                }
+            }
+        }
+
+        /**
+         * Direction of the toolbox
+         */
+        public static ToolboxDirection toolbox_direction =
+            ToolboxDirection.LtoR;
+
+        /**
+         * State of the toolbox
+         */
+        public static bool toolbox_shown = false;
+        public static bool toolbox_minimized = false;
     }
 }

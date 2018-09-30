@@ -278,6 +278,16 @@ namespace pdfpc {
                     bool timer_pace_color = bool.parse(fields[2]);
                     Options.timer_pace_color = timer_pace_color;
                     break;
+                case "toolbox":
+                    Options.toolbox_shown = bool.parse(fields[2]);
+                    break;
+                case "toolbox-direction":
+                    Options.toolbox_direction =
+                        Options.ToolboxDirection.parse(fields[2]);
+                    break;
+                case "toolbox-minimized":
+                    Options.toolbox_minimized = bool.parse(fields[2]);
+                    break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
                     break;

@@ -53,6 +53,9 @@ bind e         endSlide
 bind S+s       lastSlide
 bind S+r       jumpLastSlide
 
+# Toolbox
+bind t toggleToolbox
+
 # Font scaling
 bind plus      increaseFontSize
 bind equal     increaseFontSize
