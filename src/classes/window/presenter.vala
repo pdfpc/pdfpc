@@ -587,6 +587,13 @@ namespace pdfpc.Window {
             toolbox.get_style_context().add_class("toolbox");
             toolbox.halign = Gtk.Align.START;
             toolbox.valign = Gtk.Align.START;
+
+            // if pdfpc runs at a tablet we force the toolbox to be shown
+            var seat = Gdk.Display.get_default().get_default_seat();
+            var touchSeats = seat.get_slaves(Gdk.SeatCapabilities.TOUCH);
+            if (touchSeats.length() > 0) {
+                Options.toolbox_shown = true;
+            }
             toolbox.set_child_visible(Options.toolbox_shown);
 
             /* Toolbox handle consisting of an image + eventbox */
