@@ -851,13 +851,14 @@ namespace pdfpc {
         }
 
         /**
-         * Gets an array wit all function names
+         * Get an array with all action names
          *
-         * It would be more legant yo use the keys property of actionNames, but
+         * It would be more elegant to use the key property of actionNames, but
          * we would need an instance for doing this...
          */
         public static string[] getActionDescriptions() {
-            return {"next", "Go to next slide",
+            return {
+                "next", "Go to next slide",
                 "next10", "Jump 10 slides forward",
                 "lastOverlay", "Jump to the last overlay of the current slide",
                 "nextOverlay", "Jump forward outside of current overlay",
@@ -867,6 +868,8 @@ namespace pdfpc {
                 "goto", "Ask for a page to jump to",
                 "gotoFirst", "Jump to first slide",
                 "gotoLast", "Jump to last slide",
+                "nextUnseen", "Jump to the next unseen slide",
+                "prevSeen", "Jump to the last previously seen slide",
                 "overview", "Show the overview mode",
                 "histBack", "Go back in history",
                 "start", "Start the timer",
@@ -874,6 +877,7 @@ namespace pdfpc {
                 "resetTimer", "Reset the timer",
                 "reset", "Reset the presentation",
                 "blank", "Blank presentation screen",
+                "hide", "Hide the presentation screen",
                 "freeze", "Toggle freeze presentation screen",
                 "freezeOn", "Freeze presentation screen if unfrozen",
                 "overlay", "Mark current slide as overlay slide",
@@ -886,6 +890,13 @@ namespace pdfpc {
                 "togglePointer", "Toggle pointer mode",
                 "increasePointer", "Increase pointer size",
                 "decreasePointer", "Decrease pointer size",
+                "toggleDrawing", "Toggle drawing mode",
+                "toggleEraser", "Toggle between eraser/pen in the drawing mode",
+                "increasePen", "Increase pen size",
+                "decreasePen", "Decrease pen size",
+                "clearDrawing", "Clear all drawings on the current slide",
+                "hideDrawing", "Hide all drawings on the current slide",
+                "toggleToolbox", "Toggle the toolbox",
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
                 "quit", "Exit pdfpc",
                 "setPenColor", "Change pen color (requires argument)",
