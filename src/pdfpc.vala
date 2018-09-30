@@ -223,9 +223,9 @@ namespace pdfpc {
                 string[] actions = PresentationController.getActionDescriptions();
                 for (int i = 0; i < actions.length; i+=2) {
                     string tabAlignment = "\t";
-                    if (actions[i].length < 8)
+                    if (actions[i].length < 12)
                         tabAlignment += "\t";
-                    GLib.print("\t%s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
+                    GLib.print("    %s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
                 }
 
                 return;
