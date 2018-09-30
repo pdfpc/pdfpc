@@ -194,6 +194,13 @@ namespace pdfpc {
                 GLib.printerr("--notes option detected. Disable auto grouping.\n");
             }
 
+            // if pdfpc runs at a tablet we force the toolbox to be shown
+            var seat = Gdk.Display.get_default().get_default_seat();
+            var touchSeats = seat.get_slaves(Gdk.SeatCapabilities.TOUCH);
+            if (touchSeats.length() > 0) {
+                Options.toolbox_shown = true;
+            }
+
             ConfigFileReader configFileReader = new ConfigFileReader();
             configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
             configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
