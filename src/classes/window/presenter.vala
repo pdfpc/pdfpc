@@ -240,7 +240,7 @@ namespace pdfpc.Window {
 
         protected Gtk.ScaleButton add_toolbox_sbutton(Gtk.Box panel,
             bool tbox_inverse, string icon_fname) {
-            
+
             var button = new Gtk.ScaleButton(Gtk.IconSize.DIALOG,
                 0, 50, 2, null);
 
@@ -261,11 +261,11 @@ namespace pdfpc.Window {
             // is active
             var popup = button.get_popup();
             popup.show.connect(() => {
-		    this.presentation_controller.set_ignore_input_events(true);
-		});
+                this.presentation_controller.set_ignore_input_events(true);
+            });
             popup.hide.connect(() => {
-		    this.presentation_controller.set_ignore_input_events(false);
-		});
+                this.presentation_controller.set_ignore_input_events(false);
+            });
 
             return button;
         }
