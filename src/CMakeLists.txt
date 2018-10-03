@@ -82,6 +82,7 @@ endif ()
 
 add_definitions("-Wno-discarded-qualifiers")
 add_definitions("-Wno-incompatible-pointer-types")
+add_definitions("-Wno-deprecated-declarations")
 add_definitions("-Wno-implicit-function-declaration")
 
 vala_precompile(VALA_C
