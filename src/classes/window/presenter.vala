@@ -119,6 +119,11 @@ namespace pdfpc.Window {
         protected Gtk.TextView notes_view;
 
         /**
+         * CSS provider for setting note font size
+         */
+        protected Gtk.CssProvider css_provider;
+
+        /**
          * Indication that the highlight tool is selected
          */
         protected Gtk.Image highlight_icon;
@@ -363,6 +368,10 @@ namespace pdfpc.Window {
                 out strict_prev_slide_rect
             );
 
+            this.css_provider = new Gtk.CssProvider();
+            Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
+                css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
             // TextView for notes in the slides
             this.notes_view = new Gtk.TextView();
             this.notes_view.name = "notesView";
@@ -373,16 +382,13 @@ namespace pdfpc.Window {
             this.notes_view.buffer.text = "";
             this.notes_view.key_press_event.connect(this.on_key_press_notes_view);
             if (this.metadata.font_size >= 0) {
-                Pango.FontDescription font_desc = get_notes_font_description();
-
-                // LEGCAY font size detection
+                // LEGACY font size detection
                 // Before, we had the font size in absolute (device) units.
-                // These where typically larger then 1000
+                // These were typically larger than 1000
                 if (this.metadata.font_size >= 1000) {
                     this.metadata.font_size /= Pango.SCALE;
                 }
-                font_desc.set_size(this.metadata.font_size * Pango.SCALE);
-                this.notes_view.override_font(font_desc);
+                this.set_font_size(this.metadata.font_size);
             }
 
             // The countdown timer is centered in the 90% bottom part of the screen
@@ -446,7 +452,7 @@ namespace pdfpc.Window {
             // resize the bottom text based on the window height
             // (see http://stackoverflow.com/a/35237445/730138)
             var bottom_text_css_provider = new Gtk.CssProvider();
-            Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),
+            Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
                 bottom_text_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
 
             const string bottom_text_css_template = ".bottomText { font-size: %dpx; }";
@@ -955,34 +961,43 @@ namespace pdfpc.Window {
          * Increase font sizes for Widgets
          */
         public void increase_font_size() {
-            Pango.FontDescription font_desc = get_notes_font_description();
-
-            int font_size = font_desc.get_size() / Pango.SCALE;
+            int font_size = get_font_size();
             font_size += 2;
-            font_desc.set_size(font_size * Pango.SCALE);
             this.metadata.font_size = font_size;
-            this.notes_view.override_font(font_desc);
+            set_font_size(font_size);
         }
 
         /**
          * Decrease font sizes for Widgets
          */
         public void decrease_font_size() {
-            Pango.FontDescription font_desc = get_notes_font_description();
-
-            int font_size = font_desc.get_size() / Pango.SCALE;
-            font_size = (int)GLib.Math.fmax(font_size - 2, 0);
-            font_desc.set_size(font_size * Pango.SCALE);
+            int font_size = get_font_size();
+            font_size -= 2;
+            if (font_size < 2) {
+                font_size = 2;
+            }
             this.metadata.font_size = font_size;
-            this.notes_view.override_font(font_desc);
+            set_font_size(font_size);
         }
 
-        private Pango.FontDescription get_notes_font_description() {
+        private int get_font_size() {
             Gtk.StyleContext style_context = this.notes_view.get_style_context();
             Pango.FontDescription font_desc;
             style_context.get(style_context.get_state(), "font", out font_desc, null);
 
-            return font_desc;
+            return font_desc.get_size()/Pango.SCALE;
+        }
+
+        private void set_font_size(int size) {
+
+            const string text_css_template = "#notesView { font-size: %dpt; }";
+            var css = text_css_template.printf(size);
+
+            try {
+                css_provider.load_from_data(css, -1);
+            } catch (Error e) {
+                GLib.printerr("Warning: failed to set CSS for notes.\n");
+            }
         }
     }
 }
