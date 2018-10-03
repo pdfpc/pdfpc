@@ -282,14 +282,12 @@ namespace pdfpc {
 
             var screen = Gdk.Screen.get_default();
             if (!Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1) {
-                int presenter_monitor, presentation_monitor;
-                if (Options.display_switch != true) {
-                    presenter_monitor = screen.get_primary_monitor();
-                } else {
-                    presenter_monitor = (screen.get_primary_monitor() + 1) % 2;
+                int presenter_monitor = screen.get_primary_monitor();
+                if (Options.display_switch) {
+                    presenter_monitor = (presenter_monitor + 1) % 2;
                 }
 
-                presentation_monitor = (presenter_monitor + 1) % 2;
+                int presentation_monitor = (presenter_monitor + 1) % 2;
                 this.controller.presenter = this.create_presenter(metadata, presenter_monitor);
                 this.controller.presentation = this.create_presentation(metadata, presentation_monitor, width, height);
             } else if (Options.windowed && !Options.single_screen) {

@@ -96,16 +96,15 @@ namespace pdfpc.Window {
 
                 // Start in the given monitor
                 this.screen_to_use = Gdk.Screen.get_default();
-                this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
             } else {
                 // Start in the monitor the cursor is in
-                var display = Gdk.Display.get_default().get_device_manager().get_client_pointer();
+                var device = Gdk.Display.get_default().get_default_seat().get_pointer();
                 int pointerx, pointery;
-                display.get_position(out this.screen_to_use, out pointerx, out pointery);
+                device.get_position(out this.screen_to_use, out pointerx, out pointery);
 
                 this.screen_num_to_use = this.screen_to_use.get_monitor_at_point(pointerx, pointery);
-                this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
             }
+            this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
 
             this.gdk_scale = this.screen_to_use.get_monitor_scale_factor(this.screen_num_to_use);
             if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
