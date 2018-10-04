@@ -80,10 +80,24 @@ else ()
     LIST(REMOVE_ITEM VALA_SRC classes/action/movie.vala)
 endif ()
 
-add_definitions("-Wno-discarded-qualifiers")
-add_definitions("-Wno-incompatible-pointer-types")
-add_definitions("-Wno-deprecated-declarations")
-add_definitions("-Wno-implicit-function-declaration")
+# Check for some compiler flags to suppress excessive Vala-triggered warnings
+include(CheckCCompilerFlag)
+check_c_compiler_flag(-Wno-discarded-qualifiers HAS_NO_DISCARDED_QUALIFIERS)
+if (HAS_NO_DISCARDED_QUALIFIERS)
+    add_definitions("-Wno-discarded-qualifiers")
+endif()
+check_c_compiler_flag(-Wno-incompatible-pointer-types HAS_NO_INCOMPATIBLE_POINTER_TYPES)
+if (HAS_NO_INCOMPATIBLE_POINTER_TYPES)
+    add_definitions("-Wno-incompatible-pointer-types")
+endif()
+check_c_compiler_flag(-Wno-deprecated-declarations HAS_NO_DEPRECATED_DECLARATIONS)
+if (HAS_NO_DEPRECATED_DECLARATIONS)
+    add_definitions("-Wno-deprecated-declarations")
+endif()
+check_c_compiler_flag(-Wno-implicit-function-declaration HAS_NO_IMPLICIT_FUNCTION_DECLARATION)
+if (HAS_NO_IMPLICIT_FUNCTION_DECLARATION)
+    add_definitions("-Wno-implicit-function-declaration")
+endif()
 
 vala_precompile(VALA_C
     ${VALA_SRC}
