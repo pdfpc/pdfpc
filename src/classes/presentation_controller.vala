@@ -695,11 +695,9 @@ namespace pdfpc {
         }
 
         protected void draw_pointer(Cairo.Context context, Gtk.Allocation a) {
-            int x = (int)(a.width*pointer_x);
-            int y = (int)(a.height*pointer_y);
-            int r = (int)(a.height*0.001*pointer_size);
-
-            if (highlight_w>0) {
+            // Draw the highlighted area, but ignore very short drags
+            // made unintentionally by mouse clicks
+            if (highlight_w > 0.01 && highlight_h > 0.01) {
                 context.rectangle(0,0,a.width, a.height);
                 context.new_sub_path();
                 context.rectangle((int)(highlight_x*a.width), (int)(highlight_y*a.height), (int)(highlight_w*a.width), (int)(highlight_h*a.height));
@@ -708,10 +706,14 @@ namespace pdfpc {
                 context.set_source_rgba(0,0,0,0.5);
                 context.fill_preserve();
 
-                //cursor
                 context.new_path();
             }
+            // Draw the pointer when not dragging
             if (drag_x == -1) {
+                int x = (int)(a.width*pointer_x);
+                int y = (int)(a.height*pointer_y);
+                int r = (int)(a.height*0.001*pointer_size);
+
                 context.set_source_rgba(255,0,0,0.5);
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
