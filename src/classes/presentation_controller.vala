@@ -799,10 +799,10 @@ namespace pdfpc {
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
             add_action("lastOverlay", this.jump_to_last_overlay);
-            add_action("firstOverlay", this.jump_to_first_overlay);
             add_action("nextOverlay", this.next_user_page);
             add_action("prev", this.previous_page);
             add_action("prev10", this.back10);
+            add_action("firstOverlay", this.jump_to_first_overlay);
             add_action("prevOverlay", this.previous_user_page);
             add_action("prevSeen", this.previous_seen);
             add_action("nextUnseen", this.next_unseen);
@@ -864,10 +864,10 @@ namespace pdfpc {
                 "next", "Go to the next slide",
                 "next10", "Jump 10 slides forward",
                 "lastOverlay", "Jump to the last overlay of the current slide",
-                "firstOverlay", "Jump to the first overlay of the current slide",
                 "nextOverlay", "Jump forward outside of the current overlay",
                 "prev", "Go to the previous slide",
                 "prev10", "Jump 10 slides back",
+                "firstOverlay", "Jump to the first overlay of the current slide",
                 "prevOverlay", "Jump back outside of the current overlay",
                 "goto", "Ask for a page to jump to",
                 "gotoFirst", "Jump to the first slide",
