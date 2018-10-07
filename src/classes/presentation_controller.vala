@@ -799,6 +799,7 @@ namespace pdfpc {
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
             add_action("lastOverlay", this.jump_to_last_overlay);
+            add_action("firstOverlay", this.jump_to_first_overlay);
             add_action("nextOverlay", this.next_user_page);
             add_action("prev", this.previous_page);
             add_action("prev10", this.back10);
@@ -863,6 +864,7 @@ namespace pdfpc {
                 "next", "Go to the next slide",
                 "next10", "Jump 10 slides forward",
                 "lastOverlay", "Jump to the last overlay of the current slide",
+                "firstOverlay", "Jump to the first overlay of the current slide",
                 "nextOverlay", "Jump forward outside of the current overlay",
                 "prev", "Go to the previous slide",
                 "prev10", "Jump 10 slides back",
@@ -1339,6 +1341,27 @@ namespace pdfpc {
 
             if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
                 this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
+            }
+        }
+
+        /**
+         * Jump to the first overlay for the current user slide
+         */
+        public void jump_to_first_overlay() {
+            this.timer.start();
+
+            int destination = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, false);
+            if (this.current_slide_number != destination) {
+                this.current_slide_number = destination;
+
+                if (!this.frozen) {
+                    this.faded_to_black = false;
+                }
+                this.controllables_update();
+
+                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
+                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
+                }
             }
         }
 
