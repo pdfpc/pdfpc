@@ -1318,29 +1318,19 @@ namespace pdfpc {
          */
         public void jump_to_last_overlay() {
             this.timer.start();
-            bool needs_update = false; // Did we change anything? Default: no
 
-            // there is a next user slide
-            if (this.current_user_slide_number < this.metadata.get_user_slide_count() - 1) {
-                // last overlay = next user slide (as real) - 1
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1) - 1;
-                needs_update = true;
-            } else {
-                // we are at the last user slide
-                // last overlay == last last
-                this.current_slide_number = this.n_slides - 1;
-                needs_update = true;
-            }
+            int destination = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, true);
+            if (this.current_slide_number != destination) {
+                this.current_slide_number = destination;
 
-            if (needs_update) {
                 if (!this.frozen) {
                     this.faded_to_black = false;
                 }
                 this.controllables_update();
-            }
 
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
+                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
+                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
+                }
             }
         }
 
