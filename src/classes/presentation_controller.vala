@@ -347,7 +347,6 @@ namespace pdfpc {
                 draw_pen_surface(context, presentation_allocation, false);
                 return true;
             });
-            this.controllables_update();
         }
 
         protected void init_presenter_pen() {
