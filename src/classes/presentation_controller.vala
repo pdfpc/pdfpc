@@ -544,14 +544,12 @@ namespace pdfpc {
             pen_enabled = !pen_enabled;
             if (pen_enabled) {
                 pen_drawing_present = true;
-                if (this._presenter != null) {
-                    this._presenter.get_window().set_event_compression(false);
-                }
                 current_pen_drawing_tool = pen_drawing.pen;
-            } else {
-                if (this._presenter != null) {
-                    this.presenter.get_window().set_event_compression(true);
-                }
+            }
+
+            // Disable event compression for smoother drawing
+            if (this.presenter != null) {
+                this.presenter.get_window().set_event_compression(!pen_enabled);
             }
 
             // When drawing mode is inactive, make the drawing surface
