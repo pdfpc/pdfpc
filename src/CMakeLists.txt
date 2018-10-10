@@ -117,10 +117,6 @@ OPTIONS
     --debug
     --enable-experimental
     ${EXTRA_VALA_OPTIONS}
-GENERATE_HEADER
-    presenter
-GENERATE_VAPI
-    presenter
 CUSTOM_VAPIS
     ${CMAKE_CURRENT_BINARY_DIR}/paths.vala
     ${CMAKE_CURRENT_SOURCE_DIR}/custom_binding.vapi
@@ -152,11 +148,4 @@ install(TARGETS
 RUNTIME
 DESTINATION
     bin
-)
-
-# The tests need a library version of all the pdf_presenter_stuff
-add_library(pdf_presenter_console_test_library
-    SHARED
-    EXCLUDE_FROM_ALL
-    ${VALA_C} presenter.h presenter.vapi
 )
