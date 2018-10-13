@@ -2,6 +2,23 @@
 pdfpc Changelog
 ===============
 
+Version 4.2
+===========
+
+*Released: October 2018*
+
+- Toolbar for pen/eraser/pointer mode (e.g. for touch screens)
+
+- Jump to first overlay
+
+- Bug fixes
+    - Print proper error messages if gstreamer fails to load because of missing plugins
+    - Fix freeze mode in combination with video slides
+    - Fix race conditions in gstreamer video pipeline (e.g. when the user switches
+      slides 'too fast')
+    - Jumping to last overlay works reliable
+    - Video controls are working now with shown drawings on that slide
+
 Version 4.1.2
 =============
 
