@@ -71,7 +71,7 @@ requirements need to be met:
 
 - CMake Version >=3.0
 - vala >= 0.26
-- GTK+ >= 3.10
+- GTK+ >= 3.20
 - gee 0.8
 - poppler with glib bindings
 - gstreamer 1.0
