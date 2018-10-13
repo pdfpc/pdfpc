@@ -9,6 +9,9 @@ install(FILES
     highlight.svg
     pen.svg
     eraser.svg
+    move.svg
+    settings.svg
+    linewidth.svg
 DESTINATION
     share/pixmaps/pdfpc
 )
