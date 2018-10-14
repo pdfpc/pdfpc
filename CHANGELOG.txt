@@ -2,6 +2,13 @@
 pdfpc Changelog
 ===============
 
+Version 4.2.1
+=============
+
+*Released: October 2018*
+
+- Bug fix: Add missing icons to CMakeLists.txt
+
 Version 4.2
 ===========
 
