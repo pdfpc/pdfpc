@@ -19,6 +19,7 @@ at https://pdfpc.github.io/
 
 Installation
 ============
+
 - On Ubuntu or Debian systems::
 
         sudo apt-get install pdf-presenter-console
@@ -34,6 +35,14 @@ Installation
 - On FreeBSD::
 
         It's available under graphics/pdfpc. A pre built binary is also available.
+
+- On macOS with MacPorts::
+
+        # Nice macOS integration, but no video support currently
+        sudo port -v install pdfpc +quartz
+
+        # Video support, but window placing might not work well
+        sudo port -v install pdfpc +x11
 
 - On Windows 10 (with *Windows Subsystem for Linux (WSL)*)::
 
@@ -144,20 +153,6 @@ For pdfpc the following compile time dependencies are necessary:
 - libpoppler
 - gstreamer
 - libgstinterfaces1.0-devel (has gstreamer.audio included)
-
-Compiling in Mac OS X (Yosemite)
---------------------------------
-
-First, install homebrew as described on their webpage, then install the dependencies::
-
-    brew install cmake vala gtk+3 libgee poppler librsvg libcroco
-
-You need to call cmake with::
-
-    cmake -DMOVIES=off
-
-since Yosemite has no X11 implementation, and the movie playback uses X11
-features.
 
 Compiling Trouble Shooting
 --------------------------
