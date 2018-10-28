@@ -553,7 +553,10 @@ namespace pdfpc {
 
             // When drawing mode is inactive, make the drawing surface
             // transparent to the input events
-            presenter_pen_surface.get_window().set_pass_through(!pen_enabled);
+            var w = presenter_pen_surface.get_window();
+            if (w != null) {
+                w.set_pass_through(!pen_enabled);
+            }
 
             hide_or_show_pen_surfaces();
             this.controllables_update();
