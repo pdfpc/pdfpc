@@ -114,7 +114,7 @@ function(vala_precompile output)
         "SOURCES;PACKAGES;OPTIONS;DEFINITIONS;CUSTOM_VAPIS" ${ARGN})
 
     if(ARGS_DIRECTORY)
-		get_filename_component(DIRECTORY ${ARGS_DIRECTORY} ABSOLUTE)
+        get_filename_component(DIRECTORY ${ARGS_DIRECTORY} ABSOLUTE)
     else(ARGS_DIRECTORY)
         set(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     endif(ARGS_DIRECTORY)
