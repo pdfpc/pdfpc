@@ -54,6 +54,16 @@ bind e         endSlide
 bind S+s       lastSlide
 bind S+r       jumpLastSlide
 
+# Annotation modes
+bind 0         switchMode normal
+bind KP_0      switchMode normal
+bind 2         switchMode eraser
+bind KP_2      switchMode eraser
+bind 5         switchMode pen
+bind KP_5      switchMode pen
+bind 8         switchMode pointer
+bind KP_8      switchMode pointer
+
 # Toolbox
 bind t toggleToolbox
 
@@ -67,25 +77,19 @@ bind KP_Subtract decreaseFontSize
 bind bracketright decreaseFontSize
 
 # Pointer
-bind 8         togglePointer
-bind KP_8      togglePointer
 bind 7         decreasePointer
 bind KP_7      decreasePointer
 bind 9         increasePointer
 bind KP_9      increasePointer
 
 # Drawing
-bind 5         toggleDrawing
-bind KP_5      toggleDrawing
 bind 6         clearDrawing
 bind KP_6      clearDrawing
-bind 4         hideDrawing
-bind KP_4      hideDrawing
+bind 4         toggleDrawings
+bind KP_4      toggleDrawings
 
 bind 1         decreasePen
 bind KP_1      decreasePen
-bind 2         toggleEraser
-bind KP_2      toggleEraser
 bind 3         increasePen
 bind KP_3      increasePen
 

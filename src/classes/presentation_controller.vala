@@ -264,6 +264,37 @@ namespace pdfpc {
         protected uint32 screensaver_cookie = 0;
 
         /**
+         * Operation mode
+         */
+        public enum AnnotationMode {
+            NORMAL,
+            POINTER,
+            PEN,
+            ERASER;
+
+            public static AnnotationMode parse(string? mode_str) {
+                if (mode_str == null) {
+                    return NORMAL;
+                }
+
+                switch (mode_str.down()) {
+                    case "normal":
+                        return NORMAL;
+                    case "pointer":
+                        return POINTER;
+                    case "pen":
+                        return PEN;
+                    case "eraser":
+                        return ERASER;
+                    default:
+                        return NORMAL;
+                }
+            }
+        }
+
+        private AnnotationMode annotation_mode = AnnotationMode.NORMAL;
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController(Metadata.Pdf metadata, bool allow_black_on_end) {
@@ -315,16 +346,17 @@ namespace pdfpc {
             DBusServer.start_server(this, this.metadata);
         }
 
-        /* pen mode state */
+        /* pen drawing widgets */
         public Gtk.DrawingArea? presenter_pen_surface;
         public Gtk.DrawingArea? presentation_pen_surface;
+
         public Drawings.Drawing pen_drawing;
-        private Drawings.DrawingTool? current_mouse_tool = null;
         private Drawings.DrawingTool? current_pen_drawing_tool = null;
-        private bool mouse_tool_is_eraser = false;
-        private uint pen_step = 2;
-        private bool pen_enabled = false;
+
+        /* pen drawing state */
         private bool pen_drawing_present = false;
+
+        private uint pen_step = 2;
         private double pen_last_x;
         private double pen_last_y;
         private bool pen_is_pressed = false;
@@ -334,8 +366,7 @@ namespace pdfpc {
                 this.pen_drawing = Drawings.create(metadata,
                                                    a.width,
                                                    a.height);
-                this.current_mouse_tool = pen_drawing.pen;
-                this.current_pen_drawing_tool = pen_drawing.pen;
+                current_pen_drawing_tool = pen_drawing.pen;
             }
         }
 
@@ -366,7 +397,7 @@ namespace pdfpc {
             });
 
             this.presenter_pen_surface.button_press_event.connect((event) => {
-                if (pen_enabled) {
+                if (in_drawing_mode()) {
                     move_pen(
                         event.x / presenter_allocation.width,
                         event.y / presenter_allocation.height
@@ -379,7 +410,7 @@ namespace pdfpc {
             });
 
             this.presenter_pen_surface.button_release_event.connect((event) => {
-                if (pen_enabled) {
+                if (in_drawing_mode()) {
                     move_pen(
                         event.x / presenter_allocation.width,
                         event.y / presenter_allocation.height
@@ -397,11 +428,15 @@ namespace pdfpc {
         }
 
         public bool is_eraser_active() {
-            return pen_enabled && current_mouse_tool == pen_drawing.eraser;
+            return annotation_mode == AnnotationMode.ERASER;
         }
 
         public bool is_pen_active() {
-            return pen_enabled && current_mouse_tool == pen_drawing.pen;
+            return annotation_mode == AnnotationMode.PEN;
+        }
+
+        protected bool in_drawing_mode() {
+            return is_eraser_active() || is_pen_active();
         }
 
         private void move_pen(double x, double y) {
@@ -413,16 +448,8 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
-        public void toggle_eraser() {
-            if (!mouse_tool_is_eraser) {
-                current_mouse_tool = pen_drawing.eraser;
-            } else {
-                current_mouse_tool = pen_drawing.pen;
-            }
-            mouse_tool_is_eraser = !mouse_tool_is_eraser;
-            // don't allow drawing to continue
-            pen_is_pressed = false;
-            this.controllables_update();
+        public void set_eraser_mode() {
+            this.set_mode(AnnotationMode.ERASER);
         }
 
         public void increase_pen() {
@@ -472,14 +499,12 @@ namespace pdfpc {
         protected bool on_move_pen(Gtk.Widget source, Gdk.EventMotion move) {
             Gdk.InputSource source_type  = move.get_source_device().get_source();
             if (source_type == Gdk.InputSource.ERASER) {
-                current_pen_drawing_tool = pen_drawing.eraser;
+                this.set_mode(AnnotationMode.ERASER);
             } else if (source_type == Gdk.InputSource.PEN) {
-                current_pen_drawing_tool = pen_drawing.pen;
-            } else { // MOUSE, CURSOR, TOUCHPAD, TRACKPOINT, ....
-                current_pen_drawing_tool = current_mouse_tool;
+                this.set_mode(AnnotationMode.PEN);
             }
 
-            if (pen_enabled) {
+            if (in_drawing_mode()) {
                 move_pen(move.x / (double) presenter_allocation.width, move.y / (double) presenter_allocation.height);
             }
             return true;
@@ -500,7 +525,7 @@ namespace pdfpc {
                 context.set_source_surface(drawing_surface, 0, 0);
                 context.paint();
                 context.set_matrix(old_xform);
-                if (for_presenter && pen_enabled) {
+                if (for_presenter && in_drawing_mode()) {
                     double width_adjustment = (double) a.width / base_width;
                     context.set_operator(Cairo.Operator.OVER);
                     context.set_line_width(2.0);
@@ -539,33 +564,79 @@ namespace pdfpc {
             }
         }
 
-        public void toggle_pen_drawing() {
-            pen_enabled = !pen_enabled;
-            if (pen_enabled) {
-                pen_drawing_present = true;
-                current_pen_drawing_tool = pen_drawing.pen;
+        public void set_mode(AnnotationMode mode) {
+            if (this.annotation_mode == mode) {
+                return;
             }
+
+            this.annotation_mode = mode;
+
+            switch (mode) {
+                case AnnotationMode.NORMAL:
+                break;
+
+                case AnnotationMode.POINTER:
+                break;
+
+                case AnnotationMode.PEN:
+                    pen_drawing_present = true;
+                    current_pen_drawing_tool = pen_drawing.pen;
+                break;
+
+                case AnnotationMode.ERASER:
+                    pen_drawing_present = true;
+                    current_pen_drawing_tool = pen_drawing.eraser;
+                    // abort any drawing currently in progress
+                    pen_is_pressed = false;
+                break;
+            }
+
+            // Update pointer surfaces
+            if (this.annotation_mode == AnnotationMode.POINTER) {
+                if (presenter != null) {
+                    presenter_pointer_surface.show();
+                }
+                if (presentation != null) {
+                    presentation_pointer_surface.show();
+                }
+            } else {
+                if (presenter != null) {
+                    presenter_pointer_surface.hide();
+                }
+                if (presentation != null) {
+                    presentation_pointer_surface.hide();
+                }
+            }
+
+            // Update drawing surfaces
+            hide_or_show_pen_surfaces();
 
             // Disable event compression for smoother drawing
             if (this.presenter != null) {
-                this.presenter.get_window().set_event_compression(!pen_enabled);
+                this.presenter.get_window().set_event_compression(!in_drawing_mode());
             }
 
             // When drawing mode is inactive, make the drawing surface
             // transparent to the input events
             var w = presenter_pen_surface.get_window();
             if (w != null) {
-                w.set_pass_through(!pen_enabled);
+                w.set_pass_through(!pen_drawing_present);
             }
 
-            hide_or_show_pen_surfaces();
             this.controllables_update();
         }
 
-        public void hide_pen_drawing() {
-            pen_drawing_present = false;
-            pen_enabled = false;
-            hide_or_show_pen_surfaces();
+        public void set_pen_mode() {
+            this.set_mode(AnnotationMode.PEN);
+        }
+
+        public void toggle_drawings() {
+            pen_drawing_present = !pen_drawing_present;
+            if (!pen_drawing_present && in_drawing_mode()) {
+                this.set_mode(AnnotationMode.NORMAL);
+            } else {
+                hide_or_show_pen_surfaces();
+            }
         }
 
         public void clear_pen_drawing() {
@@ -600,12 +671,11 @@ namespace pdfpc {
         private double highlight_h;
         private double drag_x;
         private double drag_y;
-        private bool pointer_enabled = false;
         private double pointer_x;
         private double pointer_y;
 
         public bool is_pointer_active() {
-            return pointer_enabled;
+            return this.annotation_mode == AnnotationMode.POINTER;
         }
 
         protected void init_presenter_pointer() {
@@ -726,24 +796,8 @@ namespace pdfpc {
         }
 
 
-        public void toggle_pointers() {
-            pointer_enabled = !pointer_enabled;
-            if (pointer_enabled) {
-                if (presenter != null) {
-                    presenter_pointer_surface.show();
-                }
-                if (presentation != null) {
-                    presentation_pointer_surface.show();
-                }
-            } else {
-                if (presenter != null) {
-                    presenter_pointer_surface.hide();
-                }
-                if (presentation != null) {
-                    presentation_pointer_surface.hide();
-                }
-            }
-            this.controllables_update();
+        public void set_pointer_mode() {
+            this.set_mode(AnnotationMode.POINTER);
         }
 
 
@@ -779,7 +833,7 @@ namespace pdfpc {
         }
 
         public void set_pen_color_to_string(Variant? color_variant) {
-            if (pen_enabled) {
+            if (in_drawing_mode()) {
                 Gdk.RGBA color = Gdk.RGBA();
                 color.parse(color_variant.get_string());
                 pen_drawing.pen.set_rgba(color);
@@ -787,17 +841,21 @@ namespace pdfpc {
             }
         }
 
+        public void set_mode_to_string(Variant? mode_variant) {
+            this.set_mode(AnnotationMode.parse(mode_variant.get_string()));
+        }
+
         protected void add_actions() {
-            add_action("toggleDrawing", this.toggle_pen_drawing);
+            add_action_with_parameter("switchMode", GLib.VariantType.STRING,
+                this.set_mode_to_string);
             add_action("clearDrawing", this.clear_pen_drawing);
-            add_action("hideDrawing", this.hide_pen_drawing);
+            add_action("toggleDrawings", this.toggle_drawings);
             add_action("increasePen", this.increase_pen);
             add_action("decreasePen", this.decrease_pen);
 
-            add_action_with_parameter("setPenColor", GLib.VariantType.STRING, this.set_pen_color_to_string);
+            add_action_with_parameter("setPenColor", GLib.VariantType.STRING,
+                this.set_pen_color_to_string);
 
-            add_action("togglePointer", this.toggle_pointers);
-            add_action("toggleEraser", this.toggle_eraser);
             add_action("increasePointer", this.inc_pointer);
             add_action("decreasePointer", this.dec_pointer);
 
@@ -896,19 +954,17 @@ namespace pdfpc {
                 "jumpLastSlide", "Goto the last displayed slide",
                 "increaseFontSize", "Increase the current font size by 2pt",
                 "decreaseFontSize", "Decrease the current font size by 2pt",
-                "togglePointer", "Toggle the pointer mode",
+                "switchMode <mode>", "Switch annotation mode (normal|pointer|pen|eraser)",
                 "increasePointer", "Increase the pointer size",
                 "decreasePointer", "Decrease the pointer size",
-                "toggleDrawing", "Toggle the drawing mode",
-                "toggleEraser", "Toggle between eraser/pen in the drawing mode",
                 "increasePen", "Increase the pen size",
                 "decreasePen", "Decrease the pen size",
-                "clearDrawing", "Clear all drawings on the current slide",
-                "hideDrawing", "Hide all drawings on the current slide",
+                "setPenColor", "Change the pen color (requires an argument)",
+                "clearDrawing", "Clear drawing on the current slide",
+                "toggleDrawings", "Toggle all drawings on all slides",
                 "toggleToolbox", "Toggle the toolbox",
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
                 "quit", "Exit pdfpc",
-                "setPenColor", "Change the pen color (requires an argument)",
             };
         }
 

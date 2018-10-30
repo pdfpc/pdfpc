@@ -191,7 +191,8 @@ namespace pdfpc {
             }
 
             public void setActionArg(string? actionArg) throws ConfigFileError {
-                if (this.actionName != "setPenColor") {
+                if (this.actionName != "setPenColor" &&
+                    this.actionName != "switchMode") {
                     throw new ConfigFileError.INVALID_BIND("Only 'setPenColor' accepts an action argument");
                 }
 
