@@ -30,6 +30,10 @@ entry, iconview, textview *, window {
     color: white;
 }
 
+entry {
+    background-image: none;
+}
+
 .toolbox button:not(.color) * {
     background-color: gray;
 }
