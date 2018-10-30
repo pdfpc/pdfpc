@@ -191,19 +191,13 @@ namespace pdfpc.Window {
             // right thing.  On Wayland, the window is "somewhere", but we do
             // not care, since the next call should fix it.
             this.move(this.screen_geometry.x, this.screen_geometry.y);
-            #if GTK_LEGACY
-            // GTK version prior to 3.18 do not have fullscreen_on_monitor API.
-            // probably, they might have no wayland, so no problem to use just
-            // fullscreen()
-            this.fullscreen();
-            #else
+
             // In wayland sessions we should end up on the correct monitor in
             // fullscreen state. In X11, this API call is not implemented
             // correctly until gtk 3.22. For X11 with gtk < 3.22, this call is
             // just switching to fullscreen on the current screen. Since we
             // moved it to the correct screen anyways, we should be safe here.
             this.fullscreen_on_monitor(this.screen_to_use, this.screen_num_to_use);
-            #endif
 
             return true;
         }
