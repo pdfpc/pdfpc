@@ -616,7 +616,7 @@ namespace pdfpc {
             // transparent to the input events
             var w = presenter_pen_surface.get_window();
             if (w != null) {
-                w.set_pass_through(!pen_drawing_present);
+                w.set_pass_through(!in_drawing_mode());
             }
 
             this.controllables_update();
