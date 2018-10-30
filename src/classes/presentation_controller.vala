@@ -607,16 +607,16 @@ namespace pdfpc {
             // Update drawing surfaces
             hide_or_show_pen_surfaces();
 
-            // Disable event compression for smoother drawing
             if (this.presenter != null) {
+                // Disable event compression for smoother drawing
                 this.presenter.get_window().set_event_compression(!in_drawing_mode());
-            }
 
-            // When drawing mode is inactive, make the drawing surface
-            // transparent to the input events
-            var w = presenter_pen_surface.get_window();
-            if (w != null) {
-                w.set_pass_through(!in_drawing_mode());
+                // When drawing mode is inactive, make the drawing surface
+                // transparent to the input events
+                var w = presenter_pen_surface.get_window();
+                if (w != null) {
+                    w.set_pass_through(!in_drawing_mode());
+                }
             }
 
             this.controllables_update();
