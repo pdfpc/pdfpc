@@ -6,6 +6,7 @@ install(FILES
     saved.svg
     loaded.svg
     locked.svg
+    empty.svg
     highlight.svg
     pen.svg
     eraser.svg

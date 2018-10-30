@@ -448,10 +448,6 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
-        public void set_eraser_mode() {
-            this.set_mode(AnnotationMode.ERASER);
-        }
-
         public void increase_pen() {
             if (current_pen_drawing_tool.width < 500) {
                 current_pen_drawing_tool.width += pen_step;
@@ -626,8 +622,20 @@ namespace pdfpc {
             this.controllables_update();
         }
 
+        public void set_normal_mode() {
+            this.set_mode(AnnotationMode.NORMAL);
+        }
+
+        public void set_pointer_mode() {
+            this.set_mode(AnnotationMode.POINTER);
+        }
+
         public void set_pen_mode() {
             this.set_mode(AnnotationMode.PEN);
+        }
+
+        public void set_eraser_mode() {
+            this.set_mode(AnnotationMode.ERASER);
         }
 
         public void toggle_drawings() {
@@ -793,11 +801,6 @@ namespace pdfpc {
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
             }
-        }
-
-
-        public void set_pointer_mode() {
-            this.set_mode(AnnotationMode.POINTER);
         }
 
 
