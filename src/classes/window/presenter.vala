@@ -638,15 +638,15 @@ namespace pdfpc.Window {
 
             tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.toggle_pointers();
+		    this.presentation_controller.set_pointer_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.toggle_pen_drawing();
+		    this.presentation_controller.set_pen_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.toggle_eraser();
+		    this.presentation_controller.set_eraser_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg");
             tb.clicked.connect(() => {
