@@ -636,6 +636,10 @@ namespace pdfpc.Window {
                     button_panel.set_child_visible(!state);
 		});
 
+            tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg");
+            tb.clicked.connect(() => {
+		    this.presentation_controller.set_normal_mode();
+		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
             tb.clicked.connect(() => {
 		    this.presentation_controller.set_pointer_mode();
