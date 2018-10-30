@@ -147,7 +147,7 @@ Increase font size of notes
 Decrease font size of notes
 .TP
 .B 8 / KP_8
-Toggle pointer mode
+Switch the pointer mode on
 .TP
 .B 7 / KP_7
 Decrease pointer size
@@ -156,13 +156,13 @@ Decrease pointer size
 Increase pointer size
 .TP
 .B 5 / KP_5
-Toggle drawing mode
+Switch the pen drawing mode on
 .TP
 .B 6 / KP_6
-Clear the current drawing
+Clear the drawing on the current page
 .TP
 .B 4 / KP_4
-Temporarily hide the current drawing and exit drawing mode
+Toggle the current drawings; if in the drawing mode (pen/eraser), exit it
 .TP
 .B 1 / KP_1
 Decrease the pen or eraser size for drawing
@@ -171,7 +171,10 @@ Decrease the pen or eraser size for drawing
 Increase the pen or eraser size for drawing
 .TP
 .B 2 / KP_2
-Toggle between the pen and eraser tool for drawing
+Switch the eraser drawing mode on
+.TP
+.B 0 / KP_0
+Switch to the normal mode (pen/eraser and pointer are off)
 .TP
 .B Shift-1 / Shift-KP_2 ... Shift-8 / Shift-KP_8
 Switch the drawing color to red/orange/yellow/green/blue/violet/black/white,
