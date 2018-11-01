@@ -92,9 +92,7 @@ Size of the presentation window in width:height format (forces windowed mode)
 .PP
 
 Some previous command-line options (like black-on-end) were moved to permanent
-config file options. See
-.B pdfpcrc(5)
-for further details.
+config file options. See \fBpdfpcrc\fR(5) for further details.
 
 .SH KEYBINDINGS
 These are the default keybindings for pdfpc:
@@ -236,9 +234,7 @@ Select previous slide
 Select next slide
 
 .P
-See
-.B pdfpcrc(5)
-if you want to customize the keybindings.
+See \fBpdfpcrc\fR(5) if you want to customize the keybindings.
 
 .SH FEATURES
 
@@ -533,12 +529,22 @@ locations where pdfpc is looking for files. The default location is
 @CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. It can be copied
 to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and modified to the user's liking.
 
-.SS Integration with other tools
+.SS Desktop integration
 
 .PP
-Pdfpc provides a dbus interface that other tools can use to execute any
-action listed by \fB--list-actions\fR.  The interface appears on the session bus
-as \fI io.github.pdfpc\fR.
+Pdfpc provides a DBus interface that appears on the session bus as
+\fIio.github.pdfpc\fR. Other applications can, in particular, execute any action
+listed by \fB--list-actions\fR. It is also possible to control pdfpc from the
+command line (and write shell scripts) using the \fBdbus-send\fR(1) utility. For
+example, to advance to the next slide, run
+
+dbus-send --type=method_call --session --dest=io.github.pdfpc
+ /io/github/pdfpc io.github.pdfpc.TriggerAction string:next
+
+In addition to the \fBTriggerAction\fR method, the pdfpc DBus interface exposes
+the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
+\fBNumberOfSlides\fR, \fBUrl\fR) and two signals (\fBOverlayChange\fR and
+\fBSlideChange\fR).
 
 .SH BUGS
 
@@ -560,7 +566,7 @@ pdfpc is a fork of Pdf Presenter Console, available
 
 .SH SEE ALSO
 .PP
-pdfpcrc(5)
+\fBpdfpcrc\fR(5)
 
 There are several other programs with similar functionality.
 
