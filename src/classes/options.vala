@@ -168,6 +168,11 @@ namespace pdfpc {
         public static string pointer_color = "red";
 
         /**
+         * Pointer size
+         */
+        public static uint pointer_size = 10;
+
+        /**
          * Page which should be displayed after startup
          */
         public static int page = 1;
