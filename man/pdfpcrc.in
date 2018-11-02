@@ -76,6 +76,13 @@ Percentage of the height of the presenter screen to be used for the next slide. 
 .B overview-min-size
 Minimum width for the overview miniatures, in pixels. (int, Default 150)
 .TP
+.B pointer-color
+Set the pointer color. Can be a literal color name or a #rrggbb representation
+(default is red).
+.TP
+.B pointer-size
+Set the initial pointer size (int, default is 10).
+.TP
 .B switch-screens
 Switch the presentation and the presenter screen. (bool, Default false)
 .TP
