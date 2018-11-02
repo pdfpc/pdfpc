@@ -88,24 +88,24 @@ requirements need to be met:
 
 On Ubuntu systems, you can install these dependencies with::
 
-    sudo apt-get install cmake valac libgee-0.8-dev libpoppler-glib-dev libgtk-3-dev libgstreamer1.0-dev libgstreamer-plugins-bad1.0-dev
+    sudo apt-get install cmake valac libgee-0.8-dev libpoppler-glib-dev libgtk-3-dev libgstreamer1.0-dev gstreamer1.0-gtk3
 
-and you should consider installing all the available gstreamer codecs::
-
-    sudo apt-get install gstreamer1.0-*
+(the latter is a run-time dependence). You should also consider installing all
+plugins to support required video formats; chances are they are already present
+through dependencies of ``ubuntu-desktop``.
 
 Compiling from source tarballs
 ------------------------------
 
 You can download the latest stable release of pdfpc in the release section of
 github (https://github.com/pdfpc/pdfpc/releases). Uncompress the tarball (we
-use v4.0.2 as an example here)::
+use v4.2.1 as an example here)::
 
-    tar xvf pdfpc-4.0.2.tar.gz
+    tar xvf pdfpc-4.2.1.tar.gz
 
 Change to the extracted directory::
 
-    cd pdfpc-4.0.2
+    cd pdfpc-4.2.1
 
 Compile and install::
 
