@@ -86,7 +86,7 @@ requirements need to be met:
 - gstreamer 1.0
 - pangocairo
 
-On Ubuntu systems, you can install these dependencies with::
+On Ubuntu 18.04 onwards, you can install these dependencies with::
 
     sudo apt-get install cmake valac libgee-0.8-dev libpoppler-glib-dev libgtk-3-dev libgstreamer1.0-dev gstreamer1.0-gtk3
 
