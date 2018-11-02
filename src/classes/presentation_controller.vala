@@ -668,10 +668,16 @@ namespace pdfpc {
             presenter_allocation = a;
             init_presenter_pen();
             init_presenter_pointer();
+            if (pointer_color.parse(Options.pointer_color) != true) {
+                GLib.printerr("Cannot parse color specification '%s'\n",
+                    Options.pointer_color);
+                pointer_color.parse("red");
+            }
         }
 
         private uint pointer_size = 10;
         private uint pointer_step = 10;
+        private Gdk.RGBA pointer_color;
 
         private double highlight_x;
         private double highlight_y;
@@ -797,7 +803,10 @@ namespace pdfpc {
                 int y = (int)(a.height*pointer_y);
                 int r = (int)(a.height*0.001*pointer_size);
 
-                context.set_source_rgba(255,0,0,0.5);
+                context.set_source_rgba(pointer_color.red,
+                                        pointer_color.green,
+                                        pointer_color.blue,
+                                        0.5);
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
             }

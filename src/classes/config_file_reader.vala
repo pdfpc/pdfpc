@@ -260,6 +260,9 @@ namespace pdfpc {
                 case "overview-min-size":
                     Options.min_overview_width = int.parse(fields[2]);
                     break;
+                case "pointer-color":
+                    Options.pointer_color = fields[2];
+                    break;
                 case "switch-screens":
                     bool switch_screens = bool.parse(fields[2]);
                     if (switch_screens) {
