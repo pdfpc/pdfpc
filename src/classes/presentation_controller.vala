@@ -669,6 +669,9 @@ namespace pdfpc {
             init_presenter_pen();
             init_presenter_pointer();
             pointer_size = Options.pointer_size;
+            if (pointer_size > 500) {
+                pointer_size = 500;
+            }
             if (pointer_color.parse(Options.pointer_color) != true) {
                 GLib.printerr("Cannot parse color specification '%s'\n",
                     Options.pointer_color);
@@ -677,7 +680,7 @@ namespace pdfpc {
         }
 
         private uint pointer_size;
-        private uint pointer_step = 10;
+        private uint pointer_step = 5;
         private Gdk.RGBA pointer_color;
 
         private double highlight_x;
@@ -815,7 +818,7 @@ namespace pdfpc {
 
 
         public void inc_pointer() {
-            if (pointer_size<1000) pointer_size+=pointer_step;
+            if (pointer_size<500) pointer_size+=pointer_step;
             queue_pointer_surface_draws();
         }
 
