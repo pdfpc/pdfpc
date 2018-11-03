@@ -677,11 +677,16 @@ namespace pdfpc {
                     Options.pointer_color);
                 pointer_color.parse("red");
             }
+            pointer_opacity = (double) Options.pointer_opacity/100.0;
+            if (pointer_opacity < 0.0 || pointer_opacity > 1.0) {
+                pointer_opacity = 1.0;
+            }
         }
 
         private uint pointer_size;
         private uint pointer_step = 5;
         private Gdk.RGBA pointer_color;
+        private double pointer_opacity;
 
         private double highlight_x;
         private double highlight_y;
@@ -810,7 +815,7 @@ namespace pdfpc {
                 context.set_source_rgba(pointer_color.red,
                                         pointer_color.green,
                                         pointer_color.blue,
-                                        0.5);
+                                        pointer_opacity);
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
             }

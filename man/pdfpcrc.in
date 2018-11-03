@@ -80,6 +80,9 @@ Minimum width for the overview miniatures, in pixels. (int, Default 150)
 Set the pointer color. Can be a literal color name or a #rrggbb representation
 (default is red).
 .TP
+.B pointer-opacity
+Set the pointer opacity in percent (int, default is 50).
+.TP
 .B pointer-size
 Set the initial pointer size (int, default is 10).
 .TP
