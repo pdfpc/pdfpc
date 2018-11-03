@@ -701,11 +701,15 @@ namespace pdfpc.Window {
                 (int) Math.floor(allocation.height * 0.9));
         }
 
+       /**
+         * Load an (SVG) icon, replacing a substring in it in special cases
+         */
         protected Gtk.Image load_icon(string filename, int icon_height) {
 
             // attempt to load from a local path (if the user hasn't installed)
             // if that fails, attempt to load from the global path
-            string load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons", filename);
+            string load_icon_path = Path.build_filename(Paths.SOURCE_PATH,
+                "icons", filename);
             File icon_file = File.new_for_path(load_icon_path);
             if (!icon_file.query_exists()) {
                 load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
@@ -713,17 +717,38 @@ namespace pdfpc.Window {
 
             Gtk.Image icon;
             try {
-                int width = (int) Math.floor(1.06 * icon_height) * this.gdk_scale;
-                int height = icon_height * this.gdk_scale;
+                int width  = (int) Math.floor(1.06*icon_height)*this.gdk_scale;
+                int height = icon_height*this.gdk_scale;
 
-                Gdk.Pixbuf pixbuf = new Gdk.Pixbuf.from_file_at_size(load_icon_path, width, height);
-                Cairo.Surface surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, 0, null);
+                Gdk.Pixbuf pixbuf;
+                if (filename == "highlight.svg") {
+                    uint8[] contents;
+                    string etag_out;
+                    icon_file.load_contents(null, out contents, out etag_out);
+
+                    string buf = (string) contents;
+                    buf = buf.replace("pointer_color", Options.pointer_color);
+
+                    MemoryInputStream stream =
+                        new MemoryInputStream.from_data(buf.data);
+
+                    pixbuf = new Gdk.Pixbuf.from_stream_at_scale(stream,
+                        width, height, true);
+                } else {
+                    pixbuf = new Gdk.Pixbuf.from_file_at_scale(load_icon_path,
+                        width, height, true);
+                }
+
+                Cairo.Surface surface =
+                    Gdk.cairo_surface_create_from_pixbuf(pixbuf, 0, null);
 
                 icon = new Gtk.Image.from_surface(surface);
                 icon.no_show_all = true;
             } catch (Error e) {
-                GLib.printerr("Warning: Could not load icon %s (%s)\n", load_icon_path, e.message);
-                icon = new Gtk.Image.from_icon_name("image-missing", Gtk.IconSize.LARGE_TOOLBAR);
+                GLib.printerr("Warning: Could not load icon %s (%s)\n",
+                    load_icon_path, e.message);
+                icon = new Gtk.Image.from_icon_name("image-missing",
+                    Gtk.IconSize.LARGE_TOOLBAR);
             }
             return icon;
         }
