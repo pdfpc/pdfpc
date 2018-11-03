@@ -168,6 +168,11 @@ namespace pdfpc {
         public static string pointer_color = "red";
 
         /**
+         * Pointer opacity (0 - 100)
+         */
+        public static int pointer_opacity = 50;
+
+        /**
          * Pointer size
          */
         public static uint pointer_size = 10;

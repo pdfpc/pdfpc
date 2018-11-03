@@ -263,6 +263,9 @@ namespace pdfpc {
                 case "pointer-color":
                     Options.pointer_color = fields[2];
                     break;
+                case "pointer-opacity":
+                    Options.pointer_opacity = int.parse(fields[2]);
+                    break;
                 case "pointer-size":
                     Options.pointer_size = int.parse(fields[2]);
                     break;
