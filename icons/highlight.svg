@@ -16,8 +16,12 @@
    id="svg4571"
    inkscape:version="0.92.1 r15371"
    sodipodi:docname="hilight.svg">
-  <defs
-     id="defs4565" />
+  <defs id="defs4565">
+     <radialGradient id="pointerGradient" cx="0%" cy="100%">
+         <stop offset="10%" stop-color="gold"/>
+         <stop offset="95%" stop-color="pointer_color"/>
+     </radialGradient>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -73,7 +77,7 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
     <path
-       style="fill:#e96969;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:url(#pointerGradient);fill-opacity:0.85;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 9.7895833,281.12496 24.60625,263.1333 h 1.852083 l -15.345833,19.05 c 0,0 -0.529167,0.26458 -1.058333,-0.26458 C 9.525,281.38955 9.8021521,281.23237 9.7895833,281.12496 Z"
        id="path4579"
        inkscape:connector-curvature="0"
