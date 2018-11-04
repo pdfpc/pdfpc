@@ -717,8 +717,13 @@ namespace pdfpc.Window {
 
             Gtk.Image icon;
             try {
-                int width  = (int) Math.floor(1.06*icon_height)*this.gdk_scale;
-                int height = icon_height*this.gdk_scale;
+                int width = (int) Math.floor(1.06*icon_height);
+                int height = icon_height;
+
+                if (!Pdfpc.is_Wayland_backend()) {
+                    width *= this.gdk_scale;
+                    height *= this.gdk_scale;
+                }
 
                 Gdk.Pixbuf pixbuf;
                 if (filename == "highlight.svg") {
