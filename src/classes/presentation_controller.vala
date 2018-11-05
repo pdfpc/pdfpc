@@ -448,14 +448,14 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
-        public void increase_pen() {
+        public void increase_pen_size() {
             if (current_pen_drawing_tool.width < 500) {
                 current_pen_drawing_tool.width += pen_step;
             }
             queue_pen_surface_draws();
         }
 
-        public void decrease_pen() {
+        public void decrease_pen_size() {
             if (current_pen_drawing_tool.width > pen_step) {
                 current_pen_drawing_tool.width -= pen_step;
             }
@@ -822,12 +822,12 @@ namespace pdfpc {
         }
 
 
-        public void inc_pointer() {
+        public void increase_pointer_size() {
             if (pointer_size<500) pointer_size+=pointer_step;
             queue_pointer_surface_draws();
         }
 
-        public void dec_pointer() {
+        public void decrease_pointer_size() {
             if (pointer_size>pointer_step) pointer_size-=pointer_step;
             queue_pointer_surface_draws();
         }
@@ -1804,12 +1804,12 @@ namespace pdfpc {
                 break;
 
                 case AnnotationMode.POINTER:
-                this.inc_pointer();
+                this.increase_pointer_size();
                 break;
 
                 case AnnotationMode.PEN:
                 case AnnotationMode.ERASER:
-                this.increase_pen();
+                this.increase_pen_size();
                 break;
             }
         }
@@ -1824,12 +1824,12 @@ namespace pdfpc {
                 break;
 
                 case AnnotationMode.POINTER:
-                this.dec_pointer();
+                this.decrease_pointer_size();
                 break;
 
                 case AnnotationMode.PEN:
                 case AnnotationMode.ERASER:
-                this.decrease_pen();
+                this.decrease_pen_size();
                 break;
             }
         }
