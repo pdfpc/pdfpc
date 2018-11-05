@@ -871,14 +871,9 @@ namespace pdfpc {
                 this.set_mode_to_string);
             add_action("clearDrawing", this.clear_pen_drawing);
             add_action("toggleDrawings", this.toggle_drawings);
-            add_action("increasePen", this.increase_pen);
-            add_action("decreasePen", this.decrease_pen);
 
             add_action_with_parameter("setPenColor", GLib.VariantType.STRING,
                 this.set_pen_color_to_string);
-
-            add_action("increasePointer", this.inc_pointer);
-            add_action("decreasePointer", this.dec_pointer);
 
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
@@ -916,8 +911,8 @@ namespace pdfpc {
             add_action("lastSlide", this.set_last_saved_slide);
             add_action("jumpLastSlide", this.goto_last_saved_slide);
 
-            add_action("increaseFontSize", this.increase_font_size);
-            add_action("decreaseFontSize", this.decrease_font_size);
+            add_action("increaseSize", this.increase_size);
+            add_action("decreaseSize", this.decrease_size);
 
             add_action("toggleToolbox", this.toggle_toolbox);
 
@@ -973,13 +968,9 @@ namespace pdfpc {
                 "endSlide", "Set the current slide as the end slide",
                 "lastSlide", "Set the last displayed slide",
                 "jumpLastSlide", "Goto the last displayed slide",
-                "increaseFontSize", "Increase the current font size by 2pt",
-                "decreaseFontSize", "Decrease the current font size by 2pt",
                 "switchMode <mode>", "Switch annotation mode (normal|pointer|pen|eraser)",
-                "increasePointer", "Increase the pointer size",
-                "decreasePointer", "Decrease the pointer size",
-                "increasePen", "Increase the pen size",
-                "decreasePen", "Decrease the pen size",
+                "increaseSize", "Increase the size of notes|pointer|pen|eraser",
+                "decreaseSize", "Decrease the size of notes|pointer|pen|eraser",
                 "setPenColor", "Change the pen color (requires an argument)",
                 "clearDrawing", "Clear drawing on the current slide",
                 "toggleDrawings", "Toggle all drawings on all slides",
@@ -1801,6 +1792,46 @@ namespace pdfpc {
 
         protected void decrease_font_size() {
             this.decrease_font_size_request();
+        }
+
+        /**
+         * Mode-sensitive size increment
+         */
+        protected void increase_size() {
+            switch (this.annotation_mode) {
+                case AnnotationMode.NORMAL:
+                this.increase_font_size();
+                break;
+
+                case AnnotationMode.POINTER:
+                this.inc_pointer();
+                break;
+
+                case AnnotationMode.PEN:
+                case AnnotationMode.ERASER:
+                this.increase_pen();
+                break;
+            }
+        }
+
+        /**
+         * Mode-sensitive size decrement
+         */
+        protected void decrease_size() {
+            switch (this.annotation_mode) {
+                case AnnotationMode.NORMAL:
+                this.decrease_font_size();
+                break;
+
+                case AnnotationMode.POINTER:
+                this.dec_pointer();
+                break;
+
+                case AnnotationMode.PEN:
+                case AnnotationMode.ERASER:
+                this.decrease_pen();
+                break;
+            }
         }
 
         /**
