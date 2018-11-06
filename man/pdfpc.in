@@ -139,19 +139,15 @@ Overview mode
 Input a slide number to jump to
 .TP
 .B Plus / Equal / KP_Add / Bracket Left
-Increase font size of notes
+Depending on the current mode, increase font size of notes or pointer size or
+the size of pen or eraser
 .TP
 .B Minus / KP_Subtract / Bracket Right
-Decrease font size of notes
+Depending on the current mode, decrease font size of notes or pointer size or
+the size of pen or eraser
 .TP
 .B 8 / KP_8
 Switch the pointer mode on
-.TP
-.B 7 / KP_7
-Decrease pointer size
-.TP
-.B 9 / KP_9
-Increase pointer size
 .TP
 .B 5 / KP_5
 Switch the pen drawing mode on
@@ -161,12 +157,6 @@ Clear the drawing on the current page
 .TP
 .B 4 / KP_4
 Toggle the current drawings; if in the drawing mode (pen/eraser), exit it
-.TP
-.B 1 / KP_1
-Decrease the pen or eraser size for drawing
-.TP
-.B 3 / KP_3
-Increase the pen or eraser size for drawing
 .TP
 .B 2 / KP_2
 Switch the eraser drawing mode on
