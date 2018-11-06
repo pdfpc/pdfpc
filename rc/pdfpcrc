@@ -1,129 +1,123 @@
 #### Keybindings
 
-# Forward movement
-bind Next      next
-bind Return    next
-bind Right     next
-bind space     next
-bind l         lastOverlay
-bind Down      nextOverlay
-bind S+Next    next10
-bind S+Return  next10
-bind S+Right   next10
-bind S+space   next10
-bind S+Down    next10
-bind k         nextUnseen
+# Standard forward movement
+bind Next               next
+bind Return             next
+bind Right              next
+bind space              next
+bind Down               next
 
-# Back movement
-bind Left      prev
-bind Prior     prev
-bind L         firstOverlay
-bind Up        prevOverlay
-bind S+Left    prev10
-bind S+Prior   prev10
-bind S+Up      prev10
-bind j         prevSeen
+# Standard backward movement
+bind Prior              prev
+bind Left               prev
+bind Up                 prev
+bind BackSpace          prev
+
+# Overlay paging
+bind S+Next             nextOverlay
+bind S+Prior            prevOverlay
+
+# Intra-slide navigation
+bind S+Up               lastOverlay
+bind S+Down             firstOverlay
+
+# Fast forward/backward (10 pages)
+bind S+Right            next10
+bind S+Left             prev10
 
 # "Jumps"
-bind Home      gotoFirst
-bind End       gotoLast
-bind g         goto
-bind Tab       overview
-bind BackSpace histBack
+bind Home               gotoFirst
+bind End                gotoLast
+bind g                  goto
 
-# Exit
-bind Escape    quit
-bind q         quit
+# Bookmarking [the current action names are misleading]
+bind m                  lastSlide
+bind S+m                jumpLastSlide
 
-# Timer related
-bind s         start
-bind p         pause
-bind r         resetTimer
-bind R         reset
+# History? [these 3 are seriously broken]
+bind S+BackSpace        histBack
+bind S+End              nextUnseen
+bind S+Home             prevSeen
 
-# Change state
-bind b         blank
-bind period    blank
-bind f         freeze
-bind h         hide
-
-# Presentation properties
-bind n         note
-bind o         overlay
-bind e         endSlide
-bind S+s       lastSlide
-bind S+r       jumpLastSlide
-
-# Annotation modes
-bind 0         switchMode normal
-bind KP_0      switchMode normal
-bind 2         switchMode eraser
-bind KP_2      switchMode eraser
-bind 5         switchMode pen
-bind KP_5      switchMode pen
-bind 8         switchMode pointer
-bind KP_8      switchMode pointer
+# The overview mode
+bind Tab                overview
 
 # Toolbox
-bind t toggleToolbox
+bind t                  toggleToolbox
 
-# Font scaling
-bind plus      increaseFontSize
-bind equal     increaseFontSize
-bind KP_Add    increaseFontSize
-bind bracketleft increaseFontSize
-bind minus     decreaseFontSize
-bind KP_Subtract decreaseFontSize
-bind bracketright decreaseFontSize
+# Exit
+bind C+q                quit
 
-# Pointer
-bind 7         decreasePointer
-bind KP_7      decreasePointer
-bind 9         increasePointer
-bind KP_9      increasePointer
+# Presentation state
+bind b                  blank
+bind f                  freeze
+bind h                  hide
+bind Escape             exitState
 
-# Drawing
-bind 6         clearDrawing
-bind KP_6      clearDrawing
-bind 4         toggleDrawings
-bind KP_4      toggleDrawings
+# Timer related
+bind s                  start
+bind p                  pause
+bind C+t                resetTimer
 
-bind 1         decreasePen
-bind KP_1      decreasePen
-bind 3         increasePen
-bind KP_3      increasePen
+# Presentation editing
+bind C+n                note
+bind C+o                overlay
+bind C+e                endSlide
+
+# Reset the presentation
+bind C+z                reset
+
+# Annotation modes
+bind 1                  switchMode normal
+bind KP_1               switchMode normal
+bind 2                  switchMode pointer
+bind KP_2               switchMode pointer
+bind 3                  switchMode pen
+bind KP_3               switchMode pen
+bind 4                  switchMode eraser
+bind KP_4               switchMode eraser
+
+# Mode-sensitive size adjustment (notes|pointer|pen|eraser)
+bind plus               increaseSize
+bind equal              increaseSize
+bind KP_Add             increaseSize
+bind minus              decreaseSize
+bind KP_Subtract        decreaseSize
+
+# Drawings
+bind c                  clearDrawing
+bind d                  toggleDrawings
+
+# Pen colors
+bind S+exclam           setPenColor red
+bind S+1                setPenColor red
+bind S+KP_1             setPenColor red
+bind S+at               setPenColor orange
+bind S+2                setPenColor orange
+bind S+KP_2             setPenColor orange
+bind S+numbersign       setPenColor yellow
+bind S+3                setPenColor yellow
+bind S+KP_3             setPenColor yellow
+bind S+dollar           setPenColor green
+bind S+4                setPenColor green
+bind S+KP_4             setPenColor green
+bind S+percent          setPenColor blue
+bind S+5                setPenColor blue
+bind S+KP_5             setPenColor blue
+bind S+asciicircum      setPenColor violet
+bind S+6                setPenColor violet
+bind S+KP_6             setPenColor violet
+bind S+dead_circumflex  setPenColor violet
+bind S+ampersand        setPenColor black
+bind S+7                setPenColor black
+bind S+KP_7             setPenColor black
+bind S+asterisk         setPenColor white
+bind S+8                setPenColor white
+bind S+KP_8             setPenColor white
 
 #### Mouse bindings
-mouse 1        next
-mouse S+1      next10
-mouse 2        overview
-mouse 3        prev
-mouse S+3      prev10
-
-# pen colors
-bind S+exclam     setPenColor red
-bind S+at         setPenColor orange
-bind S+numbersign setPenColor yellow
-bind S+dollar     setPenColor green
-bind S+percent    setPenColor blue
-bind S+asciicircum setPenColor violet
-bind S+dead_circumflex setPenColor violet
-bind S+ampersand  setPenColor black
-bind S+asterisk   setPenColor white
-
-bind S+1          setPenColor red
-bind S+KP_1       setPenColor red
-bind S+2          setPenColor orange
-bind S+KP_2       setPenColor orange
-bind S+3          setPenColor yellow
-bind S+KP_3       setPenColor yellow
-bind S+4          setPenColor green
-bind S+KP_4       setPenColor green
-bind S+5          setPenColor blue
-bind S+KP_5       setPenColor blue
-bind S+6          setPenColor violet
-bind S+KP_6       setPenColor violet
-bind S+7          setPenColor black
-bind S+KP_7       setPenColor black
-bind S+8          setPenColor white
-bind S+KP_8       setPenColor white
+mouse 1                 next
+mouse S+1               next10
+mouse 2                 overview
+mouse 3                 prev
+mouse S+3               prev10
