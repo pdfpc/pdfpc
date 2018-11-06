@@ -67,6 +67,10 @@ see
 see
 .B \fBpdfpc\fR(1)
 .TP
+.BI disable-input-autodetection
+Do not automatically detect type (pen or eraser) of tablet input devices (bool,
+Default is false).
+.TP
 .BI disable-scrolling
 Disable scrolling events on the presenter window (bool, Default is false).
 .TP

@@ -493,15 +493,19 @@ namespace pdfpc {
         }
 
         protected bool on_move_pen(Gtk.Widget source, Gdk.EventMotion move) {
-            Gdk.InputSource source_type  = move.get_source_device().get_source();
-            if (source_type == Gdk.InputSource.ERASER) {
-                this.set_mode(AnnotationMode.ERASER);
-            } else if (source_type == Gdk.InputSource.PEN) {
-                this.set_mode(AnnotationMode.PEN);
+            if (!Options.disable_input_autodetection) {
+                Gdk.InputSource source_type =
+                    move.get_source_device().get_source();
+                if (source_type == Gdk.InputSource.ERASER) {
+                    this.set_mode(AnnotationMode.ERASER);
+                } else if (source_type == Gdk.InputSource.PEN) {
+                    this.set_mode(AnnotationMode.PEN);
+                }
             }
 
             if (in_drawing_mode()) {
-                move_pen(move.x / (double) presenter_allocation.width, move.y / (double) presenter_allocation.height);
+                move_pen(move.x/presenter_allocation.width,
+                         move.y/presenter_allocation.height);
             }
             return true;
         }
