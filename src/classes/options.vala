@@ -70,9 +70,15 @@ namespace pdfpc {
         public static bool disable_cache_compression = false;
 
         /**
+         * Config option to disable detection of tablet input type (pen|eraser)
+         */
+        public static bool disable_input_autodetection = false;
+
+        /**
          * Config option to disable scrolling events on the presenter window.
          */
         public static bool disable_scrolling = false;
+
         /**
          * Commandline option to persist the PNG cache to disk.
          */
