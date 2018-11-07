@@ -895,7 +895,6 @@ namespace pdfpc {
             add_action("start", this.start);
             add_action("pause", this.toggle_pause);
             add_action("resetTimer", this.reset_timer);
-            add_action("reset", this.controllables_reset);
 
             add_action("blank", this.fade_to_black);
             add_action("freeze", this.toggle_freeze);
@@ -1656,16 +1655,6 @@ namespace pdfpc {
          */
         protected void controllables_update() {
             this.update_request();
-        }
-
-        /**
-         * Reset all registered controllables to their initial state
-         */
-        protected void controllables_reset() {
-            this.current_slide_number = 0;
-            this.current_user_slide_number = 0;
-            this.controllables_update();
-            this.reset_timer();
         }
 
         protected void toggle_overview() {

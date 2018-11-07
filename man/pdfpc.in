@@ -192,9 +192,6 @@ below)
 .B p
 Pause timer
 .TP
-.B r
-Reset presentation (reset timer and go back to first slide)
-.TP
 .B e
 Define end slide
 .TP
