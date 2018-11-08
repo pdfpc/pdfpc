@@ -30,9 +30,9 @@ bind Home               gotoFirst
 bind End                gotoLast
 bind g                  goto
 
-# Bookmarking [the current action names are misleading]
-bind m                  lastSlide
-bind S+m                jumpLastSlide
+# Bookmarking
+bind m                  saveBookmark
+bind S+m                loadBookmark
 
 # History? [these 3 are seriously broken]
 bind S+BackSpace        histBack

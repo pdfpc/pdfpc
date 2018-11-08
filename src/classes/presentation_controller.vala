@@ -907,8 +907,8 @@ namespace pdfpc {
             add_action("overlay", this.toggle_skip);
             add_action("note", this.controllables_edit_note);
             add_action("endSlide", this.set_end_user_slide);
-            add_action("lastSlide", this.set_last_saved_slide);
-            add_action("jumpLastSlide", this.goto_last_saved_slide);
+            add_action("saveBookmark", this.set_last_saved_slide);
+            add_action("loadBookmark", this.goto_last_saved_slide);
 
             add_action("increaseSize", this.increase_size);
             add_action("decreaseSize", this.decrease_size);
@@ -965,8 +965,8 @@ namespace pdfpc {
                 "overlay", "Mark the current slide as an overlay slide",
                 "note", "Edit notes for the current slide",
                 "endSlide", "Set the current slide as the end slide",
-                "lastSlide", "Set the last displayed slide",
-                "jumpLastSlide", "Goto the last displayed slide",
+                "saveBookmark", "Bookmark the currently displayed slide",
+                "loadBookmark", "Load the bookmarked slide",
                 "switchMode <mode>", "Switch annotation mode (normal|pointer|pen|eraser)",
                 "increaseSize", "Increase the size of notes|pointer|pen|eraser",
                 "decreaseSize", "Decrease the size of notes|pointer|pen|eraser",
@@ -1185,14 +1185,6 @@ namespace pdfpc {
             this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
             this.controllables_update();
             presenter.session_saved();
-        }
-
-        /**
-         * Set the last slide as defined by the user
-         */
-        public void set_last_saved_slide_overview() {
-            int user_selected = this.overview.current_slide;
-            this.metadata.set_last_saved_slide(user_selected + 1);
         }
 
         /**
