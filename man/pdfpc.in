@@ -89,35 +89,26 @@ Disable the compression of slide images to trade memory consumption for speed.
 .BI "\-Z, \-\-size"
 Size of the presentation window in width:height format (forces windowed mode)
 
-.PP
-
-Some previous command-line options (like black-on-end) were moved to permanent
-config file options. See \fBpdfpcrc\fR(5) for further details.
-
 .SH KEYBINDINGS
 These are the default keybindings for pdfpc:
 .TP
-.B Right cursor key / Page down / Return / Space / Left mouse button
+.B Right cursor key / Down cursor key / Page down / Return / Space / 1st mouse button / Mouse wheel down
 Go forward one slide
 .TP
-.B Shift + Right cursor key / Page down / Return / Space / Left mouse button / Mouse wheel down or right
-Go forward 10 slides
-.TP
-.B Down cursor key
-Go forward one user slide (see
-.B Overlays
-below)
-.TP
-.B Left cursor key / Page up / Right mouse button / Mouse wheel up or left
+.B Left cursor key / Up cursor key / Page up / Backspace / 3rd mouse button / Mouse wheel up
 Go back one slide
 .TP
-.B Shift + Left cursor key / Page up / Right mouse button
-Go back 10 slides
+.B Shift + Page down
+Go forward one user slide (see \fBOverlays\fR below)
 .TP
-.B Up cursor key
-Go back one user slide (see
-.B Overlays
-below)
+.B Shift + Page up
+Go back one user slide (see \fBOverlays\fR below)
+.TP
+.B Shift + Right cursor key / 1st mouse button / Mouse wheel down
+Go forward 10 slides
+.TP
+.B Shift + Left cursor key / 3rd mouse button / Mouse wheel up
+Go back 10 slides
 .TP
 .B Home
 Go to the first slide
@@ -125,93 +116,101 @@ Go to the first slide
 .B End
 Go to the last slide
 .TP
-.B Backspace
-Go back in history. Note that history is defined by "jump" commands, not by normal slide movement.
+.B Shift + Backspace
+Go back in history. Note that history is defined by "jump" commands, not by
+normal slide movement.
 .TP
-.B j / k
+.B Shift + Home / Shift + End
 Go to the previous / next slide, skipping over overlays that have already been
 viewed, but at most one user slide.
 .TP
-.B Tab / Middle mouse button
+.B Tab / 2nd mouse button
 Overview mode
 .TP
 .B g
 Input a slide number to jump to
 .TP
-.B Plus / Equal / KP_Add / Bracket Left
+.B m
+Bookmark the current slide and store it in the \fB.pdfpc\fR file for later usage
+.TP
+.B Shift + m
+Load the bookmarked slide which was saved with \fBm\fR before
+.TP
+.B t
+Toggle the toolbox
+.TP
+.B 1 / KP_1
+Switch to the normal mode (pen/eraser and pointer are off)
+.TP
+.B 2 / KP_2
+Switch the pointer mode on
+.TP
+.B 3 / KP_3
+Switch the pen drawing mode on
+.TP
+.B 4 / KP_4
+Switch the eraser drawing mode on
+.TP
+.B Plus / KP_Add / Equal
 Depending on the current mode, increase font size of notes or pointer size or
 the size of pen or eraser
 .TP
-.B Minus / KP_Subtract / Bracket Right
+.B Minus / KP_Subtract
 Depending on the current mode, decrease font size of notes or pointer size or
 the size of pen or eraser
 .TP
-.B 8 / KP_8
-Switch the pointer mode on
-.TP
-.B 5 / KP_5
-Switch the pen drawing mode on
-.TP
-.B 6 / KP_6
+.B c
 Clear the drawing on the current page
 .TP
-.B 4 / KP_4
-Toggle the current drawings; if in the drawing mode (pen/eraser), exit it
+.B d
+Toggle visibility the drawings; if in the drawing mode (pen/eraser), exit it
 .TP
-.B 2 / KP_2
-Switch the eraser drawing mode on
-.TP
-.B 0 / KP_0
-Switch to the normal mode (pen/eraser and pointer are off)
-.TP
-.B Shift-1 / Shift-KP_2 ... Shift-8 / Shift-KP_8
+.B Shift + 1 / KP_1 ... Shift + 8 / KP_8
 Switch the drawing color to red/orange/yellow/green/blue/violet/black/white,
-respectively. (Depending on your keyboard layout, not all options will work
-in the main section of the keyboard.)
-.TP
-.B Escape / q
-Exit pdfpc
-.TP
-.B b
-Turn off the presentation view (i.e.  fill it with a black color)
-.TP
-.B h
-Hide the presentation window (i.e. make other windows on the other screen visible)
-.TP
-.B n
-Edit note for current slide
+respectively.
 .TP
 .B f
 Freeze the current presentation display (the presenter display is still
 fully active)
 .TP
-.B o
-Toggle the overlay flag for one particular slide (see Overlays
-below)
+.B b
+Turn off the presentation view (i.e.  fill it with a black color)
+.TP
+.B h
+Hide the presentation window (i.e. make other windows on the other screen
+visible)
+.TP
+.B Escape
+Exit any "special" state (pause, freeze, blank)
+.TP
+.B Ctrl + n
+Edit notes for the current slide (press Escape to exit this mode)
+.TP
+.B s
+Start timer
 .TP
 .B p
 Pause timer
 .TP
-.B e
+.B Ctrl + t
+Reset timer
+.TP
+.B Ctrl + o
+Toggle the overlay flag for one particular slide (see Overlays
+below)
+.TP
+.B Ctrl + e
 Define end slide
 .TP
-.B R
-Restore last saved session. Go to the slide which was saved with
-.B S
-before
-.TP
-.B S
-Save the current session. Store the current slide in the
-.B .pdfpc
-file for later usage
-
+.B Ctrl + q
+Exit pdfpc
 .P
-Within overview mode the following key bindings are used:
+Within the overview mode, the following key bindings are used:
 .TP
-.B Return / Left mouse button
+.B Return / 1st mouse button
 Go to currently selected page (last page of overlay)
 .TP
-.B Shift + Return / Shift + Left mouse button
+.B Shift + Return / Shift + 1st mouse button
 Go to currently selected page (first page of overlay)
 .TP
 .B Cursor left / Page up
