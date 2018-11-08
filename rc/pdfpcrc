@@ -25,7 +25,7 @@ bind S+Down             firstOverlay
 bind S+Right            next10
 bind S+Left             prev10
 
-# "Jumps"
+# Jumps
 bind Home               gotoFirst
 bind End                gotoLast
 bind g                  goto
@@ -34,7 +34,7 @@ bind g                  goto
 bind m                  saveBookmark
 bind S+m                loadBookmark
 
-# History? [these 3 are seriously broken]
+# History
 bind S+BackSpace        histBack
 bind S+End              nextUnseen
 bind S+Home             prevSeen
