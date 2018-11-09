@@ -448,14 +448,14 @@ namespace pdfpc {
             queue_pen_surface_draws();
         }
 
-        public void increase_pen() {
+        public void increase_pen_size() {
             if (current_pen_drawing_tool.width < 500) {
                 current_pen_drawing_tool.width += pen_step;
             }
             queue_pen_surface_draws();
         }
 
-        public void decrease_pen() {
+        public void decrease_pen_size() {
             if (current_pen_drawing_tool.width > pen_step) {
                 current_pen_drawing_tool.width -= pen_step;
             }
@@ -826,12 +826,12 @@ namespace pdfpc {
         }
 
 
-        public void inc_pointer() {
+        public void increase_pointer_size() {
             if (pointer_size<500) pointer_size+=pointer_step;
             queue_pointer_surface_draws();
         }
 
-        public void dec_pointer() {
+        public void decrease_pointer_size() {
             if (pointer_size>pointer_step) pointer_size-=pointer_step;
             queue_pointer_surface_draws();
         }
@@ -875,14 +875,9 @@ namespace pdfpc {
                 this.set_mode_to_string);
             add_action("clearDrawing", this.clear_pen_drawing);
             add_action("toggleDrawings", this.toggle_drawings);
-            add_action("increasePen", this.increase_pen);
-            add_action("decreasePen", this.decrease_pen);
 
             add_action_with_parameter("setPenColor", GLib.VariantType.STRING,
                 this.set_pen_color_to_string);
-
-            add_action("increasePointer", this.inc_pointer);
-            add_action("decreasePointer", this.dec_pointer);
 
             add_action("next", this.next_page);
             add_action("next10", this.jump10);
@@ -904,7 +899,6 @@ namespace pdfpc {
             add_action("start", this.start);
             add_action("pause", this.toggle_pause);
             add_action("resetTimer", this.reset_timer);
-            add_action("reset", this.controllables_reset);
 
             add_action("blank", this.fade_to_black);
             add_action("freeze", this.toggle_freeze);
@@ -917,11 +911,11 @@ namespace pdfpc {
             add_action("overlay", this.toggle_skip);
             add_action("note", this.controllables_edit_note);
             add_action("endSlide", this.set_end_user_slide);
-            add_action("lastSlide", this.set_last_saved_slide);
-            add_action("jumpLastSlide", this.goto_last_saved_slide);
+            add_action("saveBookmark", this.set_last_saved_slide);
+            add_action("loadBookmark", this.goto_last_saved_slide);
 
-            add_action("increaseFontSize", this.increase_font_size);
-            add_action("decreaseFontSize", this.decrease_font_size);
+            add_action("increaseSize", this.increase_size);
+            add_action("decreaseSize", this.decrease_size);
 
             add_action("toggleToolbox", this.toggle_toolbox);
 
@@ -975,15 +969,11 @@ namespace pdfpc {
                 "overlay", "Mark the current slide as an overlay slide",
                 "note", "Edit notes for the current slide",
                 "endSlide", "Set the current slide as the end slide",
-                "lastSlide", "Set the last displayed slide",
-                "jumpLastSlide", "Goto the last displayed slide",
-                "increaseFontSize", "Increase the current font size by 2pt",
-                "decreaseFontSize", "Decrease the current font size by 2pt",
+                "saveBookmark", "Bookmark the currently displayed slide",
+                "loadBookmark", "Load the bookmarked slide",
                 "switchMode <mode>", "Switch annotation mode (normal|pointer|pen|eraser)",
-                "increasePointer", "Increase the pointer size",
-                "decreasePointer", "Decrease the pointer size",
-                "increasePen", "Increase the pen size",
-                "decreasePen", "Decrease the pen size",
+                "increaseSize", "Increase the size of notes|pointer|pen|eraser",
+                "decreaseSize", "Decrease the size of notes|pointer|pen|eraser",
                 "setPenColor", "Change the pen color (requires an argument)",
                 "clearDrawing", "Clear drawing on the current slide",
                 "toggleDrawings", "Toggle all drawings on all slides",
@@ -1199,14 +1189,6 @@ namespace pdfpc {
             this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
             this.controllables_update();
             presenter.session_saved();
-        }
-
-        /**
-         * Set the last slide as defined by the user
-         */
-        public void set_last_saved_slide_overview() {
-            int user_selected = this.overview.current_slide;
-            this.metadata.set_last_saved_slide(user_selected + 1);
         }
 
         /**
@@ -1671,16 +1653,6 @@ namespace pdfpc {
             this.update_request();
         }
 
-        /**
-         * Reset all registered controllables to their initial state
-         */
-        protected void controllables_reset() {
-            this.current_slide_number = 0;
-            this.current_user_slide_number = 0;
-            this.controllables_update();
-            this.reset_timer();
-        }
-
         protected void toggle_overview() {
             if (this.overview_shown) {
                 this.controllables_hide_overview();
@@ -1805,6 +1777,46 @@ namespace pdfpc {
 
         protected void decrease_font_size() {
             this.decrease_font_size_request();
+        }
+
+        /**
+         * Mode-sensitive size increment
+         */
+        protected void increase_size() {
+            switch (this.annotation_mode) {
+                case AnnotationMode.NORMAL:
+                this.increase_font_size();
+                break;
+
+                case AnnotationMode.POINTER:
+                this.increase_pointer_size();
+                break;
+
+                case AnnotationMode.PEN:
+                case AnnotationMode.ERASER:
+                this.increase_pen_size();
+                break;
+            }
+        }
+
+        /**
+         * Mode-sensitive size decrement
+         */
+        protected void decrease_size() {
+            switch (this.annotation_mode) {
+                case AnnotationMode.NORMAL:
+                this.decrease_font_size();
+                break;
+
+                case AnnotationMode.POINTER:
+                this.decrease_pointer_size();
+                break;
+
+                case AnnotationMode.PEN:
+                case AnnotationMode.ERASER:
+                this.decrease_pen_size();
+                break;
+            }
         }
 
         /**
