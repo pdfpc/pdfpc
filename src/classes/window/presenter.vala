@@ -713,6 +713,7 @@ namespace pdfpc.Window {
             File icon_file = File.new_for_path(load_icon_path);
             if (!icon_file.query_exists()) {
                 load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
+                icon_file = File.new_for_path(load_icon_path);
             }
 
             Gtk.Image icon;
