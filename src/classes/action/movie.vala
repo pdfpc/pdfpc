@@ -747,28 +747,20 @@ namespace pdfpc {
         /**
          * Hook up the elements to draw the controls to the first output leg.
          */
-        protected Gst.Element add_video_control(Gst.Element source, Gst.Bin bin, Gdk.Rectangle rect, Gdk.Rectangle video_size_rect) {
+        protected Gst.Element add_video_control(Gst.Element source, Gst.Bin bin,
+            Gdk.Rectangle rect, Gdk.Rectangle video_size_rect) {
             dynamic Gst.Element overlay;
-            Gst.Element adaptor2;
+            Gst.Element adaptor;
             try {
-                var scale = gst_element_make("videoscale", null);
-                var rate = gst_element_make("videorate", null);
-                var adaptor1 = gst_element_make("videoconvert", null);
-                adaptor2 = gst_element_make("videoconvert", null);
+                adaptor = gst_element_make("videoconvert", null);
                 overlay = gst_element_make("cairooverlay", null);
-                var caps = Gst.Caps.from_string(
-                    "video/x-raw," + // Same as cairooverlay; hope to minimize transformations
-                    "framerate=[25/1,2147483647/1]," + // At least 25 fps
-                    @"width=$(video_size_rect.width),height=$(video_size_rect.height)"
-                );
-                var filter = gst_element_make("capsfilter", null);
-                filter.set("caps", caps);
-                bin.add_many(adaptor1, adaptor2, overlay, scale, rate, filter);
-                if (!source.link_many(rate, scale, adaptor1, filter, overlay, adaptor2)) {
+                bin.add_many(adaptor, overlay);
+                if (!source.link_many(overlay, adaptor)) {
                     throw new PipelineError.Linking("Could not link pipeline.");
                 }
             } catch (PipelineError err) {
-                GLib.printerr("Error creating control pipeline: %s\n", err.message);
+                GLib.printerr("Error creating control pipeline: %s\n",
+                    err.message);
                 return source;
             }
 
@@ -776,7 +768,7 @@ namespace pdfpc {
             overlay.draw.connect(this.on_draw);
             overlay.caps_changed.connect(this.on_prepare);
 
-            return adaptor2;
+            return adaptor;
         }
 
         /**
