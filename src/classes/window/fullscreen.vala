@@ -157,8 +157,9 @@ namespace pdfpc.Window {
             this.resizable = true;
 
             if (!Options.windowed) {
-                // start moving and fullscreening after the window was shown initially
-                this.map_event.connect(this.on_mapped);
+                this.do_fullscreen();
+                // start fullscreening after the window was shown initially
+                // this.map_event.connect(this.on_mapped);
             } else {
                 if (width > 0 && height > 0) {
                         this.screen_geometry.width = width;
@@ -180,16 +181,7 @@ namespace pdfpc.Window {
             this.restart_hide_cursor_timer();
         }
 
-        /**
-         * Move/fullscreen after the window was shown for the first time.
-         * Some WM ignore move requests before the window was shown initially so
-         * we wait until the window has been shown.
-         */
-        protected bool on_mapped(Gdk.EventAny event) {
-            if (event.type != Gdk.EventType.MAP) {
-                return false;
-            }
-
+        protected void do_fullscreen() {
             // Wayland has no concept of global coordinates, so move() does not
             // work there. The window is "somewhere", but we do not care,
             // since the next call should fix it. For X11 and KWin/Plasma this
@@ -199,6 +191,19 @@ namespace pdfpc.Window {
             // Specially for Wayland; just fullscreen() would do otherwise...
             this.fullscreen_on_monitor(this.screen_to_use,
                 this.monitor_num_to_use);
+        }
+
+        /**
+         * Move/fullscreen after the window was shown for the first time.
+         * Some WM (which?) ignore move requests before the window was shown
+         * initially so we wait until the window has been shown.
+         */
+        protected bool on_mapped(Gdk.EventAny event) {
+            if (event.type != Gdk.EventType.MAP) {
+                return false;
+            }
+
+            this.do_fullscreen();
 
             return true;
         }
