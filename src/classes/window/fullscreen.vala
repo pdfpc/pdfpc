@@ -138,13 +138,15 @@ namespace pdfpc.Window {
             this.overlay_layout.add_overlay(this.pointer_drawing_surface);
 
             this.video_surface.realize.connect(() => {
-                this.set_widget_event_pass_though(this.video_surface, true);
+                this.set_widget_event_pass_through(this.video_surface, true);
             });
             this.pen_drawing_surface.realize.connect(() => {
-                this.set_widget_event_pass_though(this.pen_drawing_surface, true);
+                this.set_widget_event_pass_through(this.pen_drawing_surface,
+                    true);
             });
             this.pointer_drawing_surface.realize.connect(() => {
-                this.set_widget_event_pass_though(this.pointer_drawing_surface, true);
+                this.set_widget_event_pass_through(this.pointer_drawing_surface,
+                    true);
             });
 
             this.pointer_drawing_surface.halign = Gtk.Align.FILL;
@@ -169,16 +171,17 @@ namespace pdfpc.Window {
                 // this.map_event.connect(this.on_mapped);
             } else {
                 if (width > 0 && height > 0) {
-                        this.screen_geometry.width = width;
-                        this.screen_geometry.height = height;
+                    this.screen_geometry.width = width;
+                    this.screen_geometry.height = height;
                 } else {
-                        this.screen_geometry.width /= 2;
-                        this.screen_geometry.height /= 2;
+                    this.screen_geometry.width /= 2;
+                    this.screen_geometry.height /= 2;
                 }
                 this.resizable = false;
             }
 
-            this.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
+            this.set_size_request(this.screen_geometry.width,
+                this.screen_geometry.height);
 
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect(this.on_mouse_move);
@@ -235,7 +238,8 @@ namespace pdfpc.Window {
                 Source.remove(this.hide_cursor_timeout);
             }
 
-            this.hide_cursor_timeout = Timeout.add_seconds(5, this.on_hide_cursor_timeout);
+            this.hide_cursor_timeout = Timeout.add_seconds(5,
+                this.on_hide_cursor_timeout);
         }
 
         /**
@@ -247,7 +251,9 @@ namespace pdfpc.Window {
 
             // Window might be null in case it has not been mapped
             if (this.get_window() != null) {
-                var cursor = new Gdk.Cursor.for_display(Gdk.Display.get_default(), Gdk.CursorType.BLANK_CURSOR);
+                var cursor =
+                    new Gdk.Cursor.for_display(Gdk.Display.get_default(),
+                        Gdk.CursorType.BLANK_CURSOR);
                 this.get_window().set_cursor(cursor);
 
                 // After the timeout disabled the cursor do not run it again
@@ -263,10 +269,11 @@ namespace pdfpc.Window {
         /**
          * Set the widget passthrough.
          *
-         * If set to true, the widget will not receive events and they will be forwarded to the
-         * underlying widgets within the Gtk.Overlay
+         * If set to true, the widget will not receive events and they will be
+         * forwarded to the underlying widgets within the Gtk.Overlay
          */
-        protected void set_widget_event_pass_though(Gtk.Widget w, bool pass_through) {
+        protected void set_widget_event_pass_through(Gtk.Widget w,
+            bool pass_through) {
             this.overlay_layout.set_overlay_pass_through(w, pass_through);
         }
     }
