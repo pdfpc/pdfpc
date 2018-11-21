@@ -88,25 +88,29 @@ namespace pdfpc.Window {
         /**
          * The monitor number we want to show the window
          */
-        protected int screen_num_to_use;
+        protected int monitor_num_to_use;
 
-        public Fullscreen(int screen_num, int width = -1, int height = -1) {
-            if (screen_num >= 0) {
-                this.screen_num_to_use = screen_num;
+        public Fullscreen(int monitor_num, int width = -1, int height = -1) {
+            var display = Gdk.Display.get_default();
+            if (monitor_num >= 0) {
+                this.monitor_num_to_use = monitor_num;
 
                 // Start in the given monitor
-                this.screen_to_use = Gdk.Screen.get_default();
+                this.screen_to_use = display.get_default_screen();
             } else {
                 // Start in the monitor the cursor is in
-                var device = Gdk.Display.get_default().get_default_seat().get_pointer();
+                var device = display.get_default_seat().get_pointer();
                 int pointerx, pointery;
-                device.get_position(out this.screen_to_use, out pointerx, out pointery);
+                device.get_position(out this.screen_to_use,
+                    out pointerx, out pointery);
 
-                this.screen_num_to_use = this.screen_to_use.get_monitor_at_point(pointerx, pointery);
+                this.monitor_num_to_use =
+                    this.screen_to_use.get_monitor_at_point(pointerx, pointery);
             }
-            this.screen_to_use.get_monitor_geometry(this.screen_num_to_use, out this.screen_geometry);
+            var monitor = display.get_monitor(this.monitor_num_to_use);
+            this.screen_geometry = monitor.get_geometry();
 
-            this.gdk_scale = this.screen_to_use.get_monitor_scale_factor(this.screen_num_to_use);
+            this.gdk_scale = this.get_scale_factor();
             if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
                 // See issue 214. Wayland is doing some double scaling therefore
                 // we are lying about the actual screen size
@@ -186,18 +190,15 @@ namespace pdfpc.Window {
                 return false;
             }
 
-            // move does not work on wayland sessions correctly, since wayland
-            // has no concept of global coordinates. For X11, this does the
-            // right thing.  On Wayland, the window is "somewhere", but we do
-            // not care, since the next call should fix it.
+            // Wayland has no concept of global coordinates, so move() does not
+            // work there. The window is "somewhere", but we do not care,
+            // since the next call should fix it. For X11 and KWin/Plasma this
+            // does the right thing.
             this.move(this.screen_geometry.x, this.screen_geometry.y);
 
-            // In wayland sessions we should end up on the correct monitor in
-            // fullscreen state. In X11, this API call is not implemented
-            // correctly until gtk 3.22. For X11 with gtk < 3.22, this call is
-            // just switching to fullscreen on the current screen. Since we
-            // moved it to the correct screen anyways, we should be safe here.
-            this.fullscreen_on_monitor(this.screen_to_use, this.screen_num_to_use);
+            // Specially for Wayland; just fullscreen() would do otherwise...
+            this.fullscreen_on_monitor(this.screen_to_use,
+                this.monitor_num_to_use);
 
             return true;
         }
