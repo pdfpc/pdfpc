@@ -182,6 +182,8 @@ namespace pdfpc {
 #endif
             Gtk.init(ref args);
 
+            var display = Gdk.Display.get_default();
+
             string pdfFilename = this.parse_command_line_options(ref args);
 
             if (Options.version) {
@@ -195,7 +197,7 @@ namespace pdfpc {
             }
 
             // if pdfpc runs at a tablet we force the toolbox to be shown
-            var seat = Gdk.Display.get_default().get_default_seat();
+            var seat = display.get_default_seat();
             var touchSeats = seat.get_slaves(Gdk.SeatCapabilities.TOUCH);
             if (touchSeats.length() > 0) {
                 Options.toolbox_shown = true;
@@ -280,29 +282,37 @@ namespace pdfpc {
 
             set_styling();
 
-            var screen = Gdk.Screen.get_default();
-            if (!Options.windowed && !Options.single_screen && screen.get_n_monitors() > 1) {
-                int presenter_monitor = screen.get_primary_monitor();
-                if (Options.display_switch) {
-                    presenter_monitor = (presenter_monitor + 1) % 2;
-                }
-
-                int presentation_monitor = (presenter_monitor + 1) % 2;
-                this.controller.presenter = this.create_presenter(metadata, presenter_monitor);
-                this.controller.presentation = this.create_presentation(metadata, presentation_monitor, width, height);
-            } else if (Options.windowed && !Options.single_screen) {
-                this.controller.presenter = this.create_presenter(metadata, -1);
-                this.controller.presentation = this.create_presentation(metadata, -1, width, height);
-            } else {
-                if (!Options.display_switch) {
-                    this.controller.presenter = this.create_presenter(metadata, -1);
+            int primary_monitor_num = 0, secondary_monitor_num = 0;
+            int presenter_monitor = -1, presentation_monitor = -1;
+            int n_monitors = display.get_n_monitors();
+            for (int i = 0; i < n_monitors; i++) {
+                // Not obvious what's right to do if n_monitors > 2...
+                // But let's be realistic :)
+                if (display.get_monitor(i).is_primary()) {
+                    primary_monitor_num = i;
                 } else {
-                    this.controller.presentation = this.create_presentation(metadata, -1, width, height);
+                    secondary_monitor_num = i;
                 }
             }
+            if (!Options.display_switch) {
+                presenter_monitor    = primary_monitor_num;
+                presentation_monitor = secondary_monitor_num;
+            } else {
+                presenter_monitor    = secondary_monitor_num;
+                presentation_monitor = primary_monitor_num;
+            }
 
-            // The windows are always displayed at last to be sure all caches have
-            // been created at this point.
+            if (!Options.single_screen || !Options.display_switch) {
+                this.controller.presenter = this.create_presenter(metadata,
+                    presenter_monitor);
+            }
+            if (!Options.single_screen || Options.display_switch) {
+                this.controller.presentation = this.create_presentation(metadata,
+                    presentation_monitor, width, height);
+            }
+
+            // The windows are always displayed at last to be sure all caches
+            // have been created at this point.
             if (this.controller.presentation != null) {
                 this.controller.presentation.show_all();
                 this.controller.presentation.update();
@@ -313,11 +323,14 @@ namespace pdfpc {
                 this.controller.presenter.update();
             }
 
-            if (Options.page >= 1 && Options.page <= metadata.get_end_user_slide()) {
-                int u = metadata.user_slide_to_real_slide(Options.page - 1, false);
+            if (Options.page >= 1 &&
+                Options.page <= metadata.get_end_user_slide()) {
+                int u = metadata.user_slide_to_real_slide(Options.page - 1,
+                    false);
                 this.controller.page_change_request(u, false);
             } else {
-                GLib.printerr("Argument --page/-P must be between %d and %d\n", 1, metadata.get_end_user_slide());
+                GLib.printerr("Argument --page/-P must be between 1 and %d\n",
+                    metadata.get_end_user_slide());
                 Process.exit(1);
             }
 
