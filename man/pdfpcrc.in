@@ -74,6 +74,11 @@ Default is false).
 .BI disable-scrolling
 Disable scrolling events on the presenter window (bool, Default is false).
 .TP
+.B move-on-mapped
+Dual-monitor full-screen window placement is a tricky business. Some window
+managers (e.g., FVWM) ignore the placement if made before the window is
+shown. This option enables a workaround (bool, Default is false).
+.TP
 .B next-height
 Percentage of the height of the presenter screen to be used for the next slide (int, Default is 70).
 .TP

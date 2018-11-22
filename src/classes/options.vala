@@ -70,6 +70,12 @@ namespace pdfpc {
         public static bool disable_cache_compression = false;
 
         /**
+         * Config option to enable a workaround for fullscreen window placement
+         * (needed for some WM's, e.g., fvwm)
+         */
+        public static bool move_on_mapped = false;
+
+        /**
          * Config option to disable detection of tablet input type (pen|eraser)
          */
         public static bool disable_input_autodetection = false;
