@@ -161,9 +161,13 @@ namespace pdfpc.Window {
             this.resizable = true;
 
             if (!Options.windowed) {
-                this.do_fullscreen();
-                // start fullscreening after the window was shown initially
-                // this.map_event.connect(this.on_mapped);
+                if (Options.move_on_mapped) {
+                     // Some WM's ignore move requests made prior to
+                     // mapping the window
+                    this.map_event.connect(this.on_mapped);
+                } else {
+                    this.do_fullscreen();
+                }
             } else {
                 if (width > 0 && height > 0) {
                     this.screen_geometry.width = width;
@@ -198,11 +202,6 @@ namespace pdfpc.Window {
                 this.monitor_num_to_use);
         }
 
-        /**
-         * Move/fullscreen after the window was shown for the first time.
-         * Some WM (which?) ignore move requests before the window was shown
-         * initially so we wait until the window has been shown.
-         */
         protected bool on_mapped(Gdk.EventAny event) {
             if (event.type != Gdk.EventType.MAP) {
                 return false;

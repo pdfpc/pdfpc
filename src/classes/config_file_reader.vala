@@ -257,6 +257,9 @@ namespace pdfpc {
                 case "disable-scrolling":
                     Options.disable_scrolling = bool.parse(fields[2]);
                     break;
+                case "move-on-mapped":
+                    Options.move_on_mapped = bool.parse(fields[2]);
+                    break;
                 case "next-height":
                     Options.next_height = int.parse(fields[2]);
                     break;
