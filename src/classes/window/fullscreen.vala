@@ -88,16 +88,16 @@ namespace pdfpc.Window {
         /**
          * The monitor number we want to show the window
          */
-        protected int monitor_num_to_use = 0;
+        protected int monitor_num_to_use;
 
         public Fullscreen(int monitor_num, int width = -1, int height = -1) {
             var display = Gdk.Display.get_default();
             Gdk.Monitor monitor;
             if (monitor_num >= 0) {
+                // Start in the given monitor
                 monitor = display.get_monitor(monitor_num);
                 this.monitor_num_to_use = monitor_num;
 
-                // Start in the given monitor
                 this.screen_to_use = display.get_default_screen();
             } else {
                 // Start in the monitor the cursor is in
@@ -107,13 +107,8 @@ namespace pdfpc.Window {
                     out pointerx, out pointery);
 
                 monitor = display.get_monitor_at_point(pointerx, pointery);
-                int n_monitors = display.get_n_monitors();
-                for (int i = 0; i < n_monitors; i++) {
-                    if (display.get_monitor(i) == monitor) {
-                        this.monitor_num_to_use = i;
-                        break;
-                    }
-                }
+                // Shouldn't be used, just a safety precaution
+                this.monitor_num_to_use = 0;
             }
             this.screen_geometry = monitor.get_geometry();
 
