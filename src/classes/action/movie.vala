@@ -77,12 +77,17 @@ namespace pdfpc {
         protected bool eos = false;
 
         /**
-         * A flag to indicated whether the movie should be played in a loop.
+         * A flag to indicate whether the movie should start automatically.
+         */
+        protected bool autostart = false;
+
+        /**
+         * A flag to indicate whether the movie should be played in a loop.
          */
         protected bool loop;
 
         /**
-         * A flag to indicated whether the progress bar should be supressed.
+         * A flag to indicate whether the progress bar should be supressed.
          */
         protected bool noprogress = false;
 
@@ -153,8 +158,8 @@ namespace pdfpc {
          * via GLib.Idle.add()
          */
         protected void init_movie2(ControlledMovie movie,
-                string uri, bool autostart) {
-            movie.establish_pipeline(uri);
+                string uri, string? suburi) {
+            movie.establish_pipeline(uri, suburi);
             if (movie.pipeline == null) {
                 return;
             }
@@ -169,7 +174,7 @@ namespace pdfpc {
 
             movie.hide();
 
-            if (autostart) {
+            if (movie.autostart) {
                 movie.play();
             }
         }
@@ -179,10 +184,11 @@ namespace pdfpc {
          */
         public void init_movie(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, bool autostart, bool loop, bool noprogress,
+                string uri, string? suburi, bool autostart, bool loop, bool noprogress,
                 bool noaudio, int start = 0, int stop = 0, bool temp = false) {
             other.init(area, controller, document);
             ControlledMovie movie = (ControlledMovie) other;
+            movie.autostart = autostart;
             movie.loop = loop;
             movie.noprogress = noprogress;
             movie.noaudio = noaudio;
@@ -192,11 +198,11 @@ namespace pdfpc {
 
 #if MOVIE_LOAD_ASYNC
             GLib.Idle.add( () => {
-                this.init_movie2(movie, uri, autostart);
+                this.init_movie2(movie, uri, suburi);
                 return false;
             } );
 #else
-            this.init_movie2(movie, uri, autostart);
+            this.init_movie2(movie, uri, suburi);
 #endif
         }
 
@@ -237,6 +243,7 @@ namespace pdfpc {
             bool noprogress = "noprogress" in queryarray;
             var start = 0;
             var stop = 0;
+            string srtfile = null;
             foreach (string param in queryarray) {
                 if (param.has_prefix("start=")) {
                     start = int.parse(param.split("=")[1]);
@@ -244,8 +251,17 @@ namespace pdfpc {
                 if (param.has_prefix("stop=")) {
                     stop = int.parse(param.split("=")[1]);
                 }
+                if (param.has_prefix("srtfile=")) {
+                    srtfile = param.split("=")[1];
+                }
             }
             string uri = filename_to_uri(file, controller.get_pdf_fname());
+            string suburi;
+            if (srtfile != null) {
+                suburi = filename_to_uri(srtfile, controller.get_pdf_fname());
+            } else {
+                suburi = null;
+            }
             bool uncertain;
             string ctype = GLib.ContentType.guess(uri, null, out uncertain);
             if (!("video" in ctype)) {
@@ -254,7 +270,8 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_movie(new_obj, mapping.area, controller, document, uri, autostart, loop, noprogress, noaudio, start, stop);
+            this.init_movie(new_obj, mapping.area, controller, document, uri,
+                suburi, autostart, loop, noprogress, noaudio, start, stop);
             return new_obj;
         }
 
@@ -282,7 +299,7 @@ namespace pdfpc {
         public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             Poppler.Annot annot = mapping.annot;
-            string uri;
+            string uri, suburi = null;
             bool temp = false;
             bool noprogress = false;
             bool loop = false;
@@ -348,7 +365,8 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_movie(new_obj, mapping.area, controller, document, uri, false, loop, noprogress, false, 0, 0, temp);
+            this.init_movie(new_obj, mapping.area, controller, document, uri,
+                suburi, false, loop, noprogress, false, 0, 0, temp);
             return new_obj;
         }
 
@@ -617,7 +635,7 @@ namespace pdfpc {
         /**
          * Set up the gstreamer pipeline.
          */
-        protected void establish_pipeline(string uri) {
+        protected void establish_pipeline(string uri, string? suburi) {
             this.pipeline = null;
 
             Gst.Bin bin = new Gst.Bin("bin");
@@ -710,6 +728,12 @@ namespace pdfpc {
 
             this.pipeline = Gst.ElementFactory.make("playbin", "playbin");
             this.pipeline.set("uri", uri);
+            if (suburi != null) {
+                this.pipeline.set("suburi", suburi);
+            }
+            // Make the fontsize adjustable?
+            int subsize = 18;
+            this.pipeline.set("subtitle-font-desc", @"Sans, $subsize");
             this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
             this.pipeline.set("video_sink", bin);
             this.pipeline.set("mute", this.noaudio);
@@ -726,12 +750,13 @@ namespace pdfpc {
          * is not an absolute path, use the pdf file location as a base
          * directory.
          */
-        protected string filename_to_uri(string file, string pdf_fname) {
+        protected string? filename_to_uri(string file, string pdf_fname) {
             Regex uriRE = null;
             try {
                 uriRE = new Regex("^[a-z]*://");
             } catch (Error error) {
                 // Won't happen
+                return null;
             }
             if (uriRE.match(file)) {
                 return file;
@@ -741,7 +766,12 @@ namespace pdfpc {
             }
 
             string dirname = GLib.Path.get_dirname(pdf_fname);
-            return "file://" + Posix.realpath(GLib.Path.build_filename(dirname, file));
+            string rp = Posix.realpath(GLib.Path.build_filename(dirname, file));
+            if (rp != null) {
+                return "file://" + rp;
+            } else {
+                return null;
+            }
         }
 
         /**
