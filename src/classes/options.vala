@@ -170,6 +170,16 @@ namespace pdfpc {
         public static string? notes_position = null;
 
         /**
+         * Screen to be used for the presentation (output name)
+         */
+        public static string? presentation_screen = null;
+
+        /**
+         * Screen to be used for the presenter (output name)
+         */
+        public static string? presenter_screen = null;
+
+        /**
          * Size of the presenter window
          */
         public static string? size = null;

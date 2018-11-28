@@ -63,6 +63,8 @@ namespace pdfpc {
             { "persist-cache", 'p', 0, 0, ref Options.persist_cache, "Persist the PNG cache on disk for faster startup.", null },
             { "page", 'P', 0, OptionArg.INT, ref Options.page, "Goto a specific page directly after startup", "PAGE" },
             { "pdfpc-location", 'R', 0, OptionArg.STRING, ref Options.pdfpc_location, "Full path location to a pdfpc file (e.g. ./build/withnotes.pdfpc).", "LOCATION"},
+            { "presentation-screen", '2', 0, OptionArg.STRING, ref Options.presentation_screen, "Screen to be used for the presentation (output name)", "OUTPUT"},
+            { "presenter-screen", '1', 0, OptionArg.STRING, ref Options.presenter_screen, "Screen to be used for the presenter (output name)", "OUTPUT"},
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
@@ -285,12 +287,14 @@ namespace pdfpc {
             int primary_monitor_num = 0, secondary_monitor_num = 0;
             int presenter_monitor = -1, presentation_monitor = -1;
             int n_monitors = display.get_n_monitors();
+            bool by_output = (Options.presentation_screen != null) || (Options.presenter_screen != null);
             for (int i = 0; i < n_monitors; i++) {
                 // Not obvious what's right to do if n_monitors > 2...
                 // But let's be realistic :)
-                if (display.get_monitor(i).is_primary()) {
+                if ((by_output && Options.presenter_screen == display.get_monitor(i).get_model())
+                    || display.get_monitor(i).is_primary()) {
                     primary_monitor_num = i;
-                } else {
+                } else if (!by_output || Options.presentation_screen == display.get_monitor(i).get_model()) {
                     secondary_monitor_num = i;
                 }
             }

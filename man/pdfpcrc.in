@@ -95,6 +95,12 @@ Set the pointer opacity in percent (int, default is 50).
 .B pointer-size
 Set the initial pointer size, in pixels (int, default is 10).
 .TP
+.B presentation-screen
+Screen to be used for the presentation (output name, see e.g. "xrandr --listmonitors").
+.TP
+.B presenter-screen
+Screen to be used for the presenter (output name).
+.TP
 .B switch-screens
 Switch the presentation and the presenter screen (bool, Default is false).
 .TP
