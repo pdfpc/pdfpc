@@ -67,6 +67,12 @@ Go to a specific page directly after startup. In case of overlays, the first sli
 .BI "\-R, \-\-pdfpc\-location"=LOCATION
 Use custom pdfpc file.
 .TP
+.BI "\-1, \-\-presenter\-screen"=OUTPUT
+Screen to be used for the presenter (output name, see e.g. "xrandr --listmonitors").
+.TP
+.BI "\-2, \-\-presentation\-screen"=OUTPUT
+Screen to be used for the presentation (output name).
+.TP
 .BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
 .TP
