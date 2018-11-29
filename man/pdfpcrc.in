@@ -50,6 +50,9 @@ Some permanent changes can be configured via the config file. The syntax is:
 The following option_name's are recognized:
 
 .TP
+.B auxiliary-screen
+Screen to be used for the auxiliary (output name).
+.TP
 .B black-on-end
 Add an additional black slide at the end of the presentation (bool, Default is false).
 .TP

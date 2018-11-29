@@ -226,6 +226,9 @@ namespace pdfpc {
             }
 
             switch (fields[1]) {
+                case "auxiliary-screen":
+                    Options.auxiliary_screen = fields[2];
+                    break;
                 case "black-on-end":
                     Options.black_on_end = bool.parse(fields[2]);
                     break;

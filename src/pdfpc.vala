@@ -52,6 +52,7 @@ namespace pdfpc {
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
+            { "auxiliary-screen", '3', 0, OptionArg.STRING, ref Options.auxiliary_screen, "Screen to be used as auxiliary (output name)", "OUTPUT"},
             { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
             { "time-of-day", 'C', 0, 0, ref Options.use_time_of_day, "Use the current time of the day for the timer", null},
             { "duration", 'd', 0, OptionArg.INT, ref Options.duration, "Duration in minutes of the presentation used for timer display.", "N" },
@@ -285,9 +286,9 @@ namespace pdfpc {
             set_styling();
 
             int primary_monitor_num = 0, secondary_monitor_num = 0;
-            int presenter_monitor = -1, presentation_monitor = -1;
+            int presenter_monitor = -1, presentation_monitor = -1, auxiliary_monitor = -1;
             int n_monitors = display.get_n_monitors();
-            bool by_output = (Options.presentation_screen != null) || (Options.presenter_screen != null);
+            bool by_output = (Options.presentation_screen != null) || (Options.presenter_screen != null) || (Options.auxiliary_screen != null);
             for (int i = 0; i < n_monitors; i++) {
                 // Not obvious what's right to do if n_monitors > 2...
                 // But let's be realistic :)
@@ -296,6 +297,8 @@ namespace pdfpc {
                     primary_monitor_num = i;
                 } else if (!by_output || Options.presentation_screen == display.get_monitor(i).get_model()) {
                     secondary_monitor_num = i;
+                } else if (by_output && Options.auxiliary_screen == display.get_monitor(i).get_model()) {
+                    auxiliary_monitor = i;
                 }
             }
             if (!Options.display_switch) {

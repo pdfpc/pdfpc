@@ -180,6 +180,11 @@ namespace pdfpc {
         public static string? presenter_screen = null;
 
         /**
+         * Screen to be used for the auxiliary (output name)
+         */
+        public static string? auxiliary_screen = null;
+
+        /**
          * Size of the presenter window
          */
         public static string? size = null;

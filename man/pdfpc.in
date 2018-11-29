@@ -73,6 +73,9 @@ Screen to be used for the presenter (output name, see e.g. "xrandr --listmonitor
 .BI "\-2, \-\-presentation\-screen"=OUTPUT
 Screen to be used for the presentation (output name).
 .TP
+.BI "\-3, \-\-auxiliary\-screen"=OUTPUT
+Screen to be used as auxiliary (output name).
+.TP
 .BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
 .TP
