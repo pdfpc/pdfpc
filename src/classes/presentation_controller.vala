@@ -116,6 +116,25 @@ namespace pdfpc {
             }
         }
         private Window.Presentation _presentation=null;
+
+        /**
+         * Window which shows an auxiliary slide in fullscreen
+         *
+         * This window is supposed to be shown on the second beamer
+         */
+        public Window.Auxiliary auxiliary {
+            get {
+                return _auxiliary;
+            }
+            set {
+                _auxiliary = value;
+                if (value != null) {
+                    auxiliary.main_view.size_allocate.connect(init_presentation_pointer);
+                }
+            }
+        }
+        private Window.Auxiliary _auxiliary=null;
+
         public Gtk.Image presenter_pointer;
         public Gtk.Image presentation_pointer;
 

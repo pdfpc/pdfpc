@@ -176,6 +176,17 @@ namespace pdfpc {
         }
 
         /**
+         * Create and return an AuxiliaryWindow using the specified monitor
+         * while displaying the given file
+         */
+        private Window.Auxiliary create_auxiliary(Metadata.Pdf metadata, int monitor, int width = -1, int height = -1) {
+            var auxiliary = new Window.Auxiliary(metadata, monitor, this.controller, width, height);
+            auxiliary.set_cache_observer(this.cache_status);
+
+            return auxiliary;
+        }
+
+        /**
          * Main application function, which instantiates the windows and
          * initializes the Gtk system.
          */
@@ -289,6 +300,9 @@ namespace pdfpc {
             int presenter_monitor = -1, presentation_monitor = -1, auxiliary_monitor = -1;
             int n_monitors = display.get_n_monitors();
             bool by_output = (Options.presentation_screen != null) || (Options.presenter_screen != null) || (Options.auxiliary_screen != null);
+            if (Options.auxiliary_screen != null) {
+                auxiliary_monitor = 0;
+            }
             for (int i = 0; i < n_monitors; i++) {
                 // Not obvious what's right to do if n_monitors > 2...
                 // But let's be realistic :)
@@ -317,6 +331,10 @@ namespace pdfpc {
                 this.controller.presentation = this.create_presentation(metadata,
                     presentation_monitor, width, height);
             }
+            if(auxiliary_monitor != -1) {
+                this.controller.auxiliary = this.create_auxiliary(metadata,
+                    auxiliary_monitor);
+            }
 
             // The windows are always displayed at last to be sure all caches
             // have been created at this point.
@@ -328,6 +346,11 @@ namespace pdfpc {
             if (this.controller.presenter != null) {
                 this.controller.presenter.show_all();
                 this.controller.presenter.update();
+            }
+
+            if (this.controller.auxiliary != null) {
+                this.controller.auxiliary.show_all();
+                this.controller.auxiliary.update();
             }
 
             if (Options.page >= 1 &&
