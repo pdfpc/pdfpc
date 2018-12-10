@@ -50,6 +50,11 @@ namespace pdfpc.Window {
         protected View.Pdf view;
 
         /**
+         * Metadata of the slides
+         */
+        protected Metadata.Pdf metadata;
+
+        /**
          * Base constructor instantiating a new presentation window
          */
         public Auxiliary(Metadata.Pdf metadata, int screen_num,
@@ -62,6 +67,8 @@ namespace pdfpc.Window {
 
             this.presentation_controller = presentation_controller;
             this.presentation_controller.update_request.connect(this.update);
+
+            this.metadata = metadata;
 
             Gdk.Rectangle scale_rect;
             this.view = new View.Pdf.from_metadata(
@@ -110,8 +117,12 @@ namespace pdfpc.Window {
             if (this.presentation_controller.frozen)
                 return;
 
+            int user_slide = this.presentation_controller.current_user_slide_number;
+            if (user_slide > 0) {
+                user_slide--;
+            }
             try {
-                this.view.display(this.presentation_controller.current_slide_number-1, true);
+                this.view.display(this.metadata.user_slide_to_real_slide(user_slide), true);
             } catch (Renderer.RenderError e) {
                 GLib.printerr("The pdf page %d could not be rendered: %s\n",
                     this.presentation_controller.current_slide_number, e.message );
