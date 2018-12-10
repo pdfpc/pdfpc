@@ -730,6 +730,8 @@ namespace pdfpc {
             this.pipeline.set("uri", uri);
             if (suburi != null) {
                 this.pipeline.set("suburi", suburi);
+            } else if (Options.auto_srt) {
+                this.pipeline.set("suburi", uri + ".srt");
             }
             // Make the fontsize adjustable?
             int subsize = 18;

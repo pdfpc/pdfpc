@@ -82,6 +82,11 @@ Force to use only one screen
 .BI "\-t, \-\-start\-time"=T
 Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 .TP
+.BI "\-T, \-\-enable\-auto\-srt\-load"
+Try load video subtitle files automatically. For each video media, pdfpc will
+append ".srt" to the media URI and attempt to load a subtitle file (in the SRT
+format) from that location.
+.TP
 .BI "\-W, \-\-wayland\-workaround"
 Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
 .TP

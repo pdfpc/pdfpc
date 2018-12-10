@@ -200,6 +200,11 @@ namespace pdfpc {
         public static uint pointer_size = 10;
 
         /**
+         * Try to automatically load video srt file
+         */
+        public static bool auto_srt = false;
+
+        /**
          * Page which should be displayed after startup
          */
         public static int page = 1;
