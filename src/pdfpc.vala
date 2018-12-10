@@ -66,6 +66,7 @@ namespace pdfpc {
             { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
             { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
             { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
+            { "enable-auto-srt-load", 'T', 0, 0, ref Options.auto_srt, "Load video subtitle files automatically.", null },
             { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
             { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
             { "wayland-workaround", 'W', 0, 0, ref Options.wayland_workaround, "Enable Wayland-specific workaround. This might fix HiDPI scaling problems", null},
