@@ -257,6 +257,9 @@ namespace pdfpc {
                 case "disable-scrolling":
                     Options.disable_scrolling = bool.parse(fields[2]);
                     break;
+                case "enable-auto-srt-load":
+                    Options.auto_srt = bool.parse(fields[2]);
+                    break;
                 case "move-on-mapped":
                     Options.move_on_mapped = bool.parse(fields[2]);
                     break;
