@@ -52,29 +52,67 @@ namespace pdfpc {
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
-            { "disable-cache", 'c', 0, 0, ref Options.disable_caching, "Disable caching and pre-rendering of slides to save memory at the cost of speed.", null },
-            { "time-of-day", 'C', 0, 0, ref Options.use_time_of_day, "Use the current time of the day for the timer", null},
-            { "duration", 'd', 0, OptionArg.INT, ref Options.duration, "Duration in minutes of the presentation used for timer display.", "N" },
-            { "end-time", 'e', 0, OptionArg.STRING, ref Options.end_time, "End time of the presentation. (Format: HH:MM (24h))", "T" },
-            { "disable-auto-grouping", 'g', 0, 0, ref Options.disable_auto_grouping, "Disable auto detection and grouping of overlayed slides", null },
-            { "last-minutes", 'l', 0, OptionArg.INT, ref Options.last_minutes, "Time in minutes, from which on the timer changes its color. (Default 5 minutes)", "N" },
-            { "list-actions", 'L', 0, 0, ref Options.list_actions, "List actions supported in the config file(s)", null},
-            { "notes", 'n', 0, OptionArg.STRING, ref Options.notes_position, "Position of notes on the pdf page (either left, right, top or bottom)", "P"},
-            { "persist-cache", 'p', 0, 0, ref Options.persist_cache, "Persist the PNG cache on disk for faster startup.", null },
-            { "page", 'P', 0, OptionArg.INT, ref Options.page, "Goto a specific page directly after startup", "PAGE" },
-            { "pdfpc-location", 'R', 0, OptionArg.STRING, ref Options.pdfpc_location, "Full path location to a pdfpc file (e.g. ./build/withnotes.pdfpc).", "LOCATION"},
-            { "presentation-screen", '2', 0, OptionArg.STRING, ref Options.presentation_screen, "Screen to be used for the presentation (output name)", "OUTPUT"},
-            { "presenter-screen", '1', 0, OptionArg.STRING, ref Options.presenter_screen, "Screen to be used for the presenter (output name)", "OUTPUT"},
-            { "switch-screens", 's', 0, 0, ref Options.display_switch, "Switch the presentation and the presenter screen.", null },
-            { "single-screen", 'S', 0, 0, ref Options.single_screen, "Force to use only one screen", null },
-            { "start-time", 't', 0, OptionArg.STRING, ref Options.start_time, "Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))", "T" },
-            { "enable-auto-srt-load", 'T', 0, 0, ref Options.auto_srt, "Load video subtitle files automatically.", null },
-            { "version", 'v', 0, 0, ref Options.version, "Print the version string and copyright statement", null },
-            { "windowed", 'w', 0, 0, ref Options.windowed, "Run in windowed mode (devel tool)", null},
-            { "wayland-workaround", 'W', 0, 0, ref Options.wayland_workaround, "Enable Wayland-specific workaround. This might fix HiDPI scaling problems", null},
-            { "disable-compression", 'z', 0, 0, ref Options.disable_cache_compression, "Disable the compression of slide images to trade memory consumption for speed. (Avg. factor 30)", null },
-            { "size", 'Z', 0, OptionArg.STRING, ref Options.size, "Size of the presentation window in width:height format (forces windowed mode)", null},
-            { null }
+            {"disable-cache", 'c', 0, 0,
+                ref Options.disable_caching,
+                "Disable caching and pre-rendering of slides", null},
+            {"time-of-day", 'C', 0, 0,
+                ref Options.use_time_of_day,
+                "Use the current time for the timer", null},
+            {"duration", 'd', 0, OptionArg.INT,
+                ref Options.duration,
+                "Duration of the presentation (in minutes)", "N"},
+            {"end-time", 'e', 0, OptionArg.STRING,
+                ref Options.end_time,
+                "End time of the presentation", "HH:MM"},
+            {"disable-auto-grouping", 'g', 0, 0,
+                ref Options.disable_auto_grouping,
+                "Disable auto detection of overlays", null},
+            {"last-minutes", 'l', 0, OptionArg.INT,
+                ref Options.last_minutes,
+                "Change the timer color during last N mins [5]", "N"},
+            {"list-actions", 'L', 0, 0,
+                ref Options.list_actions,
+                "List actions supported in the config file(s)", null},
+            {"notes", 'n', 0, OptionArg.STRING,
+                ref Options.notes_position,
+                "Position of notes (left|right|top|bottom)", "P"},
+            {"persist-cache", 'p', 0, 0,
+                ref Options.persist_cache,
+                "Keep the cache on disk for faster startup", null},
+            {"page", 'P', 0, OptionArg.INT,
+                ref Options.page,
+                "Go to page number N directly after startup", "N"},
+            {"pdfpc-location", 'R', 0, OptionArg.STRING,
+                ref Options.pdfpc_location,
+                "Full path location to a pdfpc file", "PATH"},
+            {"switch-screens", 's', 0, 0,
+                ref Options.display_switch,
+                "Swap the presentation/presenter screens", null},
+            {"single-screen", 'S', 0, 0,
+                ref Options.single_screen,
+                "Force to use only one screen", null},
+            {"start-time", 't', 0, OptionArg.STRING,
+                ref Options.start_time,
+                "Start time of the presentation", "HH:MM"},
+            {"enable-auto-srt-load", 'T', 0, 0,
+                ref Options.auto_srt,
+                "Load video subtitle files automatically", null},
+            {"version", 'v', 0, 0,
+                ref Options.version,
+                "Output version information and exit", null},
+            {"windowed", 'w', 0, 0,
+                ref Options.windowed,
+                "Run in the windowed mode", null},
+            {"wayland-workaround", 'W', 0, 0,
+                ref Options.wayland_workaround,
+                "Enable Wayland-specific workaround", null},
+            {"disable-compression", 'z', 0, 0,
+                ref Options.disable_cache_compression,
+                "Disable compression of the cached slide images", null},
+            {"size", 'Z', 0, OptionArg.STRING,
+                ref Options.size,
+                "Size of the presentation window (implies \"-w\")", "W:H"},
+            {null}
         };
 
         /**
@@ -288,14 +326,12 @@ namespace pdfpc {
             int primary_monitor_num = 0, secondary_monitor_num = 0;
             int presenter_monitor = -1, presentation_monitor = -1;
             int n_monitors = display.get_n_monitors();
-            bool by_output = (Options.presentation_screen != null) || (Options.presenter_screen != null);
             for (int i = 0; i < n_monitors; i++) {
                 // Not obvious what's right to do if n_monitors > 2...
                 // But let's be realistic :)
-                if ((by_output && Options.presenter_screen == display.get_monitor(i).get_model())
-                    || display.get_monitor(i).is_primary()) {
+                if (display.get_monitor(i).is_primary()) {
                     primary_monitor_num = i;
-                } else if (!by_output || Options.presentation_screen == display.get_monitor(i).get_model()) {
+                } else {
                     secondary_monitor_num = i;
                 }
             }
