@@ -705,16 +705,16 @@ namespace pdfpc.Window {
          * Load an (SVG) icon, replacing a substring in it in special cases
          */
         protected Gtk.Image load_icon(string filename, int icon_height) {
-
             // attempt to load from a local path (if the user hasn't installed)
             // if that fails, attempt to load from the global path
-            string load_icon_path = Path.build_filename(Paths.SOURCE_PATH,
-                "icons", filename);
-            File icon_file = File.new_for_path(load_icon_path);
-            if (!icon_file.query_exists()) {
+            string load_icon_path;
+            if (Options.no_install) {
+                load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons",
+                    filename);
+            } else {
                 load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
-                icon_file = File.new_for_path(load_icon_path);
             }
+            File icon_file = File.new_for_path(load_icon_path);
 
             Gtk.Image icon;
             try {

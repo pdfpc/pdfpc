@@ -219,6 +219,11 @@ namespace pdfpc {
          */
         public static string? pdfpc_location = null;
 
+        /**
+         * Test pdfpc without installation
+         */
+        public static bool no_install = false;
+
         public class BindTuple {
             public string type;
             public uint keyCode;
