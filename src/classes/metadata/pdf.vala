@@ -58,12 +58,12 @@ namespace pdfpc.Metadata {
         /**
          * Pdf page width
          */
-        protected double original_page_width;
+        protected double original_page_width = 0;
 
         /**
          * Pdf page height
          */
-        protected double original_page_height;
+        protected double original_page_height = 0;
 
         /**
          * Indicates if pages contains also notes and there position (e. g. when using latex beamer)
@@ -477,13 +477,18 @@ namespace pdfpc.Metadata {
             }
             this.document = this.open_pdf_document(this.pdf_fname);
 
-            // Cache some often used values to minimize thread locking in the
-            // future.
+            // Get maximal page dimensions
             this.page_count = this.document.get_n_pages();
-            this.document.get_page(0).get_size(
-                out this.original_page_width,
-                out this.original_page_height
-            );
+            for (int i = 0; i < this.page_count; ++i) {
+                double width1, height1;
+                this.document.get_page(i).get_size(out width1, out height1);
+                if (this.original_page_width < width1) {
+                    this.original_page_width = width1;
+                }
+                if (this.original_page_height < height1) {
+                    this.original_page_height = height1;
+                }
+            }
 
             if (Options.disable_auto_grouping && !skips_by_user) {
                 // Ignore overlayed slides

@@ -44,11 +44,6 @@ namespace pdfpc {
         public int height { get; protected set; }
 
         /**
-         * The scaling factor needed to render the pdf page to the desired size.
-         */
-        protected double scaling_factor;
-
-        /**
          * The area of the pdf which shall be displayed
          */
         protected Metadata.Area area;
@@ -73,10 +68,6 @@ namespace pdfpc {
             this.height = height;
 
             this.area = area;
-
-            // Calculate the scaling factor needed.
-            this.scaling_factor = Math.fmax(width / metadata.get_page_width(),
-                height / metadata.get_page_height());
         }
 
         /**
@@ -117,9 +108,22 @@ namespace pdfpc {
             cr.rectangle(0, 0, this.width, this.height);
             cr.fill();
 
-            cr.scale(this.scaling_factor, this.scaling_factor);
-            cr.translate(-metadata.get_horizontal_offset(this.area),
-                -metadata.get_vertical_offset(this.area));
+            // Calculate the scaling factor and the offsets for centering
+            double width1, height1;
+            page.get_size(out width1, out height1);
+            double scaling_factor, v_offset, h_offset;
+            if (width/width1 < height/height1) {
+                scaling_factor = width/width1;
+                h_offset = 0;
+                v_offset = (height/scaling_factor - height1)/2;
+            } else {
+                scaling_factor = height/height1;
+                h_offset = (width/scaling_factor - width1)/2;
+                v_offset = 0;
+            }
+            cr.scale(scaling_factor, scaling_factor);
+            cr.translate(-metadata.get_horizontal_offset(this.area) + h_offset,
+                -metadata.get_vertical_offset(this.area) + v_offset);
             page.render(cr);
 
             // If the cache is enabled store the newly rendered pixmap
@@ -139,7 +143,9 @@ namespace pdfpc {
             cr.rectangle(0, 0, this.width, this.height);
             cr.fill();
 
-            cr.scale(this.scaling_factor, this.scaling_factor);
+            double scaling_factor = Math.fmax(width/metadata.get_page_width(),
+                height/metadata.get_page_height());
+            cr.scale(scaling_factor, scaling_factor);
 
             return surface;
         }
