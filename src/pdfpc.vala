@@ -76,6 +76,9 @@ namespace pdfpc {
             {"notes", 'n', 0, OptionArg.STRING,
                 ref Options.notes_position,
                 "Position of notes (left|right|top|bottom)", "P"},
+            {"no-install", 'N', 0, 0,
+                ref Options.no_install,
+                "Test pdfpc without installation", null},
             {"persist-cache", 'p', 0, 0,
                 ref Options.persist_cache,
                 "Keep the cache on disk for faster startup", null},
@@ -170,16 +173,18 @@ namespace pdfpc {
             Gtk.StyleContext.add_provider_for_screen(Gdk.Display.get_default().get_default_screen(),
                 userProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
-            var sourceCssPath = Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpc.css");
-            var distCssPath = Path.build_filename(Paths.ICON_PATH, "pdfpc.css");
+            string distCssPath;
+            if (Options.no_install) {
+                distCssPath = Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpc.css");
+            } else {
+                distCssPath = Path.build_filename(Paths.ICON_PATH, "pdfpc.css");
+            }
             var legacyUserCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
             var userCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpc.css");
 
             try {
-                // pdfpc.css in dist path or in build directory is mandatory
-                if (GLib.FileUtils.test(sourceCssPath, (GLib.FileTest.IS_REGULAR))) {
-                    globalProvider.load_from_path(sourceCssPath);
-                } else if (GLib.FileUtils.test(distCssPath, (GLib.FileTest.IS_REGULAR))) {
+                // pdfpc.css in dist path is mandatory
+                if (GLib.FileUtils.test(distCssPath, (GLib.FileTest.IS_REGULAR))) {
                     globalProvider.load_from_path(distCssPath);
                 } else {
                     GLib.printerr("No CSS file found\n");
@@ -251,8 +256,11 @@ namespace pdfpc {
             }
 
             ConfigFileReader configFileReader = new ConfigFileReader();
-            configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
-            configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
+            if (Options.no_install) {
+                configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
+            } else {
+                configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
+            }
             var legacyUserConfig = Path.build_filename(Environment.get_home_dir(), ".pdfpcrc");
             var userConfig = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpcrc");
             if (GLib.FileUtils.test(userConfig, (GLib.FileTest.IS_REGULAR))) {

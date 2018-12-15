@@ -58,6 +58,11 @@ List actions supported in the config file(s)
 .BI "\-n, \-\-notes"=P
 Position of notes on the PDF page. Position can be either left, right, top or bottom. Disable slide auto-grouping (Default: none)
 .TP
+.BI "\-N, \-\-no\-install"
+Allow for testing pdfpc without proper installation. Icons, configuration files,
+etc. will be loaded from the source path locations. Mostly intended for
+developers.
+.TP
 .BI "\-p, \-\-persist\-cache"
 Persist the PNG cache on disk for faster startup.
 .TP
