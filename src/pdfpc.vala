@@ -49,6 +49,11 @@ namespace pdfpc {
         private CacheStatus cache_status;
 
         /**
+         * Show the available monitors(s)
+         */
+        private static bool list_monitors = false;
+
+        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
@@ -73,6 +78,9 @@ namespace pdfpc {
             {"list-actions", 'L', 0, 0,
                 ref Options.list_actions,
                 "List actions supported in the config file(s)", null},
+            {"list-monitors", 'M', 0, 0,
+                ref list_monitors,
+                "List available monitors", null},
             {"notes", 'n', 0, OptionArg.STRING,
                 ref Options.notes_position,
                 "Position of notes (left|right|top|bottom)", "P"},
@@ -117,10 +125,10 @@ namespace pdfpc {
                 "Size of the presentation window (implies \"-w\")", "W:H"},
             {"presenter-screen", '1', 0, OptionArg.STRING,
                 ref Options.presenter_screen,
-                "Screen to be used for the presenter", "S"},
+                "Monitor to be used for the presenter", "M"},
             {"presentation-screen", '2', 0, OptionArg.STRING,
                 ref Options.presentation_screen,
-                "Screen to be used for the presentation", "S"},
+                "Monitor to be used for the presentation", "M"},
             {null}
         };
 
@@ -240,6 +248,21 @@ namespace pdfpc {
 
             if (Options.version) {
                 print_version();
+                Process.exit(0);
+            }
+
+            if (list_monitors) {
+                int n_monitors = display.get_n_monitors();
+                GLib.print("Monitors: %d\n", n_monitors);
+                for (int i = 0; i < n_monitors; i++) {
+                    var monitor = display.get_monitor(i);
+                    var geo = monitor.get_geometry();
+                    GLib.print(" %d: %c %s [%dx%d@%dHz]\n", i,
+                        monitor.is_primary() ? '*':' ',
+                        monitor.get_model(),
+                        geo.width, geo.height,
+                        (monitor.get_refresh_rate() + 500)/1000);
+                }
                 Process.exit(0);
             }
 

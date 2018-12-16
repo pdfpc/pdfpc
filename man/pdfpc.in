@@ -55,6 +55,9 @@ Time in minutes, from which on the timer changes its color. (Default: 5 minutes)
 .BI "\-L, \-\-list\-actions"
 List actions supported in the config file(s)
 .TP
+.BI "\-M, \-\-list\-monitors"
+List monitors known to the operating system
+.TP
 .BI "\-n, \-\-notes"=P
 Position of notes on the PDF page. Position can be either left, right, top or bottom. Disable slide auto-grouping (Default: none)
 .TP
@@ -71,12 +74,6 @@ Go to a specific page directly after startup. In case of overlays, the first sli
 .TP
 .BI "\-R, \-\-pdfpc\-location"=LOCATION
 Use custom pdfpc file.
-.TP
-.BI "\-1, \-\-presenter\-screen"=OUTPUT
-Screen to be used for the presenter (output name, see e.g. "xrandr --listmonitors").
-.TP
-.BI "\-2, \-\-presentation\-screen"=OUTPUT
-Screen to be used for the presentation (output name).
 .TP
 .BI "\-s, \-\-switch\-screens"
 Switch the presentation and the presenter screen.
@@ -104,6 +101,12 @@ Disable the compression of slide images to trade memory consumption for speed.
 .TP
 .BI "\-Z, \-\-size"
 Size of the presentation window in width:height format (forces windowed mode)
+.TP
+.BI "\-1, \-\-presenter\-screen"=MONITOR
+Monitor to be used for the presenter screen (see the \-M option).
+.TP
+.BI "\-2, \-\-presentation\-screen"=MONITOR
+Monitor to be used for the presentation screen (see the \-M option).
 
 .SH KEYBINDINGS
 These are the default keybindings for pdfpc:
