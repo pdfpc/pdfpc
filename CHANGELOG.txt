@@ -2,6 +2,30 @@
 pdfpc Changelog
 ===============
 
+Version 4.3.0
+=============
+
+*Released: December 2018*
+
+- *Breaking changes*
+    - Improvement/more logical default key bindings
+    - GTK+3 >= 3.22
+
+- Four-State operation mode
+    - makes handling of drawing, eraser and pointer mode much easier
+
+- Permament setting of pointer color and size in pdfpcrc
+
+- Window placement can be done by output device name
+
+- Subtitles for video playback
+
+- Different slide sizes per presentation are allowed
+
+- Bug fixes
+    - Wayland high dpi scaling issues
+    - Window placement issues with some WMs
+
 Version 4.2.1
 =============
 
