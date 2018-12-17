@@ -165,6 +165,11 @@ namespace pdfpc {
         public static bool list_actions = false;
 
         /**
+         * Show the available monitors(s)
+         */
+        public static bool list_monitors = false;
+
+        /**
          * Position of notes on slides
          */
         public static string? notes_position = null;
