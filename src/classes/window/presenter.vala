@@ -883,6 +883,11 @@ namespace pdfpc.Window {
          * Ask for the page to jump to
          */
         public void ask_goto_page() {
+            // Ignore events coming from the presentation view
+            if (!this.is_active) {
+                return;
+            }
+
             this.slide_progress.set_text("/%u".printf(this.presentation_controller.user_n_slides));
             this.slide_progress.sensitive = true;
             this.slide_progress.grab_focus();
@@ -922,6 +927,11 @@ namespace pdfpc.Window {
          * Edit a note. Basically give focus to notes_view
          */
         public void edit_note() {
+            // Ignore events coming from the presentation view
+            if (!this.is_active) {
+                return;
+            }
+
             // Disallow editing notes imported from PDF annotations
             int number = this.presentation_controller.current_user_slide_number;
             if (this.metadata.get_notes().is_note_read_only(number)) {
@@ -961,6 +971,11 @@ namespace pdfpc.Window {
         }
 
         public void show_overview() {
+            // Ignore events coming from the presentation view
+            if (!this.is_active) {
+                return;
+            }
+
             this.overview.current_slide = this.presentation_controller.current_user_slide_number;
             this.slide_stack.set_visible_child_name("overview");
             this.overview.ensure_focus();
