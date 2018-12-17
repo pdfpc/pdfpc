@@ -7,7 +7,7 @@ Version 4.3.0
 
 *Released: December 2018*
 
-- *Breaking changes*
+- *Backward incompatible changes*
     - Improvement/more logical default key bindings
     - GTK+3 >= 3.22
 
@@ -16,14 +16,14 @@ Version 4.3.0
 
 - Permament setting of pointer color and size in pdfpcrc
 
-- Window placement can be done by output device name
+- Window placement can be done by monitor name
 
 - Subtitles for video playback
 
 - Different slide sizes per presentation are allowed
 
 - Bug fixes
-    - Wayland high dpi scaling issues
+    - Wayland high DPI scaling issues
     - Window placement issues with some WMs
 
 Version 4.2.1
