@@ -49,11 +49,6 @@ namespace pdfpc {
         private CacheStatus cache_status;
 
         /**
-         * Show the available monitors(s)
-         */
-        private static bool list_monitors = false;
-
-        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
@@ -79,7 +74,7 @@ namespace pdfpc {
                 ref Options.list_actions,
                 "List actions supported in the config file(s)", null},
             {"list-monitors", 'M', 0, 0,
-                ref list_monitors,
+                ref Options.list_monitors,
                 "List available monitors", null},
             {"notes", 'n', 0, OptionArg.STRING,
                 ref Options.notes_position,
@@ -251,7 +246,7 @@ namespace pdfpc {
                 Process.exit(0);
             }
 
-            if (list_monitors) {
+            if (Options.list_monitors) {
                 int n_monitors = display.get_n_monitors();
                 GLib.print("Monitors: %d\n", n_monitors);
                 for (int i = 0; i < n_monitors; i++) {
