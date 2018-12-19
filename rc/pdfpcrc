@@ -18,8 +18,8 @@ bind S+Next             nextOverlay
 bind S+Prior            prevOverlay
 
 # Intra-slide navigation
-bind S+Up               lastOverlay
-bind S+Down             firstOverlay
+bind S+Down             lastOverlay
+bind S+Up               firstOverlay
 
 # Fast forward/backward (10 pages)
 bind S+Right            next10
