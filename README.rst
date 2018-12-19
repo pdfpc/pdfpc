@@ -158,10 +158,10 @@ Compiling Trouble Shooting
 --------------------------
 
 Some distributions do not have a *valac* executable. Instead they ship with a
-version suffix like *valac-0.28*. If cmake can not find your compiler you can
+version suffix like *valac-0.40*. If cmake can not find your compiler you can
 try running cmake with::
 
-    cmake -DVALA_EXECUTABLE:NAMES=valac-0.28 ..
+    cmake -DVALA_EXECUTABLE:NAMES=valac-0.40 ..
 
 Usage
 =====
