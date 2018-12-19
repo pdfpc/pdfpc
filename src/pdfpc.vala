@@ -251,12 +251,15 @@ namespace pdfpc {
                 GLib.print("Monitors: %d\n", n_monitors);
                 for (int i = 0; i < n_monitors; i++) {
                     var monitor = display.get_monitor(i);
+                    int sf = monitor.get_scale_factor();
                     var geo = monitor.get_geometry();
-                    GLib.print(" %d: %c %s [%dx%d@%dHz]\n", i,
-                        monitor.is_primary() ? '*':' ',
+                    GLib.print(" %d: %c %s \t[%dx%d+%d+%d@%dHz \tscale=%d%%]\n",
+                        i, monitor.is_primary() ? '*':' ',
                         monitor.get_model(),
-                        geo.width, geo.height,
-                        (monitor.get_refresh_rate() + 500)/1000);
+                        geo.width*sf, geo.height*sf,
+                        geo.x*sf, geo.y*sf,
+                        (monitor.get_refresh_rate() + 500)/1000,
+                        100*sf);
                 }
                 Process.exit(0);
             }
