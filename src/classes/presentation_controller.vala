@@ -169,13 +169,6 @@ namespace pdfpc {
         public signal void decrease_font_size_request();
 
         /**
-         * A flag signaling if we allow for a black slide at the end. Tis is
-         * useful for the next view and (for some presenters) also for the main
-         * view.
-         */
-        protected bool black_on_end;
-
-        /**
          * Controllables which are registered with this presentation controller.
          */
         protected Gee.List<Controllable> controllables;
@@ -297,10 +290,9 @@ namespace pdfpc {
         /**
          * Instantiate a new controller
          */
-        public PresentationController(Metadata.Pdf metadata, bool allow_black_on_end) {
+        public PresentationController(Metadata.Pdf metadata) {
             this.metadata = metadata;
             this.metadata.controller = this;
-            this.black_on_end = allow_black_on_end;
 
             this.controllables = new Gee.ArrayList<Controllable>();
 
@@ -1303,7 +1295,7 @@ namespace pdfpc {
                 }
 
                 this.controllables_update();
-            } else if (this.black_on_end && !this.faded_to_black) {
+            } else if (Options.black_on_end && !this.faded_to_black) {
                 this.fade_to_black();
             }
             if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
@@ -1326,7 +1318,7 @@ namespace pdfpc {
             } else {
                 // we are at the last slide
                 if (this.current_slide_number == this.n_slides - 1) {
-                    if (this.black_on_end && !this.faded_to_black) {
+                    if (Options.black_on_end && !this.faded_to_black) {
                         this.fade_to_black();
                     }
                 } else {
