@@ -33,13 +33,13 @@ namespace pdfpc {
 
         public int number_of_overlays {
             get {
-                return (int) this.metadata.get_slide_count();
+                return (int) this.controller.metadata.get_slide_count();
             }
         }
 
         public int number_of_slides {
             get {
-                return this.metadata.get_user_slide_count();
+                return this.controller.metadata.get_user_slide_count();
             }
         }
 
@@ -51,28 +51,28 @@ namespace pdfpc {
         }
 
         protected PresentationController controller;
-        protected Metadata.Pdf metadata;
 
-        public DBusServer(PresentationController controller, Metadata.Pdf metadata) {
+        public DBusServer(PresentationController controller) {
             this.controller = controller;
-            this.metadata = metadata;
-            this._url = this.metadata.get_url();
+            this._url = this.controller.metadata.get_url();
             controller.notify["current-slide-number"].connect(
                 () => overlay_change(controller.current_slide_number));
             controller.notify["current-user-slide-number"].connect(
                 () => slide_change(controller.current_user_slide_number));
         }
 
-        public static void start_server(PresentationController controller, Metadata.Pdf metadata) {
-            Bus.own_name(BusType.SESSION, "io.github.pdfpc", BusNameOwnerFlags.NONE,
+        public static void start_server(PresentationController controller) {
+            Bus.own_name(BusType.SESSION,
+                "io.github.pdfpc", BusNameOwnerFlags.NONE,
                 (connection) => {
                     try {
                         connection.register_object("/io/github/pdfpc",
-                            new DBusServer(controller, metadata));
+                            new DBusServer(controller));
                     } catch (IOError e) {
                         GLib.printerr("Could not register DBus service.\n");
                     }
-                }, () => {}, () => GLib.printerr("Could not acquire DBus bus.\n"));
+                }, () => {},
+                   () => GLib.printerr("Could not acquire DBus bus.\n"));
         }
 
         public void trigger_action(string name) throws GLib.Error {
@@ -80,7 +80,9 @@ namespace pdfpc {
         }
 
         public string get_notes() throws GLib.Error {
-            return this.metadata.get_notes().get_note_for_slide(controller.current_user_slide_number);
+            var notes = this.controller.metadata.get_notes();
+            return
+                notes.get_note_for_slide(controller.current_user_slide_number);
         }
     }
 }
