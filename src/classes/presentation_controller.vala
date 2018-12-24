@@ -176,7 +176,35 @@ namespace pdfpc {
         /**
          * The metadata of the presentation
          */
-        protected Metadata.Pdf metadata;
+        private Metadata.Pdf _metadata;
+        public Metadata.Pdf metadata {
+            get {
+                return _metadata;
+            }
+            set {
+                _metadata = value;
+                if (value != null) {
+                    this.metadata.controller = this;
+
+                    this.user_slide_progress =
+                        new int[metadata.get_user_slide_count()];
+
+                    // If end_time is set, reset duration to 0
+                    if (Options.end_time != null) {
+                        Options.duration = 0;
+                        this.metadata.set_duration(0);
+                    }
+                    this.timer = getTimerLabel(this,
+                        (int) this.metadata.get_duration() * 60);
+                    this.timer.reset();
+
+                    this.n_slides = (int) this.metadata.get_slide_count();
+
+                    this.current_slide_number = 0;
+                    this.current_user_slide_number = 0;
+                }
+            }
+        }
 
         /**
          * The presenters overview. We need to communicate with it for toggling
@@ -290,37 +318,30 @@ namespace pdfpc {
         /**
          * Instantiate a new controller
          */
-        public PresentationController(Metadata.Pdf metadata) {
-            this.metadata = metadata;
-            this.metadata.controller = this;
-
+        public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
 
             this.history = new Gee.ArrayQueue<int>();
-            this.user_slide_progress = new int[metadata.get_user_slide_count()];
 
-            // If end_time is set, reset duration to 0
-            if (Options.end_time != null) {
-                Options.duration = 0;
-                this.metadata.set_duration(0);
-            }
-            this.timer = getTimerLabel(this,
-                (int) this.metadata.get_duration() * 60);
+            this.timer = getTimerLabel(this, 0);
             this.timer.reset();
-
-            this.n_slides = (int) this.metadata.get_slide_count();
-
-            this.current_slide_number = 0;
-            this.current_user_slide_number = 0;
 
             this.add_actions();
 
-            Bus.get_proxy.begin<ScreenSaver>(BusType.SESSION, "org.freedesktop.ScreenSaver", "/org/freedesktop/ScreenSaver", 0, null, (obj, res) => {
+            readKeyBindings();
+            readMouseBindings();
+
+            Bus.get_proxy.begin<ScreenSaver>(BusType.SESSION,
+                "org.freedesktop.ScreenSaver",
+                "/org/freedesktop/ScreenSaver",
+                0, null, (obj, res) => {
                 try {
                     this.screensaver = Bus.get_proxy.end(res);
-                    this.screensaver.inhibit.begin("pdfpc", "Showing a presentation", (obj, res) => {
+                    this.screensaver.inhibit.begin("pdfpc",
+                        "Showing a presentation", (obj, res) => {
                         try {
-                            this.screensaver_cookie = this.screensaver.inhibit.end(res);
+                            this.screensaver_cookie =
+                                this.screensaver.inhibit.end(res);
                             GLib.print("Screensaver inhibited\n");
                         } catch (GLib.Error error) {
                             // pass
@@ -331,11 +352,7 @@ namespace pdfpc {
                 }
             });
 
-            readKeyBindings();
-            readMouseBindings();
-
-
-            DBusServer.start_server(this, this.metadata);
+            DBusServer.start_server(this);
         }
 
         /* pen drawing widgets */
@@ -1151,16 +1168,9 @@ namespace pdfpc {
         }
 
         /**
-         * Get the last slide as defined by the user
-         */
-        public int get_end_user_slide() {
-            return this.metadata.get_end_user_slide();
-        }
-
-        /**
          * Set the last slide as defined by the user
          */
-        public void set_end_user_slide() {
+        private void set_end_user_slide() {
             this.metadata.set_end_user_slide(this.current_user_slide_number + 1);
             this.controllables_update();
         }

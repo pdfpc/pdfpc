@@ -339,7 +339,8 @@ namespace pdfpc {
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
-            this.controller = new PresentationController(metadata);
+            this.controller = new PresentationController();
+            this.controller.metadata = metadata;
             this.cache_status = new CacheStatus();
 
             set_styling();
