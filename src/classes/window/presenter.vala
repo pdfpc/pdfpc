@@ -775,7 +775,7 @@ namespace pdfpc.Window {
         }
 
         public void custom_slide_count(int current) {
-            int total = this.presentation_controller.get_end_user_slide();
+            int total = this.metadata.get_end_user_slide();
             this.slide_progress.set_text("%d/%u".printf(current, total));
         }
 
