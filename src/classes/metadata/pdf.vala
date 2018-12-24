@@ -458,7 +458,23 @@ namespace pdfpc.Metadata {
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf(string fname, string? fpcname = null) {
+        public Pdf(string pdfFilename) {
+            var fname = pdfFilename;
+            string cwd = GLib.Environment.get_current_dir();
+            if (!GLib.Path.is_absolute(fname)) {
+                fname = GLib.Path.build_filename(cwd, fname);
+            }
+
+            var fpcname = Options.pdfpc_location;
+            if (fpcname != null && !GLib.Path.is_absolute(fpcname)) {
+                fpcname = GLib.Path.build_filename(cwd, fpcname);
+            }
+            if (fpcname != null &&
+                !GLib.FileUtils.test(fpcname, (GLib.FileTest.IS_REGULAR))) {
+                GLib.printerr("Can't find custom pdfpc file at %s\n", fpcname);
+                Process.exit(1);
+            }
+
             this.url = File.new_for_commandline_arg(fname).get_uri();
 
             this.action_mapping = new Gee.ArrayList<ActionMapping>();

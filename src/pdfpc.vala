@@ -335,21 +335,7 @@ namespace pdfpc {
                 Options.windowed = true;
             }
 
-            string cwd = GLib.Environment.get_current_dir();
-            if (!GLib.Path.is_absolute(pdfFilename)) {
-                pdfFilename = GLib.Path.build_filename(cwd, pdfFilename);
-            }
-            var pdfpc_location = Options.pdfpc_location;
-            if (pdfpc_location != null && !GLib.Path.is_absolute(pdfpc_location)) {
-                pdfpc_location = GLib.Path.build_filename(cwd, pdfpc_location);
-            }
-
-            if (pdfpc_location != null && !GLib.FileUtils.test(pdfpc_location, (GLib.FileTest.IS_REGULAR))) {
-                GLib.printerr("Can't find custom pdfpc file at %s\n", pdfpc_location);
-                Process.exit(1);
-            }
-
-            var metadata = new Metadata.Pdf(pdfFilename, pdfpc_location);
+            var metadata = new Metadata.Pdf(pdfFilename);
 
             // Initialize global controller and CacheStatus, to manage
             // crosscutting concerns between the different windows.
