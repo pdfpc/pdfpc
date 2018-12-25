@@ -300,15 +300,13 @@ namespace pdfpc.Window {
             Gdk.Rectangle current_slide_rect;
             int current_allocated_width = (int) Math.floor(
                 this.screen_geometry.width * Options.current_size / (double) 100);
-            this.current_view = new View.Pdf.from_metadata(
-                metadata,
+            this.current_view = new View.Pdf.from_fullscreen(
+                this,
                 current_allocated_width,
                 (int) Math.floor(Options.current_height * bottom_position / (double) 100),
                 Metadata.Area.NOTES,
                 Options.black_on_end,
                 true,
-                this.presentation_controller,
-                this.gdk_scale,
                 out current_slide_rect
             );
 
@@ -321,40 +319,34 @@ namespace pdfpc.Window {
             this.next_allocated_width = next_allocated_width;
             // We leave a bit of margin between the two views
             Gdk.Rectangle next_slide_rect;
-            this.next_view = new View.Pdf.from_metadata(
-                metadata,
+            this.next_view = new View.Pdf.from_fullscreen(
+                this,
                 next_allocated_width,
                 (int) Math.floor(Options.next_height * bottom_position / (double)100 ),
                 Metadata.Area.CONTENT,
                 true,
                 false,
-                this.presentation_controller,
-                this.gdk_scale,
                 out next_slide_rect
             );
 
             Gdk.Rectangle strict_next_slide_rect;
-            this.strict_next_view = new View.Pdf.from_metadata(
-                metadata,
+            this.strict_next_view = new View.Pdf.from_fullscreen(
+                this,
                 (int) Math.floor(0.5 * current_allocated_width),
                 (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
                 true,
                 false,
-                this.presentation_controller,
-                this.gdk_scale,
                 out strict_next_slide_rect
             );
             Gdk.Rectangle strict_prev_slide_rect;
-            this.strict_prev_view = new View.Pdf.from_metadata(
-                metadata,
+            this.strict_prev_view = new View.Pdf.from_fullscreen(
+                this,
                 (int) Math.floor(0.5 * current_allocated_width),
                 (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
                 true,
                 false,
-                this.presentation_controller,
-                this.gdk_scale,
                 out strict_prev_slide_rect
             );
 

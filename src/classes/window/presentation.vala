@@ -60,10 +60,10 @@ namespace pdfpc.Window {
             this.presentation_controller.update_request.connect(this.update);
 
             Gdk.Rectangle scale_rect;
-            this.view = new View.Pdf.from_metadata(
-                metadata, this.screen_geometry.width, this.screen_geometry.height, Metadata.Area.CONTENT,
-                Options.black_on_end, true, this.presentation_controller, this.gdk_scale, out scale_rect
-            );
+            this.view = new View.Pdf.from_fullscreen(this,
+                this.screen_geometry.width, this.screen_geometry.height,
+                Metadata.Area.CONTENT,
+                Options.black_on_end, true, out scale_rect);
 
             if (!Options.disable_caching) {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);

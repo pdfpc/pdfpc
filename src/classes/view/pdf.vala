@@ -147,7 +147,7 @@ namespace pdfpc {
         }
 
         /**
-         * Create a new Pdf view directly from a file
+         * Create a new Pdf view from a Fullscreen window instance
          *
          * This is a convenience constructor which automatically create a full
          * metadata and rendering chain to be used with the pdf view. The given
@@ -155,18 +155,21 @@ namespace pdfpc {
          * aspect ration. The scale rectangle is provided in the scale_rect
          * argument.
          */
-        public Pdf.from_metadata(Metadata.Pdf metadata, int width, int height,
-                                 Metadata.Area area, bool allow_black_on_end, bool clickable_links,
-                                 PresentationController presentation_controller, int gdk_scale_factor, out Gdk.Rectangle scale_rect = null) {
+        public Pdf.from_fullscreen(Window.Fullscreen window,
+            int width, int height, Metadata.Area area,
+            bool allow_black_on_end, bool clickable_links,
+            out Gdk.Rectangle scale_rect = null) {
+            var presentation_controller = window.presentation_controller;
+            var metadata = presentation_controller.metadata;
             var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
             scale_rect = scaler.scale_to(width, height);
 
-            scale_rect.width *= gdk_scale_factor;
-            scale_rect.height *= gdk_scale_factor;
+            scale_rect.width *= window.gdk_scale;
+            scale_rect.height *= window.gdk_scale;
 
             var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
 
-            this(renderer, allow_black_on_end, clickable_links, presentation_controller, gdk_scale_factor);
+            this(renderer, allow_black_on_end, clickable_links, presentation_controller, window.gdk_scale);
         }
 
         /**
