@@ -63,7 +63,7 @@ namespace pdfpc.Window {
             this.view = new View.Pdf.from_fullscreen(this,
                 this.screen_geometry.width, this.screen_geometry.height,
                 Metadata.Area.CONTENT,
-                Options.black_on_end, true, out scale_rect);
+                true, out scale_rect);
 
             if (!Options.disable_caching) {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);
