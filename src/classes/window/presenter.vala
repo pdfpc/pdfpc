@@ -305,7 +305,6 @@ namespace pdfpc.Window {
                 current_allocated_width,
                 (int) Math.floor(Options.current_height * bottom_position / (double) 100),
                 Metadata.Area.NOTES,
-                Options.black_on_end,
                 true,
                 out current_slide_rect
             );
@@ -324,7 +323,6 @@ namespace pdfpc.Window {
                 next_allocated_width,
                 (int) Math.floor(Options.next_height * bottom_position / (double)100 ),
                 Metadata.Area.CONTENT,
-                true,
                 false,
                 out next_slide_rect
             );
@@ -335,7 +333,6 @@ namespace pdfpc.Window {
                 (int) Math.floor(0.5 * current_allocated_width),
                 (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
-                true,
                 false,
                 out strict_next_slide_rect
             );
@@ -345,7 +342,6 @@ namespace pdfpc.Window {
                 (int) Math.floor(0.5 * current_allocated_width),
                 (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
-                true,
                 false,
                 out strict_prev_slide_rect
             );

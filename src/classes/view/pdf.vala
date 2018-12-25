@@ -106,7 +106,7 @@ namespace pdfpc {
         /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
-        public Pdf(Renderer.Pdf renderer, bool allow_black_on_end, bool clickable_links,
+        public Pdf(Renderer.Pdf renderer, bool clickable_links,
             PresentationController presentation_controller, int gdk_scale_factor) {
             this.renderer = renderer;
             this.gdk_scale = gdk_scale_factor;
@@ -157,7 +157,7 @@ namespace pdfpc {
          */
         public Pdf.from_fullscreen(Window.Fullscreen window,
             int width, int height, Metadata.Area area,
-            bool allow_black_on_end, bool clickable_links,
+            bool clickable_links,
             out Gdk.Rectangle scale_rect = null) {
             var presentation_controller = window.presentation_controller;
             var metadata = presentation_controller.metadata;
@@ -169,7 +169,7 @@ namespace pdfpc {
 
             var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
 
-            this(renderer, allow_black_on_end, clickable_links, presentation_controller, window.gdk_scale);
+            this(renderer, clickable_links, presentation_controller, window.gdk_scale);
         }
 
         /**
