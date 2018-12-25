@@ -469,7 +469,7 @@ namespace pdfpc.Window {
                 GLib.printerr("Warning: failed to set CSS for auto-sized bottom controls.\n");
             }
 
-            this.overview = new Overview(this.metadata, this.presentation_controller, this);
+            this.overview = new Overview(this.presentation_controller);
             this.overview.vexpand = true;
             this.overview.hexpand = true;
             this.overview.set_n_slides(this.presentation_controller.user_n_slides);

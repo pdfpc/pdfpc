@@ -39,10 +39,13 @@ namespace pdfpc.Window {
         protected Gtk.IconView slides_view;
 
         /**
-         * We will need the metadata mainly for converting from user slides to
-         * real slides.
+         * Metadata of the slides
          */
-        protected Metadata.Pdf metadata;
+        protected Metadata.Pdf metadata {
+            get {
+                return this.presentation_controller.metadata;
+            }
+        }
 
         /**
          * How many (user) slides we have.
@@ -77,10 +80,13 @@ namespace pdfpc.Window {
         protected PresentationController presentation_controller;
 
         /**
-         * The presenter. We have a reference here to update the current slide
-         * display.
+         * The presenter
          */
-        protected Presenter presenter;
+        protected Presenter presenter {
+            get {
+                return this.presentation_controller.presenter;
+            }
+        }
 
         /**
          * The maximal size of the slides_view.
@@ -127,7 +133,9 @@ namespace pdfpc.Window {
         /**
          * Constructor
          */
-        public Overview( Metadata.Pdf metadata, PresentationController presentation_controller, Presenter presenter ) {
+        public Overview(PresentationController presentation_controller) {
+            this.presentation_controller = presentation_controller;
+
             this.get_style_context().add_class("overviewWindow");
 
             this.slides = new Gtk.ListStore(1, typeof(int));
@@ -147,17 +155,12 @@ namespace pdfpc.Window {
             this.slides_view.show();
             this.add(this.slides_view);
 
-            this.metadata = metadata;
-            this.presentation_controller = presentation_controller;
-            this.presenter = presenter;
-
             this.slides_view.motion_notify_event.connect(this.presenter.on_mouse_move);
             this.slides_view.motion_notify_event.connect(this.on_mouse_move);
             this.slides_view.button_release_event.connect(this.on_mouse_release);
             this.slides_view.key_press_event.connect(this.on_key_press);
             this.slides_view.selection_changed.connect(this.on_selection_changed);
             this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
-
         }
 
         public void set_available_space(int width, int height) {
