@@ -269,6 +269,11 @@ namespace pdfpc {
                 GLib.printerr("--notes option detected. Disable auto grouping.\n");
             }
 
+            // If end_time is set, reset duration to 0
+            if (Options.end_time != null) {
+                Options.duration = 0;
+            }
+
             // if pdfpc runs at a tablet we force the toolbox to be shown
             var seat = display.get_default_seat();
             var touchSeats = seat.get_slaves(Gdk.SeatCapabilities.TOUCH);

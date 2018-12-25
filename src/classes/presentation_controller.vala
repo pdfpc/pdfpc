@@ -189,11 +189,6 @@ namespace pdfpc {
                     this.user_slide_progress =
                         new int[metadata.get_user_slide_count()];
 
-                    // If end_time is set, reset duration to 0
-                    if (Options.end_time != null) {
-                        Options.duration = 0;
-                        this.metadata.set_duration(0);
-                    }
                     this.timer = getTimerLabel(this,
                         (int) this.metadata.get_duration() * 60);
                     this.timer.reset();
