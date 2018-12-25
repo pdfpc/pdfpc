@@ -182,7 +182,11 @@ namespace pdfpc.Window {
         /**
          * Metadata of the slides
          */
-        protected Metadata.Pdf metadata;
+        protected Metadata.Pdf metadata {
+            get {
+                return this.presentation_controller.metadata;
+            }
+        }
 
         /**
          * Width of next/notes area
@@ -278,15 +282,17 @@ namespace pdfpc.Window {
        /**
          * Base constructor instantiating a new presenter window
          */
-        public Presenter(Metadata.Pdf metadata, int screen_num,
-            PresentationController presentation_controller) {
+        public Presenter(PresentationController presentation_controller,
+            int screen_num) {
             base(screen_num);
+
+            this.presentation_controller = presentation_controller;
+
             this.role = "presenter";
             this.title = "pdfpc - presenter (%s)".printf(metadata.get_document().get_title());
 
             this.destroy.connect((source) => presentation_controller.quit());
 
-            this.presentation_controller = presentation_controller;
             this.presentation_controller.update_request.connect(this.update);
             this.presentation_controller.edit_note_request.connect(this.edit_note);
             this.presentation_controller.ask_goto_page_request.connect(this.ask_goto_page);
@@ -294,8 +300,6 @@ namespace pdfpc.Window {
             this.presentation_controller.hide_overview_request.connect(this.hide_overview);
             this.presentation_controller.increase_font_size_request.connect(this.increase_font_size);
             this.presentation_controller.decrease_font_size_request.connect(this.decrease_font_size);
-
-            this.metadata = metadata;
 
             // We need the value of 90% height a lot of times. Therefore store it
             // in advance

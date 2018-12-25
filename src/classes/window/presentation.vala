@@ -52,15 +52,18 @@ namespace pdfpc.Window {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public Presentation(Metadata.Pdf metadata, int screen_num,
-            PresentationController presentation_controller, int width = -1, int height = -1) {
+        public Presentation(PresentationController presentation_controller,
+            int screen_num, int width = -1, int height = -1) {
             base(screen_num, width, height);
+            this.presentation_controller = presentation_controller;
+
+            var metadata = presentation_controller.metadata;
+
             this.role = "presentation";
             this.title = "pdfpc - presentation (%s)".printf(metadata.get_document().get_title());
 
             this.destroy.connect((source) => presentation_controller.quit());
 
-            this.presentation_controller = presentation_controller;
             this.presentation_controller.update_request.connect(this.update);
 
             Gdk.Rectangle scale_rect;

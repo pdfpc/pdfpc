@@ -210,7 +210,7 @@ namespace pdfpc {
          * while displaying the given file
          */
         private Window.Presenter create_presenter(Metadata.Pdf metadata, int monitor) {
-            var presenter = new Window.Presenter(metadata, monitor, this.controller);
+            var presenter = new Window.Presenter(this.controller, monitor);
             presenter.set_cache_observer(this.cache_status);
 
             return presenter;
@@ -220,8 +220,10 @@ namespace pdfpc {
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation(Metadata.Pdf metadata, int monitor, int width = -1, int height = -1) {
-            var presentation = new Window.Presentation(metadata, monitor, this.controller, width, height);
+        private Window.Presentation create_presentation(Metadata.Pdf metadata,
+            int monitor, int width = -1, int height = -1) {
+            var presentation = new Window.Presentation(this.controller, monitor,
+                width, height);
             presentation.set_cache_observer(this.cache_status);
 
             return presentation;
