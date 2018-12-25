@@ -209,7 +209,7 @@ namespace pdfpc {
          * Create and return a PresenterWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presenter create_presenter(Metadata.Pdf metadata, int monitor) {
+        private Window.Presenter create_presenter(int monitor) {
             var presenter = new Window.Presenter(this.controller, monitor);
             presenter.set_cache_observer(this.cache_status);
 
@@ -220,8 +220,8 @@ namespace pdfpc {
          * Create and return a PresentationWindow using the specified monitor
          * while displaying the given file
          */
-        private Window.Presentation create_presentation(Metadata.Pdf metadata,
-            int monitor, int width = -1, int height = -1) {
+        private Window.Presentation create_presentation(int monitor,
+            int width = -1, int height = -1) {
             var presentation = new Window.Presentation(this.controller, monitor,
                 width, height);
             presentation.set_cache_observer(this.cache_status);
@@ -375,12 +375,13 @@ namespace pdfpc {
             }
 
             if (!Options.single_screen || !Options.display_switch) {
-                this.controller.presenter = this.create_presenter(metadata,
-                    presenter_monitor);
+                this.controller.presenter =
+                    this.create_presenter(presenter_monitor);
             }
             if (!Options.single_screen || Options.display_switch) {
-                this.controller.presentation = this.create_presentation(metadata,
-                    presentation_monitor, width, height);
+                this.controller.presentation =
+                    this.create_presentation(presentation_monitor,
+                        width, height);
             }
 
             // The windows are always displayed at last to be sure all caches
