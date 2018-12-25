@@ -94,7 +94,9 @@ namespace pdfpc.Window {
         /**
          * The GDK scale factor. Used for better slide rendering
          */
-        protected int gdk_scale = 1;
+        public int gdk_scale {
+            get; protected set;
+        }
 
         /**
          * The screen we want this window to be shown
@@ -107,6 +109,7 @@ namespace pdfpc.Window {
         protected int monitor_num_to_use;
 
         public Fullscreen(int monitor_num, int width = -1, int height = -1) {
+            this.gdk_scale = 1;
             var display = Gdk.Display.get_default();
             Gdk.Monitor monitor;
             if (monitor_num >= 0) {
