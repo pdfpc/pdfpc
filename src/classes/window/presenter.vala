@@ -37,11 +37,6 @@ namespace pdfpc.Window {
      */
     public class Presenter : Fullscreen, Controllable {
         /**
-         * The registered PresentationController
-         */
-        public PresentationController presentation_controller { get; protected set; }
-
-        /**
          * Only handle links and annotations on the current_view
          */
         public View.Pdf main_view {
@@ -178,15 +173,6 @@ namespace pdfpc.Window {
          * Size of the toolbox button icons
          **/
         private int toolbox_icon_height;
-
-        /**
-         * Metadata of the slides
-         */
-        protected Metadata.Pdf metadata {
-            get {
-                return this.presentation_controller.metadata;
-            }
-        }
 
         /**
          * Width of next/notes area

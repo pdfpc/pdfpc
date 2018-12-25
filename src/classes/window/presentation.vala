@@ -31,11 +31,6 @@ namespace pdfpc.Window {
      */
     public class Presentation : Fullscreen, Controllable {
         /**
-         * The registered PresentationController
-         */
-        public PresentationController presentation_controller { get; protected set; }
-
-        /**
          * The only view is the main view.
          */
         public View.Pdf main_view {
@@ -56,8 +51,6 @@ namespace pdfpc.Window {
             int screen_num, int width = -1, int height = -1) {
             base(screen_num, width, height);
             this.presentation_controller = presentation_controller;
-
-            var metadata = presentation_controller.metadata;
 
             this.role = "presentation";
             this.title = "pdfpc - presentation (%s)".printf(metadata.get_document().get_title());

@@ -34,6 +34,22 @@ namespace pdfpc.Window {
      */
     public class Fullscreen : Gtk.Window {
         /**
+         * The registered PresentationController
+         */
+        public PresentationController presentation_controller {
+            get; protected set;
+        }
+
+        /**
+         * Metadata of the slides
+         */
+        protected Metadata.Pdf metadata {
+            get {
+                return this.presentation_controller.metadata;
+            }
+        }
+
+        /**
          * The geometry data of the screen this window is on
          */
         protected Gdk.Rectangle screen_geometry;
