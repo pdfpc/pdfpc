@@ -91,7 +91,11 @@ namespace pdfpc {
         /**
          * The number of slides in the presentation
          */
-        protected int n_slides;
+        protected int n_slides {
+            get {
+                return (int) renderer.metadata.get_slide_count();
+            }
+        }
 
         /**
          * List to store all associated behaviours
@@ -115,8 +119,6 @@ namespace pdfpc {
                                   (int)(renderer.height*(1.0/this.gdk_scale)));
 
             this.current_slide_number = 0;
-
-            this.n_slides = (int) renderer.metadata.get_slide_count();
 
             // Render the initial page on first realization.
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
@@ -216,7 +218,9 @@ namespace pdfpc {
             int* i = null;
             // The page_count will be transfered into the lamda function as
             // well.
-            var page_count = this.get_renderer().metadata.get_slide_count();
+            if (this.n_slides == 0) {
+                return;
+            }
 
             this.prerendering_started();
 
@@ -243,7 +247,7 @@ namespace pdfpc {
                 // Increment one slide for each call and stop the loop if we
                 // have reached the last slide
                 *i = *i + 1;
-                if (*i >= page_count) {
+                if (*i >= this.n_slides) {
                     this.prerendering_completed();
                     free(i);
                     return false;
@@ -277,6 +281,10 @@ namespace pdfpc {
          */
         public void display(int slide_number, bool force_redraw=false)
             throws Renderer.RenderError {
+
+            if (this.n_slides == 0) {
+                return;
+            }
 
             // If the slide is out of bounds render the outer most slide on
             // each side of the document.
@@ -339,6 +347,10 @@ namespace pdfpc {
          * the window surface.
          */
         public override bool draw(Cairo.Context cr) {
+            var metadata = this.get_renderer().metadata;
+            if (!metadata.is_ready) {
+                return true;
+            }
             cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
             cr.set_source_surface(this.current_slide, 0, 0);
             cr.rectangle(0, 0, this.current_slide.get_width(), this.current_slide.get_height());
