@@ -778,9 +778,9 @@ namespace pdfpc.Window {
             int current_slide_number = this.presentation_controller.current_slide_number;
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
             try {
-                this.current_view.display(current_slide_number);
+                this.current_view.display(current_slide_number, true);
                 this.next_view.display(this.metadata.user_slide_to_real_slide(
-                    current_user_slide_number + 1));
+                    current_user_slide_number + 1), true);
                 if (this.presentation_controller.skip_next()) {
                     this.strict_next_view.display(current_slide_number + 1, true);
                 } else {
