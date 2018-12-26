@@ -194,6 +194,9 @@ namespace pdfpc.Window {
          * for all the slides.
          */
         protected void prepare_layout() {
+            if (!this.metadata.is_ready) {
+                return;
+            }
             if (this.max_width == -1) {
                 return;
             }
