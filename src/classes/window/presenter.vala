@@ -275,7 +275,7 @@ namespace pdfpc.Window {
             this.presentation_controller = presentation_controller;
 
             this.role = "presenter";
-            this.title = "pdfpc - presenter (%s)".printf(metadata.get_document().get_title());
+            this.title = "pdfpc - presenter (%s)".printf(metadata.get_title());
 
             this.destroy.connect((source) => presentation_controller.quit());
 
@@ -772,6 +772,9 @@ namespace pdfpc.Window {
         }
 
         public void update() {
+            if (!metadata.is_ready) {
+                return;
+            }
             int current_slide_number = this.presentation_controller.current_slide_number;
             int current_user_slide_number = this.presentation_controller.current_user_slide_number;
             try {

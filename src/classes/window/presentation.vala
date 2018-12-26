@@ -53,7 +53,7 @@ namespace pdfpc.Window {
             this.presentation_controller = presentation_controller;
 
             this.role = "presentation";
-            this.title = "pdfpc - presentation (%s)".printf(metadata.get_document().get_title());
+            this.title = "pdfpc - presentation (%s)".printf(metadata.get_title());
 
             this.destroy.connect((source) => presentation_controller.quit());
 
