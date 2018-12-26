@@ -114,6 +114,11 @@ namespace pdfpc.Metadata {
         private int _font_size = -1;
         public int font_size { get { return _font_size; } set { _font_size = value; } }
 
+        public bool is_ready {
+            get {
+                return (this.document != null);
+            }
+        }
 
         /**
          * A file to read additional notes from
@@ -292,7 +297,9 @@ namespace pdfpc.Metadata {
          * Called on quit
          */
         public void quit() {
-            this.save_to_disk();
+            if (this.is_ready) {
+                this.save_to_disk();
+            }
             foreach (var mapping in this.action_mapping) {
                 mapping.deactivate();
             }
@@ -768,6 +775,17 @@ namespace pdfpc.Metadata {
          */
         public Poppler.Document get_document() {
             return this.document;
+        }
+
+        /**
+         * Return the PDF title
+         */
+        public string get_title() {
+            if (this.document != null) {
+                return this.document.get_title();
+            } else {
+                return "";
+            }
         }
 
         /**
