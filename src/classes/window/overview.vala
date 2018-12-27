@@ -155,7 +155,6 @@ namespace pdfpc.Window {
             this.slides_view.show();
             this.add(this.slides_view);
 
-            this.slides_view.motion_notify_event.connect(this.presenter.on_mouse_move);
             this.slides_view.motion_notify_event.connect(this.on_mouse_move);
             this.slides_view.button_release_event.connect(this.on_mouse_release);
             this.slides_view.key_press_event.connect(this.on_key_press);
