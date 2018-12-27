@@ -48,6 +48,9 @@ bind t                  toggleToolbox
 # Exit
 bind C+q                quit
 
+# Exit
+bind C+r                reload
+
 # Presentation state
 bind b                  blank
 bind f                  freeze
