@@ -924,6 +924,7 @@ namespace pdfpc {
             add_action("toggleToolbox", this.toggle_toolbox);
 
             add_action("exitState", this.exit_state);
+            add_action("reload", this.reload);
             add_action("quit", this.quit);
         }
 
@@ -982,6 +983,7 @@ namespace pdfpc {
                 "toggleDrawings", "Toggle all drawings on all slides",
                 "toggleToolbox", "Toggle the toolbox",
                 "exitState", "Exit \"special\" state (pause, freeze, blank)",
+                "reload", "Reload the presentation",
                 "quit", "Exit pdfpc",
             };
         }
@@ -1286,6 +1288,9 @@ namespace pdfpc {
          * Go to the next slide
          */
         public void next_page() {
+            if (!this.metadata.is_ready) {
+                return;
+            }
             if (overview_shown)
                 return;
 
@@ -1650,6 +1655,9 @@ namespace pdfpc {
         }
 
         protected void toggle_overview() {
+            if (!this.metadata.is_ready) {
+                return;
+            }
             if (this.overview_shown) {
                 this.controllables_hide_overview();
             } else {
@@ -1765,6 +1773,18 @@ namespace pdfpc {
          */
         protected void reset_timer() {
             this.timer.reset();
+        }
+
+        /**
+         * Reload the presentation
+         */
+        protected void reload() {
+            var fname = this.metadata.pdf_fname;
+            if (fname != null) {
+                this.metadata.load(fname);
+                this.overview.set_n_slides(this.user_n_slides);
+                this.controllables_update();
+            }
         }
 
         protected void increase_font_size() {

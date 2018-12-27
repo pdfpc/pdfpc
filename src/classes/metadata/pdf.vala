@@ -465,7 +465,16 @@ namespace pdfpc.Metadata {
         /**
          * Base constructor taking the file url to the pdf file
          */
-        public Pdf(string pdfFilename) {
+        public Pdf(string? pdfFilename) {
+            if (pdfFilename != null) {
+                this.load(pdfFilename);
+            }
+        }
+
+        /**
+         * Actual file loading, initialization, etc
+         */
+        public void load(string pdfFilename) {
             var fname = pdfFilename;
             string cwd = GLib.Environment.get_current_dir();
             if (!GLib.Path.is_absolute(fname)) {
@@ -498,6 +507,7 @@ namespace pdfpc.Metadata {
             if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                 parse_pdfpc_file(out skip_line);
             }
+            this.user_view_indexes = new int [0];
             this.document = this.open_pdf_document(this.pdf_fname);
 
             // Get maximal page dimensions

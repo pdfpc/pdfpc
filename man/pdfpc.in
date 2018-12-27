@@ -221,6 +221,9 @@ below)
 .B Ctrl + e
 Define end slide
 .TP
+.B Ctrl + r
+Reload the presentation (e.g., if the PDF file has been updated)
+.TP
 .B Ctrl + q
 Exit pdfpc
 .P
