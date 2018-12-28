@@ -100,6 +100,14 @@ namespace pdfpc.Renderer.Cache {
 
             return surface;
         }
+
+        /**
+         * Invalidate the cache
+         */
+        public override void invalidate() {
+            uint size = this.metadata.get_slide_count();
+            this.storage = new PNG.Item[size];
+        }
     }
 }
 

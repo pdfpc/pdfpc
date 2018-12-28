@@ -55,5 +55,13 @@ namespace pdfpc.Renderer.Cache {
         public override Cairo.ImageSurface? retrieve( uint index ) {
             return this.storage[index];
         }
+
+        /**
+         * Invalidate the cache
+         */
+        public override void invalidate() {
+            uint size = this.metadata.get_slide_count();
+            this.storage = new Cairo.ImageSurface[size];
+        }
     }
 }
