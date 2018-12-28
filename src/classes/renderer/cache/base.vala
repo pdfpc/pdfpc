@@ -64,6 +64,11 @@ namespace pdfpc.Renderer.Cache {
          * If no item with the given index is available null is returned
          */
         public abstract Cairo.ImageSurface? retrieve(uint index);
+
+        /**
+         * Invalidate the whole cache (if the document is reloaded/changed)
+         */
+        public abstract void invalidate();
     }
 
     /**
