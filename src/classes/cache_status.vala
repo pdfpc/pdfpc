@@ -72,5 +72,13 @@ namespace pdfpc {
                 this.update();
             });
         }
+
+        /**
+         * Reset the stats
+         */
+        public void reset() {
+            this.max_value = 0;
+            this.current_value = 0;
+        }
     }
 }
