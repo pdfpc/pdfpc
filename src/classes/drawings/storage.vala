@@ -50,6 +50,11 @@ namespace pdfpc.Drawings.Storage {
          * The returned reference can be modified without modifying the storage.
          */
         public abstract Cairo.ImageSurface? retrieve(uint index);
+
+        /**
+         * Clear the storage
+         */
+        public abstract void clear();
     }
 
     public class MemoryUncompressed : Drawings.Storage.Base {
@@ -77,6 +82,10 @@ namespace pdfpc.Drawings.Storage {
             Cairo.ImageSurface? result = storage[index];
             storage[index] = null;
             return result;
+        }
+
+        public override void clear() {
+            storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
         }
     }
 
