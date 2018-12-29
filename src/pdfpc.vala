@@ -42,13 +42,6 @@ namespace pdfpc {
         private PresentationController controller;
 
         /**
-         * CacheStatus widget, which coordinates all the information about
-         * cached slides to provide a visual feedback to the user about the
-         * rendering state
-         */
-        private CacheStatus cache_status;
-
-        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
@@ -206,30 +199,6 @@ namespace pdfpc {
         }
 
         /**
-         * Create and return a PresenterWindow using the specified monitor
-         * while displaying the given file
-         */
-        private Window.Presenter create_presenter(int monitor) {
-            var presenter = new Window.Presenter(this.controller, monitor);
-            presenter.set_cache_observer(this.cache_status);
-
-            return presenter;
-        }
-
-        /**
-         * Create and return a PresentationWindow using the specified monitor
-         * while displaying the given file
-         */
-        private Window.Presentation create_presentation(int monitor,
-            int width = -1, int height = -1) {
-            var presentation = new Window.Presentation(this.controller, monitor,
-                width, height);
-            presentation.set_cache_observer(this.cache_status);
-
-            return presentation;
-        }
-
-        /**
          * Main application function, which instantiates the windows and
          * initializes the Gtk system.
          */
@@ -344,11 +313,10 @@ namespace pdfpc {
 
             var metadata = new Metadata.Pdf(pdfFilename);
 
-            // Initialize global controller and CacheStatus, to manage
+            // Initialize global controller to manage
             // crosscutting concerns between the different windows.
             this.controller = new PresentationController();
             this.controller.metadata = metadata;
-            this.cache_status = new CacheStatus();
 
             set_styling();
 
@@ -376,12 +344,13 @@ namespace pdfpc {
 
             if (!Options.single_screen || !Options.display_switch) {
                 this.controller.presenter =
-                    this.create_presenter(presenter_monitor);
+                    new Window.Presenter(this.controller, presenter_monitor);
+
             }
             if (!Options.single_screen || Options.display_switch) {
                 this.controller.presentation =
-                    this.create_presentation(presentation_monitor,
-                        width, height);
+                    new Window.Presentation(this.controller,
+                        presentation_monitor, width, height);
             }
 
             // The windows are always displayed at last to be sure all caches

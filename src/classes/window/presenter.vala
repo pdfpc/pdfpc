@@ -279,6 +279,7 @@ namespace pdfpc.Window {
 
             this.destroy.connect((source) => presentation_controller.quit());
 
+            this.presentation_controller.reload_request.connect(this.on_reload);
             this.presentation_controller.update_request.connect(this.update);
             this.presentation_controller.edit_note_request.connect(this.edit_note);
             this.presentation_controller.ask_goto_page_request.connect(this.ask_goto_page);
@@ -669,6 +670,8 @@ namespace pdfpc.Window {
             full_overlay.set_overlay_pass_through(this.toolbox_container, true);
 
             this.add(full_overlay);
+
+            this.set_cache_observer(this.presentation_controller.cache_status);
         }
 
         public override void show() {
@@ -769,6 +772,18 @@ namespace pdfpc.Window {
             scale_button.set_value(controller.get_pen_size());
             scale_button.set_child_visible(controller.is_pen_active() ||
                 controller.is_eraser_active());
+        }
+
+        /**
+         * Called on document reload. Currently, only re-enables the cache
+         * progress indicator, but in principle the document geometry may
+         * change; TODO
+         */
+        public void on_reload() {
+            if (!Options.disable_caching) {
+                this.prerender_progress.set_fraction(0);
+                this.prerender_progress.opacity = 1;
+            }
         }
 
         public void update() {

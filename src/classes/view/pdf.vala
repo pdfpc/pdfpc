@@ -120,6 +120,8 @@ namespace pdfpc {
 
             this.current_slide_number = 0;
 
+            presentation_controller.reload_request.connect(this.rebuild_cache);
+
             // Render the initial page on first realization.
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
             this.realize.connect(() => {
@@ -359,6 +361,18 @@ namespace pdfpc {
             // We are the only ones drawing on this context skip everything
             // else.
             return true;
+        }
+
+        /**
+         * Clear the current cache and begin building it anew
+         */
+        protected void rebuild_cache() {
+            if (this.renderer.cache != null) {
+                this.renderer.cache.invalidate();
+                if (renderer.cache.allows_prerendering()) {
+                    this.register_prerendering();
+                }
+            }
         }
     }
 }
