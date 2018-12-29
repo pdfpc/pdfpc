@@ -83,6 +83,8 @@ namespace pdfpc.Window {
             this.scroll_event.connect(this.presentation_controller.scroll);
 
             this.presentation_controller.register_controllable(this);
+
+            this.set_cache_observer(this.presentation_controller.cache_status);
         }
 
         /**
