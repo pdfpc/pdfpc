@@ -36,7 +36,7 @@ namespace pdfpc.Window {
         /**
          * The registered PresentationController
          */
-        public PresentationController presentation_controller {
+        public PresentationController controller {
             get; protected set;
         }
 
@@ -45,7 +45,7 @@ namespace pdfpc.Window {
          */
         protected Metadata.Pdf metadata {
             get {
-                return this.presentation_controller.metadata;
+                return this.controller.metadata;
             }
         }
 

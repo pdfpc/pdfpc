@@ -256,10 +256,10 @@ namespace pdfpc.Window {
             // is active
             var popup = button.get_popup();
             popup.show.connect(() => {
-                this.presentation_controller.set_ignore_input_events(true);
+                this.controller.set_ignore_input_events(true);
             });
             popup.hide.connect(() => {
-                this.presentation_controller.set_ignore_input_events(false);
+                this.controller.set_ignore_input_events(false);
             });
 
             return button;
@@ -268,25 +268,25 @@ namespace pdfpc.Window {
        /**
          * Base constructor instantiating a new presenter window
          */
-        public Presenter(PresentationController presentation_controller,
+        public Presenter(PresentationController controller,
             int screen_num) {
             base(screen_num);
 
-            this.presentation_controller = presentation_controller;
+            this.controller = controller;
 
             this.role = "presenter";
             this.title = "pdfpc - presenter (%s)".printf(metadata.get_title());
 
-            this.destroy.connect((source) => presentation_controller.quit());
+            this.destroy.connect((source) => controller.quit());
 
-            this.presentation_controller.reload_request.connect(this.on_reload);
-            this.presentation_controller.update_request.connect(this.update);
-            this.presentation_controller.edit_note_request.connect(this.edit_note);
-            this.presentation_controller.ask_goto_page_request.connect(this.ask_goto_page);
-            this.presentation_controller.show_overview_request.connect(this.show_overview);
-            this.presentation_controller.hide_overview_request.connect(this.hide_overview);
-            this.presentation_controller.increase_font_size_request.connect(this.increase_font_size);
-            this.presentation_controller.decrease_font_size_request.connect(this.decrease_font_size);
+            this.controller.reload_request.connect(this.on_reload);
+            this.controller.update_request.connect(this.update);
+            this.controller.edit_note_request.connect(this.edit_note);
+            this.controller.ask_goto_page_request.connect(this.ask_goto_page);
+            this.controller.show_overview_request.connect(this.show_overview);
+            this.controller.hide_overview_request.connect(this.hide_overview);
+            this.controller.increase_font_size_request.connect(this.increase_font_size);
+            this.controller.decrease_font_size_request.connect(this.decrease_font_size);
 
             // We need the value of 90% height a lot of times. Therefore store it
             // in advance
@@ -371,7 +371,7 @@ namespace pdfpc.Window {
             }
 
             // The countdown timer is centered in the 90% bottom part of the screen
-            this.timer = this.presentation_controller.getTimer();
+            this.timer = this.controller.getTimer();
             this.timer.name = "timer";
             this.timer.get_style_context().add_class("bottomText");
             this.timer.set_justify(Gtk.Justification.CENTER);
@@ -424,9 +424,9 @@ namespace pdfpc.Window {
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.add_events(Gdk.EventMask.SCROLL_MASK);
 
-            this.key_press_event.connect(this.presentation_controller.key_press);
-            this.button_press_event.connect(this.presentation_controller.button_press);
-            this.scroll_event.connect(this.presentation_controller.scroll);
+            this.key_press_event.connect(this.controller.key_press);
+            this.button_press_event.connect(this.controller.button_press);
+            this.scroll_event.connect(this.controller.scroll);
 
             // resize the bottom text based on the window height
             // (see http://stackoverflow.com/a/35237445/730138)
@@ -444,12 +444,12 @@ namespace pdfpc.Window {
                 GLib.printerr("Warning: failed to set CSS for auto-sized bottom controls.\n");
             }
 
-            this.overview = new Overview(this.presentation_controller);
+            this.overview = new Overview(this.controller);
             this.overview.vexpand = true;
             this.overview.hexpand = true;
-            this.overview.set_n_slides(this.presentation_controller.user_n_slides);
-            this.presentation_controller.set_overview(this.overview);
-            this.presentation_controller.register_controllable(this);
+            this.overview.set_n_slides(this.controller.user_n_slides);
+            this.controller.set_overview(this.overview);
+            this.controller.register_controllable(this);
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if (!Options.disable_caching) {
@@ -617,50 +617,50 @@ namespace pdfpc.Window {
 
             tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.set_normal_mode();
+		    this.controller.set_normal_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.set_pointer_mode();
+		    this.controller.set_pointer_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.set_pen_mode();
+		    this.controller.set_pen_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.set_eraser_mode();
+		    this.controller.set_eraser_mode();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.toggle_freeze();
+		    this.controller.toggle_freeze();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "blank.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.fade_to_black();
+		    this.controller.fade_to_black();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "hidden.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.hide_presentation();
+		    this.controller.hide_presentation();
 		});
             tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg");
             tb.clicked.connect(() => {
-		    this.presentation_controller.toggle_pause();
+		    this.controller.toggle_pause();
 		});
 
             scale_button = add_toolbox_sbutton(button_panel, tbox_inverse,
                 "linewidth.svg");
             scale_button.set_child_visible(false);
             scale_button.value_changed.connect((val) => {
-                this.presentation_controller.set_pen_size(val);
+                this.controller.set_pen_size(val);
             });
 
             color_button = add_toolbox_cbutton(button_panel, tbox_inverse);
             color_button.set_child_visible(false);
             color_button.color_set.connect(() => {
                     var rgba = color_button.rgba;
-                    this.presentation_controller.pen_drawing.pen.set_rgba(rgba);
-                    this.presentation_controller.queue_pen_surface_draws();
+                    this.controller.pen_drawing.pen.set_rgba(rgba);
+                    this.controller.queue_pen_surface_draws();
 		});
 
             this.toolbox_container = new Gtk.Fixed();
@@ -671,7 +671,7 @@ namespace pdfpc.Window {
 
             this.add(full_overlay);
 
-            this.set_cache_observer(this.presentation_controller.cache_status);
+            this.set_cache_observer(this.controller.cache_status);
         }
 
         public override void show() {
@@ -753,7 +753,7 @@ namespace pdfpc.Window {
          */
         protected void update_slide_count() {
             int current_user_slide_number =
-                this.presentation_controller.current_user_slide_number;
+                this.controller.current_user_slide_number;
             this.custom_slide_count(current_user_slide_number + 1);
         }
 
@@ -765,7 +765,7 @@ namespace pdfpc.Window {
         protected void update_toolbox() {
             toolbox.set_child_visible(Options.toolbox_shown);
 
-            var controller = this.presentation_controller;
+            var controller = this.controller;
 
             var rgba = controller.pen_drawing.pen.get_rgba();
             color_button.set_rgba(rgba);
@@ -792,18 +792,18 @@ namespace pdfpc.Window {
             if (!metadata.is_ready) {
                 return;
             }
-            int current_slide_number = this.presentation_controller.current_slide_number;
-            int current_user_slide_number = this.presentation_controller.current_user_slide_number;
+            int current_slide_number = this.controller.current_slide_number;
+            int current_user_slide_number = this.controller.current_user_slide_number;
             try {
                 this.current_view.display(current_slide_number, true);
                 this.next_view.display(this.metadata.user_slide_to_real_slide(
                     current_user_slide_number + 1), true);
-                if (this.presentation_controller.skip_next()) {
+                if (this.controller.skip_next()) {
                     this.strict_next_view.display(current_slide_number + 1, true);
                 } else {
                     this.strict_next_view.fade_to_black();
                 }
-                if (this.presentation_controller.skip_previous()) {
+                if (this.controller.skip_previous()) {
                     this.strict_prev_view.display(current_slide_number - 1, true);
                 } else {
                     this.strict_prev_view.fade_to_black();
@@ -820,34 +820,34 @@ namespace pdfpc.Window {
             } else {
                 this.pause_icon.hide();
             }
-            if (this.presentation_controller.faded_to_black) {
+            if (this.controller.faded_to_black) {
                 this.blank_icon.show();
             } else {
                 this.blank_icon.hide();
             }
-            if (this.presentation_controller.hidden) {
+            if (this.controller.hidden) {
                 this.hidden_icon.show();
                 // Ensure the presenter window remains focused
                 this.present();
             } else {
                 this.hidden_icon.hide();
             }
-            if (this.presentation_controller.frozen) {
+            if (this.controller.frozen) {
                 this.frozen_icon.show();
             } else {
                 this.frozen_icon.hide();
             }
-            if (this.presentation_controller.is_pointer_active()) {
+            if (this.controller.is_pointer_active()) {
                 this.highlight_icon.show();
             } else {
                 this.highlight_icon.hide();
             }
-            if (this.presentation_controller.is_eraser_active()) {
+            if (this.controller.is_eraser_active()) {
                 this.eraser_icon.show();
             } else {
                 this.eraser_icon.hide();
             }
-            if (this.presentation_controller.is_pen_active()) {
+            if (this.controller.is_pen_active()) {
                 this.pen_icon.show();
             } else {
                 this.pen_icon.hide();
@@ -886,11 +886,11 @@ namespace pdfpc.Window {
                 return;
             }
 
-            this.slide_progress.set_text("/%u".printf(this.presentation_controller.user_n_slides));
+            this.slide_progress.set_text("/%u".printf(this.controller.user_n_slides));
             this.slide_progress.sensitive = true;
             this.slide_progress.grab_focus();
             this.slide_progress.set_position(0);
-            this.presentation_controller.set_ignore_input_events(true);
+            this.controller.set_ignore_input_events(true);
         }
 
         /**
@@ -902,9 +902,9 @@ namespace pdfpc.Window {
                 string input_text = this.slide_progress.text;
                 int destination = int.parse(input_text.substring(0, input_text.index_of("/")));
                 this.slide_progress.sensitive = false;
-                this.presentation_controller.set_ignore_input_events(false);
+                this.controller.set_ignore_input_events(false);
                 if (destination != 0)
-                    this.presentation_controller.goto_user_page(destination);
+                    this.controller.goto_user_page(destination);
                 else
                     this.update_slide_count(); // Reset the display we had before
                 return true;
@@ -931,7 +931,7 @@ namespace pdfpc.Window {
             }
 
             // Disallow editing notes imported from PDF annotations
-            int number = this.presentation_controller.current_user_slide_number;
+            int number = this.controller.current_user_slide_number;
             if (this.metadata.get_notes().is_note_read_only(number)) {
                 blink_lock_icon();
                 return;
@@ -940,7 +940,7 @@ namespace pdfpc.Window {
             this.notes_view.editable = true;
             this.notes_view.cursor_visible = true;
             this.notes_view.grab_focus();
-            this.presentation_controller.set_ignore_input_events(true);
+            this.controller.set_ignore_input_events(true);
         }
 
         /**
@@ -951,8 +951,8 @@ namespace pdfpc.Window {
                 this.notes_view.editable = false;
                 this.notes_view.cursor_visible = false;
                 this.metadata.get_notes().set_note(this.notes_view.buffer.text,
-                    this.presentation_controller.current_user_slide_number);
-                this.presentation_controller.set_ignore_input_events(false);
+                    this.controller.current_user_slide_number);
+                this.controller.set_ignore_input_events(false);
                 return true;
             } else {
                 return false;
@@ -964,7 +964,7 @@ namespace pdfpc.Window {
          */
         protected void update_note() {
             string this_note = this.metadata.get_notes().get_note_for_slide(
-                this.presentation_controller.current_user_slide_number);
+                this.controller.current_user_slide_number);
             this.notes_view.buffer.text = this_note;
         }
 
@@ -974,7 +974,7 @@ namespace pdfpc.Window {
                 return;
             }
 
-            this.overview.current_slide = this.presentation_controller.current_user_slide_number;
+            this.overview.current_slide = this.controller.current_user_slide_number;
             this.slide_stack.set_visible_child_name("overview");
             this.overview.ensure_focus();
         }
