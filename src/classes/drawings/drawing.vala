@@ -153,6 +153,13 @@ namespace pdfpc.Drawings {
                 this.current_slide = slide_number;
             }
         }
+
+        /*
+         * Clear the storage.
+         */
+        public void clear_storage() {
+            this.storage.clear();
+        }
     }
 
     public Drawing create(Metadata.Pdf metadata, int width, int height) {
