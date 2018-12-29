@@ -668,13 +668,13 @@ namespace pdfpc.Metadata {
          * The user slide corresponding to a real slide.
          *
          * If number is larger than the number of real slides return the
-         * number of user slides.
+         * last user slide.
          */
         public int real_slide_to_user_slide(int number) {
 
             // is this not a valid page?
             if (number > this.page_count) {
-                return (int)this.get_user_slide_count();
+                return (int)this.get_user_slide_count() - 1;
             }
 
             // is number a real page of the last user page?
