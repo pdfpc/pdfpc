@@ -1803,11 +1803,20 @@ namespace pdfpc {
                     this.controllables_hide_overview();
                 }
 
+                var position_saved = this.current_slide_number;
                 this.metadata.load(fname);
+                if (this.n_slides == 0) {
+                    return;
+                }
 
-                this.current_user_slide_number =
-                    this.metadata.real_slide_to_user_slide(
-                        this.current_slide_number);
+                // Make sure the current position remains valid
+                if (position_saved >= this.n_slides) {
+                    this.current_slide_number = (int) this.n_slides - 1;
+                    this.current_user_slide_number =
+                        this.metadata.real_slide_to_user_slide(
+                            this.current_slide_number);
+                }
+
                 this.overview.set_n_slides(this.user_n_slides);
                 this.cache_status.reset();
                 this.reload_request();
