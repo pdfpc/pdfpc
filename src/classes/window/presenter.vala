@@ -904,7 +904,7 @@ namespace pdfpc.Window {
                 this.slide_progress.sensitive = false;
                 this.controller.set_ignore_input_events(false);
                 if (destination != 0)
-                    this.controller.goto_user_page(destination);
+                    this.controller.goto_user_page(destination - 1);
                 else
                     this.update_slide_count(); // Reset the display we had before
                 return true;
