@@ -752,7 +752,9 @@ namespace pdfpc.Window {
          * Update the slide count view
          */
         protected void update_slide_count() {
-            this.custom_slide_count(this.metadata.real_slide_to_user_slide(this.presentation_controller.current_slide_number) + 1);
+            int current_user_slide_number =
+                this.presentation_controller.current_user_slide_number;
+            this.custom_slide_count(current_user_slide_number + 1);
         }
 
         public void custom_slide_count(int current) {
