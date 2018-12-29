@@ -339,7 +339,7 @@ namespace pdfpc.Window {
                     break;
                 case 0xff0d: /* Return */
                     bool gotoFirst = (key.state & Gdk.ModifierType.SHIFT_MASK) != 0;
-                    this.controller.goto_user_page(this.current_slide + 1, !gotoFirst);
+                    this.controller.goto_user_page(this.current_slide, !gotoFirst);
                     handled = true;
                     break;
             }
@@ -367,7 +367,7 @@ namespace pdfpc.Window {
         public bool on_mouse_release(Gdk.EventButton event) {
             if (event.button == 1) {
                 bool gotoFirst = (event.state & Gdk.ModifierType.SHIFT_MASK) != 0;
-                this.controller.goto_user_page(this.current_slide + 1, !gotoFirst);
+                this.controller.goto_user_page(this.current_slide, !gotoFirst);
             }
             return false;
         }

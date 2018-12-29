@@ -1610,19 +1610,19 @@ namespace pdfpc {
         }
 
         /**
-         * Goto a slide in user page numbers. page_number is 1 indexed.
+         * Goto a slide in user page numbers
          */
         public void goto_user_page(int page_number, bool useLast = true) {
             this.timer.start();
 
-            if (this.current_user_slide_number != page_number - 1) {
+            if (this.current_user_slide_number != page_number) {
                 this.push_history();
             }
 
             this.controllables_hide_overview();
-            int destination = page_number - 1;
+            int destination = page_number;
             int n_user_slides = this.metadata.get_user_slide_count();
-            if (page_number < 1) {
+            if (page_number < 0) {
                 destination = 0;
             } else if (page_number >= n_user_slides) {
                 destination = n_user_slides - 1;
