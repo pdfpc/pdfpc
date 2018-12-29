@@ -111,7 +111,7 @@ namespace pdfpc {
          * Default constructor restricted to Pdf renderers as input parameter
          */
         public Pdf(Renderer.Pdf renderer, bool clickable_links,
-            PresentationController presentation_controller, int gdk_scale_factor) {
+            PresentationController controller, int gdk_scale_factor) {
             this.renderer = renderer;
             this.gdk_scale = gdk_scale_factor;
 
@@ -120,7 +120,7 @@ namespace pdfpc {
 
             this.current_slide_number = 0;
 
-            presentation_controller.reload_request.connect(this.rebuild_cache);
+            controller.reload_request.connect(this.rebuild_cache);
 
             // Render the initial page on first realization.
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
@@ -163,8 +163,8 @@ namespace pdfpc {
             int width, int height, Metadata.Area area,
             bool clickable_links,
             out Gdk.Rectangle scale_rect = null) {
-            var presentation_controller = window.presentation_controller;
-            var metadata = presentation_controller.metadata;
+            var controller = window.controller;
+            var metadata = controller.metadata;
             var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
             scale_rect = scaler.scale_to(width, height);
 
@@ -173,7 +173,7 @@ namespace pdfpc {
 
             var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
 
-            this(renderer, clickable_links, presentation_controller, window.gdk_scale);
+            this(renderer, clickable_links, controller, window.gdk_scale);
         }
 
         /**

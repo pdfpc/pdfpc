@@ -43,7 +43,7 @@ namespace pdfpc.Window {
          */
         protected Metadata.Pdf metadata {
             get {
-                return this.presentation_controller.metadata;
+                return this.controller.metadata;
             }
         }
 
@@ -77,14 +77,14 @@ namespace pdfpc.Window {
         /**
          * The presentation controller
          */
-        protected PresentationController presentation_controller;
+        protected PresentationController controller;
 
         /**
          * The presenter
          */
         protected Presenter presenter {
             get {
-                return this.presentation_controller.presenter;
+                return this.controller.presenter;
             }
         }
 
@@ -133,8 +133,8 @@ namespace pdfpc.Window {
         /**
          * Constructor
          */
-        public Overview(PresentationController presentation_controller) {
-            this.presentation_controller = presentation_controller;
+        public Overview(PresentationController controller) {
+            this.controller = controller;
 
             this.get_style_context().add_class("overviewWindow");
 
@@ -339,7 +339,7 @@ namespace pdfpc.Window {
                     break;
                 case 0xff0d: /* Return */
                     bool gotoFirst = (key.state & Gdk.ModifierType.SHIFT_MASK) != 0;
-                    this.presentation_controller.goto_user_page(this.current_slide + 1, !gotoFirst);
+                    this.controller.goto_user_page(this.current_slide + 1, !gotoFirst);
                     handled = true;
                     break;
             }
@@ -367,7 +367,7 @@ namespace pdfpc.Window {
         public bool on_mouse_release(Gdk.EventButton event) {
             if (event.button == 1) {
                 bool gotoFirst = (event.state & Gdk.ModifierType.SHIFT_MASK) != 0;
-                this.presentation_controller.goto_user_page(this.current_slide + 1, !gotoFirst);
+                this.controller.goto_user_page(this.current_slide + 1, !gotoFirst);
             }
             return false;
         }

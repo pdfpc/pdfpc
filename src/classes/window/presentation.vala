@@ -47,17 +47,17 @@ namespace pdfpc.Window {
         /**
          * Base constructor instantiating a new presentation window
          */
-        public Presentation(PresentationController presentation_controller,
+        public Presentation(PresentationController controller,
             int screen_num, int width = -1, int height = -1) {
             base(screen_num, width, height);
-            this.presentation_controller = presentation_controller;
+            this.controller = controller;
 
             this.role = "presentation";
             this.title = "pdfpc - presentation (%s)".printf(metadata.get_title());
 
-            this.destroy.connect((source) => presentation_controller.quit());
+            this.destroy.connect((source) => controller.quit());
 
-            this.presentation_controller.update_request.connect(this.update);
+            this.controller.update_request.connect(this.update);
 
             Gdk.Rectangle scale_rect;
             this.view = new View.Pdf.from_fullscreen(this,
@@ -78,13 +78,13 @@ namespace pdfpc.Window {
 
             this.add(overlay_layout);
 
-            this.key_press_event.connect(this.presentation_controller.key_press);
-            this.button_press_event.connect(this.presentation_controller.button_press);
-            this.scroll_event.connect(this.presentation_controller.scroll);
+            this.key_press_event.connect(this.controller.key_press);
+            this.button_press_event.connect(this.controller.button_press);
+            this.scroll_event.connect(this.controller.scroll);
 
-            this.presentation_controller.register_controllable(this);
+            this.controller.register_controllable(this);
 
-            this.set_cache_observer(this.presentation_controller.cache_status);
+            this.set_cache_observer(this.controller.cache_status);
         }
 
         /**
@@ -92,27 +92,27 @@ namespace pdfpc.Window {
          * other observed events
          */
         public void set_controller(PresentationController controller) {
-            this.presentation_controller = controller;
+            this.controller = controller;
         }
 
         /**
          * Update the display
          */
         public void update() {
-            this.visible = !this.presentation_controller.hidden;
+            this.visible = !this.controller.hidden;
 
-            if (this.presentation_controller.faded_to_black) {
+            if (this.controller.faded_to_black) {
                 this.view.fade_to_black();
                 return;
             }
-            if (this.presentation_controller.frozen)
+            if (this.controller.frozen)
                 return;
 
             try {
-                this.view.display(this.presentation_controller.current_slide_number, true);
+                this.view.display(this.controller.current_slide_number, true);
             } catch (Renderer.RenderError e) {
                 GLib.printerr("The pdf page %d could not be rendered: %s\n",
-                    this.presentation_controller.current_slide_number, e.message );
+                    this.controller.current_slide_number, e.message );
                 Process.exit(1);
             }
         }

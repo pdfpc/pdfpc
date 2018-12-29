@@ -32,7 +32,7 @@ namespace pdfpc {
         /**
          * The registered PresentationController
          */
-        public abstract PresentationController presentation_controller { get; protected set; }
+        public abstract PresentationController controller { get; protected set; }
 
         /**
          * The view on which links and annotations should be handled.
