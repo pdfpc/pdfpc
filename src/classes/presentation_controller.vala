@@ -1795,7 +1795,15 @@ namespace pdfpc {
         protected void reload() {
             var fname = this.metadata.pdf_fname;
             if (fname != null) {
+                if (this.overview_shown) {
+                    this.controllables_hide_overview();
+                }
+
                 this.metadata.load(fname);
+
+                this.current_user_slide_number =
+                    this.metadata.real_slide_to_user_slide(
+                        this.current_slide_number);
                 this.overview.set_n_slides(this.user_n_slides);
                 this.cache_status.reset();
                 this.reload_request();
