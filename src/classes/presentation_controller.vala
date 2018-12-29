@@ -1817,6 +1817,10 @@ namespace pdfpc {
                             this.current_slide_number);
                 }
 
+                // Reset the drawing storage & clear the current drawings
+                this.pen_drawing.clear_storage();
+                this.clear_pen_drawing();
+
                 this.overview.set_n_slides(this.user_n_slides);
                 this.cache_status.reset();
                 this.reload_request();
