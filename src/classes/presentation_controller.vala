@@ -68,7 +68,11 @@ namespace pdfpc {
         /**
          * The number of slides in the presentation
          */
-        public int n_slides { get; protected set; }
+        public uint n_slides {
+            get {
+                return this.metadata.get_slide_count();
+            }
+        }
 
         /**
          * The number of user slides
@@ -204,8 +208,6 @@ namespace pdfpc {
                     this.timer = getTimerLabel(this,
                         (int) this.metadata.get_duration() * 60);
                     this.timer.reset();
-
-                    this.n_slides = (int) this.metadata.get_slide_count();
 
                     this.current_slide_number = 0;
                     this.current_user_slide_number = 0;
@@ -1341,13 +1343,15 @@ namespace pdfpc {
                 needs_update = true;
             } else {
                 // we are at the last slide
-                if (this.current_slide_number == this.n_slides - 1) {
+                if (this.current_slide_number + 1 == this.n_slides) {
                     if (Options.black_on_end && !this.faded_to_black) {
                         this.fade_to_black();
                     }
                 } else {
                     // move to the last slide, we are already at the last user slide
-                    this.current_slide_number = this.n_slides - 1;
+                    if (this.n_slides > 0) {
+                        this.current_slide_number = (int) this.n_slides - 1;
+                    }
                 }
             }
 
@@ -1374,7 +1378,7 @@ namespace pdfpc {
                 this.faded_to_black = false;
             }
 
-            if(this.current_slide_number == this.n_slides - 1) {
+            if(this.current_slide_number + 1 == this.n_slides) {
                 return;
             }
 
