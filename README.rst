@@ -61,7 +61,7 @@ Installation
 Sample presentations
 --------------------
 
-- `Simple demo <https://pdfpc.github.io/demo/pdfpc-demo.pdf>`_
+- `Simple demo <https://github.com/pdfpc/pdfpc/releases/download/v4.3.0/pdfpc-demo.pdf>`_
 - `Embedded movies <https://pdfpc.github.io/demo/pdfpc-video-example.zip>`_
 
 Try it out::
