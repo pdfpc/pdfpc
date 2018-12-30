@@ -759,11 +759,6 @@ namespace pdfpc {
                 | Gdk.EventMask.BUTTON_RELEASE_MASK
                 | Gdk.EventMask.POINTER_MOTION_MASK
             );
-
-            var w = presenter_pointer_surface.get_window();
-            if (w != null) {
-                w.set_cursor(new Gdk.Cursor.from_name(Gdk.Display.get_default(), "none"));
-            }
         }
 
         protected void init_presentation_pointer() {
@@ -785,24 +780,20 @@ namespace pdfpc {
             }
         }
 
-        public void move_pointer(double percent_x, double percent_y) {
-            pointer_y = percent_y;
-            pointer_x = percent_x;
+        /**
+         * Handle mouse scrolling events on the window and, if neccessary send
+         * them to the presentation controller
+         */
+        protected bool on_move_pointer(Gtk.Widget source, Gdk.EventMotion move) {
+            pointer_x = move.x/presenter_allocation.width;
+            pointer_y = move.y/presenter_allocation.height;
             if (presenter != null) {
                 presenter_pointer_surface.queue_draw();
             }
             if (presentation != null) {
                 presentation_pointer_surface.queue_draw();
             }
-        }
-
-        /**
-         * Handle mouse scrolling events on the window and, if neccessary send
-         * them to the presentation controller
-         */
-        protected bool on_move_pointer(Gtk.Widget source, Gdk.EventMotion move) {
-            move_pointer(move.x / (double) presenter_allocation.width, move.y / (double) presenter_allocation.height);
-            update_highlight(move.x/presenter_allocation.width, move.y/presenter_allocation.height);
+            update_highlight(pointer_x, pointer_y);
             return true;
         }
 
