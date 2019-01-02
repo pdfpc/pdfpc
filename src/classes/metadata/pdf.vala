@@ -294,15 +294,23 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Deactivate all active mappings
+         */
+        private void deactivate_mappings() {
+            foreach (var mapping in this.action_mapping) {
+                mapping.deactivate();
+            }
+            this.action_mapping.clear();
+        }
+
+        /**
          * Called on quit
          */
         public void quit() {
             if (this.is_ready) {
                 this.save_to_disk();
             }
-            foreach (var mapping in this.action_mapping) {
-                mapping.deactivate();
-            }
+            this.deactivate_mappings();
         }
 
         /**
@@ -493,7 +501,11 @@ namespace pdfpc.Metadata {
 
             this.url = File.new_for_commandline_arg(fname).get_uri();
 
-            this.action_mapping = new Gee.ArrayList<ActionMapping>();
+            if (this.action_mapping != null) {
+                this.deactivate_mappings();
+            } else {
+                this.action_mapping = new Gee.ArrayList<ActionMapping>();
+            }
 
             this.notes_position = NotesPosition.from_string(Options.notes_position);
 
@@ -863,9 +875,7 @@ namespace pdfpc.Metadata {
          */
         public unowned Gee.List<ActionMapping> get_action_mapping(int page_num) {
             if (page_num != this.mapping_page_num) {
-                foreach (var mapping in this.action_mapping) {
-                    mapping.deactivate();
-                }
+                this.deactivate_mappings();
                 this.action_mapping.clear();
 
                 GLib.List<Poppler.LinkMapping> link_mappings;
