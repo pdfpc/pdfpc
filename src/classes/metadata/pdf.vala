@@ -876,7 +876,6 @@ namespace pdfpc.Metadata {
         public unowned Gee.List<ActionMapping> get_action_mapping(int page_num) {
             if (page_num != this.mapping_page_num) {
                 this.deactivate_mappings();
-                this.action_mapping.clear();
 
                 GLib.List<Poppler.LinkMapping> link_mappings;
                 link_mappings = this.get_document().get_page(page_num).get_link_mapping();
