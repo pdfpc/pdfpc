@@ -247,6 +247,22 @@ namespace pdfpc {
         protected delegate void callback_with_parameter(GLib.Variant? parameter);
         protected SimpleActionGroup action_group = new SimpleActionGroup();
 
+        protected class ActionDescription : GLib.Object {
+            public string name { get; set; }
+            public string description { get; set; }
+            public string arg_name { get; set; }
+
+            public ActionDescription(string name, string description,
+                string? arg_name = null) {
+                this.name = name;
+                this.description = description;
+                this.arg_name = arg_name;
+            }
+        }
+
+        protected Gee.ArrayList<ActionDescription> action_descriptions =
+            new Gee.ArrayList<ActionDescription>();
+
         protected class KeyDef : GLib.Object, Gee.Hashable<KeyDef> {
             public uint keycode { get; set; }
             public uint modMask { get; set; }
@@ -278,9 +294,11 @@ namespace pdfpc {
             }
         }
 
-        protected Gee.HashMap<KeyDef, ActionAndParameter> keyBindings = new Gee.HashMap<KeyDef, ActionAndParameter>();
+        protected Gee.HashMap<KeyDef, ActionAndParameter> keyBindings =
+            new Gee.HashMap<KeyDef, ActionAndParameter>();
         // We abuse the KeyDef structure
-        protected Gee.HashMap<KeyDef, ActionAndParameter> mouseBindings = new Gee.HashMap<KeyDef, ActionAndParameter>();
+        protected Gee.HashMap<KeyDef, ActionAndParameter> mouseBindings =
+            new Gee.HashMap<KeyDef, ActionAndParameter>();
 
         /*
          * "Main" view of current slide
@@ -882,117 +900,129 @@ namespace pdfpc {
         }
 
         protected void add_actions() {
-            add_action_with_parameter("switchMode", GLib.VariantType.STRING,
-                this.set_mode_to_string);
-            add_action("clearDrawing", this.clear_pen_drawing);
-            add_action("toggleDrawings", this.toggle_drawings);
+            add_action("next", this.next_page,
+                "Go to the next slide");
+            add_action("next10", this.jump10,
+                "Jump 10 slides forward");
+            add_action("lastOverlay", this.jump_to_last_overlay,
+                "Jump to the last overlay of the current slide");
+            add_action("nextOverlay", this.next_user_page,
+                "Jump forward outside of the current overlay");
+            add_action("prev", this.previous_page,
+                "Go to the previous slide");
+            add_action("prev10", this.back10,
+                "Jump 10 slides back");
+            add_action("firstOverlay", this.jump_to_first_overlay,
+                "Jump to the first overlay of the current slide");
+            add_action("prevOverlay", this.previous_user_page,
+                "Jump back outside of the current overlay");
 
-            add_action_with_parameter("setPenColor", GLib.VariantType.STRING,
-                this.set_pen_color_to_string);
+            add_action("goto", this.controllables_ask_goto_page,
+                "Ask for a page to jump to");
+            add_action("gotoFirst", this.goto_first,
+                "Jump to the first slide");
+            add_action("gotoLast", this.goto_last,
+                "Jump to the last slide");
+            add_action("nextUnseen", this.next_unseen,
+                "Jump to the next unseen slide");
+            add_action("prevSeen", this.previous_seen,
+                "Jump to the last previously seen slide");
+            add_action("overview", this.toggle_overview,
+                "Show the overview mode");
+            add_action("histBack", this.history_back,
+                "Go back in history");
 
-            add_action("next", this.next_page);
-            add_action("next10", this.jump10);
-            add_action("lastOverlay", this.jump_to_last_overlay);
-            add_action("nextOverlay", this.next_user_page);
-            add_action("prev", this.previous_page);
-            add_action("prev10", this.back10);
-            add_action("firstOverlay", this.jump_to_first_overlay);
-            add_action("prevOverlay", this.previous_user_page);
-            add_action("prevSeen", this.previous_seen);
-            add_action("nextUnseen", this.next_unseen);
+            add_action("start", this.start,
+                "Start the timer");
+            add_action("pause", this.toggle_pause,
+                "Pause the timer");
+            add_action("resetTimer", this.reset_timer,
+                "Reset the timer");
 
-            add_action("goto", this.controllables_ask_goto_page);
-            add_action("gotoFirst", this.goto_first);
-            add_action("gotoLast", this.goto_last);
-            add_action("overview", this.toggle_overview);
-            add_action("histBack", this.history_back);
-
-            add_action("start", this.start);
-            add_action("pause", this.toggle_pause);
-            add_action("resetTimer", this.reset_timer);
-
-            add_action("blank", this.fade_to_black);
-            add_action("freeze", this.toggle_freeze);
+            add_action("blank", this.fade_to_black,
+                "Blank the presentation screen");
+            add_action("hide", this.hide_presentation,
+                "Hide the presentation screen");
+            add_action("freeze", this.toggle_freeze,
+                "Toggle freeze the presentation screen");
             add_action("freezeOn", () => {
                 if (!this.frozen)
                     this.toggle_freeze();
-                });
-            add_action("hide", this.hide_presentation);
+                },
+                "Freeze the presentation screen");
 
-            add_action("overlay", this.toggle_skip);
-            add_action("note", this.controllables_edit_note);
-            add_action("endSlide", this.set_end_user_slide);
-            add_action("saveBookmark", this.set_last_saved_slide);
-            add_action("loadBookmark", this.goto_last_saved_slide);
+            add_action("overlay", this.toggle_skip,
+                "Mark the current slide as an overlay slide");
+            add_action("note", this.controllables_edit_note,
+                "Edit notes for the current slide");
+            add_action("endSlide", this.set_end_user_slide,
+                "Set the current slide as the end slide");
+            add_action("saveBookmark", this.set_last_saved_slide,
+                "Bookmark the currently displayed slide");
+            add_action("loadBookmark", this.goto_last_saved_slide,
+                "Load the bookmarked slide");
 
-            add_action("increaseSize", this.increase_size);
-            add_action("decreaseSize", this.decrease_size);
+            add_action_with_parameter("switchMode", GLib.VariantType.STRING,
+                this.set_mode_to_string,
+                "Switch annotation mode (normal|pointer|pen|eraser)", "mode");
 
-            add_action("toggleToolbox", this.toggle_toolbox);
+            add_action("increaseSize", this.increase_size,
+                "Increase the size of notes|pointer|pen|eraser");
+            add_action("decreaseSize", this.decrease_size,
+                "Decrease the size of notes|pointer|pen|eraser");
 
-            add_action("exitState", this.exit_state);
-            add_action("reload", this.reload);
-            add_action("quit", this.quit);
+            add_action_with_parameter("setPenColor", GLib.VariantType.STRING,
+                this.set_pen_color_to_string,
+                "Change the pen color", "color");
+            add_action("clearDrawing", this.clear_pen_drawing,
+                "Clear drawing on the current slide");
+            add_action("toggleDrawings", this.toggle_drawings,
+                "Toggle all drawings on all slides");
+
+            add_action("toggleToolbox", this.toggle_toolbox,
+                "Toggle the toolbox");
+
+            add_action("exitState", this.exit_state,
+                "Exit \"special\" state (pause, freeze, blank)");
+            add_action("reload", this.reload,
+                "Reload the presentation");
+            add_action("quit", this.quit,
+                "Exit pdfpc");
         }
 
-        protected void add_action(string name, callback func) {
+        protected void add_action(string name, callback func,
+            string description) {
             SimpleAction action = new SimpleAction(name, null);
-            action.activate.connect(() => func());  // Trying to connect func directly causes error.
+            action.activate.connect(() => func());
             this.action_group.add_action(action);
+            this.action_descriptions.add(new ActionDescription(name,
+                description));
         }
 
-        protected void add_action_with_parameter(string name, GLib.VariantType param_type, callback_with_parameter func) {
+        protected void add_action_with_parameter(string name,
+            GLib.VariantType param_type, callback_with_parameter func,
+            string description, string arg_name) {
             SimpleAction action = new SimpleAction(name, param_type);
             action.activate.connect((param) => func(param));
             this.action_group.add_action(action);
+            this.action_descriptions.add(new ActionDescription(name,
+                description, arg_name));
         }
 
         /**
-         * Get an array with all action names
-         *
-         * It would be more elegant to use the key property of actionNames, but
-         * we would need an instance for doing this...
+         * Get an array with all action names & descriptions
          */
-        public static string[] getActionDescriptions() {
-            return {
-                "next", "Go to the next slide",
-                "next10", "Jump 10 slides forward",
-                "lastOverlay", "Jump to the last overlay of the current slide",
-                "nextOverlay", "Jump forward outside of the current overlay",
-                "prev", "Go to the previous slide",
-                "prev10", "Jump 10 slides back",
-                "firstOverlay", "Jump to the first overlay of the current slide",
-                "prevOverlay", "Jump back outside of the current overlay",
-                "goto", "Ask for a page to jump to",
-                "gotoFirst", "Jump to the first slide",
-                "gotoLast", "Jump to the last slide",
-                "nextUnseen", "Jump to the next unseen slide",
-                "prevSeen", "Jump to the last previously seen slide",
-                "overview", "Show the overview mode",
-                "histBack", "Go back in history",
-                "start", "Start the timer",
-                "pause", "Pause the timer",
-                "resetTimer", "Reset the timer",
-                "blank", "Blank the presentation screen",
-                "hide", "Hide the presentation screen",
-                "freeze", "Toggle freeze the presentation screen",
-                "freezeOn", "Freeze the presentation screen",
-                "overlay", "Mark the current slide as an overlay slide",
-                "note", "Edit notes for the current slide",
-                "endSlide", "Set the current slide as the end slide",
-                "saveBookmark", "Bookmark the currently displayed slide",
-                "loadBookmark", "Load the bookmarked slide",
-                "switchMode <mode>", "Switch annotation mode (normal|pointer|pen|eraser)",
-                "increaseSize", "Increase the size of notes|pointer|pen|eraser",
-                "decreaseSize", "Decrease the size of notes|pointer|pen|eraser",
-                "setPenColor <color>", "Change the pen color",
-                "clearDrawing", "Clear drawing on the current slide",
-                "toggleDrawings", "Toggle all drawings on all slides",
-                "toggleToolbox", "Toggle the toolbox",
-                "exitState", "Exit \"special\" state (pause, freeze, blank)",
-                "reload", "Reload the presentation",
-                "quit", "Exit pdfpc",
-            };
+        public string[] get_action_descriptions() {
+            string[] retval = {};
+            foreach (var entry in this.action_descriptions) {
+                if (entry.arg_name != null) {
+                    retval += (entry.name + " <" + entry.arg_name + ">");
+                } else {
+                    retval += entry.name;
+                }
+                retval += entry.description;
+            }
+            return retval;
         }
 
         /**

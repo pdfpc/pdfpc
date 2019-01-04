@@ -272,26 +272,6 @@ namespace pdfpc {
 #if MOVIES
             Gst.init(ref args);
 #endif
-            if (Options.list_actions) {
-                GLib.print("Config file commands accepted by pdfpc:\n");
-                string[] actions = PresentationController.getActionDescriptions();
-                for (int i = 0; i < actions.length; i+=2) {
-                    string tabAlignment = "\t";
-                    if (actions[i].length < 12)
-                        tabAlignment += "\t";
-                    GLib.print("    %s%s=> %s\n", actions[i], tabAlignment, actions[i+1]);
-                }
-
-                return;
-            }
-            if (pdfFilename == null) {
-                GLib.printerr("No pdf file given\n");
-                Process.exit(1);
-            } else if (!GLib.FileUtils.test(pdfFilename, (GLib.FileTest.IS_REGULAR))) {
-                GLib.printerr("Pdf file \"%s\" not found\n", pdfFilename);
-                Process.exit(1);
-            }
-
             // parse size option
             // should be in the width:height format
 
@@ -311,11 +291,34 @@ namespace pdfpc {
                 Options.windowed = true;
             }
 
-            var metadata = new Metadata.Pdf(pdfFilename);
-
-            // Initialize global controller to manage
-            // crosscutting concerns between the different windows.
+            // Initialize the master controller
             this.controller = new PresentationController();
+
+            if (Options.list_actions) {
+                GLib.print("Actions supported by pdfpc:\n");
+                var actions = this.controller.get_action_descriptions();
+                for (int i = 0; i < actions.length; i += 2) {
+                    string tabAlignment = "\t";
+                    if (actions[i].length < 12) {
+                        tabAlignment += "\t";
+                    }
+                    GLib.print("    %s%s=> %s\n",
+                        actions[i], tabAlignment, actions[i+1]);
+                }
+
+                return;
+            }
+
+            if (pdfFilename == null) {
+                GLib.printerr("No pdf file given\n");
+                Process.exit(1);
+            } else if (!GLib.FileUtils.test(pdfFilename,
+                (GLib.FileTest.IS_REGULAR))) {
+                GLib.printerr("Pdf file \"%s\" not found\n", pdfFilename);
+                Process.exit(1);
+            }
+
+            var metadata = new Metadata.Pdf(pdfFilename);
             this.controller.metadata = metadata;
 
             set_styling();
