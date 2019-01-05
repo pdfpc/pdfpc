@@ -29,6 +29,9 @@ monitors).
 
 .SH OPTIONS
 .TP
+.BI "\-B, \-\-list\-bindings"
+List action bindings defined
+.TP
 .BI "\-c, \-\-disable\-cache"
 Disable caching and pre-rendering of slides to save memory at the cost of speed.
 .TP
@@ -53,7 +56,7 @@ Show this help
 Time in minutes, from which on the timer changes its color. (Default: 5 minutes)
 .TP
 .BI "\-L, \-\-list\-actions"
-List actions supported in the config file(s)
+List actions supported
 .TP
 .BI "\-M, \-\-list\-monitors"
 List monitors known to the operating system

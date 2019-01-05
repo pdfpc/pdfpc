@@ -38,8 +38,9 @@ Unbind a mouse button
 Clear all the mouse bindings
 
 .PP
-A list of all possible actions can be obtained
-via the \-L command line option of \fBpdfpc\fR(1).
+A list of all possible actions can be obtained via the \fB\-L\fR command line
+option of \fBpdfpc\fR(1). Use the \fB\-B\fR command line option to list the
+action bindings defined.
 
 .SS Options
 .PP

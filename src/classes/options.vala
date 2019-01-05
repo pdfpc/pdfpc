@@ -165,6 +165,11 @@ namespace pdfpc {
         public static bool list_actions = false;
 
         /**
+         * Show the defined action bindings
+         */
+        public static bool list_bindings = false;
+
+        /**
          * Show the available monitors(s)
          */
         public static bool list_monitors = false;

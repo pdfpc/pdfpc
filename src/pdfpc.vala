@@ -66,6 +66,9 @@ namespace pdfpc {
             {"list-actions", 'L', 0, 0,
                 ref Options.list_actions,
                 "List actions supported in the config file(s)", null},
+            {"list-bindings", 'B', 0, 0,
+                ref Options.list_bindings,
+                "List action bindings defined", null},
             {"list-monitors", 'M', 0, 0,
                 ref Options.list_monitors,
                 "List available monitors", null},
@@ -303,6 +306,21 @@ namespace pdfpc {
                         tabAlignment += "\t";
                     }
                     GLib.print("    %s%s=> %s\n",
+                        actions[i], tabAlignment, actions[i+1]);
+                }
+
+                return;
+            }
+
+            if (Options.list_bindings) {
+                GLib.print("Action bindings defined:\n");
+                var actions = this.controller.get_action_bindings();
+                for (int i = 0; i < actions.length; i += 2) {
+                    string tabAlignment = "\t";
+                    if (actions[i].length < 12) {
+                        tabAlignment += "\t";
+                    }
+                    GLib.print("    %s%s<= %s\n",
                         actions[i], tabAlignment, actions[i+1]);
                 }
 
