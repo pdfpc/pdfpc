@@ -70,16 +70,26 @@ namespace pdfpc {
             }
         }
 
-        private void bindKey(string wholeLine, string[] fields) {
+        private void bindKeyOrMouse(bool is_mouse,
+            string wholeLine, string[] fields) {
             if (fields.length != 3 && fields.length != 4) {
-                GLib.printerr("Bad key specification: %s\n", wholeLine);
+                GLib.printerr("Bad bind specification: %s\n", wholeLine);
                 return;
             }
             uint modMask = 0;
             uint keycode = 0;
-            readBindDef(fields[1], Gdk.keyval_from_name, out keycode, out modMask);
+            Gee.List<Options.BindTuple> bindings;
+            if (is_mouse) {
+                bindings = Options.mouse_bindings;
+                readBindDef(fields[1], (x) => {return (uint)int.parse(x);},
+                    out keycode, out modMask);
+            } else {
+                bindings = Options.key_bindings;
+                readBindDef(fields[1], Gdk.keyval_from_name,
+                    out keycode, out modMask);
+            }
             if (keycode == 0x0) {
-                GLib.printerr("Warning: Unknown key: %s\n", fields[1]);
+                GLib.printerr("Warning: Unknown key/button: %s\n", fields[1]);
             } else {
                 try {
                     Options.BindTuple bt = new Options.BindTuple();
@@ -90,82 +100,63 @@ namespace pdfpc {
                     if (fields.length > 3) {
                         bt.setActionArg(fields[3]);
                     }
-                    Options.key_bindings.add(bt);
+                    bindings.add(bt);
                 } catch (ConfigFileError e) {
-                    GLib.printerr("Line '%s' contains errors. Reason: %s\n", wholeLine, e.message);
+                    GLib.printerr("Line '%s' contains errors. Reason: %s\n",
+                        wholeLine, e.message);
                 }
             }
         }
 
-        private void unbindKey(string wholeLine, string[] fields) {
+        private void bindKey(string wholeLine, string[] fields) {
+            bindKeyOrMouse(false, wholeLine, fields);
+        }
+
+        private void bindMouse(string wholeLine, string[] fields) {
+            bindKeyOrMouse(true, wholeLine, fields);
+        }
+
+        private void unbindKeyOrMouse(bool is_mouse,
+            string wholeLine, string[] fields) {
             if (fields.length != 2) {
                 GLib.printerr("Bad unbind specification: %s\n", wholeLine);
                 return;
             }
             uint modMask = 0;
             uint keycode = 0;
-            readBindDef(fields[1], Gdk.keyval_from_name, out keycode, out modMask);
+            Gee.List<Options.BindTuple> bindings;
+            if (is_mouse) {
+                bindings = Options.mouse_bindings;
+                readBindDef(fields[1], (x) => {return (uint)int.parse(x);},
+                    out keycode, out modMask);
+            } else {
+                bindings = Options.key_bindings;
+                readBindDef(fields[1], Gdk.keyval_from_name,
+                    out keycode, out modMask);
+            }
             if (keycode == 0x0) {
-                GLib.printerr("Warning: Unknown key: %s\n", fields[1]);
+                GLib.printerr("Warning: Unknown key/button: %s\n", fields[1]);
             } else {
                 Options.BindTuple bt = new Options.BindTuple();
                 bt.type = "unbind";
                 bt.keyCode = keycode;
                 bt.modMask = modMask;
-                Options.key_bindings.add(bt);
+                bindings.add(bt);
             }
+        }
+
+        private void unbindKey(string wholeLine, string[] fields) {
+            unbindKeyOrMouse(false, wholeLine, fields);
+        }
+
+        private void unbindMouse(string wholeLine, string[] fields) {
+            unbindKeyOrMouse(true, wholeLine, fields);
         }
 
         private void unbindKeyAll() {
             Options.BindTuple bt = new Options.BindTuple();
             bt.type = "unbindall";
             Options.key_bindings.add(bt);
-        }
-
-        private void bindMouse(string wholeLine, string[] fields) {
-            if (fields.length != 3 && fields.length != 4) {
-                GLib.printerr("Bad mouse specification: %s\n", wholeLine);
-                return;
-            }
-            uint modMask = 0;
-            uint button = 0;
-            readBindDef(fields[1], (x) => { return (uint)int.parse(x); }, out button, out modMask);
-            if (button == 0x0) {
-                GLib.printerr("Warning: Unknown button: %s\n", fields[1]);
-            } else {
-                try {
-                    Options.BindTuple bt = new Options.BindTuple();
-                    bt.type = "bind";
-                    bt.keyCode = button;
-                    bt.modMask = modMask;
-                    bt.actionName = fields[2];
-                    if (fields.length > 3) {
-                        bt.setActionArg(fields[3]);
-                    }
-                    Options.mouse_bindings.add(bt);
-                } catch (ConfigFileError e) {
-                    GLib.printerr("Line '%s' contains errors. Reason: %s\n", wholeLine, e.message);
-                }
-            }
-        }
-
-        private void unbindMouse(string wholeLine, string[] fields) {
-            if (fields.length != 2) {
-                GLib.printerr("Bad unmouse specification: %s\n", wholeLine);
-                return;
-            }
-            uint modMask = 0;
-            uint button = 0;
-            readBindDef(fields[1], (x) => { return (uint)int.parse(x); }, out button, out modMask);
-            if (button == 0x0) {
-                GLib.printerr("Warning: Unknown button: %s\n", fields[1]);
-            } else {
-                Options.BindTuple bt = new Options.BindTuple();
-                bt.type = "unbind";
-                bt.keyCode = button;
-                bt.modMask = modMask;
-                Options.mouse_bindings.add(bt);
-            }
         }
 
         private void unbindMouseAll() {
