@@ -1033,29 +1033,50 @@ namespace pdfpc {
         }
 
         /**
-         * Bind the (user-defined) keys
+         * Bind the (user-defined) key or mouse button
          */
-        public void bind(uint keycode, uint modMask, string action_name, GLib.Variant? parameter) {
+        private void bindKeyOrMouse(bool is_mouse, uint keycode, uint modMask,
+            string action_name, GLib.Variant? parameter) {
             Action? action = this.action_group.lookup_action(action_name);
             if (action != null) {
                 GLib.VariantType expected_type = action.get_parameter_type();
                 if (expected_type == null) {
                     if (parameter != null) {
-                        GLib.printerr("Parameter provided to action %s that does not expect one\n", action_name);
+                        GLib.printerr("Action %s does not expect a parameter\n",
+                            action_name);
                     }
                 } else if (parameter == null) {
-                    GLib.printerr("Parameter expected for action %s but not provided\n", action_name);
+                    GLib.printerr("Action %s expects a parameter\n",
+                        action_name);
                 } else {
                     assert(
                         parameter.get_type().equal(GLib.VariantType.STRING) &&
                         expected_type.equal(GLib.VariantType.STRING)
                     );
                 }
-                this.keyBindings.set(new KeyDef(keycode, modMask),
+                Gee.HashMap<KeyDef, ActionAndParameter> bindings;
+                if (is_mouse) {
+                    bindings = this.mouseBindings;
+                } else {
+                    bindings = this.keyBindings;
+                }
+                bindings.set(new KeyDef(keycode, modMask),
                     new ActionAndParameter(action, parameter));
             } else {
                 GLib.printerr("Unknown action %s\n", action_name);
             }
+        }
+
+        private void bind(uint keycode, uint modMask,
+            string action_name, GLib.Variant? parameter) {
+            this.bindKeyOrMouse(false, keycode, modMask,
+                action_name, parameter);
+        }
+
+        private void bindMouse(uint keycode, uint modMask,
+            string action_name, GLib.Variant? parameter) {
+            this.bindKeyOrMouse(true, keycode, modMask,
+                action_name, parameter);
         }
 
         /**
@@ -1070,32 +1091,6 @@ namespace pdfpc {
          */
         public void unbindAll() {
             this.keyBindings.clear();
-        }
-
-        /**
-         * Bind the (user-defined) keys
-         */
-        public void bindMouse(uint button, uint modMask, string action_name, Variant? parameter) {
-            Action? action = this.action_group.lookup_action(action_name);
-            if (action != null) {
-                GLib.VariantType expected_type = action.get_parameter_type();
-                if (expected_type == null) {
-                    if (parameter != null) {
-                        GLib.printerr("Parameter provided to action %s that does not expect one\n", action_name);
-                    }
-                } else if (parameter == null) {
-                    GLib.printerr("Parameter expected for action %s but not provided\n", action_name);
-                } else {
-                    assert(
-                        parameter.get_type().equal(GLib.VariantType.STRING) &&
-                        expected_type.equal(GLib.VariantType.STRING)
-                    );
-                }
-                this.mouseBindings.set(new KeyDef(button, modMask),
-                    new ActionAndParameter(action, parameter));
-            } else {
-                GLib.printerr("Unknown action %s\n", action_name);
-            }
         }
 
         /**
