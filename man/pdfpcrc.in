@@ -18,8 +18,9 @@ user-specific one if it exists.
 .PP
 The following commands are accepted:
 .TP
-.B bind <key> <func> [<arg>]
-Bind a key to a function, passing a specified argument for functions which require one
+.B bind <key> <action> [<arg>]
+Bind a key to an action, passing a specified argument for actions that require
+one
 .TP
 .B unbind <key>
 Unbind the given key
@@ -27,8 +28,8 @@ Unbind the given key
 .B unbind_all
 Clear all the key bindings
 .TP
-.B mouse <button> <func>
-Bind a mouse button to a function
+.B mouse <button> <action>
+Bind a mouse button to an action
 .TP
 .B unmouse <button>
 Unbind a mouse button
@@ -37,7 +38,7 @@ Unbind a mouse button
 Clear all the mouse bindings
 
 .PP
-A list of all possible functions can be obtained
+A list of all possible actions can be obtained
 via the \-L command line option of \fBpdfpc\fR(1).
 
 .SS Options
@@ -144,7 +145,7 @@ bind S+Next    next10
 A shorthand for specifying key combinations constituting shift and an
 alphabetic character is to simply give the uppercase version of the
 alphabetic character. For example, to bind <shift>+r to the 'reset'
-function, use
+action, use
 
 .RS
 bind R reset
