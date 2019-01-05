@@ -185,11 +185,7 @@ the size of pen or eraser
 Clear the drawing on the current page
 .TP
 .B d
-Toggle visibility the drawings; if in the drawing mode (pen/eraser), exit it
-.TP
-.B Shift + 1 / KP_1 ... Shift + 8 / KP_8
-Switch the drawing color to red/orange/yellow/green/blue/violet/black/white,
-respectively.
+Toggle visibility of the drawings; if in the drawing mode (pen/eraser), exit it
 .TP
 .B f
 Freeze the current presentation display (the presenter display is still
