@@ -251,12 +251,14 @@ namespace pdfpc {
             public string name { get; set; }
             public string description { get; set; }
             public string arg_name { get; set; }
+            public Gee.ArrayList<KeyDef> bindings { get; set; }
 
             public ActionDescription(string name, string description,
                 string? arg_name = null) {
                 this.name = name;
                 this.description = description;
                 this.arg_name = arg_name;
+                this.bindings = new Gee.ArrayList<KeyDef>();
             }
         }
 
@@ -1026,6 +1028,60 @@ namespace pdfpc {
         }
 
         /**
+         * Get an array with all action names & their bindings
+         */
+        public string[] get_action_bindings() {
+            string[] retval = {};
+            foreach (var entry in this.action_descriptions) {
+                if (entry.bindings.size == 0) {
+                    continue;
+                }
+                retval += entry.name;
+                string bindstr = "";
+                foreach (var keydef in entry.bindings) {
+                    bool is_mouse;
+                    if (keydef.keycode < 10) {
+                        is_mouse = true;
+                    } else {
+                        is_mouse = false;
+                    }
+
+                    string keystr, modstr = "";
+                    if ((keydef.modMask & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                        modstr = "Ctrl+";
+                    }
+                    if ((keydef.modMask & Gdk.ModifierType.META_MASK) != 0) {
+                        modstr = "Meta+";
+                    }
+                    if ((keydef.modMask & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                        modstr = "Shift+";
+                    }
+                    if (is_mouse) {
+                        keystr = "Mouse_%u".printf(keydef.keycode);
+                    } else {
+                        keystr = Gdk.keyval_name(keydef.keycode);
+                        // Simple "shifted" keycodes have been capitalized
+                        // by ConfigFileReader.readBindDef()
+                        if (keystr.length == 1) {
+                            keystr = keystr.down();
+                        }
+                    }
+                    if (bindstr != "") {
+                        bindstr += ", ";
+                    }
+                    bindstr += modstr + keystr;
+
+                    var action = this.keyBindings.get(keydef);
+                    if (action != null && action.parameter != null) {
+                        bindstr += " [" + action.parameter.get_string() + "]";
+                    }
+                }
+                retval += bindstr;
+            }
+            return retval;
+        }
+
+        /**
          * Trigger an action by name
          */
         public void trigger_action(string name) {
@@ -1060,8 +1116,17 @@ namespace pdfpc {
                 } else {
                     bindings = this.keyBindings;
                 }
-                bindings.set(new KeyDef(keycode, modMask),
-                    new ActionAndParameter(action, parameter));
+                var keydef = new KeyDef(keycode, modMask);
+                bindings.set(keydef, new ActionAndParameter(action, parameter));
+
+                // Store the binding in the action_descriptions list
+                // to be used for online help
+                foreach (var entry in this.action_descriptions) {
+                    if (entry.name == action_name) {
+                        entry.bindings.add(keydef);
+                        break;
+                    }
+                }
             } else {
                 GLib.printerr("Unknown action %s\n", action_name);
             }
