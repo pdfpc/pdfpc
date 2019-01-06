@@ -38,6 +38,17 @@ Unbind a mouse button
 Clear all the mouse bindings
 
 .PP
+Key names can be obtained with the help of the \fBxev\fR(1) utility. Note that
+names are case sensitive. Key combinations with modifiers can be specified in
+the form <mod>+<key>, where <mod> is one of S (for shift), C (for control) and
+A/M (for Alt/Meta).
+
+.PP
+A shorthand for specifying key combinations constituting shift and an
+alphabetic character is to simply give the uppercase version of the
+alphabetic character. For example, S+r and R are equivalent.
+
+.PP
 A list of all possible actions can be obtained via the \fB\-L\fR command line
 option of \fBpdfpc\fR(1). Use the \fB\-B\fR command line option to list the
 action bindings defined.
@@ -133,23 +144,14 @@ Set the initial toolbox state minimized (bool, Default is false).
 .SH EXAMPLES
 
 .PP
-Key names can be obtained with the help of the xev utility. Note that
-names are case sensitive. Modifiers can be specified in the form
-<mod>+<key> where <mod> is one of S (for shift), C (for control) and
-A/M (for Alt/Meta). E.g.
+To change the drawing pen color using the numerical pad keys:
 
 .RS
-bind S+Next    next10
-.RE
-
-.PP
-A shorthand for specifying key combinations constituting shift and an
-alphabetic character is to simply give the uppercase version of the
-alphabetic character. For example, to bind <shift>+r to the 'reset'
-action, use
-
-.RS
-bind R reset
+bind S+KP_1    setPenColor  red
+.br
+bind S+KP_2    setPenColor  green
+.br
+bind S+KP_3    setPenColor  blue
 .RE
 
 .PP
