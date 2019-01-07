@@ -342,6 +342,10 @@ namespace pdfpc.Window {
                     this.controller.goto_user_page(this.current_slide, !gotoFirst);
                     handled = true;
                     break;
+                case Gdk.Key.Escape:
+                    this.controller.controllables_hide_overview();
+                    handled = true;
+                    break;
             }
 
             return handled;

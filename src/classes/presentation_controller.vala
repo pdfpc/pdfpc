@@ -1772,7 +1772,7 @@ namespace pdfpc {
             }
         }
 
-        protected void controllables_hide_overview() {
+        public void controllables_hide_overview() {
             this.ignore_mouse_events = false;
             // It may happen that in overview mode, the number of (user) slides
             // has changed due to overlay changes. We may need to correct our
