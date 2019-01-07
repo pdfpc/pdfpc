@@ -908,6 +908,11 @@ namespace pdfpc.Window {
                 else
                     this.update_slide_count(); // Reset the display we had before
                 return true;
+            } else if (key.keyval == Gdk.Key.Escape) {
+                this.slide_progress.sensitive = false;
+                this.controller.set_ignore_input_events(false);
+                this.update_slide_count();
+                return true;
             } else {
                 return false;
             }
