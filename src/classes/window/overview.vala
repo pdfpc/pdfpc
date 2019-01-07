@@ -323,21 +323,21 @@ namespace pdfpc.Window {
         public bool on_key_press(Gtk.Widget source, Gdk.EventKey key) {
             bool handled = false;
             switch (key.keyval) {
-                case 0xff51: /* Cursor left */
-                case 0xff55: /* Page Up */
+                case Gdk.Key.Left:
+                case Gdk.Key.Page_Up:
                     if (this.current_slide > 0) {
                         this.current_slide -= 1;
                     }
                     handled = true;
                     break;
-                case 0xff53: /* Cursor right */
-                case 0xff56: /* Page down */
+                case Gdk.Key.Right:
+                case Gdk.Key.Page_Down:
                     if (this.current_slide < this.n_slides - 1) {
                         this.current_slide += 1;
                     }
                     handled = true;
                     break;
-                case 0xff0d: /* Return */
+                case Gdk.Key.Return:
                     bool gotoFirst = (key.state & Gdk.ModifierType.SHIFT_MASK) != 0;
                     this.controller.goto_user_page(this.current_slide, !gotoFirst);
                     handled = true;
