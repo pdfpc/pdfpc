@@ -331,7 +331,7 @@ their textual content, no formatting attributes are preserved).  The PDF
 annotations can be made using many PDF editors and even viewers.  These "native"
 PDF notes cannot be edited in pdfpc.
 .PP
-In addition, while in the presentation mode, pressing \[aq]n\[aq] will allow you
+In addition, while in the presentation mode, pressing \[aq]Ctrl + n\[aq] will allow you
 to take notes for the current user slide.  To exit the note editing mode, press
 the Escape key.  Note that while editing a note, the keybindings stop working,
 i.e. you are not able to change slides. These notes are stored in the .pdfpc
@@ -383,7 +383,7 @@ overlay.  As one typically goes back in a presentation only when looking for a
 concrete slide, this is more convenient.
 
 .PP
-The up and down cursor keys work on the "user slide" basis.
+The Shift + Page up/down key combinations work on the "user slide" basis.
 You can use them to skip the rest of an overlay or to jump to the
 previous user slide, ignoring the state of the current slide.
 
@@ -397,7 +397,7 @@ Pdfpc tries to find these overlays automatically by looking
 into the page labels in the PDF file.  For LaTeX this works correctly at least
 with the beamer class and also modifying the page numbers manually (compiling
 with pdflatex).  If your preferred slide-producing method does not work
-correctly with this detection, you can supply this information using the \[aq]o\[aq] key
+correctly with this detection, you can supply this information using the \[aq]Ctrl + o\[aq] key
 for each slide that is part of an overlay (except the first one!).  The page
 numbering is also adapted.  This information is automatically stored.
 
@@ -408,7 +408,7 @@ slide in the actual presentation.
 Things like bibliographic references or slides referring to specialized
 questions are typical examples.
 Pdfpc lets you define which is the last slide in the
-actual presentation via the \[aq]e\[aq] key.
+actual presentation via the \[aq]Ctrl + e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
 
