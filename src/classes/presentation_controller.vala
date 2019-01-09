@@ -108,8 +108,6 @@ namespace pdfpc {
         }
         private Window.Presenter _presenter=null;
 
-
-
         /**
          * Window which shows the current slide in fullscreen
          *
@@ -127,6 +125,14 @@ namespace pdfpc {
             }
         }
         private Window.Presentation _presentation=null;
+
+        private bool single_screen_mode {
+            get {
+                return (this._presentation == null ||
+                        this._presenter == null);
+            }
+        }
+
         public Gtk.Image presenter_pointer;
         public Gtk.Image presentation_pointer;
 
@@ -301,11 +307,6 @@ namespace pdfpc {
         // We abuse the KeyDef structure
         protected Gee.HashMap<KeyDef, ActionAndParameter> mouseBindings =
             new Gee.HashMap<KeyDef, ActionAndParameter>();
-
-        /*
-         * "Main" view of current slide
-         */
-        public View.Pdf main_view = null;
 
         /**
          * DBus interface to screensaver
@@ -1373,10 +1374,7 @@ namespace pdfpc {
                 return false;
             }
 
-            //controllable.set_controller( this );
             this.controllables.add(controllable);
-            if (this.main_view == null)
-                this.main_view = controllable.main_view;
 
             return true;
         }
@@ -1789,6 +1787,10 @@ namespace pdfpc {
          * Fill the presentation display with black
          */
         public void fade_to_black() {
+            if (this.single_screen_mode) {
+                return;
+            }
+
             this.faded_to_black = !this.faded_to_black;
             this.controllables_update();
         }
@@ -1797,6 +1799,10 @@ namespace pdfpc {
          * Hide the presentation window
          */
         public void hide_presentation() {
+            if (this.single_screen_mode) {
+                return;
+            }
+
             this.hidden = !this.hidden;
             this.controllables_update();
         }
@@ -1822,15 +1828,19 @@ namespace pdfpc {
         }
 
         /**
-         * Freeze the display
+         * Freeze the presentation window
          */
         public void toggle_freeze() {
+            if (this.single_screen_mode) {
+                return;
+            }
+
             this.frozen = !this.frozen;
             if (!this.frozen) {
                 this.faded_to_black = false;
             }
             this.controllables_update();
-            main_view.freeze_toggled(this.frozen);
+            this.presentation.main_view.freeze_toggled(this.frozen);
         }
 
         /**
