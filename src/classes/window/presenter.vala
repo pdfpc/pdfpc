@@ -180,16 +180,16 @@ namespace pdfpc.Window {
         protected int next_allocated_width;
 
         protected bool on_button_press(Gtk.Widget pbut, Gdk.EventButton event) {
-	    if (event.button == 1 ) {
+            if (event.button == 1 ) {
                 var w = this.get_window();
 
                 w.get_position(out this.toolbox_x0, out this.toolbox_y0);
 
                 this.toolbox_x0 += (int) event.x;
-	        this.toolbox_y0 += (int) event.y;
+                this.toolbox_y0 += (int) event.y;
             }
 
-	    return true;
+            return true;
         }
 
         protected bool on_move_pointer(Gtk.Widget pbut, Gdk.EventMotion event) {
@@ -613,40 +613,40 @@ namespace pdfpc.Window {
             tb.clicked.connect(() => {
                     var state = button_panel.get_child_visible();
                     button_panel.set_child_visible(!state);
-		});
+                });
 
             tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg");
             tb.clicked.connect(() => {
-		    this.controller.set_normal_mode();
-		});
+                    this.controller.set_normal_mode();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
             tb.clicked.connect(() => {
-		    this.controller.set_pointer_mode();
-		});
+                    this.controller.set_pointer_mode();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
             tb.clicked.connect(() => {
-		    this.controller.set_pen_mode();
-		});
+                    this.controller.set_pen_mode();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
             tb.clicked.connect(() => {
-		    this.controller.set_eraser_mode();
-		});
+                    this.controller.set_eraser_mode();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg");
             tb.clicked.connect(() => {
-		    this.controller.toggle_freeze();
-		});
+                    this.controller.toggle_freeze();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "blank.svg");
             tb.clicked.connect(() => {
-		    this.controller.fade_to_black();
-		});
+                    this.controller.fade_to_black();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "hidden.svg");
             tb.clicked.connect(() => {
-		    this.controller.hide_presentation();
-		});
+                    this.controller.hide_presentation();
+                });
             tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg");
             tb.clicked.connect(() => {
-		    this.controller.toggle_pause();
-		});
+                    this.controller.toggle_pause();
+                });
 
             scale_button = add_toolbox_sbutton(button_panel, tbox_inverse,
                 "linewidth.svg");
@@ -661,7 +661,7 @@ namespace pdfpc.Window {
                     var rgba = color_button.rgba;
                     this.controller.pen_drawing.pen.set_rgba(rgba);
                     this.controller.queue_pen_surface_draws();
-		});
+                });
 
             this.toolbox_container = new Gtk.Fixed();
             this.toolbox_container.put(toolbox, tbox_x, tbox_y);
