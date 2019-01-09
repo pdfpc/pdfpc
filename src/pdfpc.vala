@@ -344,31 +344,67 @@ namespace pdfpc {
             int primary_monitor_num = 0, secondary_monitor_num = 0;
             int presenter_monitor = -1, presentation_monitor = -1;
             int n_monitors = display.get_n_monitors();
-            bool by_output = (Options.presentation_screen != null) || (Options.presenter_screen != null);
             for (int i = 0; i < n_monitors; i++) {
-                // Not obvious what's right to do if n_monitors > 2...
-                // But let's be realistic :)
-                if ((by_output && Options.presenter_screen == display.get_monitor(i).get_model())
-                    || display.get_monitor(i).is_primary()) {
+                // First, try to satisfy user's preferences
+                var monitor_model = display.get_monitor(i).get_model();
+                if (Options.presenter_screen != null &&
+                    Options.presenter_screen == monitor_model) {
+                    presenter_monitor = i;
+                }
+                if (Options.presentation_screen != null &&
+                    Options.presentation_screen == monitor_model) {
+                    presentation_monitor = i;
+                }
+                if (presentation_monitor >= 0 && presenter_monitor >= 0) {
+                    break;
+                }
+
+                // Also, identify the primary and secondary monitors as the
+                // fallback
+                if (display.get_monitor(i).is_primary()) {
                     primary_monitor_num = i;
-                } else if (!by_output || Options.presentation_screen == display.get_monitor(i).get_model()) {
+                } else {
                     secondary_monitor_num = i;
                 }
             }
-            if (!Options.display_switch) {
-                presenter_monitor    = primary_monitor_num;
-                presentation_monitor = secondary_monitor_num;
-            } else {
-                presenter_monitor    = secondary_monitor_num;
-                presentation_monitor = primary_monitor_num;
+
+            // Bail out if an explicitly requested monitor is not found
+            if (Options.presenter_screen != null &&
+                presenter_monitor == -1) {
+                GLib.printerr("Monitor \"%s\" not found\n",
+                    Options.presenter_screen);
+                Process.exit(1);
+            }
+            if (Options.presentation_screen != null &
+                presentation_monitor == -1) {
+                GLib.printerr("Monitor \"%s\" not found\n",
+                    Options.presentation_screen);
+                Process.exit(1);
             }
 
-            if (!Options.single_screen || !Options.display_switch) {
+            // Fallback monitor assignment - presenter on the primary,
+            // presentation on the secondary; swap if asked to
+            if (presenter_monitor == -1) {
+                presenter_monitor = !Options.display_switch ?
+                    primary_monitor_num:secondary_monitor_num;
+            }
+            if (presentation_monitor == -1) {
+                presentation_monitor = !Options.display_switch ?
+                    secondary_monitor_num:primary_monitor_num;
+            }
+
+            // Force single-screen mode when there is only one physical monitor
+            // present - unless running in the windowed mode
+            bool single_screen_mode = (Options.single_screen ||
+                                       (n_monitors == 1 && !Options.windowed));
+
+            // Create the needed windows
+            if (!single_screen_mode || !Options.display_switch) {
                 this.controller.presenter =
                     new Window.Presenter(this.controller, presenter_monitor);
 
             }
-            if (!Options.single_screen || Options.display_switch) {
+            if (!single_screen_mode || Options.display_switch) {
                 this.controller.presentation =
                     new Window.Presentation(this.controller,
                         presentation_monitor, width, height);
@@ -380,7 +416,6 @@ namespace pdfpc {
                 this.controller.presentation.show_all();
                 this.controller.presentation.update();
             }
-
             if (this.controller.presenter != null) {
                 this.controller.presenter.show_all();
                 this.controller.presenter.update();
