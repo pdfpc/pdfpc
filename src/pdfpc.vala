@@ -375,7 +375,7 @@ namespace pdfpc {
                     Options.presenter_screen);
                 Process.exit(1);
             }
-            if (Options.presentation_screen != null &
+            if (Options.presentation_screen != null &&
                 presentation_monitor == -1) {
                 GLib.printerr("Monitor \"%s\" not found\n",
                     Options.presentation_screen);
