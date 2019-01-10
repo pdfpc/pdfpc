@@ -663,17 +663,6 @@ namespace pdfpc {
 
                 n++;
             }
-            video_confs.sort((a, b) => {
-                if (a.rect.width == b.rect.width) {
-                    return 0;
-                } else if (a.rect.width < b.rect.width) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            });
-
-            var largest_rect = video_confs.last().rect;
 
             bool notes_mode = (Options.notes_position != null) ? true : false;
             n = 0;
@@ -698,7 +687,8 @@ namespace pdfpc {
                 bin.add_many(queue, sink);
                 tee.link(queue);
                 if ((conf.display_num == 0 && !notes_mode) || (conf.display_num != 0 && notes_mode)) {
-                    Gst.Element ad_element = this.add_video_control(queue, bin, conf.rect, largest_rect);
+                    Gst.Element ad_element = this.add_video_control(queue, bin,
+                        conf.rect);
                     ad_element.link(sink);
 
                     video_area.add_events(
@@ -780,7 +770,7 @@ namespace pdfpc {
          * Hook up the elements to draw the controls to the first output leg.
          */
         protected Gst.Element add_video_control(Gst.Element source, Gst.Bin bin,
-            Gdk.Rectangle rect, Gdk.Rectangle video_size_rect) {
+            Gdk.Rectangle rect) {
             dynamic Gst.Element overlay;
             Gst.Element adaptor;
             try {
