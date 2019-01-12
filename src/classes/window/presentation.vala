@@ -59,11 +59,9 @@ namespace pdfpc.Window {
 
             this.controller.update_request.connect(this.update);
 
-            Gdk.Rectangle scale_rect;
             this.view = new View.Pdf.from_fullscreen(this,
                 this.screen_geometry.width, this.screen_geometry.height,
-                Metadata.Area.CONTENT,
-                true, out scale_rect);
+                Metadata.Area.CONTENT, true);
 
             if (!Options.disable_caching) {
                 this.view.get_renderer().cache = Renderer.Cache.create(metadata);
@@ -71,12 +69,12 @@ namespace pdfpc.Window {
 
             this.overlay_layout.add(this.view);
 
-            this.overlay_layout.set_size_request(
-                this.main_view.get_renderer().width / this.gdk_scale,
-                this.main_view.get_renderer().height / this.gdk_scale
-            );
-
-            this.add(overlay_layout);
+            // TODO: update the ratio on document reload
+            double ratio = metadata.get_page_width()/metadata.get_page_height();
+            var frame = new Gtk.AspectFrame(null, 0.5f, 0.5f,
+                (float) ratio, false);
+            frame.add(overlay_layout);
+            this.add(frame);
 
             this.key_press_event.connect(this.controller.key_press);
             this.button_press_event.connect(this.controller.button_press);
@@ -129,4 +127,3 @@ namespace pdfpc.Window {
         }
     }
 }
-
