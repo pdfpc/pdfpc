@@ -115,9 +115,6 @@ namespace pdfpc {
             this.renderer = renderer;
             this.gdk_scale = gdk_scale_factor;
 
-            this.set_size_request((int)(renderer.width*(1.0/this.gdk_scale)),
-                                  (int)(renderer.height*(1.0/this.gdk_scale)));
-
             this.current_slide_number = 0;
 
             controller.reload_request.connect(this.rebuild_cache);
@@ -154,14 +151,16 @@ namespace pdfpc {
          * Create a new Pdf view from a Fullscreen window instance
          *
          * This is a convenience constructor which automatically create a full
-         * metadata and rendering chain to be used with the pdf view. The given
-         * width and height is used in conjunction with a scaler to maintain
-         * aspect ration. The scale rectangle is provided in the scale_rect
-         * argument.
+         * metadata and rendering chain to be used with the pdf view.
+         * size_request = true comes from windows unable to manage configure
+         * events themselves (i.e., all presenter view widgets). It is for these
+         * widgets that we return scale_rect, which is obtained in
+         * conjunction with a scaler to maintain the page aspect ratio.
          */
         public Pdf.from_fullscreen(Window.Fullscreen window,
             int width, int height, Metadata.Area area,
             bool clickable_links,
+            bool size_request = false,
             out Gdk.Rectangle scale_rect = null) {
             var controller = window.controller;
             var metadata = controller.metadata;
@@ -174,6 +173,12 @@ namespace pdfpc {
             var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
 
             this(renderer, clickable_links, controller, window.gdk_scale);
+
+            if (size_request) {
+                this.set_size_request(
+                    (int)(renderer.width*(1.0/this.gdk_scale)),
+                    (int)(renderer.height*(1.0/this.gdk_scale)));
+            }
         }
 
         /**
@@ -185,24 +190,23 @@ namespace pdfpc {
             Poppler.Rectangle poppler_rectangle) {
             Gdk.Rectangle gdk_rectangle = Gdk.Rectangle();
 
-            Gtk.Requisition requisition;
-            Gtk.Requisition min_requisition;
-            this.get_preferred_size(out min_requisition, out requisition);
+            Gtk.Allocation allocation;
+            this.get_allocation(out allocation);
 
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates
             var metadata = this.get_renderer().metadata;
             gdk_rectangle.x = (int) Math.ceil((poppler_rectangle.x1 / metadata.get_page_width()) *
-                requisition.width );
-            gdk_rectangle.width = (int) Math.floor(((poppler_rectangle.x2 - poppler_rectangle.x1 ) /
-                metadata.get_page_width()) * requisition.width);
+                allocation.width );
+            gdk_rectangle.width = (int) Math.floor(((poppler_rectangle.x2 - poppler_rectangle.x1) /
+                metadata.get_page_width()) * allocation.width);
 
             // Gdk has its coordinate origin in the upper left, while Poppler
             // has its origin in the lower left.
             gdk_rectangle.y = (int) Math.ceil(((metadata.get_page_height() - poppler_rectangle.y2) /
-                metadata.get_page_height()) * requisition.height);
+                metadata.get_page_height()) * allocation.height);
             gdk_rectangle.height = (int) Math.floor(((poppler_rectangle.y2 - poppler_rectangle.y1) /
-                metadata.get_page_height()) * requisition.height);
+                metadata.get_page_height()) * allocation.height);
 
             return gdk_rectangle;
         }
@@ -353,12 +357,35 @@ namespace pdfpc {
             if (!metadata.is_ready) {
                 return true;
             }
-            cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
-            cr.set_source_surface(this.current_slide, 0, 0);
-            cr.rectangle(0, 0, this.current_slide.get_width(), this.current_slide.get_height());
-            cr.fill();
 
-            // We are the only ones drawing on this context skip everything
+            Gtk.Allocation allocation;
+            this.get_allocation(out allocation);
+
+            // not ready yet
+            if (allocation.height <= 1 || allocation.width <= 1) {
+                return true;
+            }
+
+            if (renderer.width != allocation.width ||
+                renderer.height != allocation.height) {
+                // TODO: this is a mess.
+                // Renderer/cache/view ties need to be refactored
+                renderer.resize(allocation.width, allocation.height);
+                this.rebuild_cache();
+                try {
+                    this.redraw();
+                } catch (Renderer.RenderError e) {
+                }
+                // TODO: resize videos if exist on this page
+            } else {
+                cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
+                cr.set_source_surface(this.current_slide, 0, 0);
+                cr.rectangle(0, 0, this.current_slide.get_width(),
+                    this.current_slide.get_height());
+                cr.fill();
+            }
+
+            // We are the only ones drawing on this context; skip everything
             // else.
             return true;
         }

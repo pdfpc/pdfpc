@@ -272,6 +272,8 @@ namespace pdfpc.Window {
             int screen_num) {
             base(screen_num);
 
+            this.resizable = false;
+
             this.controller = controller;
 
             this.role = "presenter";
@@ -307,6 +309,7 @@ namespace pdfpc.Window {
                 (int) Math.floor(Options.current_height * bottom_position / (double) 100),
                 Metadata.Area.NOTES,
                 true,
+                true,
                 out current_slide_rect
             );
 
@@ -325,6 +328,7 @@ namespace pdfpc.Window {
                 (int) Math.floor(Options.next_height * bottom_position / (double)100 ),
                 Metadata.Area.CONTENT,
                 false,
+                true,
                 out next_slide_rect
             );
 
@@ -335,6 +339,7 @@ namespace pdfpc.Window {
                 (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
                 false,
+                true,
                 out strict_next_slide_rect
             );
             Gdk.Rectangle strict_prev_slide_rect;
@@ -344,6 +349,7 @@ namespace pdfpc.Window {
                 (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
                 Metadata.Area.CONTENT,
                 false,
+                true,
                 out strict_prev_slide_rect
             );
 
@@ -466,6 +472,12 @@ namespace pdfpc.Window {
             strict_views.pack_end(this.strict_next_view, false, false, 0);
 
             this.overlay_layout.add(this.current_view);
+
+            // The alignments are only needed for fixed-size windows,
+            // and should eventually be removed (they interfer with the
+            // automatic container geometry management
+            this.overlay_layout.halign = Gtk.Align.CENTER;
+            this.overlay_layout.valign = Gtk.Align.CENTER;
 
             this.overlay_layout.set_size_request(
                 this.main_view.get_renderer().width / this.gdk_scale,

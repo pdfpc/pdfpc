@@ -130,8 +130,8 @@ namespace pdfpc.Window {
                 this.monitor_num_to_use = 0;
             }
             this.screen_geometry = monitor.get_geometry();
+            this.gdk_scale = monitor.get_scale_factor();
 
-            this.gdk_scale = this.get_scale_factor();
             if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
                 // See issue 214. Wayland is doing some double scaling therefore
                 // we are lying about the actual screen size
@@ -140,8 +140,6 @@ namespace pdfpc.Window {
             }
 
             this.overlay_layout = new Gtk.Overlay();
-            this.overlay_layout.halign = Gtk.Align.CENTER;
-            this.overlay_layout.valign = Gtk.Align.CENTER;
 
             this.pointer_drawing_surface = new Gtk.DrawingArea();
             this.pen_drawing_surface = new Gtk.DrawingArea();
@@ -163,22 +161,6 @@ namespace pdfpc.Window {
                     true);
             });
 
-            this.pointer_drawing_surface.halign = Gtk.Align.FILL;
-            this.pointer_drawing_surface.valign = Gtk.Align.FILL;
-
-            this.pen_drawing_surface.halign = Gtk.Align.FILL;
-            this.pen_drawing_surface.valign = Gtk.Align.FILL;
-
-            this.video_surface.halign = Gtk.Align.FILL;
-            this.video_surface.valign = Gtk.Align.FILL;
-
-            // Make the window resizable to allow the window manager
-            // to correctly fit it to the screen. (Note: allegedly
-            // this presents a problem for some window managers, but
-            // setting resizable to false prevents full-screen from
-            // working)
-            this.resizable = true;
-
             if (!Options.windowed) {
                 if (Options.move_on_mapped) {
                      // Some WM's ignore move requests made prior to
@@ -195,10 +177,9 @@ namespace pdfpc.Window {
                     this.screen_geometry.width /= 2;
                     this.screen_geometry.height /= 2;
                 }
-                this.resizable = false;
             }
 
-            this.set_size_request(this.screen_geometry.width,
+            this.set_default_size(this.screen_geometry.width,
                 this.screen_geometry.height);
 
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);

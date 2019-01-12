@@ -70,6 +70,11 @@ namespace pdfpc {
             this.area = area;
         }
 
+        public void resize(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
         /**
          * Render the given slide_number to a Cairo.ImageSurface and return it.
          *
