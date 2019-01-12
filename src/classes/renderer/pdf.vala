@@ -34,12 +34,12 @@ namespace pdfpc {
         public Metadata.Pdf metadata { get; protected set; }
 
         /**
-         * Width to render to
+         * Width (in _physical_ pixels) to render to
          */
         public int width { get; protected set; }
 
         /**
-         * Height to render to
+         * Height (in _physical_ pixels) to render to
          */
         public int height { get; protected set; }
 

@@ -164,20 +164,19 @@ namespace pdfpc {
             out Gdk.Rectangle scale_rect = null) {
             var controller = window.controller;
             var metadata = controller.metadata;
-            var scaler = new Scaler(metadata.get_page_width(), metadata.get_page_height());
+            var scaler = new Scaler(metadata.get_page_width(),
+                metadata.get_page_height());
             scale_rect = scaler.scale_to(width, height);
 
-            scale_rect.width *= window.gdk_scale;
-            scale_rect.height *= window.gdk_scale;
-
-            var renderer = new Renderer.Pdf(metadata, scale_rect.width, scale_rect.height, area);
+            var renderer = new Renderer.Pdf(metadata,
+                scale_rect.width*window.gdk_scale,
+                scale_rect.height*window.gdk_scale,
+                area);
 
             this(renderer, clickable_links, controller, window.gdk_scale);
 
             if (size_request) {
-                this.set_size_request(
-                    (int)(renderer.width*(1.0/this.gdk_scale)),
-                    (int)(renderer.height*(1.0/this.gdk_scale)));
+                this.set_size_request(scale_rect.width, scale_rect.height);
             }
         }
 
@@ -366,11 +365,12 @@ namespace pdfpc {
                 return true;
             }
 
-            if (renderer.width != allocation.width ||
-                renderer.height != allocation.height) {
+            if (renderer.width != allocation.width*this.gdk_scale ||
+                renderer.height != allocation.height*this.gdk_scale) {
                 // TODO: this is a mess.
                 // Renderer/cache/view ties need to be refactored
-                renderer.resize(allocation.width, allocation.height);
+                renderer.resize(allocation.width*this.gdk_scale,
+                    allocation.height*this.gdk_scale);
                 this.rebuild_cache();
                 try {
                     this.redraw();
