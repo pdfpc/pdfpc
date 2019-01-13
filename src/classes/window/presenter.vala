@@ -479,10 +479,6 @@ namespace pdfpc.Window {
             this.overlay_layout.halign = Gtk.Align.CENTER;
             this.overlay_layout.valign = Gtk.Align.CENTER;
 
-            this.overlay_layout.set_size_request(
-                this.main_view.get_renderer().width / this.gdk_scale,
-                this.main_view.get_renderer().height / this.gdk_scale
-            );
             this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
 
             var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -578,8 +574,6 @@ namespace pdfpc.Window {
                     tbox_y = next_slide_rect.height + tb_offset;
                     break;
             }
-            tbox_x /= this.gdk_scale;
-            tbox_y /= this.gdk_scale;
             toolbox = new Gtk.Box(toolbox_orientation, 0);
             toolbox.get_style_context().add_class("toolbox");
             toolbox.halign = Gtk.Align.START;
