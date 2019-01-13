@@ -674,13 +674,20 @@ namespace pdfpc.Metadata {
          * therefore this value is assumed to be useful.
          */
         public double get_page_width() {
+            return this.get_corrected_page_width(this.original_page_width);
+        }
+
+        /**
+         * Fixes the page width if pdfpc uses notes in slit mode
+         */
+         public double get_corrected_page_width(double page_width) {
             if (    this.notes_position == NotesPosition.LEFT
                  || this.notes_position == NotesPosition.RIGHT) {
-                 return this.original_page_width / 2;
+                 return page_width / 2;
             } else {
-                return this.original_page_width;
+                return page_width;
             }
-        }
+         }
 
         /**
          * Return the height of the first page of the loaded pdf document.
@@ -691,30 +698,41 @@ namespace pdfpc.Metadata {
          * therefore this value is assumed to be useful.
          */
         public double get_page_height() {
+            return this.get_corrected_page_height(this.original_page_height);
+        }
+
+        /**
+         * Fixes the page height if pdfpc uses notes in slit mode
+         */
+         public double get_corrected_page_height(double page_height) {
             if (    this.notes_position == NotesPosition.TOP
                  || this.notes_position == NotesPosition.BOTTOM) {
-                 return this.original_page_height / 2;
+                 return page_height / 2;
             } else {
-                return this.original_page_height;
+                return page_height;
             }
-        }
+         }
 
         /**
          * Return the horizontal offset of the given area on the page
          */
-        public double get_horizontal_offset(Area area) {
+        public double get_horizontal_offset(Area area, double page_width = 0) {
+            if (page_width == 0) {
+                page_width = this.original_page_width;
+            }
+
             switch (area) {
                 case Area.CONTENT:
                     switch (this.notes_position) {
                         case NotesPosition.LEFT:
-                            return this.original_page_width / 2;
+                            return page_width / 2;
                         default:
                             return 0;
                     }
                 case Area.NOTES:
                     switch (this.notes_position) {
                         case NotesPosition.RIGHT:
-                            return this.original_page_width / 2;
+                            return page_width / 2;
                         default:
                             return 0;
                     }
@@ -726,19 +744,23 @@ namespace pdfpc.Metadata {
         /**
          * Return the vertical offset of the given area on the page
          */
-        public double get_vertical_offset(Area area) {
+        public double get_vertical_offset(Area area, double page_height = 0) {
+            if (page_height == 0) {
+                page_height = this.original_page_height;
+            }
+
             switch (area) {
                 case Area.CONTENT:
                     switch (this.notes_position) {
                         case NotesPosition.TOP:
-                            return this.original_page_height / 2;
+                            return page_height / 2;
                         default:
                             return 0;
                     }
                 case Area.NOTES:
                     switch (this.notes_position) {
                         case NotesPosition.BOTTOM:
-                            return this.original_page_height / 2;
+                            return page_height / 2;
                         default:
                             return 0;
                     }
