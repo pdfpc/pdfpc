@@ -40,7 +40,6 @@ namespace pdfpc {
         public int display_num { get; set; }
         public Gdk.Rectangle rect { get; set; }
         public Window.Fullscreen window { get; set; }
-        public int gdk_scale { get; set; }
     }
 
     /**
@@ -653,17 +652,15 @@ namespace pdfpc {
             Gee.List<VideoConf> video_confs = new Gee.ArrayList<VideoConf>();
             while (true) {
                 Gdk.Rectangle rect;
-                int gdk_scale;
                 Window.Fullscreen window;
-                this.controller.overlay_pos(n, this.area, out rect, out gdk_scale, out window);
+                this.controller.overlay_pos(n, this.area, out rect, out window);
                 if (window == null) {
                     break;
                 }
                 VideoConf conf = new VideoConf() {
                     display_num = n,
                     rect = rect,
-                    window = window,
-                    gdk_scale = gdk_scale
+                    window = window
                 };
                 video_confs.add(conf);
 

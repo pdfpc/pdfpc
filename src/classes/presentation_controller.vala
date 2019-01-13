@@ -1993,12 +1993,11 @@ namespace pdfpc {
          * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
          * controllable's main view.
          */
-        public void overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect, out int gdk_scale, out Window.Fullscreen window) {
+        public void overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect, out Window.Fullscreen window) {
             window = null;
 
             Controllable c = (n < this.controllables.size) ? this.controllables.get(n) : null;
             // default scale, and make the compiler happy
-            gdk_scale = 1;
             if (c == null) {
                 rect = Gdk.Rectangle();
                 return;
@@ -2009,7 +2008,6 @@ namespace pdfpc {
                 return;
             }
             rect = c.main_view.convert_poppler_rectangle_to_gdk_rectangle(area);
-            gdk_scale = c.main_view.scale_factor;
         }
 #endif
     }
