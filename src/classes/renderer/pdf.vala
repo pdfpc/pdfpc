@@ -109,21 +109,16 @@ namespace pdfpc {
             cr.fill();
 
             // Calculate the scaling factor and the offsets for centering
-            double width1, height1;
-            page.get_size(out width1, out height1);
-            double scaling_factor, v_offset, h_offset;
-            if (width/width1 < height/height1) {
-                scaling_factor = width/width1;
-                h_offset = 0;
-                v_offset = (height/scaling_factor - height1)/2;
-            } else {
-                scaling_factor = height/height1;
-                h_offset = (width/scaling_factor - width1)/2;
-                v_offset = 0;
-            }
+            double full_page_width, corrected_page_width, full_page_height, corrected_page_height;
+            page.get_size(out full_page_width, out full_page_height);
+            corrected_page_width = metadata.get_corrected_page_width(full_page_width);
+            corrected_page_height = metadata.get_corrected_page_height(full_page_height);
+
+            double scaling_factor = Math.fmax(width / corrected_page_width, height / corrected_page_height);
             cr.scale(scaling_factor, scaling_factor);
-            cr.translate(-metadata.get_horizontal_offset(this.area) + h_offset,
-                -metadata.get_vertical_offset(this.area) + v_offset);
+
+            cr.translate(-metadata.get_horizontal_offset(this.area, full_page_width),
+                -metadata.get_vertical_offset(this.area, full_page_height));
             page.render(cr);
 
             // If the cache is enabled store the newly rendered pixmap
