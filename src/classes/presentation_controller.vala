@@ -605,6 +605,24 @@ namespace pdfpc {
             }
         }
 
+        private void hide_or_show_pointer_surfaces() {
+            if (this.annotation_mode == AnnotationMode.POINTER) {
+                if (presenter != null) {
+                    presenter_pointer_surface.show();
+                }
+                if (presentation != null) {
+                    presentation_pointer_surface.show();
+                }
+            } else {
+                if (presenter != null) {
+                    presenter_pointer_surface.hide();
+                }
+                if (presentation != null) {
+                    presentation_pointer_surface.hide();
+                }
+            }
+        }
+
         public void set_mode(AnnotationMode mode) {
             if (this.annotation_mode == mode) {
                 return;
@@ -633,21 +651,7 @@ namespace pdfpc {
             }
 
             // Update pointer surfaces
-            if (this.annotation_mode == AnnotationMode.POINTER) {
-                if (presenter != null) {
-                    presenter_pointer_surface.show();
-                }
-                if (presentation != null) {
-                    presentation_pointer_surface.show();
-                }
-            } else {
-                if (presenter != null) {
-                    presenter_pointer_surface.hide();
-                }
-                if (presentation != null) {
-                    presentation_pointer_surface.hide();
-                }
-            }
+            hide_or_show_pointer_surfaces();
 
             // Update drawing surfaces
             hide_or_show_pen_surfaces();
