@@ -114,11 +114,20 @@ namespace pdfpc {
             corrected_page_width = metadata.get_corrected_page_width(full_page_width);
             corrected_page_height = metadata.get_corrected_page_height(full_page_height);
 
-            double scaling_factor = Math.fmax(width / corrected_page_width, height / corrected_page_height);
+            double scaling_factor, v_offset, h_offset;
+            if (width/corrected_page_width < height/corrected_page_height) {
+                scaling_factor = width/corrected_page_width;
+                h_offset = 0;
+                v_offset = (height/scaling_factor - corrected_page_height)/2;
+            } else {
+                scaling_factor = height/corrected_page_height;
+                h_offset = (width/scaling_factor - corrected_page_width)/2;
+                v_offset = 0;
+            }
             cr.scale(scaling_factor, scaling_factor);
 
-            cr.translate(-metadata.get_horizontal_offset(this.area, full_page_width),
-                -metadata.get_vertical_offset(this.area, full_page_height));
+            cr.translate(-metadata.get_horizontal_offset(this.area, full_page_width) + h_offset,
+                -metadata.get_vertical_offset(this.area, full_page_height) + v_offset);
             page.render(cr);
 
             // If the cache is enabled store the newly rendered pixmap
