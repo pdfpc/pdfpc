@@ -34,6 +34,11 @@ entry {
     background-image: none;
 }
 
+paned separator {
+    background-image: none;
+    background-color: black;
+}
+
 .toolbox button:not(.color) * {
     background-color: gray;
 }

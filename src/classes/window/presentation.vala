@@ -60,7 +60,6 @@ namespace pdfpc.Window {
             this.controller.update_request.connect(this.update);
 
             this.view = new View.Pdf.from_fullscreen(this,
-                this.screen_geometry.width, this.screen_geometry.height,
                 Metadata.Area.CONTENT, true);
 
             if (!Options.disable_caching) {

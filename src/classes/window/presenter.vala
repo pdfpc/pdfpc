@@ -174,11 +174,6 @@ namespace pdfpc.Window {
          **/
         private int toolbox_icon_height;
 
-        /**
-         * Width of next/notes area
-         **/
-        protected int next_allocated_width;
-
         protected bool on_button_press(Gtk.Widget pbut, Gdk.EventButton event) {
             if (event.button == 1 ) {
                 var w = this.get_window();
@@ -265,14 +260,22 @@ namespace pdfpc.Window {
             return button;
         }
 
+        private void disable_paned_handle(Gtk.Paned paned) {
+            paned.map.connect(() => {
+                    var handle = paned.get_handle_window();
+                    if (handle != null) {
+                        handle.set_cursor(null);
+                        handle.set_events(0);
+                    }
+                });
+        }
+
        /**
          * Base constructor instantiating a new presenter window
          */
         public Presenter(PresentationController controller,
             int screen_num) {
             base(screen_num);
-
-            this.resizable = false;
 
             this.controller = controller;
 
@@ -290,68 +293,32 @@ namespace pdfpc.Window {
             this.controller.increase_font_size_request.connect(this.increase_font_size);
             this.controller.decrease_font_size_request.connect(this.decrease_font_size);
 
-            // We need the value of 90% height a lot of times. Therefore store it
-            // in advance
-            var bottom_position = (int) Math.floor(this.screen_geometry.height * 0.9);
-            var bottom_height = this.screen_geometry.height - bottom_position;
+            // TODO: update the page aspect ratio on document reload
+            float page_ratio = (float)
+                (metadata.get_page_width()/metadata.get_page_height());
+
+            // The bottom row is 10% of the window height, fixed
+            int bottom_frac_inv = 10;
+            double bottom_height =
+                (double) this.screen_geometry.height/bottom_frac_inv;
 
             // In most scenarios the current slide is displayed bigger than the
             // next one. The option current_size represents the width this view
             // should use as a percentage value. The maximal height is 90% of
             // the screen, as we need a place to display the timer and slide
             // count.
-            Gdk.Rectangle current_slide_rect;
             int current_allocated_width = (int) Math.floor(
-                this.screen_geometry.width * Options.current_size / (double) 100);
-            this.current_view = new View.Pdf.from_fullscreen(
-                this,
-                current_allocated_width,
-                (int) Math.floor(Options.current_height * bottom_position / (double) 100),
-                Metadata.Area.NOTES,
-                true,
-                true,
-                out current_slide_rect
-            );
+                this.screen_geometry.width*Options.current_size/100.0);
+            this.current_view = new View.Pdf.from_fullscreen(this,
+                Metadata.Area.NOTES, true);
 
-            // The next slide is right to the current one and takes up the
-            // remaining width
+            this.next_view = new View.Pdf.from_fullscreen(this,
+                Metadata.Area.CONTENT, false);
 
-            // do not allocate negative width (in case of current_allocated_width == this.screen_geometry.width)
-            // this happens, when the user set -u 100
-            int next_allocated_width = (int)Math.fmax(this.screen_geometry.width - current_allocated_width - 4, 0);
-            this.next_allocated_width = next_allocated_width;
-            // We leave a bit of margin between the two views
-            Gdk.Rectangle next_slide_rect;
-            this.next_view = new View.Pdf.from_fullscreen(
-                this,
-                next_allocated_width,
-                (int) Math.floor(Options.next_height * bottom_position / (double)100 ),
-                Metadata.Area.CONTENT,
-                false,
-                true,
-                out next_slide_rect
-            );
-
-            Gdk.Rectangle strict_next_slide_rect;
-            this.strict_next_view = new View.Pdf.from_fullscreen(
-                this,
-                (int) Math.floor(0.5 * current_allocated_width),
-                (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
-                Metadata.Area.CONTENT,
-                false,
-                true,
-                out strict_next_slide_rect
-            );
-            Gdk.Rectangle strict_prev_slide_rect;
-            this.strict_prev_view = new View.Pdf.from_fullscreen(
-                this,
-                (int) Math.floor(0.5 * current_allocated_width),
-                (int) (Options.disable_auto_grouping ? 1 : (Math.floor(0.19 * bottom_position) - 2)),
-                Metadata.Area.CONTENT,
-                false,
-                true,
-                out strict_prev_slide_rect
-            );
+            this.strict_next_view = new View.Pdf.from_fullscreen(this,
+                Metadata.Area.CONTENT, false);
+            this.strict_prev_view = new View.Pdf.from_fullscreen(this,
+                Metadata.Area.CONTENT, false);
 
             this.css_provider = new Gtk.CssProvider();
             Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
@@ -360,7 +327,6 @@ namespace pdfpc.Window {
             // TextView for notes in the slides
             this.notes_view = new Gtk.TextView();
             this.notes_view.name = "notesView";
-            this.notes_view.set_size_request(next_allocated_width, -1);
             this.notes_view.editable = false;
             this.notes_view.cursor_visible = false;
             this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
@@ -412,7 +378,8 @@ namespace pdfpc.Window {
             this.prerender_progress.no_show_all = true;
             this.prerender_progress.valign = Gtk.Align.END;
 
-            int icon_height = (int)Math.round(bottom_height*0.9);
+            // TODO: resize icons and "bottom" widgets on geometry change
+            int icon_height = (int) (0.9*bottom_height);
 
             this.blank_icon = this.load_icon("blank.svg", icon_height);
             this.hidden_icon = this.load_icon("hidden.svg", icon_height);
@@ -465,40 +432,53 @@ namespace pdfpc.Window {
                 this.strict_prev_view.get_renderer().cache = Renderer.Cache.create(metadata);
             }
 
-            Gtk.Box slide_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 4);
+            Gtk.AspectFrame frame;
 
-            var strict_views = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            strict_views.pack_start(this.strict_prev_view, false, false, 0);
-            strict_views.pack_end(this.strict_next_view, false, false, 0);
+            var slide_views = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
+            slide_views.position = current_allocated_width;
+            slide_views.wide_handle = true;
+            disable_paned_handle(slide_views);
+
+            var strict_views = new Gtk.Grid();
+            strict_views.column_homogeneous = true;
+            strict_views.row_homogeneous = true;
+            strict_views.column_spacing = 10;
+            frame = new Gtk.AspectFrame(null, 0.0f, 0.0f, page_ratio, false);
+            frame.add(this.strict_prev_view);
+            strict_views.attach(frame, 0, 0);
+            frame = new Gtk.AspectFrame(null, 1.0f, 0.0f, page_ratio, false);
+            frame.add(this.strict_next_view);
+            strict_views.attach(frame, 1, 0);
 
             this.overlay_layout.add(this.current_view);
 
-            // The alignments are only needed for fixed-size windows,
-            // and should eventually be removed (they interfer with the
-            // automatic container geometry management
-            this.overlay_layout.halign = Gtk.Align.CENTER;
-            this.overlay_layout.valign = Gtk.Align.CENTER;
-
             this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
 
-            var current_view_and_stricts = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            current_view_and_stricts.pack_start(overlay_layout, false, false, 0);
-            current_view_and_stricts.pack_start(strict_views, false, false, 0);
 
-            slide_views.pack_start(current_view_and_stricts, true, true, 0);
+            var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            current_view_and_stricts.position = (int) (0.7*screen_geometry.height);
+            current_view_and_stricts.wide_handle = true;
+            disable_paned_handle(current_view_and_stricts);
+            frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
+            frame.add(overlay_layout);
+            current_view_and_stricts.pack1(frame, true, true);
+            current_view_and_stricts.pack2(strict_views, true, true);
 
-            var nextViewWithNotes = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            nextViewWithNotes.set_size_request(this.next_allocated_width, -1);
-            this.next_view.halign = Gtk.Align.CENTER;
-            this.next_view.valign = Gtk.Align.CENTER;
-            nextViewWithNotes.pack_start(next_view, false, false, 0);
+            slide_views.pack1(current_view_and_stricts, true, true);
+
+            var next_view_and_notes = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            next_view_and_notes.position = (int) (0.55*screen_geometry.height);
+            next_view_and_notes.wide_handle = true;
+            disable_paned_handle(next_view_and_notes);
+            frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
+            frame.add(next_view);
+            next_view_and_notes.pack1(frame, true, true);
 
             var notes_sw = new Gtk.ScrolledWindow(null, null);
-            notes_sw.set_size_request(this.next_allocated_width, -1);
             notes_sw.add(this.notes_view);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-            nextViewWithNotes.pack_start(notes_sw, true, true, 5);
-            slide_views.pack_start(nextViewWithNotes, true, true, 0);
+            next_view_and_notes.pack2(notes_sw, true, true);
+            slide_views.pack2(next_view_and_notes, true, true);
 
             this.slide_stack = new Gtk.Stack();
             this.slide_stack.add_named(slide_views, "slides");
@@ -506,7 +486,6 @@ namespace pdfpc.Window {
             this.slide_stack.homogeneous = true;
 
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            bottom_row.set_size_request(this.screen_geometry.width, bottom_height);
             bottom_row.homogeneous = true;
 
             var status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
@@ -532,10 +511,10 @@ namespace pdfpc.Window {
             bottom_row.pack_start(this.timer);
             bottom_row.pack_end(progress_alignment);
 
-            Gtk.Box full_layout = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-            full_layout.set_size_request(this.screen_geometry.width, this.screen_geometry.height);
-            full_layout.pack_start(this.slide_stack, true, true, 0);
-            full_layout.pack_end(bottom_row, false, false, 0);
+            Gtk.Grid full_layout = new Gtk.Grid();
+            full_layout.row_homogeneous = true;
+            full_layout.attach(this.slide_stack, 0, 0, 1, bottom_frac_inv - 1);
+            full_layout.attach(bottom_row, 0, bottom_frac_inv - 1, 1, 1);
 
             Gtk.Overlay full_overlay = new Gtk.Overlay();
             full_overlay.add_overlay(full_layout);
@@ -545,33 +524,33 @@ namespace pdfpc.Window {
 
             Gtk.Orientation toolbox_orientation = Gtk.Orientation.HORIZONTAL;
             bool tbox_inverse = false;
-            int tb_offset = (int) Math.round(0.1*strict_prev_slide_rect.height);
+            int tb_offset = (int) (0.02*this.screen_geometry.height);
 
             int tbox_x = 0, tbox_y = 0;
             switch (Options.toolbox_direction) {
                 case Options.ToolboxDirection.LtoR:
                     toolbox_orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = false;
-                    tbox_x = strict_prev_slide_rect.width + tb_offset;
-                    tbox_y = current_slide_rect.height + tb_offset;
+                    tbox_x = (int) (0.15*this.screen_geometry.width) + tb_offset;
+                    tbox_y = (int) (0.70*this.screen_geometry.height) + tb_offset;
                     break;
                 case Options.ToolboxDirection.RtoL:
                     toolbox_orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = true;
-                    tbox_x = strict_next_slide_rect.width - tb_offset;
-                    tbox_y = current_slide_rect.height + tb_offset;
+                    tbox_x = (int) (0.15*this.screen_geometry.width) - tb_offset;
+                    tbox_y = (int) (0.70*this.screen_geometry.height) + tb_offset;
                     break;
                 case Options.ToolboxDirection.TtoB:
                     toolbox_orientation = Gtk.Orientation.VERTICAL;
                     tbox_inverse = false;
-                    tbox_x = current_slide_rect.width + tb_offset;
-                    tbox_y = next_slide_rect.height + tb_offset;
+                    tbox_x = 0*this.screen_geometry.width + tb_offset;
+                    tbox_y = 0*this.screen_geometry.height + tb_offset;
                     break;
                 case Options.ToolboxDirection.BtoT:
                     toolbox_orientation = Gtk.Orientation.VERTICAL;
                     tbox_inverse = true;
-                    tbox_x = current_slide_rect.width + tb_offset;
-                    tbox_y = next_slide_rect.height + tb_offset;
+                    tbox_x = 0*this.screen_geometry.width + tb_offset;
+                    tbox_y = 0*this.screen_geometry.height + tb_offset;
                     break;
             }
             toolbox = new Gtk.Box(toolbox_orientation, 0);
