@@ -150,34 +150,18 @@ namespace pdfpc {
         /**
          * Create a new Pdf view from a Fullscreen window instance
          *
-         * This is a convenience constructor which automatically create a full
+         * This is a convenience constructor which automatically creates a full
          * metadata and rendering chain to be used with the pdf view.
-         * size_request = true comes from windows unable to manage configure
-         * events themselves (i.e., all presenter view widgets). It is for these
-         * widgets that we return scale_rect, which is obtained in
-         * conjunction with a scaler to maintain the page aspect ratio.
          */
         public Pdf.from_fullscreen(Window.Fullscreen window,
-            int width, int height, Metadata.Area area,
-            bool clickable_links,
-            bool size_request = false,
-            out Gdk.Rectangle scale_rect = null) {
+            Metadata.Area area, bool clickable_links) {
             var controller = window.controller;
             var metadata = controller.metadata;
-            var scaler = new Scaler(metadata.get_page_width(),
-                metadata.get_page_height());
-            scale_rect = scaler.scale_to(width, height);
 
-            var renderer = new Renderer.Pdf(metadata,
-                scale_rect.width*window.gdk_scale,
-                scale_rect.height*window.gdk_scale,
-                area);
+            // will be resized on first use
+            var renderer = new Renderer.Pdf(metadata, 1, 1, area);
 
             this(renderer, clickable_links, controller, window.gdk_scale);
-
-            if (size_request) {
-                this.set_size_request(scale_rect.width, scale_rect.height);
-            }
         }
 
         /**
