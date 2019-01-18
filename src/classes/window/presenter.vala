@@ -846,23 +846,6 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Display a specific page
-         */
-        public void goto_page(int page_number) {
-            try {
-                this.current_view.display(page_number);
-                this.next_view.display(page_number + 1);
-            } catch( Renderer.RenderError e ) {
-                GLib.printerr("The pdf page %d could not be rendered: %s\n", page_number, e.message);
-                Process.exit(1);
-            }
-
-            this.update_slide_count();
-            this.update_note();
-            this.blank_icon.hide();
-        }
-
-        /**
          * Ask for the page to jump to
          */
         public void ask_goto_page() {
