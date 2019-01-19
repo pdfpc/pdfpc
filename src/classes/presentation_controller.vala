@@ -946,6 +946,9 @@ namespace pdfpc {
             add_action("resetTimer", this.reset_timer,
                 "Reset the timer");
 
+            add_action("windowed", this.toggle_windowed,
+                "Toggle the windowed state");
+
             add_action("blank", this.fade_to_black,
                 "Blank the presentation screen");
             add_action("hide", this.hide_presentation,
@@ -1785,6 +1788,14 @@ namespace pdfpc {
             this.overview_shown = false;
             this.hide_overview_request();
             this.controllables_update();
+        }
+
+        protected void toggle_windowed() {
+            if (this.presenter != null) {
+                this.presenter.toggle_windowed();
+            } else if (this.presentation != null) {
+                this.presentation.toggle_windowed();
+            }
         }
 
         /**

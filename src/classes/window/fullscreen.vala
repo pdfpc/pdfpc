@@ -55,6 +55,8 @@ namespace pdfpc.Window {
         protected int window_w;
         protected int window_h;
 
+        protected bool windowed;
+
         /**
          * Timer id which monitors mouse motion to hide the cursor after 5
          * seconds of inactivity
@@ -110,6 +112,7 @@ namespace pdfpc.Window {
         protected int monitor_num_to_use;
 
         public Fullscreen(int monitor_num, int width = -1, int height = -1) {
+            this.windowed = Options.windowed;
             this.gdk_scale = 1;
             var display = Gdk.Display.get_default();
             Gdk.Monitor monitor;
@@ -166,7 +169,7 @@ namespace pdfpc.Window {
                 this.window_h /= this.gdk_scale;
             }
 
-            if (!Options.windowed) {
+            if (!this.windowed) {
                 if (Options.move_on_mapped) {
                     // Some WM's ignore move requests made prior to
                     // mapping the window
@@ -200,7 +203,6 @@ namespace pdfpc.Window {
             this.configure_event.connect((ev) => {
                     if (ev.width != this.window_w ||
                         ev.height != this.window_h) {
-                        printerr("%d %d\n", ev.width, ev.height);
                         this.window_w = ev.width;
                         this.window_h = ev.height;
                     }
@@ -219,6 +221,19 @@ namespace pdfpc.Window {
             // Specially for Wayland; just fullscreen() would do otherwise...
             this.fullscreen_on_monitor(this.screen_to_use,
                 this.monitor_num_to_use);
+        }
+
+        public void toggle_windowed() {
+            this.windowed = !this.windowed;
+            var display = this.get_display();
+            if (!this.windowed) {
+                var window = this.get_window();
+                if (window != null) {
+                    this.do_fullscreen(display.get_monitor_at_window(window));
+                }
+            } else {
+                this.unfullscreen();
+            }
         }
 
         /**
