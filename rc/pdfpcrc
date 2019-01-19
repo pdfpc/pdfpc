@@ -51,6 +51,9 @@ bind C+q                quit
 # Exit
 bind C+r                reload
 
+# Presenter state
+bind w                  windowed
+
 # Presentation state
 bind b                  blank
 bind f                  freeze

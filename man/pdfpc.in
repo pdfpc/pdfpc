@@ -191,6 +191,9 @@ Toggle visibility of the drawings; if in the drawing mode (pen/eraser), exit it
 Freeze the current presentation display (the presenter display is still
 fully active)
 .TP
+.B w
+Toggle between the fullscreen and windowed mode of the presenter screen
+.TP
 .B b
 Turn off the presentation view (i.e.  fill it with a black color)
 .TP
