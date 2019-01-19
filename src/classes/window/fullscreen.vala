@@ -50,9 +50,10 @@ namespace pdfpc.Window {
         }
 
         /**
-         * The geometry data of the screen this window is on
+         * The geometry of this window
          */
-        protected Gdk.Rectangle screen_geometry;
+        protected int window_w;
+        protected int window_h;
 
         /**
          * Timer id which monitors mouse motion to hide the cursor after 5
@@ -129,15 +130,6 @@ namespace pdfpc.Window {
                 // Shouldn't be used, just a safety precaution
                 this.monitor_num_to_use = 0;
             }
-            this.screen_geometry = monitor.get_geometry();
-            this.gdk_scale = monitor.get_scale_factor();
-
-            if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
-                // See issue 214. Wayland is doing some double scaling therefore
-                // we are lying about the actual screen size
-                this.screen_geometry.width /= this.gdk_scale;
-                this.screen_geometry.height /= this.gdk_scale;
-            }
 
             this.overlay_layout = new Gtk.Overlay();
 
@@ -161,26 +153,41 @@ namespace pdfpc.Window {
                     true);
             });
 
+            this.gdk_scale = monitor.get_scale_factor();
+
+            // By default, we go fullscreen
+            var monitor_geometry = monitor.get_geometry();
+            this.window_w = monitor_geometry.width;
+            this.window_h = monitor_geometry.height;
+            if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
+                // See issue 214. Wayland is doing some double scaling therefore
+                // we are lying about the actual screen size
+                this.window_w /= this.gdk_scale;
+                this.window_h /= this.gdk_scale;
+            }
+
             if (!Options.windowed) {
                 if (Options.move_on_mapped) {
-                     // Some WM's ignore move requests made prior to
-                     // mapping the window
-                    this.map_event.connect(this.on_mapped);
+                    // Some WM's ignore move requests made prior to
+                    // mapping the window
+                    this.map_event.connect(() => {
+                            this.do_fullscreen(monitor);
+                            return true;
+                        });
                 } else {
-                    this.do_fullscreen();
+                    this.do_fullscreen(monitor);
                 }
             } else {
                 if (width > 0 && height > 0) {
-                    this.screen_geometry.width = width;
-                    this.screen_geometry.height = height;
+                    this.window_w = width;
+                    this.window_h = height;
                 } else {
-                    this.screen_geometry.width /= 2;
-                    this.screen_geometry.height /= 2;
+                    this.window_w /= 2;
+                    this.window_h /= 2;
                 }
             }
 
-            this.set_default_size(this.screen_geometry.width,
-                this.screen_geometry.height);
+            this.set_default_size(this.window_w, this.window_h);
 
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
             this.motion_notify_event.connect(this.on_mouse_move);
@@ -188,28 +195,30 @@ namespace pdfpc.Window {
             // Start the 5 seconds timeout after which the mouse cursor is
             // hidden
             this.restart_hide_cursor_timer();
+
+            // Watch for window geometry changes; keep the local copy updated
+            this.configure_event.connect((ev) => {
+                    if (ev.width != this.window_w ||
+                        ev.height != this.window_h) {
+                        printerr("%d %d\n", ev.width, ev.height);
+                        this.window_w = ev.width;
+                        this.window_h = ev.height;
+                    }
+                    return false;
+                });
         }
 
-        protected void do_fullscreen() {
+        protected void do_fullscreen(Gdk.Monitor monitor) {
             // Wayland has no concept of global coordinates, so move() does not
             // work there. The window is "somewhere", but we do not care,
             // since the next call should fix it. For X11 and KWin/Plasma this
             // does the right thing.
-            this.move(this.screen_geometry.x, this.screen_geometry.y);
+            Gdk.Rectangle monitor_geometry = monitor.get_geometry();
+            this.move(monitor_geometry.x, monitor_geometry.y);
 
             // Specially for Wayland; just fullscreen() would do otherwise...
             this.fullscreen_on_monitor(this.screen_to_use,
                 this.monitor_num_to_use);
-        }
-
-        protected bool on_mapped(Gdk.EventAny event) {
-            if (event.type != Gdk.EventType.MAP) {
-                return false;
-            }
-
-            this.do_fullscreen();
-
-            return true;
         }
 
         /**
