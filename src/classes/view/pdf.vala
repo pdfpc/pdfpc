@@ -84,6 +84,11 @@ namespace pdfpc {
         protected int current_slide_number;
 
         /**
+         * Whether the view should remain black
+         */
+        public bool disabled;
+
+        /**
          * The surface containing the currently shown slide
          */
         protected Cairo.ImageSurface current_slide;
@@ -295,7 +300,7 @@ namespace pdfpc {
 
             // Render the requested slide
             // An exception is thrown here, if the slide can not be rendered.
-            if (slide_number < this.n_slides)
+            if (slide_number < this.n_slides && !this.disabled)
                 this.current_slide = this.renderer.render_to_surface(slide_number);
             else
                 this.current_slide = this.renderer.fade_to_black();
@@ -305,14 +310,6 @@ namespace pdfpc {
             this.queue_draw();
 
             this.entering_slide(this.current_slide_number);
-        }
-
-        /**
-         * Fill everything with black
-         */
-        public void fade_to_black() {
-            this.current_slide = this.renderer.fade_to_black();
-            this.queue_draw();
         }
 
         /**
@@ -387,4 +384,3 @@ namespace pdfpc {
         }
     }
 }
-
