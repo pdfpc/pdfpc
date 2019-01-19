@@ -98,12 +98,14 @@ namespace pdfpc.Window {
         public void update() {
             this.visible = !this.controller.hidden;
 
-            if (this.controller.faded_to_black) {
-                this.view.fade_to_black();
-                return;
-            }
             if (this.controller.frozen)
                 return;
+
+            if (this.controller.faded_to_black) {
+                this.view.disabled = true;
+            } else {
+                this.view.disabled = false;
+            }
 
             try {
                 this.view.display(this.controller.current_slide_number, true);

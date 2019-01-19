@@ -784,15 +784,17 @@ namespace pdfpc.Window {
                 this.next_view.display(this.metadata.user_slide_to_real_slide(
                     current_user_slide_number + 1), true);
                 if (this.controller.skip_next()) {
-                    this.strict_next_view.display(current_slide_number + 1, true);
+                    this.strict_next_view.disabled = false;
                 } else {
-                    this.strict_next_view.fade_to_black();
+                    this.strict_next_view.disabled = true;
                 }
+                this.strict_next_view.display(current_slide_number + 1, true);
                 if (this.controller.skip_previous()) {
-                    this.strict_prev_view.display(current_slide_number - 1, true);
+                    this.strict_prev_view.disabled = false;
                 } else {
-                    this.strict_prev_view.fade_to_black();
+                    this.strict_prev_view.disabled = true;
                 }
+                this.strict_prev_view.display(current_slide_number - 1, true);
             }
             catch( Renderer.RenderError e ) {
                 GLib.printerr("The pdf page %d could not be rendered: %s\n", current_slide_number, e.message);
