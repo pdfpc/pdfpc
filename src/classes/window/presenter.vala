@@ -300,7 +300,7 @@ namespace pdfpc.Window {
             // The bottom row is 10% of the window height, fixed
             int bottom_frac_inv = 10;
             double bottom_height =
-                (double) this.screen_geometry.height/bottom_frac_inv;
+                (double) this.window_h/bottom_frac_inv;
 
             // In most scenarios the current slide is displayed bigger than the
             // next one. The option current_size represents the width this view
@@ -308,7 +308,7 @@ namespace pdfpc.Window {
             // the screen, as we need a place to display the timer and slide
             // count.
             int current_allocated_width = (int) Math.floor(
-                this.screen_geometry.width*Options.current_size/100.0);
+                this.window_w*Options.current_size/100.0);
             this.current_view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.NOTES, true);
 
@@ -408,7 +408,7 @@ namespace pdfpc.Window {
                 bottom_text_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
 
             const string bottom_text_css_template = ".bottomText { font-size: %dpx; }";
-            var target_size_height = (int) ((double)this.screen_geometry.height / 400.0 * 12.0);
+            var target_size_height = (int) ((double)this.window_h / 400.0 * 12.0);
             var bottom_css = bottom_text_css_template.printf(target_size_height);
 
             try {
@@ -456,7 +456,7 @@ namespace pdfpc.Window {
 
 
             var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
-            current_view_and_stricts.position = (int) (0.7*screen_geometry.height);
+            current_view_and_stricts.position = (int) (0.7*this.window_h);
             current_view_and_stricts.wide_handle = true;
             disable_paned_handle(current_view_and_stricts);
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
@@ -467,7 +467,7 @@ namespace pdfpc.Window {
             slide_views.pack1(current_view_and_stricts, true, true);
 
             var next_view_and_notes = new Gtk.Paned(Gtk.Orientation.VERTICAL);
-            next_view_and_notes.position = (int) (0.55*screen_geometry.height);
+            next_view_and_notes.position = (int) (0.55*this.window_h);
             next_view_and_notes.wide_handle = true;
             disable_paned_handle(next_view_and_notes);
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
@@ -524,33 +524,33 @@ namespace pdfpc.Window {
 
             Gtk.Orientation toolbox_orientation = Gtk.Orientation.HORIZONTAL;
             bool tbox_inverse = false;
-            int tb_offset = (int) (0.02*this.screen_geometry.height);
+            int tb_offset = (int) (0.02*this.window_h);
 
             int tbox_x = 0, tbox_y = 0;
             switch (Options.toolbox_direction) {
                 case Options.ToolboxDirection.LtoR:
                     toolbox_orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = false;
-                    tbox_x = (int) (0.15*this.screen_geometry.width) + tb_offset;
-                    tbox_y = (int) (0.70*this.screen_geometry.height) + tb_offset;
+                    tbox_x = (int) (0.15*this.window_w) + tb_offset;
+                    tbox_y = (int) (0.70*this.window_h) + tb_offset;
                     break;
                 case Options.ToolboxDirection.RtoL:
                     toolbox_orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = true;
-                    tbox_x = (int) (0.15*this.screen_geometry.width) - tb_offset;
-                    tbox_y = (int) (0.70*this.screen_geometry.height) + tb_offset;
+                    tbox_x = (int) (0.15*this.window_w) - tb_offset;
+                    tbox_y = (int) (0.70*this.window_h) + tb_offset;
                     break;
                 case Options.ToolboxDirection.TtoB:
                     toolbox_orientation = Gtk.Orientation.VERTICAL;
                     tbox_inverse = false;
-                    tbox_x = 0*this.screen_geometry.width + tb_offset;
-                    tbox_y = 0*this.screen_geometry.height + tb_offset;
+                    tbox_x = 0*this.window_w + tb_offset;
+                    tbox_y = 0*this.window_h + tb_offset;
                     break;
                 case Options.ToolboxDirection.BtoT:
                     toolbox_orientation = Gtk.Orientation.VERTICAL;
                     tbox_inverse = true;
-                    tbox_x = 0*this.screen_geometry.width + tb_offset;
-                    tbox_y = 0*this.screen_geometry.height + tb_offset;
+                    tbox_x = 0*this.window_w + tb_offset;
+                    tbox_y = 0*this.window_h + tb_offset;
                     break;
             }
             toolbox = new Gtk.Box(toolbox_orientation, 0);
