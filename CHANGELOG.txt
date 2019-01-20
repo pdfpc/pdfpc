@@ -2,6 +2,14 @@
 pdfpc Changelog
 ===============
 
+Version 4.3.1
+=============
+
+*Released: January 2019*
+
+- Fix --notes= behaviour
+- Fix default key bindings for last/first overlay
+
 Version 4.3.0
 =============
 
