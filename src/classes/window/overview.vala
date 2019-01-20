@@ -401,13 +401,16 @@ namespace pdfpc.Window {
         public override void render(Cairo.Context cr, Gtk.Widget widget,
                                     Gdk.Rectangle background_area, Gdk.Rectangle cell_area,
                                     Gtk.CellRendererState flags) {
+            Cairo.ImageSurface slide_to_fill = null;
+            if (cache != null) {
+                slide_to_fill = cache.retrieve(metadata.user_slide_to_real_slide(this.slide_id));
+            }
             // nothing to show
-            if (cache == null) {
+            if (cache == null || slide_to_fill == null) {
                 cr.set_source_rgba(0.5, 0.5, 0.5, 1);
                 cr.rectangle(cell_area.x, cell_area.y, cell_area.width, cell_area.height);
                 cr.fill();
             } else {
-                var slide_to_fill = this.cache.retrieve(metadata.user_slide_to_real_slide(this.slide_id));
                 double scale_factor = (double)slide_width/slide_to_fill.get_width();
                 cr.scale(scale_factor, scale_factor);
                 cr.set_source_surface(slide_to_fill, (double)cell_area.x/scale_factor, (double)cell_area.y/scale_factor);
