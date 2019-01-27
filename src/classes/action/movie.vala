@@ -493,26 +493,32 @@ namespace pdfpc {
         }
 
         /**
-         * Mark reaching the end of stream, and set state to paused.
+         * Handling of bus messages on the Gstreamer pipeline.
          */
-        public void on_eos(Gst.Bus bus, Gst.Message message) {
-            if (this.loop) {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
-            } else {
-                // Can't seek to beginning w/o updating output, so mark to seek later
-                this.eos = true;
-                this.pause();
+        public void on_gst_message(Gst.Message message) {
+            switch (message.type) {
+            case Gst.MessageType.EOS:
+                if (this.loop) {
+                    this.pipeline.seek_simple(Gst.Format.TIME,
+                        Gst.SeekFlags.FLUSH, this.starttime*Gst.SECOND);
+                } else {
+                    // Can't seek to beginning w/o updating output,
+                    // so mark to seek later
+                    this.eos = true;
+                    this.pause();
+                }
+                break;
+            case Gst.MessageType.ERROR:
+                GLib.Error err;
+                string debug_info;
+                message.parse_error(out err, out debug_info);
+                GLib.printerr("Gstreamer error from element %s: %s\n",
+                    message.src.name, err.message);
+                if (debug_info != null) {
+                    GLib.printerr("  (debugging info: %s)\n", debug_info);
+                }
+                break;
             }
-        }
-
-        /**
-         * Basic printout of error messages on the pipeline.
-         */
-        public void on_message(Gst.Bus bus, Gst.Message message) {
-            GLib.Error err;
-            string debug;
-            message.parse_error(out err, out debug);
-            GLib.printerr("Gstreamer error %s\n", err.message);
         }
 
         /**
@@ -739,10 +745,10 @@ namespace pdfpc {
             this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
             this.pipeline.set("video_sink", bin);
             this.pipeline.set("mute", this.noaudio);
+
             Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
-            bus.message["error"] += this.on_message;
-            bus.message["eos"] += this.on_eos;
+            bus.message.connect(this.on_gst_message);
 
             Gst.Debug.bin_to_dot_file(bin, Gst.DebugGraphDetails.ALL, "pipeline");
         }
