@@ -74,6 +74,16 @@ namespace pdfpc.Window {
         protected Gtk.ProgressBar prerender_progress;
 
         /**
+         * The bottom row is 10% of the window height, fixed
+         */
+        private int bottom_frac_inv = 10;
+
+        /**
+         * Container for the status icons
+         */
+        protected Gtk.Box status;
+
+        /**
          * Indication that the slide is blanked (faded to black)
          */
         protected Gtk.Image blank_icon;
@@ -117,6 +127,11 @@ namespace pdfpc.Window {
          * CSS provider for setting note font size
          */
         protected Gtk.CssProvider css_provider;
+
+        /**
+         * CSS provider for setting timer and slide progress font size
+         */
+        protected Gtk.CssProvider bottom_text_css_provider;
 
         /**
          * Indication that the highlight tool is selected
@@ -270,6 +285,110 @@ namespace pdfpc.Window {
                 });
         }
 
+        /**
+         * (Re)load icons
+         **/
+        private void load_icons() {
+            double bottom_height = (double) this.window_h/this.bottom_frac_inv;
+            int icon_height = (int) (0.9*bottom_height);
+
+            // Remove all existing icons
+            var icons = this.status.get_children();
+            foreach (Gtk.Widget icon in icons) {
+                // NB: destroy() calls remove() internally!
+                icon.destroy();
+            }
+
+            this.blank_icon = this.load_icon("blank.svg", icon_height);
+            this.hidden_icon = this.load_icon("hidden.svg", icon_height);
+            this.frozen_icon = this.load_icon("snow.svg", icon_height);
+            this.pause_icon = this.load_icon("pause.svg", icon_height);
+            this.saved_icon = this.load_icon("saved.svg", icon_height);
+            this.loaded_icon = this.load_icon("loaded.svg", icon_height);
+            this.locked_icon = this.load_icon("locked.svg", icon_height);
+
+            this.highlight_icon = this.load_icon("highlight.svg", icon_height);
+            this.pen_icon = this.load_icon("pen.svg", icon_height);
+            this.eraser_icon = this.load_icon("eraser.svg", icon_height);
+
+            this.status.pack_start(this.blank_icon, false, false);
+            this.status.pack_start(this.hidden_icon, false, false);
+            this.status.pack_start(this.frozen_icon, false, false);
+            this.status.pack_start(this.pause_icon, false, false);
+            this.status.pack_start(this.saved_icon, false, false);
+            this.status.pack_start(this.loaded_icon, false, false);
+            this.status.pack_start(this.locked_icon, false, false);
+            this.status.pack_start(this.highlight_icon, false, false);
+            this.status.pack_start(this.pen_icon, false, false);
+            this.status.pack_start(this.eraser_icon, false, false);
+        }
+
+        /**
+         * Update (hide/show) status icons
+         **/
+        private void update_status_icons() {
+            if (this.timer.is_paused()) {
+                this.pause_icon.show();
+            } else {
+                this.pause_icon.hide();
+            }
+            if (this.controller.faded_to_black) {
+                this.blank_icon.show();
+            } else {
+                this.blank_icon.hide();
+            }
+            if (this.controller.hidden) {
+                this.hidden_icon.show();
+            } else {
+                this.hidden_icon.hide();
+            }
+            if (this.controller.frozen) {
+                this.frozen_icon.show();
+            } else {
+                this.frozen_icon.hide();
+            }
+            if (this.controller.is_pointer_active()) {
+                this.highlight_icon.show();
+            } else {
+                this.highlight_icon.hide();
+            }
+            if (this.controller.is_eraser_active()) {
+                this.eraser_icon.show();
+            } else {
+                this.eraser_icon.hide();
+            }
+            if (this.controller.is_pen_active()) {
+                this.pen_icon.show();
+            } else {
+                this.pen_icon.hide();
+            }
+        }
+
+        /**
+         * Set font size for the timer & slide progress widgets
+         **/
+        private void resize_bottom_texts() {
+            const string css_template = ".bottomText { font-size: %dpx; }";
+            var target_size_height = (int) (12.0*this.window_h/400.0);
+            var bottom_css = css_template.printf(target_size_height);
+
+            try {
+                this.bottom_text_css_provider.load_from_data(bottom_css, -1);
+            } catch (Error e) {
+                GLib.printerr("Warning: failed to set CSS for controls.\n");
+            }
+        }
+
+        /**
+         * Resize parts of the GUI that cannot do it themselves (icons, text)
+         **/
+        protected override void resize_gui() {
+            this.load_icons();
+            this.update_status_icons();
+
+            this.resize_bottom_texts();
+        }
+
        /**
          * Base constructor instantiating a new presenter window
          */
@@ -296,11 +415,6 @@ namespace pdfpc.Window {
             // TODO: update the page aspect ratio on document reload
             float page_ratio = (float)
                 (metadata.get_page_width()/metadata.get_page_height());
-
-            // The bottom row is 10% of the window height, fixed
-            int bottom_frac_inv = 10;
-            double bottom_height =
-                (double) this.window_h/bottom_frac_inv;
 
             // In most scenarios the current slide is displayed bigger than the
             // next one. The option current_size represents the width this view
@@ -342,6 +456,11 @@ namespace pdfpc.Window {
                 this.set_font_size(this.metadata.font_size);
             }
 
+            this.bottom_text_css_provider = new Gtk.CssProvider();
+            Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
+                this.bottom_text_css_provider,
+                Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
+
             // The countdown timer is centered in the 90% bottom part of the screen
             this.timer = this.controller.getTimer();
             this.timer.name = "timer";
@@ -378,20 +497,8 @@ namespace pdfpc.Window {
             this.prerender_progress.no_show_all = true;
             this.prerender_progress.valign = Gtk.Align.END;
 
-            // TODO: resize icons and "bottom" widgets on geometry change
-            int icon_height = (int) (0.9*bottom_height);
-
-            this.blank_icon = this.load_icon("blank.svg", icon_height);
-            this.hidden_icon = this.load_icon("hidden.svg", icon_height);
-            this.frozen_icon = this.load_icon("snow.svg", icon_height);
-            this.pause_icon = this.load_icon("pause.svg", icon_height);
-            this.saved_icon = this.load_icon("saved.svg", icon_height);
-            this.loaded_icon = this.load_icon("loaded.svg", icon_height);
-            this.locked_icon = this.load_icon("locked.svg", icon_height);
-
-            this.highlight_icon = this.load_icon("highlight.svg", icon_height);
-            this.pen_icon = this.load_icon("pen.svg", icon_height);
-            this.eraser_icon = this.load_icon("eraser.svg", icon_height);
+            this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
+            this.load_icons();
 
             this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
@@ -401,21 +508,7 @@ namespace pdfpc.Window {
             this.button_press_event.connect(this.controller.button_press);
             this.scroll_event.connect(this.controller.scroll);
 
-            // resize the bottom text based on the window height
-            // (see http://stackoverflow.com/a/35237445/730138)
-            var bottom_text_css_provider = new Gtk.CssProvider();
-            Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
-                bottom_text_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
-
-            const string bottom_text_css_template = ".bottomText { font-size: %dpx; }";
-            var target_size_height = (int) ((double)this.window_h / 400.0 * 12.0);
-            var bottom_css = bottom_text_css_template.printf(target_size_height);
-
-            try {
-                bottom_text_css_provider.load_from_data(bottom_css, -1);
-            } catch (Error e) {
-                GLib.printerr("Warning: failed to set CSS for auto-sized bottom controls.\n");
-            }
+            this.resize_bottom_texts();
 
             this.overview = new Overview(this.controller);
             this.overview.vexpand = true;
@@ -488,18 +581,6 @@ namespace pdfpc.Window {
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             bottom_row.homogeneous = true;
 
-            var status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
-            status.pack_start(this.blank_icon, false, false, 0);
-            status.pack_start(this.hidden_icon, false, false, 0);
-            status.pack_start(this.frozen_icon, false, false, 0);
-            status.pack_start(this.pause_icon, false, false, 0);
-            status.pack_start(this.saved_icon, false, false, 0);
-            status.pack_start(this.loaded_icon, false, false, 0);
-            status.pack_start(this.locked_icon, false, false, 0);
-            status.pack_start(this.highlight_icon, false, false, 0);
-            status.pack_start(this.pen_icon, false, false, 0);
-            status.pack_start(this.eraser_icon, false, false, 0);
-
             this.timer.halign = Gtk.Align.CENTER;
             this.timer.valign = Gtk.Align.END;
 
@@ -507,14 +588,14 @@ namespace pdfpc.Window {
             progress_alignment.pack_start(this.prerender_progress);
             progress_alignment.pack_end(this.slide_progress, false);
 
-            bottom_row.pack_start(status);
+            bottom_row.pack_start(this.status);
             bottom_row.pack_start(this.timer);
             bottom_row.pack_end(progress_alignment);
 
             Gtk.Grid full_layout = new Gtk.Grid();
             full_layout.row_homogeneous = true;
-            full_layout.attach(this.slide_stack, 0, 0, 1, bottom_frac_inv - 1);
-            full_layout.attach(bottom_row, 0, bottom_frac_inv - 1, 1, 1);
+            full_layout.attach(this.slide_stack, 0, 0, 1, this.bottom_frac_inv - 1);
+            full_layout.attach(bottom_row, 0, this.bottom_frac_inv - 1, 1, 1);
 
             Gtk.Overlay full_overlay = new Gtk.Overlay();
             full_overlay.add_overlay(full_layout);
@@ -802,43 +883,14 @@ namespace pdfpc.Window {
             }
             this.update_slide_count();
             this.update_note();
-            if (this.timer.is_paused()) {
-                this.pause_icon.show();
-            } else {
-                this.pause_icon.hide();
-            }
-            if (this.controller.faded_to_black) {
-                this.blank_icon.show();
-            } else {
-                this.blank_icon.hide();
-            }
+
+            this.update_status_icons();
+
             if (this.controller.hidden) {
-                this.hidden_icon.show();
                 // Ensure the presenter window remains focused
                 this.present();
-            } else {
-                this.hidden_icon.hide();
             }
-            if (this.controller.frozen) {
-                this.frozen_icon.show();
-            } else {
-                this.frozen_icon.hide();
-            }
-            if (this.controller.is_pointer_active()) {
-                this.highlight_icon.show();
-            } else {
-                this.highlight_icon.hide();
-            }
-            if (this.controller.is_eraser_active()) {
-                this.eraser_icon.show();
-            } else {
-                this.eraser_icon.hide();
-            }
-            if (this.controller.is_pen_active()) {
-                this.pen_icon.show();
-            } else {
-                this.pen_icon.hide();
-            }
+
             this.faded_to_black = false;
             this.saved_icon.hide();
             this.loaded_icon.hide();
