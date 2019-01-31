@@ -55,6 +55,9 @@ namespace pdfpc.Window {
         protected int window_w;
         protected int window_h;
 
+        /**
+         * Currently selected windowed (!=fullscreen) mode
+         */
         protected bool windowed;
 
         /**
@@ -110,6 +113,8 @@ namespace pdfpc.Window {
          * The monitor number we want to show the window
          */
         protected int monitor_num_to_use;
+
+        protected virtual void resize_gui() {}
 
         public Fullscreen(int monitor_num, int width = -1, int height = -1) {
             this.windowed = Options.windowed;
@@ -205,6 +210,9 @@ namespace pdfpc.Window {
                         ev.height != this.window_h) {
                         this.window_w = ev.width;
                         this.window_h = ev.height;
+
+                        // Resize any GUI elements if needed
+                        this.resize_gui();
                     }
                     return false;
                 });
@@ -296,4 +304,3 @@ namespace pdfpc.Window {
         }
     }
 }
-
