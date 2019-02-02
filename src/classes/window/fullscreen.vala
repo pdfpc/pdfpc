@@ -317,7 +317,7 @@ namespace pdfpc.Window {
 
         protected bool draw_pen(Cairo.Context context) {
             Gtk.Allocation a;
-            this.pointer_drawing_surface.get_allocation(out a);
+            this.pen_drawing_surface.get_allocation(out a);
             PresentationController c = this.controller;
 
             if (c.pen_drawing != null) {
