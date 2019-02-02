@@ -394,14 +394,7 @@ namespace pdfpc.Window {
          */
         public Presenter(PresentationController controller,
             int screen_num) {
-            base(screen_num);
-
-            this.controller = controller;
-
-            this.role = "presenter";
-            this.title = "pdfpc - presenter (%s)".printf(metadata.get_title());
-
-            this.destroy.connect((source) => controller.quit());
+            base(controller, true, screen_num);
 
             this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);
@@ -504,10 +497,6 @@ namespace pdfpc.Window {
             this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
             this.add_events(Gdk.EventMask.SCROLL_MASK);
 
-            this.key_press_event.connect(this.controller.key_press);
-            this.button_press_event.connect(this.controller.button_press);
-            this.scroll_event.connect(this.controller.scroll);
-
             this.resize_bottom_texts();
 
             this.overview = new Overview(this.controller);
@@ -515,7 +504,6 @@ namespace pdfpc.Window {
             this.overview.hexpand = true;
             this.overview.set_n_slides(this.controller.user_n_slides);
             this.controller.set_overview(this.overview);
-            this.controller.register_controllable(this);
 
             // Enable the render caching if it hasn't been forcefully disabled.
             if (!Options.disable_caching) {
