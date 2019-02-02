@@ -169,12 +169,14 @@ namespace pdfpc.Window {
                 this.set_widget_event_pass_through(this.video_surface, true);
             });
             this.pen_drawing_surface.realize.connect(() => {
+                this.enable_pen(false);
+                this.pen_drawing_surface.get_window().set_pass_through(true);
                 this.set_widget_event_pass_through(this.pen_drawing_surface,
                     true);
             });
             this.pointer_drawing_surface.realize.connect(() => {
                 this.enable_pointer(false);
-                this.enable_pen(false);
+                this.pointer_drawing_surface.get_window().set_pass_through(true);
                 this.set_widget_event_pass_through(this.pointer_drawing_surface,
                     true);
             });
