@@ -105,6 +105,7 @@ namespace pdfpc {
                     this.register_controllable(value);
 
                     presenter.current_view.size_allocate.connect(init_presenter_pen_and_pointer);
+                    this.register_mouse_handlers();
                 }
             }
         }
@@ -405,49 +406,14 @@ namespace pdfpc {
             }
         }
 
-        protected void init_presentation_pen() {
-            init_pen_drawing_if_needed(presentation_allocation);
-        }
-
         protected void init_presenter_pen() {
             init_pen_drawing_if_needed(presenter_allocation);
-            var presenter_pen_surface = presenter.pen_drawing_surface;
-
-            presenter_pen_surface.set_events(
-                  Gdk.EventMask.BUTTON_PRESS_MASK
-                | Gdk.EventMask.BUTTON_RELEASE_MASK
-                | Gdk.EventMask.POINTER_MOTION_MASK
-            );
-
-            presenter_pen_surface.button_press_event.connect((event) => {
-                if (in_drawing_mode()) {
-                    move_pen(
-                        event.x / presenter_allocation.width,
-                        event.y / presenter_allocation.height
-                    );
-                    pen_is_pressed = true;
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-
-            presenter_pen_surface.button_release_event.connect((event) => {
-                if (in_drawing_mode()) {
-                    move_pen(
-                        event.x / presenter_allocation.width,
-                        event.y / presenter_allocation.height
-                    );
-                    pen_is_pressed = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-
-            presenter_pen_surface.motion_notify_event.connect(on_move_pen);
 
             this.update_request.connect(this.update_pen_drawing);
+        }
+
+        public bool is_pointer_active() {
+            return this.annotation_mode == AnnotationMode.POINTER;
         }
 
         public bool is_eraser_active() {
@@ -513,24 +479,6 @@ namespace pdfpc {
                 this.metadata.user_slide_to_real_slide(this.current_user_slide_number)
             );
             this.queue_pen_surface_draws();
-        }
-
-        protected bool on_move_pen(Gtk.Widget source, Gdk.EventMotion move) {
-            if (!Options.disable_input_autodetection) {
-                Gdk.InputSource source_type =
-                    move.get_source_device().get_source();
-                if (source_type == Gdk.InputSource.ERASER) {
-                    this.set_mode(AnnotationMode.ERASER);
-                } else if (source_type == Gdk.InputSource.PEN) {
-                    this.set_mode(AnnotationMode.PEN);
-                }
-            }
-
-            if (in_drawing_mode()) {
-                move_pen(move.x/presenter_allocation.width,
-                         move.y/presenter_allocation.height);
-            }
-            return true;
         }
 
         private void hide_or_show_pen_surfaces() {
@@ -606,14 +554,6 @@ namespace pdfpc {
             if (this.presenter != null) {
                 // Disable event compression for smoother drawing
                 this.presenter.get_window().set_event_compression(!in_drawing_mode());
-
-                // When drawing mode is inactive, make the drawing surface
-                // transparent to the input events
-                var presenter_pen_surface = presenter.pen_drawing_surface;
-                var w = presenter_pen_surface.get_window();
-                if (w != null) {
-                    w.set_pass_through(!in_drawing_mode());
-                }
             }
 
             this.controllables_update();
@@ -653,17 +593,17 @@ namespace pdfpc {
 
 
         private Gtk.Allocation presenter_allocation;
-        private Gtk.Allocation presentation_allocation;
 
         private void init_presentation_pen_and_pointer(Gtk.Allocation a) {
-            presentation_allocation = a;
-            init_presentation_pen();
+            init_pen_drawing_if_needed(a);
         }
 
         private void init_presenter_pen_and_pointer(Gtk.Allocation a) {
+            drag_x = -1;
+            drag_y = -1;
+
             presenter_allocation = a;
             init_presenter_pen();
-            init_presenter_pointer();
             pointer_size = Options.pointer_size;
             if (pointer_size > 500) {
                 pointer_size = 500;
@@ -693,40 +633,6 @@ namespace pdfpc {
         public double pointer_x;
         public double pointer_y;
 
-        public bool is_pointer_active() {
-            return this.annotation_mode == AnnotationMode.POINTER;
-        }
-
-        protected void init_presenter_pointer() {
-            var presenter_pointer_surface = presenter.pointer_drawing_surface;
-
-            drag_x=-1;
-            drag_y=-1;
-            presenter_pointer_surface.button_press_event.connect((event) => {
-                drag_x=event.x/presenter_allocation.width;
-                drag_y=event.y/presenter_allocation.height;
-                highlight_w=0;
-                highlight_h=0;
-
-                return true;
-            });
-            presenter_pointer_surface.button_release_event.connect((event) => {
-                update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
-                drag_x=-1;
-                drag_y=-1;
-
-                return true;
-            });
-
-            presenter_pointer_surface.motion_notify_event.connect(on_move_pointer);
-
-            presenter_pointer_surface.set_events(
-                  Gdk.EventMask.BUTTON_PRESS_MASK
-                | Gdk.EventMask.BUTTON_RELEASE_MASK
-                | Gdk.EventMask.POINTER_MOTION_MASK
-            );
-        }
-
         private void queue_pointer_surface_draws() {
             if (presenter != null) {
                 presenter.pointer_drawing_surface.queue_draw();
@@ -736,11 +642,85 @@ namespace pdfpc {
             }
         }
 
+        protected void register_mouse_handlers() {
+            var view = presenter.main_view;
+            view.set_events(
+                  Gdk.EventMask.BUTTON_PRESS_MASK
+                | Gdk.EventMask.BUTTON_RELEASE_MASK
+                | Gdk.EventMask.POINTER_MOTION_MASK
+            );
+
+            view.motion_notify_event.connect(on_motion);
+            view.button_press_event.connect(on_button_press);
+            view.button_release_event.connect(on_button_release);
+        }
+
         /**
-         * Handle mouse scrolling events on the window and, if neccessary send
+         * Handle mouse events on the window and, if necessary send
          * them to the presentation controller
          */
-        protected bool on_move_pointer(Gtk.Widget source, Gdk.EventMotion move) {
+        private bool on_motion(Gdk.EventMotion event) {
+            if (this.annotation_mode == AnnotationMode.POINTER) {
+                return on_move_pointer(event);
+            } else if (this.in_drawing_mode()) {
+                return on_move_pen(event);
+            } else {
+                return false;
+            }
+        }
+
+        private bool on_button_press(Gdk.EventButton event) {
+            if (this.annotation_mode == AnnotationMode.POINTER) {
+                drag_x = event.x/presenter_allocation.width;
+                drag_y = event.y/presenter_allocation.height;
+                highlight_w = 0;
+                highlight_h = 0;
+                return true;
+            } else if (this.in_drawing_mode()) {
+                move_pen(event.x/presenter_allocation.width,
+                         event.y/presenter_allocation.height);
+                pen_is_pressed = true;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private bool on_button_release(Gdk.EventButton event) {
+            if (this.annotation_mode == AnnotationMode.POINTER) {
+                update_highlight(event.x/presenter_allocation.width,
+                                 event.y/presenter_allocation.height);
+                drag_x = -1;
+                drag_y = -1;
+                return true;
+            } else if (this.in_drawing_mode()) {
+                move_pen(event.x/presenter_allocation.width,
+                         event.y/presenter_allocation.height);
+                pen_is_pressed = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private bool on_move_pen(Gdk.EventMotion move) {
+            if (!Options.disable_input_autodetection) {
+                Gdk.InputSource source_type =
+                    move.get_source_device().get_source();
+                if (source_type == Gdk.InputSource.ERASER) {
+                    this.set_mode(AnnotationMode.ERASER);
+                } else if (source_type == Gdk.InputSource.PEN) {
+                    this.set_mode(AnnotationMode.PEN);
+                }
+            }
+
+            move_pen(move.x/presenter_allocation.width,
+                     move.y/presenter_allocation.height);
+
+            return true;
+        }
+
+        private bool on_move_pointer(Gdk.EventMotion move) {
             pointer_x = move.x/presenter_allocation.width;
             pointer_y = move.y/presenter_allocation.height;
             if (presenter != null) {
@@ -753,42 +733,13 @@ namespace pdfpc {
             return true;
         }
 
-        protected void update_highlight(double x, double y) {
+        private void update_highlight(double x, double y) {
             if (drag_x!=-1) {
                 highlight_w=Math.fabs(drag_x-x);
                 highlight_h=Math.fabs(drag_y-y);
                 highlight_x=(drag_x<x?drag_x:x);
                 highlight_y=(drag_y<y?drag_y:y);
                 queue_pointer_surface_draws();
-            }
-        }
-
-        protected void draw_pointer(Cairo.Context context, Gtk.Allocation a) {
-            // Draw the highlighted area, but ignore very short drags
-            // made unintentionally by mouse clicks
-            if (highlight_w > 0.01 && highlight_h > 0.01) {
-                context.rectangle(0,0,a.width, a.height);
-                context.new_sub_path();
-                context.rectangle((int)(highlight_x*a.width), (int)(highlight_y*a.height), (int)(highlight_w*a.width), (int)(highlight_h*a.height));
-
-                context.set_fill_rule (Cairo.FillRule.EVEN_ODD);
-                context.set_source_rgba(0,0,0,0.5);
-                context.fill_preserve();
-
-                context.new_path();
-            }
-            // Draw the pointer when not dragging
-            if (drag_x == -1) {
-                int x = (int)(a.width*pointer_x);
-                int y = (int)(a.height*pointer_y);
-                int r = (int)(a.height*0.001*pointer_size);
-
-                context.set_source_rgba(pointer_color.red,
-                                        pointer_color.green,
-                                        pointer_color.blue,
-                                        pointer_color.alpha);
-                context.arc(x, y, r, 0, 2*Math.PI);
-                context.fill();
             }
         }
 
