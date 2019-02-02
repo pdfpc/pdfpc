@@ -162,9 +162,23 @@ namespace pdfpc.Drawings {
         }
     }
 
-    public Drawing create(Metadata.Pdf metadata, int width, int height) {
+    /*
+     * We don't need pixel-to-pixel accuracy for drawings; so just take the
+     * PDF page size (in pt), and scale it up/down to have 1280 pixels in width.
+     */
+    public Drawing create(Metadata.Pdf metadata) {
+        const double desired_width = 1280;
+        double page_width = metadata.get_page_width();
+        double page_height = metadata.get_page_height();
+        if (page_width <= 0.0 || page_height <= 0.0) {
+            page_height = desired_width;
+        } else {
+            page_height = (desired_width/page_width)*page_height;
+        }
+        page_width = desired_width;
+
         Drawings.Storage.Base storage = Drawings.Storage.create(metadata);
-        return new Drawing(storage, width, height);
+        return new Drawing(storage, (int) page_width, (int) page_height);
     }
 }
 
