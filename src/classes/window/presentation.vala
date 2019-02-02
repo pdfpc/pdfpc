@@ -49,13 +49,7 @@ namespace pdfpc.Window {
          */
         public Presentation(PresentationController controller,
             int screen_num, int width = -1, int height = -1) {
-            base(screen_num, width, height);
-            this.controller = controller;
-
-            this.role = "presentation";
-            this.title = "pdfpc - presentation (%s)".printf(metadata.get_title());
-
-            this.destroy.connect((source) => controller.quit());
+            base(controller, false, screen_num, width, height);
 
             this.controller.update_request.connect(this.update);
 
@@ -75,21 +69,7 @@ namespace pdfpc.Window {
             frame.add(overlay_layout);
             this.add(frame);
 
-            this.key_press_event.connect(this.controller.key_press);
-            this.button_press_event.connect(this.controller.button_press);
-            this.scroll_event.connect(this.controller.scroll);
-
-            this.controller.register_controllable(this);
-
             this.set_cache_observer(this.controller.cache_status);
-        }
-
-        /**
-         * Set the presentation controller which is notified of keypresses and
-         * other observed events
-         */
-        public void set_controller(PresentationController controller) {
-            this.controller = controller;
         }
 
         /**

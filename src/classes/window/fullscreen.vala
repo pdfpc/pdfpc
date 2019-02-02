@@ -50,6 +50,11 @@ namespace pdfpc.Window {
         }
 
         /**
+         * Whether the instance is presenter
+         */
+        bool is_presenter = false;
+
+        /**
          * The geometry of this window
          */
         protected int window_w;
@@ -116,9 +121,18 @@ namespace pdfpc.Window {
 
         protected virtual void resize_gui() {}
 
-        public Fullscreen(int monitor_num, int width = -1, int height = -1) {
+        public Fullscreen(PresentationController controller, bool is_presenter,
+            int monitor_num, int width = -1, int height = -1) {
+            this.controller = controller;
+            this.is_presenter = is_presenter;
             this.windowed = Options.windowed;
-            this.gdk_scale = 1;
+
+            this.title = "pdfpc - %s (%s)".printf(
+                is_presenter ? "presenter" : "presentation",
+                metadata.get_title());
+
+            this.destroy.connect((source) => controller.quit());
+
             var display = Gdk.Display.get_default();
             Gdk.Monitor monitor;
             if (monitor_num >= 0) {
@@ -139,6 +153,8 @@ namespace pdfpc.Window {
                 this.monitor_num_to_use = 0;
             }
 
+            this.gdk_scale = monitor.get_scale_factor();
+
             this.overlay_layout = new Gtk.Overlay();
 
             this.pointer_drawing_surface = new Gtk.DrawingArea();
@@ -157,11 +173,11 @@ namespace pdfpc.Window {
                     true);
             });
             this.pointer_drawing_surface.realize.connect(() => {
+                this.enable_pointer(false);
+                this.enable_pen(false);
                 this.set_widget_event_pass_through(this.pointer_drawing_surface,
                     true);
             });
-
-            this.gdk_scale = monitor.get_scale_factor();
 
             // By default, we go fullscreen
             var monitor_geometry = monitor.get_geometry();
@@ -216,6 +232,13 @@ namespace pdfpc.Window {
                     }
                     return false;
                 });
+
+            this.pointer_drawing_surface.draw.connect(this.draw_pointer);
+            this.pen_drawing_surface.draw.connect(this.draw_pen);
+
+            this.key_press_event.connect(this.controller.key_press);
+            this.button_press_event.connect(this.controller.button_press);
+            this.scroll_event.connect(this.controller.scroll);
         }
 
         protected void do_fullscreen(Gdk.Monitor monitor) {
@@ -241,6 +264,101 @@ namespace pdfpc.Window {
                 }
             } else {
                 this.unfullscreen();
+            }
+        }
+
+        protected bool draw_pointer(Cairo.Context context) {
+            Gtk.Allocation a;
+            this.pointer_drawing_surface.get_allocation(out a);
+            PresentationController c = this.controller;
+
+            // Draw the highlighted area, but ignore very short drags
+            // made unintentionally by mouse clicks
+            if (c.highlight_w > 0.01 && c.highlight_h > 0.01) {
+                context.rectangle(0, 0, a.width, a.height);
+                context.new_sub_path();
+                context.rectangle((int)(c.highlight_x*a.width),
+                                  (int)(c.highlight_y*a.height),
+                                  (int)(c.highlight_w*a.width),
+                                  (int)(c.highlight_h*a.height));
+
+                context.set_fill_rule(Cairo.FillRule.EVEN_ODD);
+                context.set_source_rgba(0,0,0,0.5);
+                context.fill_preserve();
+
+                context.new_path();
+            }
+            // Draw the pointer when not dragging
+            if (c.drag_x == -1) {
+                int x = (int)(a.width*c.pointer_x);
+                int y = (int)(a.height*c.pointer_y);
+                int r = (int)(a.height*0.001*c.pointer_size);
+
+                context.set_source_rgba(c.pointer_color.red,
+                                        c.pointer_color.green,
+                                        c.pointer_color.blue,
+                                        c.pointer_color.alpha);
+                context.arc(x, y, r, 0, 2*Math.PI);
+                context.fill();
+            }
+
+            return true;
+        }
+
+        public void enable_pointer(bool onoff) {
+            if (onoff) {
+                this.pointer_drawing_surface.show();
+            } else {
+                this.pointer_drawing_surface.hide();
+            }
+        }
+
+        protected bool draw_pen(Cairo.Context context) {
+            Gtk.Allocation a;
+            this.pointer_drawing_surface.get_allocation(out a);
+            PresentationController c = this.controller;
+
+            if (c.pen_drawing != null) {
+                Cairo.Surface? drawing_surface = c.pen_drawing.render_to_surface();
+                int x = (int)(a.width*c.pen_last_x);
+                int y = (int)(a.height*c.pen_last_y);
+                int base_width = c.pen_drawing.width;
+                int base_height = c.pen_drawing.height;
+                Cairo.Matrix old_xform = context.get_matrix();
+                context.scale(
+                    (double) a.width / base_width,
+                    (double) a.height / base_height
+                );
+                context.set_source_surface(drawing_surface, 0, 0);
+                context.paint();
+                context.set_matrix(old_xform);
+                if (this.is_presenter && c.in_drawing_mode()) {
+                    double width_adjustment = (double) a.width / base_width;
+                    context.set_operator(Cairo.Operator.OVER);
+                    context.set_line_width(2.0);
+                    context.set_source_rgba(
+                        c.current_pen_drawing_tool.red,
+                        c.current_pen_drawing_tool.green,
+                        c.current_pen_drawing_tool.blue,
+                        1.0
+                    );
+                    double arc_radius = c.current_pen_drawing_tool.width * width_adjustment / 2.0;
+                    if (arc_radius < 1.0) {
+                        arc_radius = 1.0;
+                    }
+                    context.arc(x, y, arc_radius, 0, 2*Math.PI);
+                    context.stroke();
+                }
+            }
+
+            return true;
+        }
+
+        public void enable_pen(bool onoff) {
+            if (onoff) {
+                this.pen_drawing_surface.show();
+            } else {
+                this.pen_drawing_surface.hide();
             }
         }
 

@@ -102,6 +102,8 @@ namespace pdfpc {
             set {
                 _presenter = value;
                 if (value != null) {
+                    this.register_controllable(value);
+
                     presenter.current_view.size_allocate.connect(init_presenter_pen_and_pointer);
                 }
             }
@@ -120,6 +122,8 @@ namespace pdfpc {
             set {
                 _presentation = value;
                 if (value != null) {
+                    this.register_controllable(value);
+
                     presentation.main_view.size_allocate.connect(init_presentation_pen_and_pointer);
                 }
             }
@@ -132,12 +136,6 @@ namespace pdfpc {
                         this._presenter == null);
             }
         }
-
-        public Gtk.Image presenter_pointer;
-        public Gtk.Image presentation_pointer;
-
-        public Gtk.DrawingArea? presenter_pointer_surface;
-        public Gtk.DrawingArea? presentation_pointer_surface;
 
         /**
          * Key modifiers that we support
@@ -387,19 +385,15 @@ namespace pdfpc {
             DBusServer.start_server(this);
         }
 
-        /* pen drawing widgets */
-        public Gtk.DrawingArea? presenter_pen_surface;
-        public Gtk.DrawingArea? presentation_pen_surface;
-
         public Drawings.Drawing pen_drawing;
-        private Drawings.DrawingTool? current_pen_drawing_tool = null;
+        public Drawings.DrawingTool? current_pen_drawing_tool = null;
 
         /* pen drawing state */
         private bool pen_drawing_present = false;
 
         private uint pen_step = 2;
-        private double pen_last_x;
-        private double pen_last_y;
+        public double pen_last_x;
+        public double pen_last_y;
         private bool pen_is_pressed = false;
 
         protected void init_pen_drawing_if_needed(Gtk.Allocation a) {
@@ -413,31 +407,19 @@ namespace pdfpc {
 
         protected void init_presentation_pen() {
             init_pen_drawing_if_needed(presentation_allocation);
-            this.presentation_pen_surface = presentation.pen_drawing_surface;
-            this.presentation_pen_surface.hide();
-            this.presentation_pen_surface.draw.connect ((context) => {
-                draw_pen_surface(context, presentation_allocation, false);
-                return true;
-            });
         }
 
         protected void init_presenter_pen() {
             init_pen_drawing_if_needed(presenter_allocation);
-            this.presenter_pen_surface = presenter.pen_drawing_surface;
-            this.presenter_pen_surface.hide();
+            var presenter_pen_surface = presenter.pen_drawing_surface;
 
-            this.presenter_pen_surface.set_events(
+            presenter_pen_surface.set_events(
                   Gdk.EventMask.BUTTON_PRESS_MASK
                 | Gdk.EventMask.BUTTON_RELEASE_MASK
                 | Gdk.EventMask.POINTER_MOTION_MASK
             );
 
-            this.presenter_pen_surface.draw.connect ((context) => {
-                draw_pen_surface(context, presenter_allocation, true);
-                return true;
-            });
-
-            this.presenter_pen_surface.button_press_event.connect((event) => {
+            presenter_pen_surface.button_press_event.connect((event) => {
                 if (in_drawing_mode()) {
                     move_pen(
                         event.x / presenter_allocation.width,
@@ -450,7 +432,7 @@ namespace pdfpc {
                 }
             });
 
-            this.presenter_pen_surface.button_release_event.connect((event) => {
+            presenter_pen_surface.button_release_event.connect((event) => {
                 if (in_drawing_mode()) {
                     move_pen(
                         event.x / presenter_allocation.width,
@@ -463,7 +445,7 @@ namespace pdfpc {
                 }
             });
 
-            this.presenter_pen_surface.motion_notify_event.connect(on_move_pen);
+            presenter_pen_surface.motion_notify_event.connect(on_move_pen);
 
             this.update_request.connect(this.update_pen_drawing);
         }
@@ -476,7 +458,7 @@ namespace pdfpc {
             return annotation_mode == AnnotationMode.PEN;
         }
 
-        protected bool in_drawing_mode() {
+        public bool in_drawing_mode() {
             return is_eraser_active() || is_pen_active();
         }
 
@@ -519,10 +501,10 @@ namespace pdfpc {
 
         public void queue_pen_surface_draws() {
             if (presenter != null) {
-                presenter_pen_surface.queue_draw();
+                presenter.pen_drawing_surface.queue_draw();
             }
             if (presentation != null) {
-                presentation_pen_surface.queue_draw();
+                presentation.pen_drawing_surface.queue_draw();
             }
         }
 
@@ -551,56 +533,21 @@ namespace pdfpc {
             return true;
         }
 
-        protected void draw_pen_surface(Cairo.Context context, Gtk.Allocation a, bool for_presenter) {
-            if (pen_drawing != null) {
-                Cairo.Surface? drawing_surface = pen_drawing.render_to_surface();
-                int x = (int)(a.width*pen_last_x);
-                int y = (int)(a.height*pen_last_y);
-                int base_width = pen_drawing.width;
-                int base_height = pen_drawing.height;
-                Cairo.Matrix old_xform = context.get_matrix();
-                context.scale(
-                    (double) a.width / base_width,
-                    (double) a.height / base_height
-                );
-                context.set_source_surface(drawing_surface, 0, 0);
-                context.paint();
-                context.set_matrix(old_xform);
-                if (for_presenter && in_drawing_mode()) {
-                    double width_adjustment = (double) a.width / base_width;
-                    context.set_operator(Cairo.Operator.OVER);
-                    context.set_line_width(2.0);
-                    context.set_source_rgba(
-                        current_pen_drawing_tool.red,
-                        current_pen_drawing_tool.green,
-                        current_pen_drawing_tool.blue,
-                        1.0
-                    );
-                    double arc_radius = current_pen_drawing_tool.width * width_adjustment / 2.0;
-                    if (arc_radius < 1.0) {
-                        arc_radius = 1.0;
-                    }
-                    context.arc(x, y, arc_radius, 0, 2*Math.PI);
-                    context.stroke();
-                }
-            }
-        }
-
         private void hide_or_show_pen_surfaces() {
             if (pen_drawing_present) {
                 if (presenter != null) {
-                    presenter_pen_surface.show();
+                    presenter.enable_pen(true);
                 }
                 if (presentation != null) {
-                    presentation_pen_surface.show();
+                    presentation.enable_pen(true);
                 }
                 queue_pen_surface_draws();
             } else {
                 if (presenter != null) {
-                    presenter_pen_surface.hide();
+                    presenter.enable_pen(false);
                 }
                 if (presentation != null) {
-                    presentation_pen_surface.hide();
+                    presentation.enable_pen(false);
                 }
             }
         }
@@ -608,17 +555,17 @@ namespace pdfpc {
         private void hide_or_show_pointer_surfaces() {
             if (this.annotation_mode == AnnotationMode.POINTER) {
                 if (presenter != null) {
-                    presenter_pointer_surface.show();
+                    presenter.enable_pointer(true);
                 }
                 if (presentation != null) {
-                    presentation_pointer_surface.show();
+                    presentation.enable_pointer(true);
                 }
             } else {
                 if (presenter != null) {
-                    presenter_pointer_surface.hide();
+                    presenter.enable_pointer(false);
                 }
                 if (presentation != null) {
-                    presentation_pointer_surface.hide();
+                    presentation.enable_pointer(false);
                 }
             }
         }
@@ -662,6 +609,7 @@ namespace pdfpc {
 
                 // When drawing mode is inactive, make the drawing surface
                 // transparent to the input events
+                var presenter_pen_surface = presenter.pen_drawing_surface;
                 var w = presenter_pen_surface.get_window();
                 if (w != null) {
                     w.set_pass_through(!in_drawing_mode());
@@ -710,7 +658,6 @@ namespace pdfpc {
         private void init_presentation_pen_and_pointer(Gtk.Allocation a) {
             presentation_allocation = a;
             init_presentation_pen();
-            init_presentation_pointer();
         }
 
         private void init_presenter_pen_and_pointer(Gtk.Allocation a) {
@@ -733,35 +680,29 @@ namespace pdfpc {
             }
         }
 
-        private uint pointer_size;
+        public uint pointer_size;
         private uint pointer_step = 5;
-        private Gdk.RGBA pointer_color;
+        public Gdk.RGBA pointer_color;
 
-        private double highlight_x;
-        private double highlight_y;
-        private double highlight_w;
-        private double highlight_h;
-        private double drag_x;
-        private double drag_y;
-        private double pointer_x;
-        private double pointer_y;
+        public double highlight_x;
+        public double highlight_y;
+        public double highlight_w;
+        public double highlight_h;
+        public double drag_x;
+        public double drag_y;
+        public double pointer_x;
+        public double pointer_y;
 
         public bool is_pointer_active() {
             return this.annotation_mode == AnnotationMode.POINTER;
         }
 
         protected void init_presenter_pointer() {
-            this.presenter_pointer_surface = presenter.pointer_drawing_surface;
-            this.presenter_pointer_surface.hide();
-
-            this.presenter_pointer_surface.draw.connect ((context) => {
-                draw_pointer(context, presenter_allocation);
-                return true;
-            });
+            var presenter_pointer_surface = presenter.pointer_drawing_surface;
 
             drag_x=-1;
             drag_y=-1;
-            this.presenter_pointer_surface.button_press_event.connect((event) => {
+            presenter_pointer_surface.button_press_event.connect((event) => {
                 drag_x=event.x/presenter_allocation.width;
                 drag_y=event.y/presenter_allocation.height;
                 highlight_w=0;
@@ -769,7 +710,7 @@ namespace pdfpc {
 
                 return true;
             });
-            this.presenter_pointer_surface.button_release_event.connect((event) => {
+            presenter_pointer_surface.button_release_event.connect((event) => {
                 update_highlight(event.x/presenter_allocation.width, event.y/presenter_allocation.height);
                 drag_x=-1;
                 drag_y=-1;
@@ -777,31 +718,21 @@ namespace pdfpc {
                 return true;
             });
 
-            this.presenter_pointer_surface.motion_notify_event.connect(on_move_pointer);
+            presenter_pointer_surface.motion_notify_event.connect(on_move_pointer);
 
-            this.presenter_pointer_surface.set_events(
+            presenter_pointer_surface.set_events(
                   Gdk.EventMask.BUTTON_PRESS_MASK
                 | Gdk.EventMask.BUTTON_RELEASE_MASK
                 | Gdk.EventMask.POINTER_MOTION_MASK
             );
         }
 
-        protected void init_presentation_pointer() {
-            this.presentation_pointer_surface = presentation.pointer_drawing_surface;
-            this.presentation_pointer_surface.hide();
-
-            this.presentation_pointer_surface.draw.connect ((context) => {
-                draw_pointer(context, presentation_allocation);
-                return true;
-            });
-        }
-
         private void queue_pointer_surface_draws() {
             if (presenter != null) {
-                presenter_pointer_surface.queue_draw();
+                presenter.pointer_drawing_surface.queue_draw();
             }
             if (presentation != null) {
-                presentation_pointer_surface.queue_draw();
+                presentation.pointer_drawing_surface.queue_draw();
             }
         }
 
@@ -813,10 +744,10 @@ namespace pdfpc {
             pointer_x = move.x/presenter_allocation.width;
             pointer_y = move.y/presenter_allocation.height;
             if (presenter != null) {
-                presenter_pointer_surface.queue_draw();
+                presenter.pointer_drawing_surface.queue_draw();
             }
             if (presentation != null) {
-                presentation_pointer_surface.queue_draw();
+                presentation.pointer_drawing_surface.queue_draw();
             }
             update_highlight(pointer_x, pointer_y);
             return true;
