@@ -2,6 +2,13 @@
 pdfpc Changelog
 ===============
 
+Version 4.3.2
+=============
+
+*Released: February 2019*
+
+- Fix compile error on some distributions
+
 Version 4.3.1
 =============
 
