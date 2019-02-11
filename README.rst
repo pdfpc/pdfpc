@@ -173,6 +173,18 @@ Now download some [sample presentations](#sample-presentations) and load  them u
 If you encounter problems while running pdfpc, please consult the `FAQ
 <FAQ.rst>`_ first.
 
+Compiling and install with Dockerfile
+=====================================
+
+Build Docker image and create local tar.gz file::
+
+    docker build . -t local/pdfpc && docker run -it -u $(id -u) -v $(pwd):/mnt local/pdfpc cp /pdfpc.tar.gz /mnt/app/pdfpc.tar.gz
+
+extract compiled tar.gz on /::
+
+    sudo tar -xzf app/pdfpc.tar.gz -C /
+
+
 Acknowledgements
 ================
 
