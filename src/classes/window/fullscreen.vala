@@ -52,7 +52,9 @@ namespace pdfpc.Window {
         /**
          * Whether the instance is presenter
          */
-        bool is_presenter = false;
+        public bool is_presenter {
+            get; protected set;
+        }
 
         /**
          * The geometry of this window
