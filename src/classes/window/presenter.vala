@@ -380,6 +380,14 @@ namespace pdfpc.Window {
         }
 
         /**
+         * Resize the overview
+         **/
+        private void resize_overview() {
+            this.overview.set_available_space(this.window_w,
+                (int) Math.floor(this.window_h*(1.0 - 1.0/bottom_frac_inv)));
+        }
+
+        /**
          * Resize parts of the GUI that cannot do it themselves (icons, text)
          **/
         protected override void resize_gui() {
@@ -387,6 +395,8 @@ namespace pdfpc.Window {
             this.update_status_icons();
 
             this.resize_bottom_texts();
+
+            this.resize_overview();
         }
 
        /**
@@ -730,10 +740,7 @@ namespace pdfpc.Window {
 
         public override void show() {
             base.show();
-            Gtk.Allocation allocation;
-            this.get_allocation(out allocation);
-            this.overview.set_available_space(allocation.width,
-                (int) Math.floor(allocation.height * 0.9));
+            this.resize_overview();
         }
 
        /**
