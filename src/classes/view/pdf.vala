@@ -357,7 +357,6 @@ namespace pdfpc {
                     this.redraw();
                 } catch (Renderer.RenderError e) {
                 }
-                // TODO: resize videos if exist on this page
             } else {
                 cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
                 cr.set_source_surface(this.current_slide, 0, 0);

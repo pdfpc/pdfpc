@@ -108,9 +108,15 @@ namespace pdfpc {
          */
         protected string temp;
         /**
-         * The screen rectangle associated with the movie.
+         * The presenter screen rectangle associated with the movie.
          */
         protected Gdk.Rectangle rect;
+
+        /**
+         * The movie dimensions (pixels).
+         */
+        protected int video_w;
+        protected int video_h;
 
         /**
          * Data on how the movie playback must fit on the page.
@@ -382,7 +388,7 @@ namespace pdfpc {
 
             foreach (var sink in this.sinks) {
                 var parent = sink.parent as View.Video;
-                parent.remove_video(sink);
+                parent.remove_video();
             }
         }
 
@@ -536,10 +542,11 @@ namespace pdfpc {
         public void on_prepare(Gst.Element overlay, Gst.Caps caps) {
             var info = new Gst.Video.Info();
             info.from_caps(caps);
-            int width = info.width, height = info.height;
-            this.scalex = (double) width / rect.width;
-            this.scaley = (double) height / rect.height;
-            this.vheight = height;
+            this.video_w = info.width;
+            this.video_h = info.height;
+            this.scalex = (double) this.video_w/rect.width;
+            this.scaley = (double) this.video_h/rect.height;
+            this.vheight = this.video_h;
 
             overlay.query_duration(Gst.Format.TIME, out duration);
         }
@@ -665,7 +672,7 @@ namespace pdfpc {
             n = 0;
             foreach (var conf in video_confs) {
                 // if --notes passed, hide the video on the presenter screen
-                if (notes_mode && conf.display_num == 0) {
+                if (notes_mode && conf.window.is_presenter) {
                     continue;
                 }
 
@@ -683,7 +690,8 @@ namespace pdfpc {
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue, sink);
                 tee.link(queue);
-                if ((conf.display_num == 0 && !notes_mode) || (conf.display_num != 0 && notes_mode)) {
+                if ((conf.window.is_presenter && !notes_mode) ||
+                    (!conf.window.is_presenter && notes_mode)) {
                     Gst.Element ad_element = this.add_video_control(queue, bin,
                         conf.rect);
                     ad_element.link(sink);
@@ -703,11 +711,29 @@ namespace pdfpc {
 
                 // mark the video widget on the "frozen" presentation screen
                 // with a custom flag
-                if (conf.display_num == 1 && controller.frozen) {
+                if (!conf.window.is_presenter && controller.frozen) {
                     video_area.set_data("pdfpc_frozen", true);
                 }
 
-                conf.window.video_surface.add_video(video_area, conf.rect);
+                var video_surface = conf.window.video_surface;
+                video_surface.add_video(video_area, conf.rect);
+                video_surface.size_allocate.connect((a) => {
+                        Gdk.Rectangle rect;
+                        Window.Fullscreen window;
+
+                        this.controller.overlay_pos(conf.display_num,
+                            this.area, out rect, out window);
+
+                        // Update the rectangle
+                        conf.rect = rect;
+                        if ((window.is_presenter && !notes_mode) ||
+                            (!window.is_presenter && notes_mode)) {
+                            this.rect = rect;
+                            this.scalex = (double) this.video_w/rect.width;
+                            this.scaley = (double) this.video_h/rect.height;
+                        }
+                        video_surface.resize_video(rect);
+                    });
                 this.sinks.add(video_area);
 
                 n++;
@@ -735,8 +761,8 @@ namespace pdfpc {
         }
 
         /**
-         * Utility function for converting filenames to uris. If file
-         * is not an absolute path, use the pdf file location as a base
+         * Utility function for converting filenames to URI's. If file
+         * is not an absolute path, use the PDF file location as a base
          * directory.
          */
         protected string? filename_to_uri(string file, string pdf_fname) {
@@ -791,7 +817,7 @@ namespace pdfpc {
         }
 
         /**
-         * Seek to the time indicated by the mouse's position on the progress bar.
+         * Seek to the time indicated by the mouse position on the progress bar.
          */
         protected int64 mouse_seek(double x, double y) {
             double seek_fraction = (x - this.seek_bar_padding) / (rect.width -
@@ -809,6 +835,7 @@ namespace pdfpc {
             }
             return seek_time;
         }
+
         /**
          * Play the movie, rewinding to the beginning if we had reached the
          * end.
@@ -842,7 +869,11 @@ namespace pdfpc {
          * Set a flag about whether the mouse is currently in the progress bar.
          */
         private void set_mouse_in(double x, double y) {
-            this.in_seek_bar = (x > 0 && x < rect.width && (rect.height - y) > 0 && (rect.height - y) < seek_bar_height);
+            this.in_seek_bar =
+                x > 0 &&
+                x < this.rect.width &&
+                y > this.rect.height - this.seek_bar_height &&
+                y < this.rect.height;
         }
 
         /**
@@ -855,7 +886,7 @@ namespace pdfpc {
         }
 
         /**
-         * Pause if playing, as vice versa.
+         * Pause if playing, and vice versa.
          */
         protected void toggle_play() {
             Gst.State state;
