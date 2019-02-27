@@ -169,9 +169,9 @@ option black-on-end true
 System-wide configuration file
 .RE
 .PP
-.B $XDG_CONFIG_DIR/pdfpc/pdfpcrc
+.B $XDG_CONFIG_HOME/pdfpc/pdfpcrc
 .RS 4
-User configuration file (if $XDG_CONFIG_DIR is not set, $HOME/.config will be
+User configuration file (if $XDG_CONFIG_HOME is not set, $HOME/.config will be
 used).
 
 
