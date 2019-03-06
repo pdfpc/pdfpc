@@ -241,7 +241,8 @@ Select previous slide
 Select next slide
 
 .P
-See \fBpdfpcrc\fR(5) if you want to customize the keybindings.
+See \fBpdfpcrc\fR(5) if you want to customize the key or mouse bindings. Please
+note though, that only in the normal mode the mouse bindings are configurable.
 
 .SH FEATURES
 
@@ -479,7 +480,7 @@ the color and size of the pen will be indicated by the cursor. The pen size can 
 or decreased using hot keys specified in the key bindings. When the eraser tool is active,
 the size of the cursor indicates the amount to erase.
 
-The color of the pen can be changed through key or mouse bindings.
+The color of the pen can be changed through key bindings or using the toolbox.
 
 If you are using a tablet, the pen or eraser tool will be selected based on whether the tablet
 reports a pen or eraser input device is being used, overriding the normal selection of the drawing tool.
