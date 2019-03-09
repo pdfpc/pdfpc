@@ -95,8 +95,9 @@ format) from that location.
 .BI "\-W, \-\-wayland\-workaround"
 Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
 .TP
-.BI "\-w, \-\-windowed"
-Run in windowed mode
+.BI "\-w, \-\-windowed"=MODE
+Run in the given windowed mode (presenter|presentation|both|none). The default
+mode is "none" (both windows are fullscreen).
 .TP
 .BI "\-z, \-\-disable\-compression"
 Disable the compression of slide images to trade memory consumption for speed.
