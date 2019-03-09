@@ -102,9 +102,9 @@ namespace pdfpc {
             {"version", 'v', 0, 0,
                 ref Options.version,
                 "Output version information and exit", null},
-            {"windowed", 'w', 0, 0,
+            {"windowed", 'w', 0, OptionArg.STRING,
                 ref Options.windowed,
-                "Run in the windowed mode", null},
+                "Run in the given windowed mode", "MODE"},
             {"wayland-workaround", 'W', 0, 0,
                 ref Options.wayland_workaround,
                 "Enable Wayland-specific workaround", null},
@@ -291,7 +291,28 @@ namespace pdfpc {
 
                 }
 
-                Options.windowed = true;
+                Options.windowed = "both";
+            }
+
+            bool presenter_windowed = false;
+            bool presentation_windowed = false;
+            switch (Options.windowed) {
+            case "none":
+                break;
+            case "presenter":
+                presenter_windowed = true;
+                break;
+            case "presentation":
+                presentation_windowed = true;
+                break;
+            case "both":
+                presenter_windowed = true;
+                presentation_windowed = true;
+                break;
+            default:
+                GLib.printerr("Unknown windowed mode \"%s\"\n",
+                    Options.windowed);
+                Process.exit(1);
             }
 
             // Initialize the master controller
@@ -396,18 +417,20 @@ namespace pdfpc {
             // Force single-screen mode when there is only one physical monitor
             // present - unless running in the windowed mode
             bool single_screen_mode = (Options.single_screen ||
-                                       (n_monitors == 1 && !Options.windowed));
+                (n_monitors == 1 && Options.windowed != "both"));
 
             // Create the needed windows
             if (!single_screen_mode || !Options.display_switch) {
                 this.controller.presenter =
-                    new Window.Presenter(this.controller, presenter_monitor);
+                    new Window.Presenter(this.controller,
+                        presenter_monitor, presenter_windowed);
 
             }
             if (!single_screen_mode || Options.display_switch) {
                 this.controller.presentation =
                     new Window.Presentation(this.controller,
-                        presentation_monitor, width, height);
+                        presentation_monitor, presentation_windowed,
+                        width, height);
             }
 
             // The windows are always displayed at last to be sure all caches

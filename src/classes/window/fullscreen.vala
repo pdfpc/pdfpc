@@ -124,10 +124,10 @@ namespace pdfpc.Window {
         protected virtual void resize_gui() {}
 
         public Fullscreen(PresentationController controller, bool is_presenter,
-            int monitor_num, int width = -1, int height = -1) {
+            int monitor_num, bool windowed, int width = -1, int height = -1) {
             this.controller = controller;
             this.is_presenter = is_presenter;
-            this.windowed = Options.windowed;
+            this.windowed = windowed;
 
             this.title = "pdfpc - %s (%s)".printf(
                 is_presenter ? "presenter" : "presentation",

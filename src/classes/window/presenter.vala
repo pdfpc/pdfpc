@@ -403,8 +403,8 @@ namespace pdfpc.Window {
          * Base constructor instantiating a new presenter window
          */
         public Presenter(PresentationController controller,
-            int screen_num) {
-            base(controller, true, screen_num);
+            int screen_num, bool windowed) {
+            base(controller, true, screen_num, windowed);
 
             this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);

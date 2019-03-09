@@ -48,8 +48,8 @@ namespace pdfpc.Window {
          * Base constructor instantiating a new presentation window
          */
         public Presentation(PresentationController controller,
-            int screen_num, int width = -1, int height = -1) {
-            base(controller, false, screen_num, width, height);
+            int screen_num, bool windowed, int width = -1, int height = -1) {
+            base(controller, false, screen_num, windowed, width, height);
 
             this.controller.update_request.connect(this.update);
 
