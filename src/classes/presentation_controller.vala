@@ -870,6 +870,9 @@ namespace pdfpc {
             add_action("toggleToolbox", this.toggle_toolbox,
                 "Toggle the toolbox");
 
+            add_action("showHelp", this.show_help,
+                "Show a help screen");
+
             add_action("exitState", this.exit_state,
                 "Exit \"special\" state (pause, freeze, blank)");
             add_action("reload", this.reload,
@@ -1866,6 +1869,12 @@ namespace pdfpc {
         public void toggle_toolbox() {
             Options.toolbox_shown = !Options.toolbox_shown;
             this.controllables_update();
+        }
+
+        public void show_help() {
+            if (this.presenter != null) {
+                this.presenter.show_help_window(true);
+            }
         }
 
         protected void exit_state() {

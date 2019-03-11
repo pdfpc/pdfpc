@@ -43,6 +43,12 @@ paned separator {
     background-color: gray;
 }
 
+.help label {
+    font-size: 2em;
+    color: gray;
+    background-color: black;
+}
+
 .overviewWindow {
     font-size: 4em;
 }

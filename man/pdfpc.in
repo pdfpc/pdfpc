@@ -229,6 +229,10 @@ Reload the presentation (e.g., if the PDF file has been updated)
 .TP
 .B Ctrl + q
 Exit pdfpc
+.TP
+.B ?
+Show a cheat sheet with the keyboard and mouse bindings; press Escape or Return
+to exit it
 .P
 Within the overview mode, the following key bindings are used:
 .TP
