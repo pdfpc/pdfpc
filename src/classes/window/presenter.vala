@@ -275,6 +275,44 @@ namespace pdfpc.Window {
             return button;
         }
 
+        protected Gtk.ScrolledWindow create_help_window() {
+            var help_sw = new Gtk.ScrolledWindow(null, null);
+            help_sw.set_policy(Gtk.PolicyType.AUTOMATIC,
+                Gtk.PolicyType.AUTOMATIC);
+            help_sw.get_style_context().add_class("help");
+            help_sw.key_press_event.connect((event) => {
+                    // Exit the help window on some reasonable keystrokes
+                    switch (event.keyval) {
+                    case Gdk.Key.Escape:
+                    case Gdk.Key.Return:
+                    case Gdk.Key.q:
+                        this.show_help_window(false);
+                        return true;
+                    default:
+                        return false;
+                    }
+                });
+
+            var help_grid = new Gtk.Grid();
+            help_grid.row_homogeneous = true;
+            help_grid.column_spacing = 20;
+            help_grid.margin = 20;
+            help_sw.add(help_grid);
+
+            var actions = this.controller.get_action_bindings();
+            for (int i = 0; i < actions.length; i += 2) {
+                int row = i/2;
+                var action_lbl = new Gtk.Label(actions[i]);
+                action_lbl.halign = Gtk.Align.START;
+                var binding_lbl = new Gtk.Label(actions[i + 1]);
+                binding_lbl.halign = Gtk.Align.START;
+                help_grid.attach(action_lbl, 0, row);
+                help_grid.attach(binding_lbl, 1, row);
+            }
+
+            return help_sw;
+        }
+
         private void disable_paned_handle(Gtk.Paned paned) {
             paned.map.connect(() => {
                     var handle = paned.get_handle_window();
@@ -571,9 +609,12 @@ namespace pdfpc.Window {
             next_view_and_notes.pack2(notes_sw, true, true);
             slide_views.pack2(next_view_and_notes, true, true);
 
+            var help_sw = create_help_window();
+
             this.slide_stack = new Gtk.Stack();
             this.slide_stack.add_named(slide_views, "slides");
             this.slide_stack.add_named(this.overview, "overview");
+            this.slide_stack.add_named(help_sw, "help");
             this.slide_stack.homogeneous = true;
 
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
@@ -1059,7 +1100,6 @@ namespace pdfpc.Window {
         }
 
         private void set_font_size(int size) {
-
             const string text_css_template = "#notesView { font-size: %dpt; }";
             var css = text_css_template.printf(size);
 
@@ -1067,6 +1107,17 @@ namespace pdfpc.Window {
                 css_provider.load_from_data(css, -1);
             } catch (Error e) {
                 GLib.printerr("Warning: failed to set CSS for notes.\n");
+            }
+        }
+
+        public void show_help_window(bool onoff) {
+            if (onoff) {
+                this.slide_stack.set_visible_child_name("help");
+                this.slide_stack.get_child_by_name("help").grab_focus();
+                this.controller.set_ignore_input_events(true);
+            } else {
+                this.slide_stack.set_visible_child_name("slides");
+                this.controller.set_ignore_input_events(false);
             }
         }
     }

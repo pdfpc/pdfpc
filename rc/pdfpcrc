@@ -95,6 +95,9 @@ bind d                  toggleDrawings
 # Can be set by
 # bind S+1                setPenColor red|orange|yellow|green|blue|violet|black|white
 
+# Short help
+bind S+question         showHelp
+
 #### Mouse bindings
 mouse 1                 next
 mouse S+1               next10
