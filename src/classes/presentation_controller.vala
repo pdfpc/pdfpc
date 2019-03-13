@@ -264,7 +264,6 @@ namespace pdfpc {
                 this.name = name;
                 this.description = description;
                 this.arg_name = arg_name;
-                this.bindings = new Gee.ArrayList<KeyDef>();
             }
         }
 
@@ -295,10 +294,13 @@ namespace pdfpc {
         protected class ActionAndParameter : GLib.Object {
             public GLib.Action action { get; set; }
             public GLib.Variant? parameter { get; set; }
+            public string name { get; set; }
 
-            public ActionAndParameter(GLib.Action action, GLib.Variant? parameter) {
+            public ActionAndParameter(GLib.Action action,
+                GLib.Variant? parameter, string name) {
                 this.action = action;
                 this.parameter = parameter;
+                this.name = name;
             }
         }
 
@@ -916,57 +918,79 @@ namespace pdfpc {
             return retval;
         }
 
+        private string get_bindstr(KeyDef keydef, bool is_mouse) {
+            string bindstr = "", keystr, modstr = "";
+            if ((keydef.modMask & Gdk.ModifierType.CONTROL_MASK) != 0) {
+                modstr = "Ctrl+";
+            }
+            if ((keydef.modMask & Gdk.ModifierType.META_MASK) != 0) {
+                modstr = "Meta+";
+            }
+            if ((keydef.modMask & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                modstr = "Shift+";
+            }
+            if (is_mouse) {
+                keystr = "Mouse_%u".printf(keydef.keycode);
+            } else {
+                keystr = Gdk.keyval_name(keydef.keycode);
+                // Simple "shifted" keycodes have been capitalized
+                // by ConfigFileReader.readBindDef()
+                if (keystr.length == 1) {
+                    keystr = keystr.down();
+                }
+            }
+            bindstr += modstr + keystr;
+            return bindstr;
+        }
+
         /**
          * Get an array with all action names & their bindings
          */
         public string[] get_action_bindings() {
             string[] retval = {};
-            foreach (var entry in this.action_descriptions) {
-                if (entry.bindings.size == 0) {
-                    continue;
-                }
-                retval += entry.name;
-                string bindstr = "";
-                foreach (var keydef in entry.bindings) {
-                    bool is_mouse;
-                    if (keydef.keycode < 10) {
-                        is_mouse = true;
-                    } else {
-                        is_mouse = false;
-                    }
 
-                    string keystr, modstr = "";
-                    if ((keydef.modMask & Gdk.ModifierType.CONTROL_MASK) != 0) {
-                        modstr = "Ctrl+";
+            foreach (var entry in this.action_descriptions) {
+                var bindstr = "";
+                // Loop over the key bindings
+                foreach (var bentry in this.keyBindings.entries) {
+                    if (bentry.value.name != entry.name) {
+                        continue;
                     }
-                    if ((keydef.modMask & Gdk.ModifierType.META_MASK) != 0) {
-                        modstr = "Meta+";
-                    }
-                    if ((keydef.modMask & Gdk.ModifierType.SHIFT_MASK) != 0) {
-                        modstr = "Shift+";
-                    }
-                    if (is_mouse) {
-                        keystr = "Mouse_%u".printf(keydef.keycode);
-                    } else {
-                        keystr = Gdk.keyval_name(keydef.keycode);
-                        // Simple "shifted" keycodes have been capitalized
-                        // by ConfigFileReader.readBindDef()
-                        if (keystr.length == 1) {
-                            keystr = keystr.down();
-                        }
-                    }
+                    var keydef = bentry.key;
+
                     if (bindstr != "") {
                         bindstr += ", ";
                     }
-                    bindstr += modstr + keystr;
+                    bindstr += get_bindstr(keydef, false);
 
                     var action = this.keyBindings.get(keydef);
                     if (action != null && action.parameter != null) {
                         bindstr += " [" + action.parameter.get_string() + "]";
                     }
                 }
-                retval += bindstr;
+                // Same for the mouse bindings
+                foreach (var bentry in this.mouseBindings.entries) {
+                    if (bentry.value.name != entry.name) {
+                        continue;
+                    }
+                    var keydef = bentry.key;
+
+                    if (bindstr != "") {
+                        bindstr += ", ";
+                    }
+                    bindstr += get_bindstr(keydef, true);
+
+                    var action = this.keyBindings.get(keydef);
+                    if (action != null && action.parameter != null) {
+                        bindstr += " [" + action.parameter.get_string() + "]";
+                    }
+                }
+                if (bindstr != "") {
+                    retval += entry.name;
+                    retval += bindstr;
+                }
             }
+
             return retval;
         }
 
@@ -1006,16 +1030,8 @@ namespace pdfpc {
                     bindings = this.keyBindings;
                 }
                 var keydef = new KeyDef(keycode, modMask);
-                bindings.set(keydef, new ActionAndParameter(action, parameter));
-
-                // Store the binding in the action_descriptions list
-                // to be used for online help
-                foreach (var entry in this.action_descriptions) {
-                    if (entry.name == action_name) {
-                        entry.bindings.add(keydef);
-                        break;
-                    }
-                }
+                bindings.set(keydef,
+                    new ActionAndParameter(action, parameter, action_name));
             } else {
                 GLib.printerr("Unknown action %s\n", action_name);
             }
