@@ -69,9 +69,6 @@ Allow for testing pdfpc without proper installation. Icons, configuration files,
 etc. will be loaded from the source path locations. Mostly intended for
 developers.
 .TP
-.BI "\-p, \-\-persist\-cache"
-Persist the PNG cache on disk for faster startup.
-.TP
 .BI "\-P, \-\-page"
 Go to a specific page directly after startup. In case of overlays, the first slide will be displayed.
 .TP
@@ -268,11 +265,6 @@ should be much faster, as with normal PDF viewers.
 .PP
 As the pre-rendering takes a lot of memory it can be disabled using the
 \-\-disable\-cache switch at the cost of speed.
-
-.PP
-It it also possible to store the pre-rendered slides on the disk (see
-\-\-persist-cache).  This speeds up the start of the program if the slide set
-is used next time unchanged.
 
 .SS Cache compression
 

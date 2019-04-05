@@ -56,6 +56,13 @@ namespace pdfpc.Metadata {
         protected Poppler.Document document;
 
         /**
+         * Renderer to be used for rendering the slides
+         */
+        public Renderer.Pdf renderer {
+            get; protected set;
+        }
+
+        /**
          * Pdf page width
          */
         protected double original_page_width = 0;
@@ -477,6 +484,7 @@ namespace pdfpc.Metadata {
             if (pdfFilename != null) {
                 this.load(pdfFilename);
             }
+            this.renderer = new Renderer.Pdf(this);
         }
 
         /**

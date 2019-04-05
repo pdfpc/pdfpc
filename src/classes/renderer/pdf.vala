@@ -34,24 +34,9 @@ namespace pdfpc {
         public Metadata.Pdf metadata { get; protected set; }
 
         /**
-         * Width (in _physical_ pixels) to render to
-         */
-        public int width { get; protected set; }
-
-        /**
-         * Height (in _physical_ pixels) to render to
-         */
-        public int height { get; protected set; }
-
-        /**
-         * The area of the pdf which shall be displayed
-         */
-        protected Metadata.Area area;
-
-        /**
          * Cache store to be used
          */
-        public Renderer.Cache.Base? cache { get; set; default = null; }
+        protected Renderer.Cache.Base? cache { get; set; default = null; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -62,17 +47,13 @@ namespace pdfpc {
          * pdf document the renderspace is filled up completely cutting of a
          * part of the pdf document.
          */
-        public Pdf(Metadata.Pdf metadata, int width, int height, Metadata.Area area) {
+        public Pdf(Metadata.Pdf metadata) {
             this.metadata = metadata;
-            this.width = width;
-            this.height = height;
 
-            this.area = area;
-        }
-
-        public void resize(int width, int height) {
-            this.width = width;
-            this.height = height;
+            // Enable the caching unless disabled
+            if (!Options.disable_caching) {
+                this.cache = Renderer.Cache.create(metadata);
+            }
         }
 
         /**
@@ -81,7 +62,8 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public Cairo.ImageSurface render_to_surface(int slide_number)
+        public Cairo.ImageSurface render_to_surface(int slide_number,
+            Metadata.Area area, int width, int height)
             throws Renderer.RenderError {
 
             var metadata = this.metadata;
@@ -105,12 +87,12 @@ namespace pdfpc {
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
-                this.height);
+            Cairo.ImageSurface surface =
+                new Cairo.ImageSurface(Cairo.Format.RGB24, width, height);
             Cairo.Context cr = new Cairo.Context(surface);
 
             cr.set_source_rgb(255, 255, 255);
-            cr.rectangle(0, 0, this.width, this.height);
+            cr.rectangle(0, 0, width, height);
             cr.fill();
 
             // Calculate the scaling factor and the offsets for centering
@@ -131,8 +113,8 @@ namespace pdfpc {
             }
             cr.scale(scaling_factor, scaling_factor);
 
-            cr.translate(-metadata.get_horizontal_offset(this.area, full_page_width) + h_offset,
-                -metadata.get_vertical_offset(this.area, full_page_height) + v_offset);
+            cr.translate(-metadata.get_horizontal_offset(area, full_page_width) + h_offset,
+                -metadata.get_vertical_offset(area, full_page_height) + v_offset);
             page.render(cr);
 
             // If the cache is enabled store the newly rendered pixmap
@@ -143,13 +125,13 @@ namespace pdfpc {
             return surface;
         }
 
-        public Cairo.ImageSurface fade_to_black() {
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
-                this.height);
+        public Cairo.ImageSurface fade_to_black(int width, int height) {
+            Cairo.ImageSurface surface =
+                new Cairo.ImageSurface(Cairo.Format.RGB24, width, height);
             Cairo.Context cr = new Cairo.Context(surface);
 
             cr.set_source_rgb(0, 0, 0);
-            cr.rectangle(0, 0, this.width, this.height);
+            cr.rectangle(0, 0, width, height);
             cr.fill();
 
             double scaling_factor = Math.fmax(width/metadata.get_page_width(),

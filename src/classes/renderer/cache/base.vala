@@ -35,6 +35,23 @@ namespace pdfpc.Renderer.Cache {
         protected Metadata.Pdf metadata;
 
         /**
+         * Width (in _physical_ pixels) to render to
+         */
+        public int width { get; protected set; }
+
+        /**
+         * Height (in _physical_ pixels) to render to
+         */
+        public int height { get; protected set; }
+
+        public void resize(int width, int height) {
+            if (this.width != width && this.height != height) {
+                this.invalidate();
+                this.width = width;
+                this.height = height;
+            }
+        }
+        /**
          * Initialize the cache store
          */
         protected Base(Metadata.Pdf metadata) {
@@ -75,10 +92,6 @@ namespace pdfpc.Renderer.Cache {
      * Creates cache engines based on the global commandline options
      */
     public Base create(Metadata.Pdf metadata) {
-        if (Options.persist_cache) {
-            return new PNG.Persistent.Engine(metadata);
-        }
-
         if (!Options.disable_cache_compression) {
             return new PNG.Engine(metadata);
         }

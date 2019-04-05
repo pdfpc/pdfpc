@@ -68,13 +68,6 @@ namespace pdfpc.Window {
         protected uint idle_id = 0;
 
         /**
-         * The cache we get the images from. It is a reference because the user
-         * can deactivate the cache on the command line. In this case we show
-         * just slide numbers, which is not really so much useful.
-         */
-        protected Renderer.Cache.Base? cache = null;
-
-        /**
          * The presentation controller
          */
         protected PresentationController controller;
@@ -110,7 +103,7 @@ namespace pdfpc.Window {
         /**
          * The used cell renderer, for later usage
          */
-        private CellRendererHighlight renderer;
+        private CellRendererHighlight cell_renderer;
 
         /*
          * When the section changes, we need to update the current slide number.
@@ -142,15 +135,15 @@ namespace pdfpc.Window {
             this.slides_view = new Gtk.IconView.with_model(this.slides);
             this.slides_view.selection_mode = Gtk.SelectionMode.SINGLE;
             this.slides_view.halign = Gtk.Align.CENTER;
-            this.renderer = new CellRendererHighlight();
-            this.renderer.metadata = metadata;
+            this.cell_renderer = new CellRendererHighlight();
+            this.cell_renderer.metadata = metadata;
             Gtk.StyleContext style_context = this.get_style_context();
             Pango.FontDescription font_description;
             style_context.get(style_context.get_state(), "font", out font_description, null);
-            this.renderer.font_description = font_description;
+            this.cell_renderer.font_description = font_description;
 
-            this.slides_view.pack_start(renderer, true);
-            this.slides_view.add_attribute(renderer, "slide_id", 0);
+            this.slides_view.pack_start(cell_renderer, true);
+            this.slides_view.add_attribute(cell_renderer, "slide_id", 0);
             this.slides_view.set_item_padding(0);
             this.slides_view.show();
             this.add(this.slides_view);
@@ -160,6 +153,8 @@ namespace pdfpc.Window {
             this.slides_view.key_press_event.connect(this.on_key_press);
             this.slides_view.selection_changed.connect(this.on_selection_changed);
             this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
+
+            this.set_renderer(this.metadata.renderer);
         }
 
         public void set_available_space(int width, int height) {
@@ -257,8 +252,8 @@ namespace pdfpc.Window {
 
             this.last_structure_n_slides = this.n_slides;
 
-            this.renderer.slide_width = this.target_width;
-            this.renderer.slide_height = this.target_height;
+            this.cell_renderer.slide_width = this.target_width;
+            this.cell_renderer.slide_height = this.target_height;
 
             this.slides.clear();
             var iter = Gtk.TreeIter();
@@ -269,13 +264,11 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Gives the cache to retrieve the images from. The caching process
-         * itself should already be finished.
+         * Set the PDF renderer.
          */
-        public void set_cache(Renderer.Cache.Base cache) {
-            this.cache = cache;
-            this.renderer.cache = cache;
-            // force redraw if the cache is there
+        protected void set_renderer(Renderer.Pdf renderer) {
+            this.cell_renderer.renderer = renderer;
+            // force redraw
             this.slides_view.queue_draw();
         }
 
@@ -383,7 +376,7 @@ namespace pdfpc.Window {
     class CellRendererHighlight : Gtk.CellRenderer {
         public int slide_id { get; set; }
 
-        public Renderer.Cache.Base? cache { get; set; }
+        public Renderer.Pdf renderer { get; set; }
         public Pango.FontDescription font_description { get; set; }
         public Metadata.Pdf metadata { get; set; }
         public int slide_width { get; set; }
@@ -402,11 +395,21 @@ namespace pdfpc.Window {
                                     Gdk.Rectangle background_area, Gdk.Rectangle cell_area,
                                     Gtk.CellRendererState flags) {
             Cairo.ImageSurface slide_to_fill = null;
-            if (cache != null) {
-                slide_to_fill = cache.retrieve(metadata.user_slide_to_real_slide(this.slide_id));
+
+            slide_to_fill = null;
+            if (this.renderer != null) {
+                try {
+                    var real_slide_id =
+                        metadata.user_slide_to_real_slide(this.slide_id, true);
+                    slide_to_fill =
+                        this.renderer.render_to_surface(real_slide_id,
+                            Metadata.Area.CONTENT, slide_width, slide_height);
+                } catch (Renderer.RenderError e) {
+                    ;
+                }
             }
             // nothing to show
-            if (cache == null || slide_to_fill == null) {
+            if (slide_to_fill == null) {
                 cr.set_source_rgba(0.5, 0.5, 0.5, 1);
                 cr.rectangle(cell_area.x, cell_area.y, cell_area.width, cell_area.height);
                 cr.fill();

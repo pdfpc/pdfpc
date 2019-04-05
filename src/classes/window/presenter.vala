@@ -553,14 +553,6 @@ namespace pdfpc.Window {
             this.overview.set_n_slides(this.controller.user_n_slides);
             this.controller.set_overview(this.overview);
 
-            // Enable the render caching if it hasn't been forcefully disabled.
-            if (!Options.disable_caching) {
-                this.current_view.get_renderer().cache = Renderer.Cache.create(metadata);
-                this.next_view.get_renderer().cache = Renderer.Cache.create(metadata);
-                this.strict_next_view.get_renderer().cache = Renderer.Cache.create(metadata);
-                this.strict_prev_view.get_renderer().cache = Renderer.Cache.create(metadata);
-            }
-
             Gtk.AspectFrame frame;
 
             var slide_views = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
@@ -898,7 +890,7 @@ namespace pdfpc.Window {
             int current_user_slide_number = this.controller.current_user_slide_number;
 
             try {
-                this.current_view.display(current_slide_number, true);
+                this.current_view.display(current_slide_number);
                 int next_view_slide_offset = 0;
                 if (   !Options.final_slide_overlay
                     || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
@@ -906,21 +898,20 @@ namespace pdfpc.Window {
                     next_view_slide_offset = 1;
                 }
                 this.next_view.display(
-                    this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset),
-                    true
+                    this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset)
                 );
                 if (this.controller.skip_next()) {
                     this.strict_next_view.disabled = false;
                 } else {
                     this.strict_next_view.disabled = true;
                 }
-                this.strict_next_view.display(current_slide_number + 1, true);
+                this.strict_next_view.display(current_slide_number + 1);
                 if (this.controller.skip_previous()) {
                     this.strict_prev_view.disabled = false;
                 } else {
                     this.strict_prev_view.disabled = true;
                 }
-                this.strict_prev_view.display(current_slide_number - 1, true);
+                this.strict_prev_view.display(current_slide_number - 1);
             }
             catch( Renderer.RenderError e ) {
                 GLib.printerr("The pdf page %d could not be rendered: %s\n", current_slide_number, e.message);
@@ -1074,7 +1065,6 @@ namespace pdfpc.Window {
 
         public void prerender_finished() {
             this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
-            this.overview.set_cache(this.next_view.get_renderer().cache);
         }
 
         /**

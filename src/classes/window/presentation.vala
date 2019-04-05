@@ -56,10 +56,6 @@ namespace pdfpc.Window {
             this.view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, true);
 
-            if (!Options.disable_caching) {
-                this.view.get_renderer().cache = Renderer.Cache.create(metadata);
-            }
-
             this.overlay_layout.add(this.view);
 
             // TODO: update the ratio on document reload
@@ -88,7 +84,7 @@ namespace pdfpc.Window {
             }
 
             try {
-                this.view.display(this.controller.current_slide_number, true);
+                this.view.display(this.controller.current_slide_number);
             } catch (Renderer.RenderError e) {
                 GLib.printerr("The pdf page %d could not be rendered: %s\n",
                     this.controller.current_slide_number, e.message );
