@@ -303,6 +303,9 @@ namespace pdfpc {
                 case "toolbox-minimized":
                     Options.toolbox_minimized = bool.parse(fields[2]);
                     break;
+                case "final-slide":
+                    Options.final_slide_overlay = bool.parse(fields[2]);
+                    break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
                     break;
