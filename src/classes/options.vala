@@ -234,6 +234,12 @@ namespace pdfpc {
          */
         public static bool no_install = false;
 
+        /**
+         * Show the final slide of each overlay in "next slide" view
+         * instead of the next slide.
+         */
+        public static bool final_slide_overlay = false;
+
         public class BindTuple {
             public string type;
             public uint keyCode;
