@@ -900,8 +900,9 @@ namespace pdfpc.Window {
             try {
                 this.current_view.display(current_slide_number, true);
                 int next_view_slide_offset = 0;
-                if (   Options.final_slide_overlay
-                    && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number)) {
+                if (   !Options.final_slide_overlay
+                    || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
+                   ){
                     next_view_slide_offset = 1;
                 }
                 this.next_view.display(
