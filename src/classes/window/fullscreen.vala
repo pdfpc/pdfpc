@@ -120,6 +120,12 @@ namespace pdfpc.Window {
          * The monitor number we want to show the window
          */
         protected int monitor_num_to_use;
+        /**
+         * ... and the actual monitor object
+         */
+        public Gdk.Monitor monitor {
+            get; protected set;
+        }
 
         protected virtual void resize_gui() {}
 
@@ -136,10 +142,9 @@ namespace pdfpc.Window {
             this.destroy.connect((source) => controller.quit());
 
             var display = Gdk.Display.get_default();
-            Gdk.Monitor monitor;
             if (monitor_num >= 0) {
                 // Start in the given monitor
-                monitor = display.get_monitor(monitor_num);
+                this.monitor = display.get_monitor(monitor_num);
                 this.monitor_num_to_use = monitor_num;
 
                 this.screen_to_use = display.get_default_screen();
@@ -150,12 +155,12 @@ namespace pdfpc.Window {
                 device.get_position(out this.screen_to_use,
                     out pointerx, out pointery);
 
-                monitor = display.get_monitor_at_point(pointerx, pointery);
+                this.monitor = display.get_monitor_at_point(pointerx, pointery);
                 // Shouldn't be used, just a safety precaution
                 this.monitor_num_to_use = 0;
             }
 
-            this.gdk_scale = monitor.get_scale_factor();
+            this.gdk_scale = this.monitor.get_scale_factor();
 
             this.overlay_layout = new Gtk.Overlay();
 
@@ -184,7 +189,7 @@ namespace pdfpc.Window {
             });
 
             // By default, we go fullscreen
-            var monitor_geometry = monitor.get_geometry();
+            var monitor_geometry = this.monitor.get_geometry();
             this.window_w = monitor_geometry.width;
             this.window_h = monitor_geometry.height;
             if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
@@ -199,11 +204,11 @@ namespace pdfpc.Window {
                     // Some WM's ignore move requests made prior to
                     // mapping the window
                     this.map_event.connect(() => {
-                            this.do_fullscreen(monitor);
+                            this.do_fullscreen();
                             return true;
                         });
                 } else {
-                    this.do_fullscreen(monitor);
+                    this.do_fullscreen();
                 }
             } else {
                 if (width > 0 && height > 0) {
@@ -245,12 +250,16 @@ namespace pdfpc.Window {
             this.scroll_event.connect(this.controller.scroll);
         }
 
-        protected void do_fullscreen(Gdk.Monitor monitor) {
+        protected void do_fullscreen() {
+            // This should not happen, just in case...
+            if (this.monitor == null) {
+                return;
+            }
             // Wayland has no concept of global coordinates, so move() does not
             // work there. The window is "somewhere", but we do not care,
             // since the next call should fix it. For X11 and KWin/Plasma this
             // does the right thing.
-            Gdk.Rectangle monitor_geometry = monitor.get_geometry();
+            Gdk.Rectangle monitor_geometry = this.monitor.get_geometry();
             this.move(monitor_geometry.x, monitor_geometry.y);
 
             // Specially for Wayland; just fullscreen() would do otherwise...
@@ -260,15 +269,23 @@ namespace pdfpc.Window {
 
         public void toggle_windowed() {
             this.windowed = !this.windowed;
-            var display = this.get_display();
             if (!this.windowed) {
                 var window = this.get_window();
                 if (window != null) {
-                    this.do_fullscreen(display.get_monitor_at_window(window));
+                    this.do_fullscreen();
                 }
             } else {
                 this.unfullscreen();
             }
+        }
+
+        public void connect_monitor(Gdk.Monitor? monitor) {
+            // This will likely become beefier in the future
+            this.monitor = monitor;
+        }
+
+        public bool is_monitor_connected() {
+            return this.monitor != null ? true:false;
         }
 
         protected bool draw_pointer(Cairo.Context context) {
