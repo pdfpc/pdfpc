@@ -132,7 +132,8 @@ namespace pdfpc {
         private bool single_screen_mode {
             get {
                 return (this._presentation == null ||
-                        this._presenter == null);
+                        this._presenter == null ||
+                        !this._presentation.is_monitor_connected());
             }
         }
 
