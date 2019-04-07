@@ -455,6 +455,59 @@ namespace pdfpc {
                 Process.exit(1);
             }
 
+            // Handle monitor added/removed events.
+            // We assume only the presentation screen can be PnP.
+            display.monitor_added.connect((m) => {
+                    GLib.print("Monitor %s added\n", m.get_model());
+                    if (Options.single_screen) {
+                        return;
+                    }
+
+                    var controller = this.controller;
+                    var presentation = controller.presentation;
+                    if (presentation == null) {
+                        // Create the presentation window if not done yet
+                        n_monitors = display.get_n_monitors();
+                        for (int i = 0; i < n_monitors; i++) {
+                            if (display.get_monitor(i) == m) {
+                                controller.presentation =
+                                    new Window.Presentation(controller,
+                                        i, presentation_windowed,
+                                        width, height);
+                                controller.presentation.show_all();
+                                controller.presentation.update();
+                                break;
+                            }
+                        }
+                    } else if (!presentation.is_monitor_connected()) {
+                        presentation.connect_monitor(m);
+                        // Make sure it is not hidden
+                        if (controller.hidden) {
+                            controller.hide_presentation();
+                        }
+                    } else {
+                        // Everything is connected already; is this a 3rd+
+                        // monitor? Do nothing for now.
+                    }
+                });
+
+            display.monitor_removed.connect((m) => {
+                    GLib.print("Monitor %s removed\n", m.get_model());
+                    if (Options.single_screen) {
+                        return;
+                    }
+
+                    var controller = this.controller;
+                    var presentation = controller.presentation;
+                    if (presentation != null && presentation.monitor == m) {
+                        // Make sure it is hidden
+                        if (!controller.hidden) {
+                            controller.hide_presentation();
+                        }
+                        presentation.connect_monitor(null);
+                    }
+                });
+
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
             Gtk.main();
