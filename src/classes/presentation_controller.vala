@@ -818,6 +818,9 @@ namespace pdfpc {
                 "Show the overview mode");
             add_action("histBack", this.history_back,
                 "Go back in history");
+            add_action_with_parameter("gotoPage", GLib.VariantType.STRING,
+                this.goto_string,
+                "Jump to the specified page", "number");
 
             add_action("start", this.start,
                 "Start the timer");
@@ -1556,6 +1559,21 @@ namespace pdfpc {
 
             this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
             this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+
+            if (!this.frozen) {
+                this.faded_to_black = false;
+            }
+            this.controllables_update();
+        }
+
+        /**
+         * Go to the named slide
+         */
+        public void goto_string(Variant? page) {
+            this.timer.start();
+
+            int destination = int.parse(page.get_string()) - 1;
+            this.goto_user_page(destination);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
