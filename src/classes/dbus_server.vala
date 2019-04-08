@@ -76,7 +76,11 @@ namespace pdfpc {
         }
 
         public void trigger_action(string name) throws GLib.Error {
-            this.controller.trigger_action(name);
+            this.controller.trigger_action(name, null);
+        }
+
+        public void trigger_action_arg(string name, string parameter) throws GLib.Error {
+            this.controller.trigger_action(name, parameter);
         }
 
         public string get_notes() throws GLib.Error {

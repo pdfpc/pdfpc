@@ -557,7 +557,13 @@ example, to advance to the next slide, run
 dbus-send --type=method_call --session --dest=io.github.pdfpc
  /io/github/pdfpc io.github.pdfpc.TriggerAction string:next
 
-In addition to the \fBTriggerAction\fR method, the pdfpc DBus interface exposes
+For actions that require an argument, use \fBTriggerActionArg\fR, e.g.,
+
+dbus-send --type=method_call --session --dest=io.github.pdfpc
+ /io/github/pdfpc io.github.pdfpc.TriggerActionArg string:switchMode
+ string:pointer
+
+In addition to \fBTriggerAction*\fR, the pdfpc DBus interface exposes
 the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
 \fBNumberOfSlides\fR, \fBUrl\fR) and two signals (\fBOverlayChange\fR and
 \fBSlideChange\fR).

@@ -997,8 +997,8 @@ namespace pdfpc {
         /**
          * Trigger an action by name
          */
-        public void trigger_action(string name) {
-            this.action_group.activate_action(name, null);
+        public void trigger_action(string name, Variant? parameter) {
+            this.action_group.activate_action(name, parameter);
         }
 
         /**
