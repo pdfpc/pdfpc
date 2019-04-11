@@ -1,7 +1,7 @@
 install(FILES
     pdfpcrc
 DESTINATION
-    ${SYSCONFDIR}
+    ${CMAKE_INSTALL_FULL_SYSCONFDIR}
 )
 
 install(FILES
