@@ -122,10 +122,10 @@ distributions you may have to install *-devel* packages).
 
 Note: You may alter the final installation prefix in the cmake call. By default
 the pdfpc files will be installed under */usr/local/*. If you want to change
-that, for example to be installed under */usr/*, with config files under
-*/etc/* you may specify another installation prefix as follows::
+that, for example to be installed under */usr/*, you may specify another
+installation prefix as follows::
 
-    cmake -DCMAKE_INSTALL_PREFIX="/usr" -DSYSCONFDIR=/etc ..
+    cmake -DCMAKE_INSTALL_PREFIX="/usr" ..
 
 By default, pdfpc includes support for movie playback.  This requires several
 gstreamer dependencies as well as gdk-x11.  The requirement for these packages
