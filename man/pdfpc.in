@@ -493,6 +493,14 @@ The color of the pen can be changed through key bindings or using the toolbox.
 If you are using a tablet, the pen or eraser tool will be selected based on whether the tablet
 reports a pen or eraser input device is being used, overriding the normal selection of the drawing tool.
 
+.SS Monitor Plug and Play
+.PP
+Pdfpc can handle monitor plug and play. E.g. if pdfpc was started before the
+presentation screen was attached to the computer, pdfpc can create and show the
+presentation screen after the second screen was attached. This allows the user
+to rehearse the slides and switch to a normal presentation without having the
+full setup at the computer in advance.
+
 .SS pdfpc files
 .PP
 Some additional information is stored in a file with the extension
