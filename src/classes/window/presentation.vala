@@ -64,8 +64,6 @@ namespace pdfpc.Window {
                 (float) ratio, false);
             frame.add(overlay_layout);
             this.add(frame);
-
-            this.set_cache_observer(this.controller.cache_status);
         }
 
         /**
@@ -83,24 +81,7 @@ namespace pdfpc.Window {
                 this.view.disabled = false;
             }
 
-            try {
-                this.view.display(this.controller.current_slide_number);
-            } catch (Renderer.RenderError e) {
-                GLib.printerr("The pdf page %d could not be rendered: %s\n",
-                    this.controller.current_slide_number, e.message );
-                Process.exit(1);
-            }
-        }
-
-        /**
-         * Set the cache observer for the Views on this window
-         *
-         * This method takes care of registering all Prerendering Views used by
-         * this window correctly with the CacheStatus object to provide acurate
-         * cache status measurements.
-         */
-        public void set_cache_observer(CacheStatus observer) {
-            observer.monitor_view(this.view);
+            this.view.display(this.controller.current_slide_number);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace pdfpc {
         /**
          * Cache store to be used
          */
-        protected Renderer.Cache.Base? cache { get; set; default = null; }
+        protected Renderer.Cache? cache { get; set; default = null; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -52,7 +52,7 @@ namespace pdfpc {
 
             // Enable the caching unless disabled
             if (!Options.disable_caching) {
-                this.cache = Renderer.Cache.create(metadata);
+                this.cache = new Renderer.Cache();
             }
         }
 
@@ -74,13 +74,19 @@ namespace pdfpc {
                     "The requested slide '%i' does not exist.", slide_number);
             }
 
+            CachedPageProps props = new CachedPageProps(slide_number,
+                width, height);
+
             // If caching is enabled check for the page in the cache
             if (this.cache != null) {
                 Cairo.ImageSurface cache_content;
-                if ((cache_content = this.cache.retrieve(slide_number)) != null) {
+                if ((cache_content = this.cache.retrieve(props)) != null) {
                     return cache_content;
                 }
             }
+
+            // Measure the time to render the page
+            Timer timer = new Timer();
 
             // Retrieve the Poppler.Page for the page to render
             var page = metadata.get_document().get_page(slide_number);
@@ -117,9 +123,14 @@ namespace pdfpc {
                 -metadata.get_vertical_offset(area, full_page_height) + v_offset);
             page.render(cr);
 
-            // If the cache is enabled store the newly rendered pixmap
-            if (this.cache != null) {
-                this.cache.store( slide_number, surface );
+            timer.stop();
+            double seconds = timer.elapsed();
+            printerr("Render time = %g\n", seconds);
+
+            // If the cache is enabled store the newly rendered pixmap, but
+            // only if it has taken a significant time to render
+            if (this.cache != null && seconds > 0.01) {
+                this.cache.store(props, surface);
             }
 
             return surface;
@@ -139,6 +150,15 @@ namespace pdfpc {
             cr.scale(scaling_factor, scaling_factor);
 
             return surface;
+        }
+
+        /**
+         * Invalidate the whole cache (if the document is reloaded/changed)
+         */
+        public void invalidate_cache() {
+            if (this.cache != null) {
+                this.cache.invalidate();
+            }
         }
     }
 

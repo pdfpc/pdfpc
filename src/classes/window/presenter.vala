@@ -767,8 +767,6 @@ namespace pdfpc.Window {
             full_overlay.set_overlay_pass_through(this.toolbox_container, true);
 
             this.add(full_overlay);
-
-            this.set_cache_observer(this.controller.cache_status);
         }
 
         public override void show() {
@@ -889,34 +887,29 @@ namespace pdfpc.Window {
             int current_slide_number = this.controller.current_slide_number;
             int current_user_slide_number = this.controller.current_user_slide_number;
 
-            try {
-                this.current_view.display(current_slide_number);
-                int next_view_slide_offset = 0;
-                if (   !Options.final_slide_overlay
-                    || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
-                   ){
-                    next_view_slide_offset = 1;
-                }
-                this.next_view.display(
-                    this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset)
-                );
-                if (this.controller.skip_next()) {
-                    this.strict_next_view.disabled = false;
-                } else {
-                    this.strict_next_view.disabled = true;
-                }
-                this.strict_next_view.display(current_slide_number + 1);
-                if (this.controller.skip_previous()) {
-                    this.strict_prev_view.disabled = false;
-                } else {
-                    this.strict_prev_view.disabled = true;
-                }
-                this.strict_prev_view.display(current_slide_number - 1);
+            this.current_view.display(current_slide_number);
+            int next_view_slide_offset = 0;
+            if (   !Options.final_slide_overlay
+                || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
+               ){
+                next_view_slide_offset = 1;
             }
-            catch( Renderer.RenderError e ) {
-                GLib.printerr("The pdf page %d could not be rendered: %s\n", current_slide_number, e.message);
-                Process.exit(1);
+            this.next_view.display(
+                this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset)
+            );
+            if (this.controller.skip_next()) {
+                this.strict_next_view.disabled = false;
+            } else {
+                this.strict_next_view.disabled = true;
             }
+            this.strict_next_view.display(current_slide_number + 1);
+            if (this.controller.skip_previous()) {
+                this.strict_prev_view.disabled = false;
+            } else {
+                this.strict_prev_view.disabled = true;
+            }
+            this.strict_prev_view.display(current_slide_number - 1);
+
             this.update_slide_count();
             this.update_note();
 
@@ -1045,26 +1038,6 @@ namespace pdfpc.Window {
         public void hide_overview() {
             this.slide_stack.set_visible_child_name("slides");
             this.overview.ensure_structure();
-        }
-
-        /**
-         * Take a cache observer and register it with all prerendering Views
-         * shown on the window.
-         *
-         * Furthermore it is taken care of to add the cache observer to this window
-         * for display, as it is a Image widget after all.
-         */
-        public void set_cache_observer(CacheStatus observer) {
-            observer.monitor_view(this.current_view);
-            observer.monitor_view(this.next_view);
-
-            observer.update_progress.connect(this.prerender_progress.set_fraction);
-            observer.update_complete.connect(this.prerender_finished);
-            this.prerender_progress.show();
-        }
-
-        public void prerender_finished() {
-            this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
         }
 
         /**

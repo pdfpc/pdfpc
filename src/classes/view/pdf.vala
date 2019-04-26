@@ -56,32 +56,19 @@ namespace pdfpc {
         }
 
         /**
-         * Signal emitted every time a precached slide has been created
-         *
-         * This signal should be emitted slide_count number of times during a
-         * precaching cycle.
-         */
-        public signal void slide_prerendered();
-
-        /**
-         * Signal emitted when the precaching cycle is complete
-         */
-        public signal void prerendering_completed();
-
-        /**
-         * Signal emitted when the precaching cycle just started
-         */
-        public signal void prerendering_started();
-
-        /**
          * Signal emitted on toggling the freeze state
          */
         public signal void freeze_toggled(bool frozen);
 
         /**
-         * The currently displayed slide
+         * The currently displayed slide number
          */
         protected int current_slide_number;
+
+        /**
+         * and its rendered image
+         */
+        protected Cairo.ImageSurface current_slide;
 
         /**
          * Whether the view should remain black
@@ -197,13 +184,8 @@ namespace pdfpc {
 
         /**
          * Display a specific slide number
-         *
-         * If the slide number does not exist a
-         * RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public void display(int slide_number)
-            throws Renderer.RenderError {
-
+        public void display(int slide_number) {
             if (this.n_slides == 0) {
                 return;
             }
@@ -216,15 +198,20 @@ namespace pdfpc {
                 slide_number = this.n_slides - 1;
             }
 
-            // Notify all listeners
-            this.leaving_slide(this.current_slide_number, slide_number);
+            if (this.current_slide_number != slide_number) {
+                // Notify all listeners
+                this.leaving_slide(this.current_slide_number, slide_number);
 
-            this.current_slide_number = slide_number;
+                // Invalidate the locally cached image
+                this.current_slide = null;
 
-            // Have Gtk update the widget
-            this.queue_draw();
+                this.current_slide_number = slide_number;
 
-            this.entering_slide(this.current_slide_number);
+                // Have Gtk update the widget
+                this.queue_draw();
+
+                this.entering_slide(this.current_slide_number);
+            }
         }
 
         /**
@@ -257,28 +244,32 @@ namespace pdfpc {
                 return true;
             }
 
-            Cairo.ImageSurface current_slide;
-
-            try {
-                // An exception is thrown here, if the slide can not be rendered.
-                if (this.current_slide_number < this.n_slides && !this.disabled) {
-                    current_slide =
-                        this.renderer.render_to_surface(this.current_slide_number,
-                            this.area, width, height);
-                } else {
-                    current_slide = this.renderer.fade_to_black(width, height);
+            if (this.current_slide == null ||
+                this.current_slide.get_width() != width ||
+                this.current_slide.get_height() != height) {
+                try {
+                    // An exception is thrown here, if the slide can not be rendered.
+                    if (this.current_slide_number < this.n_slides && !this.disabled) {
+                        this.current_slide =
+                            this.renderer.render_to_surface(this.current_slide_number,
+                                this.area, width, height);
+                    } else {
+                        this.current_slide = this.renderer.fade_to_black(width, height);
+                    }
+                } catch (Renderer.RenderError e) {
+                    GLib.printerr("The pdf page %d could not be rendered: %s\n",
+                        this.current_slide_number, e.message);
+                    return true;
                 }
-
-                cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
-                cr.set_source_surface(current_slide, 0, 0);
-                cr.rectangle(0, 0, current_slide.get_width(),
-                    current_slide.get_height());
-                cr.fill();
-            } catch (Renderer.RenderError e) {
             }
 
-            // We are the only ones drawing on this context; skip everything
-            // else.
+            cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
+            cr.set_source_surface(this.current_slide, 0, 0);
+            cr.rectangle(0, 0, this.current_slide.get_width(),
+                this.current_slide.get_height());
+            cr.fill();
+
+            // We are the only ones drawing on this context; skip everything else
             return true;
         }
     }

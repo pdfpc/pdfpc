@@ -61,19 +61,6 @@ namespace pdfpc {
         }
 
         /**
-         * Monitor a new view for prerendering information
-         */
-        public void monitor_view( View.Pdf view ) {
-            view.prerendering_started.connect( (v) => {
-                this.max_value += (int)v.get_metadata().get_slide_count();
-            });
-            view.slide_prerendered.connect( () => {
-                ++this.current_value;
-                this.update();
-            });
-        }
-
-        /**
          * Reset the stats
          */
         public void reset() {
