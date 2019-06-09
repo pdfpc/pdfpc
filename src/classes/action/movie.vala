@@ -264,7 +264,8 @@ namespace pdfpc {
             }
             bool uncertain;
             string ctype = GLib.ContentType.guess(uri, null, out uncertain);
-            if (!("video" in ctype)) {
+            if (!("video" in ctype) ||
+                !("video" in GLib.ContentType.get_mime_type(ctype))) {
                 return null;
             }
 
