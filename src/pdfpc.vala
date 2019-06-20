@@ -157,7 +157,7 @@ namespace pdfpc {
          * Print version string and copyright statement
          */
         private void print_version() {
-            GLib.print("pdfpc v4.3.3\n"
+            GLib.print("pdfpc v4.3.4\n"
                      + "Copyright (C) 2010-2019 see CONTRIBUTORS\n\n"
                      + "License GPLv2: GNU GPL version 2 <http://gnu.org/licenses/gpl-2.0.html>.\n"
                      + "This is free software: you are free to change and redistribute it.\n"
