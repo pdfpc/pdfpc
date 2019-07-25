@@ -465,10 +465,10 @@ namespace pdfpc.Window {
             int current_allocated_width = (int) Math.floor(
                 this.window_w*Options.current_size/100.0);
             this.current_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.NOTES, true);
+                Metadata.Area.CONTENT, true);
 
             this.next_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, false);
+                Options.notes_position == null ? Metadata.Area.CONTENT : Metadata.Area.NOTES, false);
 
             this.strict_next_view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, false);
@@ -898,6 +898,7 @@ namespace pdfpc.Window {
             int current_user_slide_number = this.controller.current_user_slide_number;
 
             try {
+
                 this.current_view.display(current_slide_number, true);
                 int next_view_slide_offset = 0;
                 if (   !Options.final_slide_overlay
@@ -905,10 +906,14 @@ namespace pdfpc.Window {
                    ){
                     next_view_slide_offset = 1;
                 }
-                this.next_view.display(
-                    this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset),
-                    true
-                );
+                if (Options.notes_position == null) {
+                    this.next_view.display(
+                        this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset),
+                        true
+                    );
+                } else {
+                    this.next_view.display(current_slide_number, true);
+                }
                 if (this.controller.skip_next()) {
                     this.strict_next_view.disabled = false;
                 } else {

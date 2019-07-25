@@ -243,6 +243,7 @@ namespace pdfpc {
 
             if (Options.notes_position != null) {
                 Options.disable_auto_grouping = true;
+                Options.current_size = 50;
                 GLib.printerr("--notes option detected. Disable auto grouping.\n");
             }
 
