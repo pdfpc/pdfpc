@@ -66,19 +66,22 @@ The following option_name's are recognized:
 .B black-on-end
 Add an additional black slide at the end of the presentation (bool, Default is false).
 .TP
+.BI cache-max-rtime
+Maximal time (in units of ms) it takes to render a slide for its cache to be
+protected from expiration.
+.TP
+.BI cache-min-rtime
+Minimal time (in units of ms) it takes to render a slide for it to be cached.
+.TP
+.BI cache-max-usize
+Maximal size (in units of kB) of a slide image to store it uncompressed in the
+cache.
+.TP
 .B current-height
 Percentage of the height of the presenter screen to be used for the current slide (int, Default is 80).
 .TP
 .B current-size
 Percentage of the presenter screen to be used for the current slide (int, Default is 60).
-.TP
-.BI disable-caching
-see
-.B \fBpdfpc\fR(1)
-.TP
-.BI disable-compression
-see
-.B \fBpdfpc\fR(1)
 .TP
 .BI disable-input-autodetection
 Do not automatically detect type (pen or eraser) of tablet input devices (bool,

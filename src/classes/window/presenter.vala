@@ -529,11 +529,7 @@ namespace pdfpc.Window {
             // Don't display prerendering text if the user has disabled
             // it, but still create the control to ensure the layout
             // doesn't change.
-            if (Options.disable_caching) {
-                this.prerender_progress.text = "";
-            } else {
-                this.prerender_progress.text = "Prerendering...";
-            }
+            this.prerender_progress.text = "Prerendering...";
             this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
             this.prerender_progress.no_show_all = true;
             this.prerender_progress.valign = Gtk.Align.END;
@@ -874,10 +870,8 @@ namespace pdfpc.Window {
          * change; TODO
          */
         public void on_reload() {
-            if (!Options.disable_caching) {
-                this.prerender_progress.set_fraction(0);
-                this.prerender_progress.opacity = 1;
-            }
+            this.prerender_progress.set_fraction(0);
+            this.prerender_progress.opacity = 1;
         }
 
         public void update() {

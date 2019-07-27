@@ -58,16 +58,27 @@ namespace pdfpc {
         public static bool wayland_workaround = false;
 
         /**
-         * Commandline option which allows the complete disabling of slide caching
+         * Config option defining maximal render time of slide for its cache
+         * to be never evicted [ms]
          */
-        public static bool disable_caching = false;
+        public static bool cache_debug = false;
 
         /**
-         * Commandline option to disable the compression of cached slides. This
-         * trades speed for memory. A lot of memory ;) It's about factor 30
-         * bigger for normal presentations.
+         * Config option defining maximal render time of slide for its cache
+         * to be never evicted [ms]
          */
-        public static bool disable_cache_compression = false;
+        public static int cache_max_rtime = 1000;
+
+        /**
+         * Config option defining minimal render time of slide to be cached [ms]
+         */
+        public static int cache_min_rtime = 10;
+
+        /**
+         * Config option defining maximal slide size to be stored uncompressed
+         * [kB]
+         */
+        public static int cache_max_usize = 256;
 
         /**
          * Config option to enable a workaround for fullscreen window placement

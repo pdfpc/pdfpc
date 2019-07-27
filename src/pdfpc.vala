@@ -45,9 +45,6 @@ namespace pdfpc {
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
-            {"disable-cache", 'c', 0, 0,
-                ref Options.disable_caching,
-                "Disable caching and pre-rendering of slides", null},
             {"time-of-day", 'C', 0, 0,
                 ref Options.use_time_of_day,
                 "Use the current time for the timer", null},
@@ -105,9 +102,6 @@ namespace pdfpc {
             {"wayland-workaround", 'W', 0, 0,
                 ref Options.wayland_workaround,
                 "Enable Wayland-specific workaround", null},
-            {"disable-compression", 'z', 0, 0,
-                ref Options.disable_cache_compression,
-                "Disable compression of the cached slide images", null},
             {"size", 'Z', 0, OptionArg.STRING,
                 ref Options.size,
                 "Size of the presentation window (implies \"-w\")", "W:H"},

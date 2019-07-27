@@ -36,7 +36,7 @@ namespace pdfpc {
         /**
          * Cache store to be used
          */
-        protected Renderer.Cache? cache { get; set; default = null; }
+        protected Renderer.Cache cache { get; set; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -50,10 +50,7 @@ namespace pdfpc {
         public Pdf(Metadata.Pdf metadata) {
             this.metadata = metadata;
 
-            // Enable the caching unless disabled
-            if (!Options.disable_caching) {
-                this.cache = new Renderer.Cache();
-            }
+            this.cache = new Renderer.Cache();
         }
 
         /**
@@ -77,12 +74,10 @@ namespace pdfpc {
             CachedPageProps props = new CachedPageProps(slide_number,
                 width, height);
 
-            // If caching is enabled check for the page in the cache
-            if (this.cache != null) {
-                Cairo.ImageSurface cache_content;
-                if ((cache_content = this.cache.retrieve(props)) != null) {
-                    return cache_content;
-                }
+            // Check for the page in the cache
+            Cairo.ImageSurface cache_content;
+            if ((cache_content = this.cache.retrieve(props)) != null) {
+                return cache_content;
             }
 
             // Measure the time to render the page
@@ -124,14 +119,16 @@ namespace pdfpc {
             page.render(cr);
 
             timer.stop();
-            double seconds = timer.elapsed();
-            printerr("Render time of (%d %d %d) = %g\n",
-                slide_number, width, height, seconds);
+            double rtime = timer.elapsed();
+            if (Options.cache_debug) {
+                printerr("Render time of [%d] (%dx%d) = %g s\n",
+                    slide_number, width, height, rtime);
+            }
 
             // If the cache is enabled store the newly rendered pixmap, but
             // only if it has taken a significant time to render
-            if (this.cache != null && (force_cache || seconds > 0.01)) {
-                this.cache.store(props, surface);
+            if (force_cache || rtime > Options.cache_min_rtime/1000.0) {
+                this.cache.store(props, surface, rtime);
             }
 
             return surface;
@@ -157,9 +154,7 @@ namespace pdfpc {
          * Invalidate the whole cache (if the document is reloaded/changed)
          */
         public void invalidate_cache() {
-            if (this.cache != null) {
-                this.cache.invalidate();
-            }
+            this.cache.invalidate();
         }
     }
 
