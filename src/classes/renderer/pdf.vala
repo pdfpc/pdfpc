@@ -63,7 +63,7 @@ namespace pdfpc {
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
         public Cairo.ImageSurface render_to_surface(int slide_number,
-            Metadata.Area area, int width, int height)
+            Metadata.Area area, int width, int height, bool force_cache=false)
             throws Renderer.RenderError {
 
             var metadata = this.metadata;
@@ -125,11 +125,12 @@ namespace pdfpc {
 
             timer.stop();
             double seconds = timer.elapsed();
-            printerr("Render time = %g\n", seconds);
+            printerr("Render time of (%d %d %d) = %g\n",
+                slide_number, width, height, seconds);
 
             // If the cache is enabled store the newly rendered pixmap, but
             // only if it has taken a significant time to render
-            if (this.cache != null && seconds > 0.01) {
+            if (this.cache != null && (force_cache || seconds > 0.01)) {
                 this.cache.store(props, surface);
             }
 

@@ -1037,7 +1037,6 @@ namespace pdfpc.Window {
 
         public void hide_overview() {
             this.slide_stack.set_visible_child_name("slides");
-            this.overview.ensure_structure();
         }
 
         /**
