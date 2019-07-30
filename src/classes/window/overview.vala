@@ -363,10 +363,8 @@ namespace pdfpc.Window {
                 try {
                     var real_slide_id =
                         metadata.user_slide_to_real_slide(this.slide_id, true);
-                    slide_to_fill =
-                        renderer.render_to_surface(real_slide_id,
-                            Metadata.Area.CONTENT, slide_width, slide_height,
-                            true);
+                    slide_to_fill = renderer.render(real_slide_id,
+                        Metadata.Area.CONTENT, slide_width, slide_height, true);
                 } catch (Renderer.RenderError e) {
                     ;
                 }

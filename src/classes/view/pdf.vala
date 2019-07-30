@@ -251,7 +251,7 @@ namespace pdfpc {
                     // An exception is thrown here, if the slide can not be rendered.
                     if (this.current_slide_number < this.n_slides && !this.disabled) {
                         this.current_slide =
-                            this.renderer.render_to_surface(this.current_slide_number,
+                            this.renderer.render(this.current_slide_number,
                                 this.area, width, height);
                     } else {
                         this.current_slide = this.renderer.fade_to_black(width, height);

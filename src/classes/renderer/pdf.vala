@@ -59,7 +59,7 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public Cairo.ImageSurface render_to_surface(int slide_number,
+        public Cairo.ImageSurface render(int slide_number,
             Metadata.Area area, int width, int height, bool force_cache=false)
             throws Renderer.RenderError {
 
