@@ -1498,20 +1498,13 @@ namespace pdfpc {
         }
 
         /**
-         * Wrapper function to work with key bindings and callbacks
-         */
-        public void goto_first() {
-            _goto_first(false);
-        }
-
-        /**
          * Go to the first slide
          */
-        private void _goto_first(bool skipHistory) {
+        private void goto_first() {
             this.timer.start();
 
             // update history if we are not already at the first slide
-            if (this.current_slide_number > 0 && !skipHistory) {
+            if (this.current_slide_number > 0) {
                 this.push_history();
             }
 
@@ -1656,9 +1649,6 @@ namespace pdfpc {
             }
 
             if (this.history.is_empty) {
-                // skip history pushing to prevent slide hopping
-                this._goto_first(true);
-
                 return;
             }
 
