@@ -48,7 +48,11 @@ namespace pdfpc {
         /**
          * The current slide in "user indexes"
          */
-        public int current_user_slide_number { get; protected set; }
+        public int current_user_slide_number {
+            get {
+                return this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            }
+        }
 
         /**
          * Stores if the view is faded to black
@@ -206,15 +210,11 @@ namespace pdfpc {
                 if (value != null) {
                     this.metadata.controller = this;
 
-                    this.user_slide_progress =
-                        new int[metadata.get_user_slide_count()];
-
                     this.timer = getTimerLabel(this,
                         (int) this.metadata.get_duration() * 60);
                     this.timer.reset();
 
                     this.current_slide_number = 0;
-                    this.current_user_slide_number = 0;
 
                     this.pen_drawing = Drawings.create(metadata);
                     current_pen_drawing_tool = pen_drawing.pen;
@@ -235,14 +235,9 @@ namespace pdfpc {
         protected uint last_key_event = 0;
 
         /**
-         * Stores the "history" of the slides (jumps only)
+         * Stores the "history" of the slides
          */
         private Gee.ArrayQueue<int> history;
-
-        /**
-         * Progress tracking for user slides
-         */
-        protected int[] user_slide_progress;
 
         /**
          * Timer for the presentation. It should only be displayed on one view.
@@ -464,9 +459,7 @@ namespace pdfpc {
         }
 
         protected void update_pen_drawing() {
-            pen_drawing.switch_to_slide(
-                this.metadata.user_slide_to_real_slide(this.current_user_slide_number)
-            );
+            pen_drawing.switch_to_slide(this.current_slide_number);
             this.queue_pen_surface_draws();
         }
 
@@ -1216,11 +1209,7 @@ namespace pdfpc {
             }
 
             this.current_slide_number = page_number;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(
-                this.current_slide_number);
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
+
             this.controllables_update();
 
             if (start_timer) {
@@ -1306,7 +1295,6 @@ namespace pdfpc {
             // there is a next slide
             if (this.current_slide_number < this.n_slides - 1) {
                 ++this.current_slide_number;
-                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
 
                 if (!this.frozen) {
                     this.faded_to_black = false;
@@ -1315,9 +1303,6 @@ namespace pdfpc {
                 this.controllables_update();
             } else if (Options.black_on_end && !this.faded_to_black) {
                 this.fade_to_black();
-            }
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
             }
         }
 
@@ -1330,8 +1315,7 @@ namespace pdfpc {
 
             // there is a next user slide
             if (this.current_user_slide_number < this.metadata.get_user_slide_count() - 1) {
-                ++this.current_user_slide_number;
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1);
                 needs_update = true;
             } else {
                 // we are at the last slide
@@ -1353,10 +1337,6 @@ namespace pdfpc {
                 }
                 this.controllables_update();
             }
-
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
         }
 
         /**
@@ -1375,19 +1355,8 @@ namespace pdfpc {
             }
 
             int next_slide = this.current_slide_number + 1;
-            if(next_slide < this.n_slides - 1) {
-                int user_slide_at_next_slide = this.metadata.real_slide_to_user_slide(next_slide);
-                if(this.user_slide_progress[user_slide_at_next_slide] != 0 &&
-                        this.user_slide_progress[user_slide_at_next_slide] >= next_slide) {
-                    next_slide = this.user_slide_progress[user_slide_at_next_slide];
-                }
-            }
 
             this.current_slide_number = next_slide;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
 
             this.controllables_update();
         }
@@ -1406,10 +1375,6 @@ namespace pdfpc {
                     this.faded_to_black = false;
                 }
                 this.controllables_update();
-
-                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-                }
             }
         }
 
@@ -1427,10 +1392,6 @@ namespace pdfpc {
                     this.faded_to_black = false;
                 }
                 this.controllables_update();
-
-                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-                }
             }
         }
 
@@ -1442,16 +1403,11 @@ namespace pdfpc {
 
             if (this.current_slide_number > 0) {
                 --this.current_slide_number;
-                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
 
                 if (!this.frozen) {
                     this.faded_to_black = false;
                 }
                 this.controllables_update();
-
-                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-                }
             }
         }
 
@@ -1462,8 +1418,7 @@ namespace pdfpc {
             this.timer.start();
 
             if (this.current_user_slide_number > 0) {
-                --this.current_user_slide_number;
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number - 1);
             } else {
                 this.current_slide_number = 0;
             }
@@ -1472,10 +1427,6 @@ namespace pdfpc {
                 this.faded_to_black = false;
             }
             this.controllables_update();
-
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
         }
 
         /**
@@ -1491,8 +1442,6 @@ namespace pdfpc {
             if(this.current_slide_number == 0) {
                 return;
             }
-            this.current_slide_number = this.user_slide_progress[this.current_user_slide_number-1];
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
 
             this.controllables_update();
         }
@@ -1509,7 +1458,6 @@ namespace pdfpc {
             }
 
             this.current_slide_number = 0;
-            this.current_user_slide_number = 0;
 
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1529,8 +1477,8 @@ namespace pdfpc {
             // Start the timer
             this.timer.start();
 
-            this.current_user_slide_number = this.metadata.get_last_saved_slide() - 1;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            var new_user_slide_number = this.metadata.get_last_saved_slide() - 1;
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1551,8 +1499,8 @@ namespace pdfpc {
                 this.push_history();
             }
 
-            this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            var new_user_slide_number = this.metadata.get_end_user_slide() - 1;
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1585,8 +1533,8 @@ namespace pdfpc {
 
             this.timer.start();
 
-            this.current_user_slide_number = int.min(this.current_user_slide_number + 10, this.metadata.get_user_slide_count() - 1);
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            var new_user_slide_number = int.min(this.current_user_slide_number + 10, this.metadata.get_user_slide_count() - 1);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1604,8 +1552,8 @@ namespace pdfpc {
 
             this.timer.start();
 
-            this.current_user_slide_number = int.max(this.current_user_slide_number - 10, 0);
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
+            var new_user_slide_number = int.max(this.current_user_slide_number - 10, 0);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1631,8 +1579,7 @@ namespace pdfpc {
             } else if (page_number >= n_user_slides) {
                 destination = n_user_slides - 1;
             }
-            this.current_user_slide_number = destination;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, useLast);
+            this.current_slide_number = this.metadata.user_slide_to_real_slide(destination, useLast);
             if (!this.frozen) {
                 this.faded_to_black = false;
             }
@@ -1654,7 +1601,6 @@ namespace pdfpc {
 
             int history_head = this.history.poll_head();
             this.current_slide_number = history_head;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
 
             if (!this.frozen) {
                 this.faded_to_black = false;
@@ -1780,8 +1726,6 @@ namespace pdfpc {
                     this.overview.remove_current(this.user_n_slides);
                 }
             } else {
-                this.current_user_slide_number += this.metadata.toggle_skip(
-                    this.current_slide_number, this.current_user_slide_number);
                 this.overview.set_n_slides(this.user_n_slides);
                 this.controllables_update();
             }
@@ -1829,9 +1773,6 @@ namespace pdfpc {
                 // Make sure the current position remains valid
                 if (position_saved >= this.n_slides) {
                     this.current_slide_number = (int) this.n_slides - 1;
-                    this.current_user_slide_number =
-                        this.metadata.real_slide_to_user_slide(
-                            this.current_slide_number);
                 }
 
                 // Reset the drawing storage & clear the current drawings
