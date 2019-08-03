@@ -95,7 +95,7 @@ namespace pdfpc {
          * Default constructor taking the initial time as argument, as well as
          * the time to countdown until the talk actually starts.
          */
-        public TimerLabel(PresentationController controller, time_t start_time = 0) {
+        protected TimerLabel(PresentationController controller, time_t start_time = 0) {
             this.controller = controller;
             this.start_time = start_time;
         }

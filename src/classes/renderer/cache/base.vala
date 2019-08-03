@@ -37,7 +37,7 @@ namespace pdfpc.Renderer.Cache {
         /**
          * Initialize the cache store
          */
-        public Base(Metadata.Pdf metadata) {
+        protected Base(Metadata.Pdf metadata) {
             this.metadata = metadata;
         }
 

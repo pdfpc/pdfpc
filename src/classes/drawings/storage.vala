@@ -35,7 +35,7 @@ namespace pdfpc.Drawings.Storage {
          */
         protected Metadata.Pdf metadata;
 
-        public Base(Metadata.Pdf metadata) {
+        protected Base(Metadata.Pdf metadata) {
             this.metadata = metadata;
         }
 

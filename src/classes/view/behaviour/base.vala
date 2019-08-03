@@ -41,7 +41,7 @@ namespace pdfpc.View {
         /**
          * Base constructor not taking any arguments
          */
-        public Base() {
+        protected Base() {
             // Nothing to do here
         }
 
