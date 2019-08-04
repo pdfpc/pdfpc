@@ -48,7 +48,7 @@ namespace pdfpc {
          * methods, and we need blank objects to call them.  Thus, this blank
          * constructor.
          */
-        public ActionMapping() {
+        protected ActionMapping() {
             base();
         }
 
