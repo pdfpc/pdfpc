@@ -45,7 +45,7 @@ namespace pdfpc {
     /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
-    public Gst.Element gst_element_make(string factoryname, string? name) throws PipelineError {
+    public Gst.Element gst_element_make(string factoryname, string name) throws PipelineError {
         var element = Gst.ElementFactory.make(factoryname, name);
         if (element == null) {
             throw new PipelineError.ElementConstruction(
@@ -804,8 +804,8 @@ namespace pdfpc {
             dynamic Gst.Element overlay;
             Gst.Element adaptor;
             try {
-                adaptor = gst_element_make("videoconvert", null);
-                overlay = gst_element_make("cairooverlay", null);
+                adaptor = gst_element_make("videoconvert", "converter");
+                overlay = gst_element_make("cairooverlay", "controls");
                 bin.add_many(adaptor, overlay);
                 if (!source.link_many(overlay, adaptor)) {
                     throw new PipelineError.Linking("Could not link pipeline.");
