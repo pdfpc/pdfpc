@@ -439,7 +439,7 @@ namespace pdfpc {
                 Options.page <= metadata.get_end_user_slide()) {
                 int u = metadata.user_slide_to_real_slide(Options.page - 1,
                     false);
-                this.controller.page_change_request(u, false);
+                this.controller.switch_to_slide_number(u, true);
             } else {
                 GLib.printerr("Argument --page/-P must be between 1 and %d\n",
                     metadata.get_end_user_slide());
