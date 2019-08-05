@@ -185,7 +185,7 @@ namespace pdfpc {
         /**
          * Display a specific slide number
          */
-        public void display(int slide_number) {
+        public void display(int slide_number, bool force=false) {
             if (this.n_slides == 0) {
                 return;
             }
@@ -194,11 +194,11 @@ namespace pdfpc {
             // each side of the document.
             if (slide_number < 0) {
                 slide_number = 0;
-            } else if (slide_number >= this.n_slides + 1) {
+            } else if (slide_number >= this.n_slides) {
                 slide_number = this.n_slides - 1;
             }
 
-            if (this.current_slide_number != slide_number) {
+            if (this.current_slide_number != slide_number || force) {
                 // Notify all listeners
                 this.leaving_slide(this.current_slide_number, slide_number);
 

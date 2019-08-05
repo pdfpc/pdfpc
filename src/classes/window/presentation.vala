@@ -75,13 +75,15 @@ namespace pdfpc.Window {
             if (this.controller.frozen)
                 return;
 
+            bool old_disabled = this.view.disabled;
             if (this.controller.faded_to_black) {
                 this.view.disabled = true;
             } else {
                 this.view.disabled = false;
             }
 
-            this.view.display(this.controller.current_slide_number);
+            bool force = old_disabled != this.view.disabled;
+            this.view.display(this.controller.current_slide_number, force);
         }
     }
 }
