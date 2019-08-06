@@ -1194,14 +1194,18 @@ namespace pdfpc {
          * Was the previous slide a skip one?
          */
         public bool skip_previous() {
-            return this.current_slide_number > 0 && this.metadata.real_slide_to_user_slide(this.current_slide_number - 1) == this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            return this.current_slide_number > 0 &&
+                this.current_user_slide_number ==
+                    this.metadata.real_slide_to_user_slide(this.current_slide_number - 1);
         }
 
         /**
          * Is the next slide a skip one?
          */
         public bool skip_next() {
-            return this.current_slide_number < this.n_slides && this.metadata.real_slide_to_user_slide(this.current_slide_number) == this.metadata.real_slide_to_user_slide(this.current_slide_number + 1);
+            return this.current_slide_number < this.n_slides - 1 &&
+                this.current_user_slide_number ==
+                    this.metadata.real_slide_to_user_slide(this.current_slide_number + 1);
         }
 
         /**
