@@ -263,6 +263,11 @@ namespace pdfpc {
                 GLib.printerr("Loaded pdfpcrc from legacy location. Please move your config file to %s\n", userConfig);
             }
 
+            // with prerendering enabled, it makes no sense not to cache a slide
+            if (Options.prerender_slides != 0) {
+                Options.cache_min_rtime = 0;
+            }
+
 #if MOVIES
             Gst.init(ref args);
 #endif

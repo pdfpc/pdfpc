@@ -81,6 +81,17 @@ namespace pdfpc {
         public static int cache_max_usize = 256;
 
         /**
+         * Delay before starting prerendering consequitive slides [ms]
+         */
+        public static int prerender_delay = 4000;
+
+        /**
+         * Number of slides ahead of the current one to prerender;
+         * 0 to disable, negative => prerender all
+         */
+        public static int prerender_slides = 2;
+
+        /**
          * Config option to enable a workaround for fullscreen window placement
          * (needed for some WM's, e.g., fvwm)
          */

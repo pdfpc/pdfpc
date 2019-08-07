@@ -265,6 +265,12 @@ namespace pdfpc {
                 case "pointer-size":
                     Options.pointer_size = int.parse(fields[2]);
                     break;
+                case "prerender-delay":
+                    Options.prerender_delay = int.parse(fields[2]);
+                    break;
+                case "prerender-slides":
+                    Options.prerender_slides = int.parse(fields[2]);
+                    break;
                 case "presentation-screen":
                     Options.presentation_screen = fields[2];
                     break;

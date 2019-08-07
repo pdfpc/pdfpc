@@ -100,6 +100,74 @@ namespace pdfpc {
         protected Metadata.Area area;
 
         /**
+         * Timeout used to delay pre-rendering
+         */
+        protected uint timeout = 0;
+
+        /**
+         * Launch pre-rendering
+         */
+        protected virtual bool prerender() {
+            // The pointer is needed to keep track of the slide progress inside
+            // the pre-render loop
+            int* p_slide = null;
+
+            int first_page = this.current_slide_number + 1;
+            if (first_page >= this.n_slides) {
+                // nothing to pre-render
+                return false;
+            }
+
+            int last_slide;
+            if (Options.prerender_slides >= 0) {
+                last_slide = this.current_slide_number +
+                    Options.prerender_slides;
+            } else {
+                last_slide = this.n_slides - 1;
+            }
+            if (last_slide >= this.n_slides) {
+                last_slide = this.n_slides - 1;
+            }
+
+            int width, height;
+            this.get_pixel_dimensions(out width, out height);
+
+            GLib.Idle.add(() => {
+                if (p_slide == null) {
+                    p_slide = malloc(sizeof(int));
+                    *p_slide = first_page;
+                }
+
+                // We do not care about the result, as the
+                // rendering function stores the rendered
+                // pixmap in the cache if it is enabled. This
+                // is exactly what we want.
+                try {
+                    this.renderer.render(*p_slide, this.area, width, height);
+                } catch(Renderer.RenderError e) {
+                    GLib.printerr("Could pre-render page '%i': %s\n",
+                        *p_slide, e.message);
+                }
+
+                // Increment one slide for each call and stop the loop if we
+                // have reached the last slide
+                *p_slide = *p_slide + 1;
+                if (*p_slide > last_slide) {
+                    free(p_slide);
+                    return GLib.Source.REMOVE;
+                } else {
+                    return GLib.Source.CONTINUE;
+                }
+            });
+
+            // indicate we're done
+            this.timeout = 0;
+
+            // don't repeat...
+            return false;
+        }
+
+        /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
         public Pdf(Renderer.Pdf renderer, Metadata.Area area,
@@ -248,11 +316,18 @@ namespace pdfpc {
                 this.current_slide.get_width() != width ||
                 this.current_slide.get_height() != height) {
                 try {
-                    // An exception is thrown here, if the slide can not be rendered.
                     if (this.current_slide_number < this.n_slides && !this.disabled) {
                         this.current_slide =
                             this.renderer.render(this.current_slide_number,
                                 this.area, width, height);
+
+                        if (Options.prerender_slides != 0) {
+                            if (this.timeout == 0) {
+                                // wait before starting pre-rendering
+                                this.timeout = GLib.Timeout.add(Options.prerender_delay,
+                                    this.prerender);
+                            }
+                        }
                     } else {
                         this.current_slide = this.renderer.fade_to_black(width, height);
                     }
