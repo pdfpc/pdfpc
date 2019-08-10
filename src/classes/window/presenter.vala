@@ -71,8 +71,6 @@ namespace pdfpc.Window {
          */
         protected Gtk.Entry slide_progress;
 
-        protected Gtk.ProgressBar prerender_progress;
-
         /**
          * The bottom row is 10% of the window height, fixed
          */
@@ -522,18 +520,6 @@ namespace pdfpc.Window {
             // 7 chars (i.e. maximal 999/999 for displaying)
             this.slide_progress.width_chars = 7;
 
-            this.prerender_progress = new Gtk.ProgressBar();
-            this.prerender_progress.name = "prerenderProgress";
-            this.prerender_progress.show_text = true;
-
-            // Don't display prerendering text if the user has disabled
-            // it, but still create the control to ensure the layout
-            // doesn't change.
-            this.prerender_progress.text = "Prerendering...";
-            this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
-            this.prerender_progress.no_show_all = true;
-            this.prerender_progress.valign = Gtk.Align.END;
-
             this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
             this.load_icons();
 
@@ -611,13 +597,9 @@ namespace pdfpc.Window {
             this.timer.halign = Gtk.Align.CENTER;
             this.timer.valign = Gtk.Align.END;
 
-            var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            progress_alignment.pack_start(this.prerender_progress);
-            progress_alignment.pack_end(this.slide_progress, false);
-
             bottom_row.pack_start(this.status);
             bottom_row.pack_start(this.timer);
-            bottom_row.pack_end(progress_alignment);
+            bottom_row.pack_end(this.slide_progress, false);
 
             Gtk.Grid full_layout = new Gtk.Grid();
             full_layout.row_homogeneous = true;
@@ -865,13 +847,10 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Called on document reload. Currently, only re-enables the cache
-         * progress indicator, but in principle the document geometry may
-         * change; TODO
+         * Called on document reload.
+         * TODO: in principle the document geometry may change!
          */
         public void on_reload() {
-            this.prerender_progress.set_fraction(0);
-            this.prerender_progress.opacity = 1;
         }
 
         public void update() {
