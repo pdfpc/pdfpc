@@ -117,6 +117,11 @@ namespace pdfpc {
             // indicate we're running, too late to cancel even if desired
             this.timeout_id = 0;
 
+            // things might have changed during prerender_delay...
+            if (this.disabled) {
+                return GLib.Source.REMOVE;
+            }
+
             // The pointer is needed to keep track of the slide progress inside
             // the pre-render loop
             int* p_slide = null;
@@ -124,7 +129,7 @@ namespace pdfpc {
             int first_page = this.current_slide_number + 1;
             if (first_page >= this.n_slides) {
                 // nothing to pre-render
-                return false;
+                return GLib.Source.REMOVE;
             }
 
             var metadata = this.get_metadata();
@@ -176,7 +181,7 @@ namespace pdfpc {
             });
 
             // don't repeat...
-            return false;
+            return GLib.Source.REMOVE;
         }
 
         /**
