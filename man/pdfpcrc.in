@@ -66,6 +66,13 @@ The following option_name's are recognized:
 .B black-on-end
 Add an additional black slide at the end of the presentation (bool, Default is false).
 .TP
+.BI cache-clean-period
+Period (in units of s) to check for expired cached content (int, Default is 60).
+.TP
+.BI cache-expiration
+Time (in units of s) to keep (pre)rendered slides in the cache (int, Default is
+600). Set to a negative value to keep cached slides permanently.
+.TP
 .BI cache-max-rtime
 Maximal time (in units of ms) it takes to render a slide for its cache to be
 protected from expiration.

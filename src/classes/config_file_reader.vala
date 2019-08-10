@@ -223,6 +223,12 @@ namespace pdfpc {
                 case "cache-debug":
                     Options.cache_debug = bool.parse(fields[2]);
                     break;
+                case "cache-clean-period":
+                    Options.cache_clean_period = int.parse(fields[2]);
+                    break;
+                case "cache-expiration":
+                    Options.cache_expiration = int.parse(fields[2]);
+                    break;
                 case "cache-max-rtime":
                     Options.cache_max_rtime = int.parse(fields[2]);
                     break;

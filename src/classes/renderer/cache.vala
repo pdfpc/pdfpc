@@ -34,10 +34,20 @@ namespace pdfpc.Renderer {
         protected Gee.HashMap<CachedPageProps, CachedPage> storage = null;
 
         /**
-         * Initialize the cache store
+         * Timeout ID of cache cleaner
+         */
+        protected uint timeout_id = 0;
+
+        /**
+         * Initialize the cache store and launch a periodic cleaning
          */
         public Cache() {
             this.storage = new Gee.HashMap<CachedPageProps, CachedPage>();
+            if (Options.cache_expiration > 0) {
+                this.timeout_id =
+                    GLib.Timeout.add(1000*Options.cache_clean_period,
+                        this.clean_cache);
+            }
         }
 
         /**
@@ -52,6 +62,7 @@ namespace pdfpc.Renderer {
             }
 
             page.rtime = rtime;
+            page.atime = GLib.get_monotonic_time();
 
             // Store large images in the compressed (PNG) form
             uint size = 3*props.width*props.height;
@@ -91,6 +102,7 @@ namespace pdfpc.Renderer {
             CachedPage page = this.storage.get(props);
 
             if (page != null) {
+                page.atime = GLib.get_monotonic_time();
                 if (page.surface != null) {
                     return page.surface;
                 } else {
@@ -126,6 +138,33 @@ namespace pdfpc.Renderer {
         public void invalidate() {
             this.storage.clear();
         }
+
+        /**
+         * Evict expired cached slides
+         */
+        public bool clean_cache() {
+            var current_time = GLib.get_monotonic_time();
+
+            var it = this.storage.map_iterator();
+            while (it.has_next()) {
+                it.next();
+                var cpage = it.get_value();
+
+                // check for expired pages, but keep very "precious" ones
+                // in any case
+                if ((current_time - cpage.atime)/1000000L >
+                    Options.cache_expiration &&
+                    cpage.rtime < Options.cache_max_rtime) {
+                    if (Options.cache_debug) {
+                        var props = it.get_key();
+                        stdout.printf("Expired cache of [%u] %ux%u\n",
+                            props.index, props.width, props.height);
+                    }
+                    it.unset();
+                }
+            }
+            return GLib.Source.CONTINUE;
+        }
     }
 
     protected class CachedPageProps : Object, Gee.Hashable<CachedPageProps> {
@@ -151,8 +190,24 @@ namespace pdfpc.Renderer {
     }
 
     public class CachedPage {
+        /**
+         * The rendered raster image
+         */
         public Cairo.ImageSurface? surface = null;
+
+        /**
+         * The compressed image data (PNG)
+         */
         public uint8[]? png_data = null;
-        public double rtime;
+
+        /**
+         * CPU time (s) used to render the page
+         */
+        public double rtime = 0;
+
+        /**
+         * Last access timestamp (microseconds)
+         */
+        public int64 atime = 0;
     }
 }

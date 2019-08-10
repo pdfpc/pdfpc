@@ -58,10 +58,19 @@ namespace pdfpc {
         public static bool wayland_workaround = false;
 
         /**
-         * Config option defining maximal render time of slide for its cache
-         * to be never evicted [ms]
+         * Undocumented on purpose...
          */
         public static bool cache_debug = false;
+
+        /**
+         * Periodicity with which the cache cleaner is fired [s]
+         */
+        public static int cache_clean_period = 60;
+
+        /**
+         * Time duration for (pre)rendered pages to be kept in cache [s]
+         */
+        public static int cache_expiration = 600;
 
         /**
          * Config option defining maximal render time of slide for its cache
