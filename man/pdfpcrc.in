@@ -129,8 +129,8 @@ Set the pointer opacity in percent (int, default is 50).
 Set the initial pointer size, in pixels (int, default is 10).
 .TP
 .B prerender-delay
-Delay (in ms) to launch the pre-rendering process after a slide change (int,
-default 4000).
+Delay (in seconds) to launch the pre-rendering process after a slide change
+(int, default is 4).
 .TP
 .B prerender-slides
 Number of slides ahead of the current one to pre-render (int, default is 2). Set

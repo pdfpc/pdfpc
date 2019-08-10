@@ -90,9 +90,9 @@ namespace pdfpc {
         public static int cache_max_usize = 256;
 
         /**
-         * Delay before starting prerendering consequitive slides [ms]
+         * Delay before starting prerendering consecutive slides [s]
          */
-        public static int prerender_delay = 4000;
+        public static int prerender_delay = 4;
 
         /**
          * Number of slides ahead of the current one to prerender;

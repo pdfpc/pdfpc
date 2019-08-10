@@ -346,8 +346,9 @@ namespace pdfpc {
                             }
 
                             // wait before starting pre-rendering
-                            this.timeout_id = GLib.Timeout.add(Options.prerender_delay,
-                                this.prerender);
+                            this.timeout_id =
+                                GLib.Timeout.add(1000*Options.prerender_delay,
+                                    this.prerender);
                         }
                     } else {
                         this.current_slide = this.renderer.fade_to_black(width, height);
