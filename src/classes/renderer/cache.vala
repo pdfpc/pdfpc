@@ -55,13 +55,13 @@ namespace pdfpc.Renderer {
          * as identifier; also keep the time it took to render
          */
         public void store(CachedPageProps props, Cairo.ImageSurface surface,
-            double rtime) {
+            bool permanent) {
             CachedPage page = this.storage.get(props);
             if (page == null) {
                 page = new CachedPage();
             }
 
-            page.rtime = rtime;
+            page.permanent = permanent;
             page.atime = GLib.get_monotonic_time();
 
             // Store large images in the compressed (PNG) form
@@ -153,8 +153,7 @@ namespace pdfpc.Renderer {
                 // check for expired pages, but keep very "precious" ones
                 // in any case
                 if ((current_time - cpage.atime)/1000000L >
-                    Options.cache_expiration &&
-                    cpage.rtime < Options.cache_max_rtime) {
+                    Options.cache_expiration && !cpage.permanent) {
                     if (Options.cache_debug) {
                         var props = it.get_key();
                         stdout.printf("Expired cache of [%u] %ux%u\n",
@@ -201,9 +200,9 @@ namespace pdfpc.Renderer {
         public uint8[]? png_data = null;
 
         /**
-         * CPU time (s) used to render the page
+         * Whether to keep it permanently
          */
-        public double rtime = 0;
+        public bool permanent = false;
 
         /**
          * Last access timestamp (microseconds)

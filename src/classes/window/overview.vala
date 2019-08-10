@@ -359,15 +359,14 @@ namespace pdfpc.Window {
             Cairo.ImageSurface slide_to_fill = null;
 
             slide_to_fill = null;
-            if (renderer != null) {
-                try {
-                    var real_slide_id =
-                        metadata.user_slide_to_real_slide(this.slide_id, true);
-                    slide_to_fill = renderer.render(real_slide_id,
-                        Metadata.Area.CONTENT, slide_width, slide_height, true);
-                } catch (Renderer.RenderError e) {
-                    ;
-                }
+            try {
+                var real_slide_id =
+                    metadata.user_slide_to_real_slide(this.slide_id, true);
+                slide_to_fill = renderer.render(real_slide_id,
+                    Metadata.Area.CONTENT, slide_width, slide_height,
+                    true, true);
+            } catch (Renderer.RenderError e) {
+                ;
             }
             // nothing to show
             if (slide_to_fill == null) {
