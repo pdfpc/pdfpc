@@ -468,7 +468,7 @@ namespace pdfpc.Window {
                 Metadata.Area.NOTES, true);
 
             this.next_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, false);
+                Metadata.Area.CONTENT, false, true);
 
             this.strict_next_view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, false);

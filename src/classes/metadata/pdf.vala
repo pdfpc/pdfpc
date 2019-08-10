@@ -719,6 +719,17 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Check whether the given slide is the full user slide (i.e., the
+         * last slide within an overlay)
+         */
+        public bool is_user_slide(int number) {
+            int user_slide = real_slide_to_user_slide(number);
+            int last_slide = user_slide_to_real_slide(user_slide, true);
+
+            return (number == last_slide);
+        }
+
+        /**
          * Return the width of the first page of the loaded pdf document.
          *
          * If slides contains also notes, this method returns the width of the content part only

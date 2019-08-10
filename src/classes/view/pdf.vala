@@ -76,6 +76,12 @@ namespace pdfpc {
         public bool disabled;
 
         /**
+         * Whether the view will show only full user slides (without
+         * intermediate overlays)
+         */
+        public bool user_slides;
+
+        /**
          * The number of slides in the presentation
          */
         protected int n_slides {
@@ -100,14 +106,17 @@ namespace pdfpc {
         protected Metadata.Area area;
 
         /**
-         * Timeout used to delay pre-rendering
+         * ID of timeout used to delay pre-rendering
          */
-        protected uint timeout = 0;
+        protected uint timeout_id = 0;
 
         /**
          * Launch pre-rendering
          */
         protected virtual bool prerender() {
+            // indicate we're running, too late to cancel even if desired
+            this.timeout_id = 0;
+
             // The pointer is needed to keep track of the slide progress inside
             // the pre-render loop
             int* p_slide = null;
@@ -118,12 +127,15 @@ namespace pdfpc {
                 return false;
             }
 
+            var metadata = this.get_metadata();
+
             int last_slide;
-            if (Options.prerender_slides >= 0) {
-                last_slide = this.current_slide_number +
-                    Options.prerender_slides;
+            if (this.user_slides) {
+                var user_slide = metadata.real_slide_to_user_slide(this.current_slide_number);
+                var last_user_slide = user_slide + Options.prerender_slides;
+                last_slide = metadata.user_slide_to_real_slide(last_user_slide, true);
             } else {
-                last_slide = this.n_slides - 1;
+                last_slide = this.current_slide_number + Options.prerender_slides;
             }
             if (last_slide >= this.n_slides) {
                 last_slide = this.n_slides - 1;
@@ -138,15 +150,18 @@ namespace pdfpc {
                     *p_slide = first_page;
                 }
 
-                // We do not care about the result, as the
-                // rendering function stores the rendered
-                // pixmap in the cache if it is enabled. This
-                // is exactly what we want.
-                try {
-                    this.renderer.render(*p_slide, this.area, width, height);
-                } catch(Renderer.RenderError e) {
-                    GLib.printerr("Could pre-render page '%i': %s\n",
-                        *p_slide, e.message);
+                if (!this.user_slides || metadata.is_user_slide(*p_slide)) {
+                    // We do not care about the result, as the
+                    // rendering function stores the rendered
+                    // pixmap in the cache if it is enabled. This
+                    // is exactly what we want.
+                    try {
+                        this.renderer.render(*p_slide, this.area, width, height,
+                            true);
+                    } catch(Renderer.RenderError e) {
+                        GLib.printerr("Could pre-render page '%i': %s\n",
+                            *p_slide, e.message);
+                    }
                 }
 
                 // Increment one slide for each call and stop the loop if we
@@ -160,9 +175,6 @@ namespace pdfpc {
                 }
             });
 
-            // indicate we're done
-            this.timeout = 0;
-
             // don't repeat...
             return false;
         }
@@ -170,12 +182,13 @@ namespace pdfpc {
         /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
-        public Pdf(Renderer.Pdf renderer, Metadata.Area area,
+        protected Pdf(Renderer.Pdf renderer, Metadata.Area area,
             bool clickable_links, PresentationController controller,
-            int gdk_scale_factor) {
+            int gdk_scale_factor, bool user_slides) {
             this.renderer = renderer;
             this.gdk_scale = gdk_scale_factor;
             this.area = area;
+            this.user_slides = user_slides;
 
             this.current_slide_number = 0;
 
@@ -194,14 +207,14 @@ namespace pdfpc {
          * metadata and rendering chain to be used with the pdf view.
          */
         public Pdf.from_fullscreen(Window.Fullscreen window,
-            Metadata.Area area, bool clickable_links) {
+            Metadata.Area area, bool clickable_links, bool user_slides=false) {
             var controller = window.controller;
             var metadata = controller.metadata;
 
-            // will be resized on first use
             var renderer = metadata.renderer;
 
-            this(renderer, area, clickable_links, controller, window.gdk_scale);
+            this(renderer, area, clickable_links, controller, window.gdk_scale,
+                user_slides);
         }
 
         /**
@@ -322,11 +335,14 @@ namespace pdfpc {
                                 this.area, width, height);
 
                         if (Options.prerender_slides != 0) {
-                            if (this.timeout == 0) {
-                                // wait before starting pre-rendering
-                                this.timeout = GLib.Timeout.add(Options.prerender_delay,
-                                    this.prerender);
+                            // cancel any pending pre-rendering
+                            if (this.timeout_id != 0) {
+                                GLib.Source.remove(this.timeout_id);
                             }
+
+                            // wait before starting pre-rendering
+                            this.timeout_id = GLib.Timeout.add(Options.prerender_delay,
+                                this.prerender);
                         }
                     } else {
                         this.current_slide = this.renderer.fade_to_black(width, height);
