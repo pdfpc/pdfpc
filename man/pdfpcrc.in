@@ -75,14 +75,15 @@ Time (in units of s) to keep (pre)rendered slides in the cache (int, Default is
 .TP
 .BI cache-max-rtime
 Maximal time (in units of ms) it takes to render a slide for its cache to be
-protected from expiration.
+protected from expiration (int, Default is 1000).
 .TP
 .BI cache-min-rtime
-Minimal time (in units of ms) it takes to render a slide for it to be cached.
+Minimal time (in units of ms) it takes to render a slide for it to be cached
+(int, Default is 10).
 .TP
 .BI cache-max-usize
 Maximal size (in units of kB) of a slide image to store it uncompressed in the
-cache.
+cache (int, Default is 256).
 .TP
 .B current-height
 Percentage of the height of the presenter screen to be used for the current slide (int, Default is 80).
