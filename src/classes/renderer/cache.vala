@@ -66,7 +66,7 @@ namespace pdfpc.Renderer {
 
             // Store large images in the compressed (PNG) form
             uint size = 3*props.width*props.height;
-            if (size > Options.cache_max_usize) {
+            if (size/1024 > Options.cache_max_usize) {
                 Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface,
                     0, 0, surface.get_width(), surface.get_height());
                 try {
