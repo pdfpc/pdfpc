@@ -44,7 +44,10 @@ namespace pdfpc {
         /**
          * Commandline option parser entry definitions
          */
-        const OptionEntry[] options = {
+        const OptionEntry[] options = {		 
+            {"external-script", 'X', 0, OptionArg.STRING,
+                ref Options.external_script,
+                "Enable the execution of a particular external script", "filename"},
             {"disable-cache", 'c', 0, 0,
                 ref Options.disable_caching,
                 "Disable caching and pre-rendering of slides", null},
