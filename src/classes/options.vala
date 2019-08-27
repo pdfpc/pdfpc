@@ -37,6 +37,13 @@ namespace pdfpc {
         }
 
         /**
+         * Commandline option enabeling the execution of external
+         * scripts. Only the scripts explicitly given on the
+         * commandline can be executed.
+         */
+        public static string external_script = "none";
+        
+        /**
          * Commandline option specifying if the presenter and presentation screen
          * should be switched.
          */
