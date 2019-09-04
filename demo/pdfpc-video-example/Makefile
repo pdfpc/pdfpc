@@ -19,4 +19,4 @@ PDFDOCS = $(DEMO).pdf
 all : $(PDFDOCS)
 
 clean :
-	$(RM) $(PDFDOCS) *.aux *.log *.toc *.nav *.out *.snm *.vrb
+	$(RM) *.aux *.log *.toc *.nav *.out *.snm *.vrb
