@@ -766,12 +766,11 @@ namespace pdfpc {
          */ 
         public void execute_external_script() {
             if (Options.external_script == "none") {
-                GLib.print("Script execution disabled\n");
                 return;
             }
 
             string scriptname = Options.external_script;
-            GLib.print(@"Executing script $scriptname\n");
+            GLib.print("Executing external script\n");
             
             string std_out;
             int exit_status;
@@ -782,7 +781,7 @@ namespace pdfpc {
                     @"$scriptname $pdfname $n_slides $(current_slide_number+1) $(current_user_slide_number+1)",
                     out std_out, null, out exit_status);
                 if (exit_status != 0) {
-                    GLib.print(@"$scriptname returned $exit_status; wrote:\n$std_out");
+                    GLib.print(@"Script returned $exit_status.\n$std_out\n");
                 }
             } catch (SpawnError e) {
                 GLib.print(@"Error: $(e.message)\n");
