@@ -893,7 +893,6 @@ namespace pdfpc.Window {
                 this.present();
             }
 
-            this.faded_to_black = false;
             this.saved_icon.hide();
             this.loaded_icon.hide();
             this.locked_icon.hide();

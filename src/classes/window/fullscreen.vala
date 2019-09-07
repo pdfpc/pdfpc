@@ -74,11 +74,6 @@ namespace pdfpc.Window {
         protected uint hide_cursor_timeout = 0;
 
         /**
-         * Stores if the view is faded to black
-         */
-        protected bool faded_to_black = false;
-
-        /**
          * Overlay layout. Holds all drawing layers (like the pdf,
          * the pointer mode etc)
          */
@@ -98,11 +93,6 @@ namespace pdfpc.Window {
          * Video area for playback. All videos are added to this surface.
          */
         public View.Video video_surface { get; protected set; }
-
-        /**
-         * Stores if the view is frozen
-         */
-        protected bool frozen = false;
 
         /**
          * The GDK scale factor. Used for better slide rendering
