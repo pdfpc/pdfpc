@@ -1,2 +1,5 @@
-*.pdf
-*.zip
+*
+!Makefile
+!*.jpg
+!*.avi
+!*.tex
