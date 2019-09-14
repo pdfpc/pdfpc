@@ -169,7 +169,7 @@ option black-on-end true
 
 .SH FILES
 .PP
-.B @SYSCONFDIR@/pdfpcrc
+.B @CMAKE_INSTALL_FULL_SYSCONFDIR@/pdfpcrc
 .RS 4
 System-wide configuration file
 .RE
