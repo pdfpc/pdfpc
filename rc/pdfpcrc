@@ -93,7 +93,10 @@ bind d                  toggleDrawings
 
 # Pen colors
 # Can be set by
-# bind S+1                setPenColor red|orange|yellow|green|blue|violet|black|white
+# bind S+1              setPenColor red|orange|yellow|green|blue|violet|black|white
+
+# Script execution
+bind S+x                executeScript
 
 # Short help
 bind question           showHelp

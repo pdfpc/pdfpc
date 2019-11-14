@@ -93,6 +93,23 @@ Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
 Run in the given windowed mode (presenter|presentation|both|none). The default
 mode is "none" (both windows are fullscreen).
 .TP
+.BI "\-X, \-\-external-script"=FILENAME
+Specify a script to be executed with the 'X' (Shift+x) key during the
+presentation. The script must be executable but can otherwise be
+written in any language. The script is called with the following
+command line arguments:
+
+\[bu] Name of pdf file
+.br
+\[bu] Total slide count
+.br
+\[bu] Current slide number
+.br
+\[bu] Current user slide number
+
+If the script exits with a non-zero return value, whatever the script
+wrote to stdout is printed in the console. Otherwise nothing is printed.
+.TP
 .BI "\-Z, \-\-size"
 Size of the presentation window in width:height format (forces windowed mode)
 .TP

@@ -782,6 +782,40 @@ namespace pdfpc {
             queue_pointer_surface_draws();
         }
 
+        /**
+         * Executes the script specified with --external-script.
+         * The script is called with the following parameters:
+         * - name of pdf file
+         * - total slide count
+         * - current slide number
+         * - current user slide number
+         *
+         * If the script exits with a non-zero return value, whatever
+         * the script wrote to stdout is printed in the console.
+         */ 
+        public void execute_external_script() {
+            if (Options.external_script == "none") {
+                return;
+            }
+
+            string scriptname = Options.external_script;
+            GLib.print("Executing external script\n");
+            
+            string std_out;
+            int exit_status;
+
+            string pdfname = get_pdf_fname();
+            try {
+                Process.spawn_command_line_sync (
+                    @"$scriptname $pdfname $n_slides $(current_slide_number+1) $(current_user_slide_number+1)",
+                    out std_out, null, out exit_status);
+                if (exit_status != 0) {
+                    GLib.print(@"Script returned $exit_status.\n$std_out\n");
+                }
+            } catch (SpawnError e) {
+                GLib.print(@"Error: $(e.message)\n");
+            }
+        }
 
         /*
          * Inform metadata of quit, and then quit.
@@ -884,6 +918,8 @@ namespace pdfpc {
                 "Bookmark the currently displayed slide");
             add_action("loadBookmark", this.goto_last_saved_slide,
                 "Load the bookmarked slide");
+            add_action("executeScript", this.execute_external_script,
+                "Execute external script");
 
             add_action_with_parameter("switchMode", GLib.VariantType.STRING,
                 this.set_mode_to_string,

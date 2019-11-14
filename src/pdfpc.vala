@@ -45,6 +45,9 @@ namespace pdfpc {
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
+            {"list-bindings", 'B', 0, 0,
+                ref Options.list_bindings,
+                "List action bindings defined", null},
             {"time-of-day", 'C', 0, 0,
                 ref Options.use_time_of_day,
                 "Use the current time for the timer", null},
@@ -63,9 +66,6 @@ namespace pdfpc {
             {"list-actions", 'L', 0, 0,
                 ref Options.list_actions,
                 "List actions supported in the config file(s)", null},
-            {"list-bindings", 'B', 0, 0,
-                ref Options.list_bindings,
-                "List action bindings defined", null},
             {"list-monitors", 'M', 0, 0,
                 ref Options.list_monitors,
                 "List available monitors", null},
@@ -102,6 +102,9 @@ namespace pdfpc {
             {"wayland-workaround", 'W', 0, 0,
                 ref Options.wayland_workaround,
                 "Enable Wayland-specific workaround", null},
+            {"external-script", 'X', 0, OptionArg.STRING,
+                ref Options.external_script,
+                "Enable the execution of a particular external script", "filename"},
             {"size", 'Z', 0, OptionArg.STRING,
                 ref Options.size,
                 "Size of the presentation window (implies \"-w\")", "W:H"},
