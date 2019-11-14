@@ -124,13 +124,6 @@ namespace pdfpc {
         }
 
         /**
-         * CacheStatus object, which coordinates all the information about
-         * cached slides to provide a visual feedback to the user about the
-         * rendering state
-         */
-        public CacheStatus cache_status { get; protected set; }
-
-        /**
          * Presenter window showing the current and the next slide as well as
          * different other meta information useful for the person giving the
          * presentation.
@@ -384,8 +377,6 @@ namespace pdfpc {
          */
         public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
-
-            this.cache_status = new CacheStatus();
 
             this.history = new Gee.ArrayQueue<int>();
 
@@ -1686,7 +1677,6 @@ namespace pdfpc {
 
                 this.overview.set_n_slides(this.user_n_slides);
                 this.metadata.renderer.invalidate_cache();
-                this.cache_status.reset();
                 this.reload_request();
                 this.controllables_update();
             }
