@@ -104,7 +104,7 @@ namespace pdfpc {
                 "Enable Wayland-specific workaround", null},
             {"external-script", 'X', 0, OptionArg.STRING,
                 ref Options.external_script,
-                "Enable the execution of a particular external script", "filename"},
+                "Enable execution of an external script", "file"},
             {"size", 'Z', 0, OptionArg.STRING,
                 ref Options.size,
                 "Size of the presentation window (implies \"-w\")", "W:H"},
