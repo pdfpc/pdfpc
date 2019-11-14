@@ -56,6 +56,13 @@ namespace pdfpc.Metadata {
         protected Poppler.Document document;
 
         /**
+         * Renderer to be used for rendering the slides
+         */
+        public Renderer.Pdf renderer {
+            get; protected set;
+        }
+
+        /**
          * Pdf page width
          */
         protected double original_page_width = 0;
@@ -477,6 +484,7 @@ namespace pdfpc.Metadata {
             if (pdfFilename != null) {
                 this.load(pdfFilename);
             }
+            this.renderer = new Renderer.Pdf(this);
         }
 
         /**
@@ -708,6 +716,17 @@ namespace pdfpc.Metadata {
             }
 
             return user_slide;
+        }
+
+        /**
+         * Check whether the given slide is the full user slide (i.e., the
+         * last slide within an overlay)
+         */
+        public bool is_user_slide(int number) {
+            int user_slide = real_slide_to_user_slide(number);
+            int last_slide = user_slide_to_real_slide(user_slide, true);
+
+            return (number == last_slide);
         }
 
         /**

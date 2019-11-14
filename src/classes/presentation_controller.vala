@@ -45,10 +45,50 @@ namespace pdfpc {
          */
         public int current_slide_number { get; protected set; }
 
+        public void switch_to_slide_number(int slide_number, bool skip_history=false) {
+            if (slide_number == this.current_slide_number) {
+                // already there...
+                return;
+            }
+
+            if (slide_number < 0 || slide_number > this.n_slides) {
+                return;
+            } else if (slide_number == this.n_slides) {
+                if (Options.black_on_end) {
+                    this.faded_to_black = true;
+                }
+                // the correct last slide
+                slide_number--;
+            } else {
+                if (!this.frozen) {
+                    this.faded_to_black = false;
+                }
+            }
+
+            if (!skip_history &&
+                (this.history.is_empty ||
+                this.history.peek_head() != this.current_slide_number)) {
+                this.history.offer_head(this.current_slide_number);
+            }
+
+            this.current_slide_number = slide_number;
+
+            // start the timer unless it's the initial positioning
+            if (!this.history.is_empty) {
+                this.timer.start();
+            }
+
+            this.controllables_update();
+        }
+
         /**
-         * The current slide in "user indexes"
+         * The current slide in "user indices"
          */
-        public int current_user_slide_number { get; protected set; }
+        public int current_user_slide_number {
+            get {
+                return this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            }
+        }
 
         /**
          * Stores if the view is faded to black
@@ -82,13 +122,6 @@ namespace pdfpc {
                 return this.metadata.get_user_slide_count();
             }
         }
-
-        /**
-         * CacheStatus object, which coordinates all the information about
-         * cached slides to provide a visual feedback to the user about the
-         * rendering state
-         */
-        public CacheStatus cache_status { get; protected set; }
 
         /**
          * Presenter window showing the current and the next slide as well as
@@ -206,15 +239,11 @@ namespace pdfpc {
                 if (value != null) {
                     this.metadata.controller = this;
 
-                    this.user_slide_progress =
-                        new int[metadata.get_user_slide_count()];
-
                     this.timer = getTimerLabel(this,
                         (int) this.metadata.get_duration() * 60);
                     this.timer.reset();
 
                     this.current_slide_number = 0;
-                    this.current_user_slide_number = 0;
 
                     this.pen_drawing = Drawings.create(metadata);
                     current_pen_drawing_tool = pen_drawing.pen;
@@ -235,14 +264,9 @@ namespace pdfpc {
         protected uint last_key_event = 0;
 
         /**
-         * Stores the "history" of the slides (jumps only)
+         * Stores the "history" of the slides
          */
         private Gee.ArrayQueue<int> history;
-
-        /**
-         * Progress tracking for user slides
-         */
-        protected int[] user_slide_progress;
 
         /**
          * Timer for the presentation. It should only be displayed on one view.
@@ -354,8 +378,6 @@ namespace pdfpc {
         public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
 
-            this.cache_status = new CacheStatus();
-
             this.history = new Gee.ArrayQueue<int>();
 
             this.timer = getTimerLabel(this, 0);
@@ -464,9 +486,7 @@ namespace pdfpc {
         }
 
         protected void update_pen_drawing() {
-            pen_drawing.switch_to_slide(
-                this.metadata.user_slide_to_real_slide(this.current_user_slide_number)
-            );
+            pen_drawing.switch_to_slide(this.current_slide_number);
             this.queue_pen_surface_draws();
         }
 
@@ -1201,14 +1221,18 @@ namespace pdfpc {
          * Was the previous slide a skip one?
          */
         public bool skip_previous() {
-            return this.current_slide_number > 0 && this.metadata.real_slide_to_user_slide(this.current_slide_number - 1) == this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            return this.current_slide_number > 0 &&
+                this.current_user_slide_number ==
+                    this.metadata.real_slide_to_user_slide(this.current_slide_number - 1);
         }
 
         /**
          * Is the next slide a skip one?
          */
         public bool skip_next() {
-            return this.current_slide_number < this.n_slides && this.metadata.real_slide_to_user_slide(this.current_slide_number) == this.metadata.real_slide_to_user_slide(this.current_slide_number + 1);
+            return this.current_slide_number < this.n_slides - 1 &&
+                this.current_user_slide_number ==
+                    this.metadata.real_slide_to_user_slide(this.current_slide_number + 1);
         }
 
         /**
@@ -1234,34 +1258,6 @@ namespace pdfpc {
             this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
             this.controllables_update();
             presenter.session_saved();
-        }
-
-        /**
-         * Register the current slide in the history
-         */
-        void push_history() {
-            this.history.offer_head(this.current_slide_number);
-        }
-
-        /**
-         * A request to change the page has been issued
-         */
-        public void page_change_request(int page_number, bool start_timer = true) {
-            if (page_number != this.current_slide_number) {
-                this.push_history();
-            }
-
-            this.current_slide_number = page_number;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(
-                this.current_slide_number);
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
-            this.controllables_update();
-
-            if (start_timer) {
-                this.timer.start();
-            }
         }
 
         /**
@@ -1332,67 +1328,27 @@ namespace pdfpc {
          * Go to the next slide
          */
         public void next_page() {
-            if (!this.metadata.is_ready) {
+            if (overview_shown) {
                 return;
             }
-            if (overview_shown)
-                return;
 
-            this.timer.start();
-            // there is a next slide
-            if (this.current_slide_number < this.n_slides - 1) {
-                ++this.current_slide_number;
-                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
+            var new_slide_number = this.current_slide_number + 1;
 
-                if (!this.frozen) {
-                    this.faded_to_black = false;
-                }
-
-                this.controllables_update();
-            } else if (Options.black_on_end && !this.faded_to_black) {
-                this.fade_to_black();
-            }
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
          * Go to the next user slide
          */
         public void next_user_page() {
-            this.timer.start();
-            bool needs_update = false; // Did we change anything? Default: no
-
-            // there is a next user slide
-            if (this.current_user_slide_number < this.metadata.get_user_slide_count() - 1) {
-                ++this.current_user_slide_number;
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-                needs_update = true;
+            int new_slide_number;
+            if (this.current_user_slide_number < this.user_n_slides - 1) {
+                new_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number + 1);
             } else {
-                // we are at the last slide
-                if (this.current_slide_number + 1 == this.n_slides) {
-                    if (Options.black_on_end && !this.faded_to_black) {
-                        this.fade_to_black();
-                    }
-                } else {
-                    // move to the last slide, we are already at the last user slide
-                    if (this.n_slides > 0) {
-                        this.current_slide_number = (int) this.n_slides - 1;
-                    }
-                }
+                new_slide_number = (int) this.n_slides - 1;
             }
 
-            if (needs_update) {
-                if (!this.frozen) {
-                    this.faded_to_black = false;
-                }
-                this.controllables_update();
-            }
-
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
@@ -1400,186 +1356,68 @@ namespace pdfpc {
          * otherwise go to largest already seen real slide on next user slide
          */
         public void next_unseen() {
-            this.timer.start();
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-
-            if(this.current_slide_number + 1 == this.n_slides) {
-                return;
-            }
-
-            int next_slide = this.current_slide_number + 1;
-            if(next_slide < this.n_slides - 1) {
-                int user_slide_at_next_slide = this.metadata.real_slide_to_user_slide(next_slide);
-                if(this.user_slide_progress[user_slide_at_next_slide] != 0 &&
-                        this.user_slide_progress[user_slide_at_next_slide] >= next_slide) {
-                    next_slide = this.user_slide_progress[user_slide_at_next_slide];
-                }
-            }
-
-            this.current_slide_number = next_slide;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
-
-            this.controllables_update();
+            // TODO: implement properly
         }
 
         /**
          * Jump to the last overlay for the current user slide
          */
         public void jump_to_last_overlay() {
-            this.timer.start();
+            var new_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, true);
 
-            int destination = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, true);
-            if (this.current_slide_number != destination) {
-                this.current_slide_number = destination;
-
-                if (!this.frozen) {
-                    this.faded_to_black = false;
-                }
-                this.controllables_update();
-
-                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-                }
-            }
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
          * Jump to the first overlay for the current user slide
          */
         public void jump_to_first_overlay() {
-            this.timer.start();
+            var new_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, false);
 
-            int destination = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, false);
-            if (this.current_slide_number != destination) {
-                this.current_slide_number = destination;
-
-                if (!this.frozen) {
-                    this.faded_to_black = false;
-                }
-                this.controllables_update();
-
-                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-                }
-            }
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
          * Go to the previous slide
          */
         public void previous_page() {
-            this.timer.start();
+            var new_slide_number = this.current_slide_number - 1;
 
-            if (this.current_slide_number > 0) {
-                --this.current_slide_number;
-                this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
-
-                if (!this.frozen) {
-                    this.faded_to_black = false;
-                }
-                this.controllables_update();
-
-                if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                    this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-                }
-            }
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
          * Go to the previous user slide
          */
         public void previous_user_page() {
-            this.timer.start();
+            var new_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number - 1);
 
-            if (this.current_user_slide_number > 0) {
-                --this.current_user_slide_number;
-                this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-            } else {
-                this.current_slide_number = 0;
-            }
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-            this.controllables_update();
-
-            if(this.current_slide_number > this.user_slide_progress[this.current_user_slide_number]) {
-                this.user_slide_progress[this.current_user_slide_number] = this.current_slide_number;
-            }
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
          * Go to the largest already seen real slide on previous user slide
          */
         public void previous_seen() {
-            this.timer.start();
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-
-            if(this.current_slide_number == 0) {
-                return;
-            }
-            this.current_slide_number = this.user_slide_progress[this.current_user_slide_number-1];
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
-
-            this.controllables_update();
-        }
-
-        /**
-         * Wrapper function to work with key bindings and callbacks
-         */
-        public void goto_first() {
-            _goto_first(false);
+            // TODO: implement properly
         }
 
         /**
          * Go to the first slide
          */
-        private void _goto_first(bool skipHistory) {
-            this.timer.start();
-
-            // update history if we are not already at the first slide
-            if (this.current_slide_number > 0 && !skipHistory) {
-                this.push_history();
-            }
-
-            this.current_slide_number = 0;
-            this.current_user_slide_number = 0;
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-            this.controllables_update();
+        private void goto_first() {
+            this.switch_to_slide_number(0);
         }
 
         /**
          * Go to the last displayed slide
          */
         public void goto_last_saved_slide() {
+            var new_user_slide_number = this.metadata.get_last_saved_slide() - 1;
+            var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
-            if (this.metadata.get_last_saved_slide() == -1) {
-                return;
-            }
+            this.switch_to_slide_number(new_slide_number);
 
-            // Start the timer
-            this.timer.start();
-
-            this.current_user_slide_number = this.metadata.get_last_saved_slide() - 1;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-
-            this.controllables_update();
             presenter.session_loaded();
         }
 
@@ -1587,20 +1425,10 @@ namespace pdfpc {
          * Go to the last slide
          */
         public void goto_last() {
-            this.timer.start();
+            var new_user_slide_number = this.metadata.get_end_user_slide() - 1;
+            var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
-            // if are not already at the last slide, update history
-            if (this.current_user_slide_number < this.metadata.get_end_user_slide()) {
-                this.push_history();
-            }
-
-            this.current_user_slide_number = this.metadata.get_end_user_slide() - 1;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-            this.controllables_update();
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
@@ -1626,15 +1454,10 @@ namespace pdfpc {
                 return;
             }
 
-            this.timer.start();
+            var new_user_slide_number = int.min(this.current_user_slide_number + 10, this.user_n_slides - 1);
+            var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
-            this.current_user_slide_number = int.min(this.current_user_slide_number + 10, this.metadata.get_user_slide_count() - 1);
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-            this.controllables_update();
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
@@ -1645,42 +1468,22 @@ namespace pdfpc {
                 return;
             }
 
-            this.timer.start();
+            var new_user_slide_number = int.max(this.current_user_slide_number - 10, 0);
+            var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
-            this.current_user_slide_number = int.max(this.current_user_slide_number - 10, 0);
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number);
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-            this.controllables_update();
+            this.switch_to_slide_number(new_slide_number);
         }
 
         /**
          * Goto a slide in user page numbers
          */
         public void goto_user_page(int page_number, bool useLast = true) {
-            this.timer.start();
-
-            if (this.current_user_slide_number != page_number) {
-                this.push_history();
-            }
-
             this.controllables_hide_overview();
-            int destination = page_number;
-            int n_user_slides = this.metadata.get_user_slide_count();
-            if (page_number < 0) {
-                destination = 0;
-            } else if (page_number >= n_user_slides) {
-                destination = n_user_slides - 1;
-            }
-            this.current_user_slide_number = destination;
-            this.current_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number, useLast);
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
+
+            var new_slide_number = this.metadata.user_slide_to_real_slide(page_number, useLast);
+            this.switch_to_slide_number(new_slide_number);
+
             this.set_ignore_input_events(false);
-            this.controllables_update();
         }
 
         /**
@@ -1692,20 +1495,11 @@ namespace pdfpc {
             }
 
             if (this.history.is_empty) {
-                // skip history pushing to prevent slide hopping
-                this._goto_first(true);
-
                 return;
             }
 
-            int history_head = this.history.poll_head();
-            this.current_slide_number = history_head;
-            this.current_user_slide_number = this.metadata.real_slide_to_user_slide(this.current_slide_number);
-
-            if (!this.frozen) {
-                this.faded_to_black = false;
-            }
-            this.controllables_update();
+            var new_slide_number = this.history.poll_head();
+            this.switch_to_slide_number(new_slide_number, true);
         }
 
         /**
@@ -1826,8 +1620,6 @@ namespace pdfpc {
                     this.overview.remove_current(this.user_n_slides);
                 }
             } else {
-                this.current_user_slide_number += this.metadata.toggle_skip(
-                    this.current_slide_number, this.current_user_slide_number);
                 this.overview.set_n_slides(this.user_n_slides);
                 this.controllables_update();
             }
@@ -1875,17 +1667,16 @@ namespace pdfpc {
                 // Make sure the current position remains valid
                 if (position_saved >= this.n_slides) {
                     this.current_slide_number = (int) this.n_slides - 1;
-                    this.current_user_slide_number =
-                        this.metadata.real_slide_to_user_slide(
-                            this.current_slide_number);
                 }
+
+                this.history.clear();
 
                 // Reset the drawing storage & clear the current drawings
                 this.pen_drawing.clear_storage();
                 this.clear_pen_drawing();
 
                 this.overview.set_n_slides(this.user_n_slides);
-                this.cache_status.reset();
+                this.metadata.renderer.invalidate_cache();
                 this.reload_request();
                 this.controllables_update();
             }

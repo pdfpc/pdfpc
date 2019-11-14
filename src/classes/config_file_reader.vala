@@ -220,27 +220,29 @@ namespace pdfpc {
                 case "black-on-end":
                     Options.black_on_end = bool.parse(fields[2]);
                     break;
+                case "cache-debug":
+                    Options.cache_debug = bool.parse(fields[2]);
+                    break;
+                case "cache-clean-period":
+                    Options.cache_clean_period = int.parse(fields[2]);
+                    break;
+                case "cache-expiration":
+                    Options.cache_expiration = int.parse(fields[2]);
+                    break;
+                case "cache-max-rtime":
+                    Options.cache_max_rtime = int.parse(fields[2]);
+                    break;
+                case "cache-min-rtime":
+                    Options.cache_min_rtime = int.parse(fields[2]);
+                    break;
+                case "cache-max-usize":
+                    Options.cache_max_usize = int.parse(fields[2]);
+                    break;
                 case "current-height":
                     Options.current_height = int.parse(fields[2]);
                     break;
                 case "current-size":
                     Options.current_size = int.parse(fields[2]);
-                    break;
-                case "disable-caching":
-                    bool disable_caching = bool.parse(fields[2]);
-                    // only propagate value, it it's true
-                    // pushing false makes no sense
-                    if (disable_caching) {
-                        Options.disable_caching = true;
-                    }
-                    break;
-                case "disable-compression":
-                    bool disable_compression = bool.parse(fields[2]);
-                    // only propagate value, it it's true
-                    // pushing false makes no sense
-                    if (disable_compression) {
-                        Options.disable_cache_compression = true;
-                    }
                     break;
                 case "disable-input-autodetection":
                     Options.disable_input_autodetection = bool.parse(fields[2]);
@@ -268,6 +270,12 @@ namespace pdfpc {
                     break;
                 case "pointer-size":
                     Options.pointer_size = int.parse(fields[2]);
+                    break;
+                case "prerender-delay":
+                    Options.prerender_delay = int.parse(fields[2]);
+                    break;
+                case "prerender-slides":
+                    Options.prerender_slides = int.parse(fields[2]);
                     break;
                 case "presentation-screen":
                     Options.presentation_screen = fields[2];

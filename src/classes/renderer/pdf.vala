@@ -34,24 +34,9 @@ namespace pdfpc {
         public Metadata.Pdf metadata { get; protected set; }
 
         /**
-         * Width (in _physical_ pixels) to render to
-         */
-        public int width { get; protected set; }
-
-        /**
-         * Height (in _physical_ pixels) to render to
-         */
-        public int height { get; protected set; }
-
-        /**
-         * The area of the pdf which shall be displayed
-         */
-        protected Metadata.Area area;
-
-        /**
          * Cache store to be used
          */
-        public Renderer.Cache.Base? cache { get; set; default = null; }
+        protected Renderer.Cache cache { get; set; }
 
         /**
          * Base constructor taking a pdf metadata object as well as the desired
@@ -62,17 +47,10 @@ namespace pdfpc {
          * pdf document the renderspace is filled up completely cutting of a
          * part of the pdf document.
          */
-        public Pdf(Metadata.Pdf metadata, int width, int height, Metadata.Area area) {
+        public Pdf(Metadata.Pdf metadata) {
             this.metadata = metadata;
-            this.width = width;
-            this.height = height;
 
-            this.area = area;
-        }
-
-        public void resize(int width, int height) {
-            this.width = width;
-            this.height = height;
+            this.cache = new Renderer.Cache();
         }
 
         /**
@@ -81,7 +59,9 @@ namespace pdfpc {
          * If the requested slide is not available an
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
-        public Cairo.ImageSurface render_to_surface(int slide_number)
+        public Cairo.ImageSurface render(int slide_number,
+            Metadata.Area area, int width, int height,
+            bool force_cache = false, bool permanent_cache = false)
             throws Renderer.RenderError {
 
             var metadata = this.metadata;
@@ -92,25 +72,29 @@ namespace pdfpc {
                     "The requested slide '%i' does not exist.", slide_number);
             }
 
-            // If caching is enabled check for the page in the cache
-            if (this.cache != null) {
-                Cairo.ImageSurface cache_content;
-                if ((cache_content = this.cache.retrieve(slide_number)) != null) {
-                    return cache_content;
-                }
+            CachedPageProps props = new CachedPageProps(slide_number,
+                width, height);
+
+            // Check for the page in the cache
+            Cairo.ImageSurface cache_content;
+            if ((cache_content = this.cache.retrieve(props)) != null) {
+                return cache_content;
             }
+
+            // Measure the time to render the page
+            Timer timer = new Timer();
 
             // Retrieve the Poppler.Page for the page to render
             var page = metadata.get_document().get_page(slide_number);
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
-                this.height);
+            Cairo.ImageSurface surface =
+                new Cairo.ImageSurface(Cairo.Format.RGB24, width, height);
             Cairo.Context cr = new Cairo.Context(surface);
 
             cr.set_source_rgb(255, 255, 255);
-            cr.rectangle(0, 0, this.width, this.height);
+            cr.rectangle(0, 0, width, height);
             cr.fill();
 
             // Calculate the scaling factor and the offsets for centering
@@ -131,25 +115,37 @@ namespace pdfpc {
             }
             cr.scale(scaling_factor, scaling_factor);
 
-            cr.translate(-metadata.get_horizontal_offset(this.area, full_page_width) + h_offset,
-                -metadata.get_vertical_offset(this.area, full_page_height) + v_offset);
+            cr.translate(-metadata.get_horizontal_offset(area, full_page_width) + h_offset,
+                -metadata.get_vertical_offset(area, full_page_height) + v_offset);
             page.render(cr);
 
-            // If the cache is enabled store the newly rendered pixmap
-            if (this.cache != null) {
-                this.cache.store( slide_number, surface );
+            timer.stop();
+            double rtime = timer.elapsed();
+            if (Options.cache_debug) {
+                printerr("Render time of [%d] (%dx%d) = %g s\n",
+                    slide_number, width, height, rtime);
+            }
+
+            // If the cache is enabled store the newly rendered pixmap, but
+            // only if it has taken a significant time to render
+            if (force_cache || rtime > Options.cache_min_rtime/1000.0) {
+                // keep very "precious" slides permanently
+                if (rtime > Options.cache_max_rtime) {
+                    permanent_cache = true;
+                }
+                this.cache.store(props, surface, permanent_cache);
             }
 
             return surface;
         }
 
-        public Cairo.ImageSurface fade_to_black() {
-            Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.RGB24, this.width,
-                this.height);
+        public Cairo.ImageSurface fade_to_black(int width, int height) {
+            Cairo.ImageSurface surface =
+                new Cairo.ImageSurface(Cairo.Format.RGB24, width, height);
             Cairo.Context cr = new Cairo.Context(surface);
 
             cr.set_source_rgb(0, 0, 0);
-            cr.rectangle(0, 0, this.width, this.height);
+            cr.rectangle(0, 0, width, height);
             cr.fill();
 
             double scaling_factor = Math.fmax(width/metadata.get_page_width(),
@@ -157,6 +153,13 @@ namespace pdfpc {
             cr.scale(scaling_factor, scaling_factor);
 
             return surface;
+        }
+
+        /**
+         * Invalidate the whole cache (if the document is reloaded/changed)
+         */
+        public void invalidate_cache() {
+            this.cache.invalidate();
         }
     }
 

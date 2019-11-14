@@ -56,10 +56,6 @@ namespace pdfpc.Window {
             this.view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, true);
 
-            if (!Options.disable_caching) {
-                this.view.get_renderer().cache = Renderer.Cache.create(metadata);
-            }
-
             this.overlay_layout.add(this.view);
 
             // TODO: update the ratio on document reload
@@ -68,8 +64,6 @@ namespace pdfpc.Window {
                 (float) ratio, false);
             frame.add(overlay_layout);
             this.add(frame);
-
-            this.set_cache_observer(this.controller.cache_status);
         }
 
         /**
@@ -81,30 +75,15 @@ namespace pdfpc.Window {
             if (this.controller.frozen)
                 return;
 
+            bool old_disabled = this.view.disabled;
             if (this.controller.faded_to_black) {
                 this.view.disabled = true;
             } else {
                 this.view.disabled = false;
             }
 
-            try {
-                this.view.display(this.controller.current_slide_number, true);
-            } catch (Renderer.RenderError e) {
-                GLib.printerr("The pdf page %d could not be rendered: %s\n",
-                    this.controller.current_slide_number, e.message );
-                Process.exit(1);
-            }
-        }
-
-        /**
-         * Set the cache observer for the Views on this window
-         *
-         * This method takes care of registering all Prerendering Views used by
-         * this window correctly with the CacheStatus object to provide acurate
-         * cache status measurements.
-         */
-        public void set_cache_observer(CacheStatus observer) {
-            observer.monitor_view(this.view);
+            bool force = old_disabled != this.view.disabled;
+            this.view.display(this.controller.current_slide_number, force);
         }
     }
 }

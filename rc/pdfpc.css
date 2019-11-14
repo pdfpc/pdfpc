@@ -11,19 +11,6 @@ scrolledwindow trough {
     background-color: white;
 }
 
-progressbar {
-    min-width: 1px;
-}
-
-progressbar trough * {
-    background-image: none;
-    background-color: blue;
-}
-
-progressbar trough {
-    background-color: white;
-}
-
 entry, iconview, textview *, window {
     background-color: black;
     color: white;

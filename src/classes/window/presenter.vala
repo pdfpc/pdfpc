@@ -71,8 +71,6 @@ namespace pdfpc.Window {
          */
         protected Gtk.Entry slide_progress;
 
-        protected Gtk.ProgressBar prerender_progress;
-
         /**
          * The bottom row is 10% of the window height, fixed
          */
@@ -468,7 +466,7 @@ namespace pdfpc.Window {
                 Metadata.Area.NOTES, true);
 
             this.next_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, false);
+                Metadata.Area.CONTENT, false, true);
 
             this.strict_next_view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, false);
@@ -522,22 +520,6 @@ namespace pdfpc.Window {
             // 7 chars (i.e. maximal 999/999 for displaying)
             this.slide_progress.width_chars = 7;
 
-            this.prerender_progress = new Gtk.ProgressBar();
-            this.prerender_progress.name = "prerenderProgress";
-            this.prerender_progress.show_text = true;
-
-            // Don't display prerendering text if the user has disabled
-            // it, but still create the control to ensure the layout
-            // doesn't change.
-            if (Options.disable_caching) {
-                this.prerender_progress.text = "";
-            } else {
-                this.prerender_progress.text = "Prerendering...";
-            }
-            this.prerender_progress.set_ellipsize(Pango.EllipsizeMode.END);
-            this.prerender_progress.no_show_all = true;
-            this.prerender_progress.valign = Gtk.Align.END;
-
             this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
             this.load_icons();
 
@@ -552,14 +534,6 @@ namespace pdfpc.Window {
             this.overview.hexpand = true;
             this.overview.set_n_slides(this.controller.user_n_slides);
             this.controller.set_overview(this.overview);
-
-            // Enable the render caching if it hasn't been forcefully disabled.
-            if (!Options.disable_caching) {
-                this.current_view.get_renderer().cache = Renderer.Cache.create(metadata);
-                this.next_view.get_renderer().cache = Renderer.Cache.create(metadata);
-                this.strict_next_view.get_renderer().cache = Renderer.Cache.create(metadata);
-                this.strict_prev_view.get_renderer().cache = Renderer.Cache.create(metadata);
-            }
 
             Gtk.AspectFrame frame;
 
@@ -623,13 +597,9 @@ namespace pdfpc.Window {
             this.timer.halign = Gtk.Align.CENTER;
             this.timer.valign = Gtk.Align.END;
 
-            var progress_alignment = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-            progress_alignment.pack_start(this.prerender_progress);
-            progress_alignment.pack_end(this.slide_progress, false);
-
             bottom_row.pack_start(this.status);
             bottom_row.pack_start(this.timer);
-            bottom_row.pack_end(progress_alignment);
+            bottom_row.pack_end(this.slide_progress, false);
 
             Gtk.Grid full_layout = new Gtk.Grid();
             full_layout.row_homogeneous = true;
@@ -775,8 +745,6 @@ namespace pdfpc.Window {
             full_overlay.set_overlay_pass_through(this.toolbox_container, true);
 
             this.add(full_overlay);
-
-            this.set_cache_observer(this.controller.cache_status);
         }
 
         public override void show() {
@@ -879,15 +847,10 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Called on document reload. Currently, only re-enables the cache
-         * progress indicator, but in principle the document geometry may
-         * change; TODO
+         * Called on document reload.
+         * TODO: in principle the document geometry may change!
          */
         public void on_reload() {
-            if (!Options.disable_caching) {
-                this.prerender_progress.set_fraction(0);
-                this.prerender_progress.opacity = 1;
-            }
         }
 
         public void update() {
@@ -897,35 +860,29 @@ namespace pdfpc.Window {
             int current_slide_number = this.controller.current_slide_number;
             int current_user_slide_number = this.controller.current_user_slide_number;
 
-            try {
-                this.current_view.display(current_slide_number, true);
-                int next_view_slide_offset = 0;
-                if (   !Options.final_slide_overlay
-                    || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
-                   ){
-                    next_view_slide_offset = 1;
-                }
-                this.next_view.display(
-                    this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset),
-                    true
-                );
-                if (this.controller.skip_next()) {
-                    this.strict_next_view.disabled = false;
-                } else {
-                    this.strict_next_view.disabled = true;
-                }
-                this.strict_next_view.display(current_slide_number + 1, true);
-                if (this.controller.skip_previous()) {
-                    this.strict_prev_view.disabled = false;
-                } else {
-                    this.strict_prev_view.disabled = true;
-                }
-                this.strict_prev_view.display(current_slide_number - 1, true);
+            this.current_view.display(current_slide_number);
+            int next_view_slide_offset = 0;
+            if (   !Options.final_slide_overlay
+                || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
+               ){
+                next_view_slide_offset = 1;
             }
-            catch( Renderer.RenderError e ) {
-                GLib.printerr("The pdf page %d could not be rendered: %s\n", current_slide_number, e.message);
-                Process.exit(1);
+            this.next_view.display(
+                this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset)
+            );
+            if (this.controller.skip_next()) {
+                this.strict_next_view.disabled = false;
+            } else {
+                this.strict_next_view.disabled = true;
             }
+            this.strict_next_view.display(current_slide_number + 1);
+            if (this.controller.skip_previous()) {
+                this.strict_prev_view.disabled = false;
+            } else {
+                this.strict_prev_view.disabled = true;
+            }
+            this.strict_prev_view.display(current_slide_number - 1);
+
             this.update_slide_count();
             this.update_note();
 
@@ -936,7 +893,6 @@ namespace pdfpc.Window {
                 this.present();
             }
 
-            this.faded_to_black = false;
             this.saved_icon.hide();
             this.loaded_icon.hide();
             this.locked_icon.hide();
@@ -1053,28 +1009,6 @@ namespace pdfpc.Window {
 
         public void hide_overview() {
             this.slide_stack.set_visible_child_name("slides");
-            this.overview.ensure_structure();
-        }
-
-        /**
-         * Take a cache observer and register it with all prerendering Views
-         * shown on the window.
-         *
-         * Furthermore it is taken care of to add the cache observer to this window
-         * for display, as it is a Image widget after all.
-         */
-        public void set_cache_observer(CacheStatus observer) {
-            observer.monitor_view(this.current_view);
-            observer.monitor_view(this.next_view);
-
-            observer.update_progress.connect(this.prerender_progress.set_fraction);
-            observer.update_complete.connect(this.prerender_finished);
-            this.prerender_progress.show();
-        }
-
-        public void prerender_finished() {
-            this.prerender_progress.opacity = 0;  // hide() causes a flash for re-layout.
-            this.overview.set_cache(this.next_view.get_renderer().cache);
         }
 
         /**

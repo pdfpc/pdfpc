@@ -86,7 +86,7 @@ namespace pdfpc {
                     Poppler.Dest destination;
                     destination = this.document.find_dest(action.dest.named_dest);
 
-                    this.controller.page_change_request((int)(destination.page_num - 1));
+                    this.controller.switch_to_slide_number((int)(destination.page_num - 1));
 
                     break;
                 default:

@@ -49,29 +49,11 @@ namespace pdfpc {
         protected Renderer.Pdf renderer;
 
         /**
-         * Return the used renderer object
+         * Return the metadata object
          */
-        public Renderer.Pdf get_renderer() {
-            return this.renderer;
+        public Metadata.Pdf get_metadata() {
+            return this.renderer.metadata;
         }
-
-        /**
-         * Signal emitted every time a precached slide has been created
-         *
-         * This signal should be emitted slide_count number of times during a
-         * precaching cylce.
-         */
-        public signal void slide_prerendered();
-
-        /**
-         * Signal emitted when the precaching cycle is complete
-         */
-        public signal void prerendering_completed();
-
-        /**
-         * Signal emitted when the precaching cycle just started
-         */
-        public signal void prerendering_started();
 
         /**
          * Signal emitted on toggling the freeze state
@@ -79,9 +61,14 @@ namespace pdfpc {
         public signal void freeze_toggled(bool frozen);
 
         /**
-         * The currently displayed slide
+         * The currently displayed slide number
          */
         protected int current_slide_number;
+
+        /**
+         * and its rendered image
+         */
+        protected Cairo.ImageSurface current_slide;
 
         /**
          * Whether the view should remain black
@@ -89,16 +76,17 @@ namespace pdfpc {
         public bool disabled;
 
         /**
-         * The surface containing the currently shown slide
+         * Whether the view will show only full user slides (without
+         * intermediate overlays)
          */
-        protected Cairo.ImageSurface current_slide;
+        public bool user_slides;
 
         /**
          * The number of slides in the presentation
          */
         protected int n_slides {
             get {
-                return (int) renderer.metadata.get_slide_count();
+                return (int) this.get_metadata().get_slide_count();
             }
         }
 
@@ -113,38 +101,103 @@ namespace pdfpc {
         protected int gdk_scale = 1;
 
         /**
+         * The area of the pdf which shall be displayed
+         */
+        protected Metadata.Area area;
+
+        /**
+         * ID of timeout used to delay pre-rendering
+         */
+        protected uint timeout_id = 0;
+
+        /**
+         * Launch pre-rendering
+         */
+        protected virtual bool prerender() {
+            // indicate we're running, too late to cancel even if desired
+            this.timeout_id = 0;
+
+            // things might have changed during prerender_delay...
+            if (this.disabled) {
+                return GLib.Source.REMOVE;
+            }
+
+            // The pointer is needed to keep track of the slide progress inside
+            // the pre-render loop
+            int* p_slide = null;
+
+            int first_page = this.current_slide_number + 1;
+            if (first_page >= this.n_slides) {
+                // nothing to pre-render
+                return GLib.Source.REMOVE;
+            }
+
+            var metadata = this.get_metadata();
+
+            int last_slide;
+            if (this.user_slides) {
+                var user_slide = metadata.real_slide_to_user_slide(this.current_slide_number);
+                var last_user_slide = user_slide + Options.prerender_slides;
+                last_slide = metadata.user_slide_to_real_slide(last_user_slide, true);
+            } else {
+                last_slide = this.current_slide_number + Options.prerender_slides;
+            }
+            if (last_slide >= this.n_slides) {
+                last_slide = this.n_slides - 1;
+            }
+
+            int width, height;
+            this.get_pixel_dimensions(out width, out height);
+
+            GLib.Idle.add(() => {
+                if (p_slide == null) {
+                    p_slide = malloc(sizeof(int));
+                    *p_slide = first_page;
+                }
+
+                if (!this.user_slides || metadata.is_user_slide(*p_slide)) {
+                    // We do not care about the result, as the
+                    // rendering function stores the rendered
+                    // pixmap in the cache if it is enabled. This
+                    // is exactly what we want.
+                    try {
+                        this.renderer.render(*p_slide, this.area, width, height,
+                            true);
+                    } catch(Renderer.RenderError e) {
+                        GLib.printerr("Could pre-render page '%i': %s\n",
+                            *p_slide, e.message);
+                    }
+                }
+
+                // Increment one slide for each call and stop the loop if we
+                // have reached the last slide
+                *p_slide = *p_slide + 1;
+                if (*p_slide > last_slide) {
+                    free(p_slide);
+                    return GLib.Source.REMOVE;
+                } else {
+                    return GLib.Source.CONTINUE;
+                }
+            });
+
+            // don't repeat...
+            return GLib.Source.REMOVE;
+        }
+
+        /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
-        public Pdf(Renderer.Pdf renderer, bool clickable_links,
-            PresentationController controller, int gdk_scale_factor) {
+        protected Pdf(Renderer.Pdf renderer, Metadata.Area area,
+            bool clickable_links, PresentationController controller,
+            int gdk_scale_factor, bool user_slides) {
             this.renderer = renderer;
             this.gdk_scale = gdk_scale_factor;
+            this.area = area;
+            this.user_slides = user_slides;
 
             this.current_slide_number = 0;
 
-            controller.reload_request.connect(this.rebuild_cache);
-
-            // Render the initial page on first realization.
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
-            this.realize.connect(() => {
-                try {
-                    this.display( this.current_slide_number );
-                } catch( Renderer.RenderError e ) {
-                    // There should always be a page 0 but you never know.
-                    GLib.printerr("Could not render initial page %d: %s\n",
-                        this.current_slide_number, e.message);
-                    Process.exit(1);
-                }
-
-                // Start the prerender cycle if the renderer supports caching
-                // and the used cache engine allows prerendering.
-                // Executing the cycle here to ensure it is executed within the
-                // Gtk event loop. If it is not proper Gdk thread handling is
-                // impossible.
-                if (renderer.cache != null && renderer.cache.allows_prerendering()) {
-                    this.register_prerendering();
-                }
-            });
 
             if (clickable_links) {
                 // Enable the PDFLink Behaviour by default on PDF Views
@@ -159,14 +212,14 @@ namespace pdfpc {
          * metadata and rendering chain to be used with the pdf view.
          */
         public Pdf.from_fullscreen(Window.Fullscreen window,
-            Metadata.Area area, bool clickable_links) {
+            Metadata.Area area, bool clickable_links, bool user_slides=false) {
             var controller = window.controller;
             var metadata = controller.metadata;
 
-            // will be resized on first use
-            var renderer = new Renderer.Pdf(metadata, 1, 1, area);
+            var renderer = metadata.renderer;
 
-            this(renderer, clickable_links, controller, window.gdk_scale);
+            this(renderer, area, clickable_links, controller, window.gdk_scale,
+                user_slides);
         }
 
         /**
@@ -183,7 +236,7 @@ namespace pdfpc {
 
             // We need the page dimensions for coordinate conversion between
             // pdf coordinates and screen coordinates
-            var metadata = this.get_renderer().metadata;
+            var metadata = this.get_metadata();
             gdk_rectangle.x = (int) Math.ceil((poppler_rectangle.x1 / metadata.get_page_width()) *
                 allocation.width );
             gdk_rectangle.width = (int) Math.floor(((poppler_rectangle.x2 - poppler_rectangle.x1) /
@@ -197,58 +250,6 @@ namespace pdfpc {
                 metadata.get_page_height()) * allocation.height);
 
             return gdk_rectangle;
-        }
-
-        /**
-         * Start a thread to prerender all slides this view might display at
-         * some time.
-         *
-         * This method may only be called from within the Gtk event loop, as
-         * thread handling is borked otherwise.
-         */
-        protected void register_prerendering() {
-            // The pointer is needed to keep track of the slide progress inside
-            // the prerender function
-            int* i = null;
-            // The page_count will be transfered into the lamda function as
-            // well.
-            if (this.n_slides == 0) {
-                return;
-            }
-
-            this.prerendering_started();
-
-            Idle.add(() => {
-                if (i == null) {
-                    i = malloc(sizeof(int));
-                    *i = 0;
-                }
-
-                // We do not care about the result, as the
-                // rendering function stores the rendered
-                // pixmap in the cache if it is enabled. This
-                // is exactly what we want.
-                try {
-                    this.get_renderer().render_to_surface(*i);
-                } catch(Renderer.RenderError e) {
-                    GLib.printerr("Could not render page '%i' while pre-rendering: %s\n", *i, e.message);
-                    Process.exit(1);
-                }
-
-                // Inform possible observers about the cached slide
-                this.slide_prerendered();
-
-                // Increment one slide for each call and stop the loop if we
-                // have reached the last slide
-                *i = *i + 1;
-                if (*i >= this.n_slides) {
-                    this.prerendering_completed();
-                    free(i);
-                    return false;
-                } else {
-                    return true;
-                }
-            });
         }
 
         /**
@@ -269,13 +270,8 @@ namespace pdfpc {
 
         /**
          * Display a specific slide number
-         *
-         * If the slide number does not exist a
-         * RenderError.SLIDE_DOES_NOT_EXIST is thrown
          */
-        public void display(int slide_number, bool force_redraw=false)
-            throws Renderer.RenderError {
-
+        public void display(int slide_number, bool force=false) {
             if (this.n_slides == 0) {
                 return;
             }
@@ -284,46 +280,34 @@ namespace pdfpc {
             // each side of the document.
             if (slide_number < 0) {
                 slide_number = 0;
-            } else if (slide_number >= this.n_slides + 1) {
+            } else if (slide_number >= this.n_slides) {
                 slide_number = this.n_slides - 1;
             }
 
-            if (!force_redraw && slide_number == this.current_slide_number &&
-                this.current_slide != null) {
-                // The slide does not need to be changed, as the correct one is
-                // already shown.
-                return;
+            if (this.current_slide_number != slide_number || force) {
+                // Notify all listeners
+                this.leaving_slide(this.current_slide_number, slide_number);
+
+                // Invalidate the locally cached image
+                this.current_slide = null;
+
+                this.current_slide_number = slide_number;
+
+                // Have Gtk update the widget
+                this.queue_draw();
+
+                this.entering_slide(this.current_slide_number);
             }
-
-            // Notify all listeners
-            this.leaving_slide(this.current_slide_number, slide_number);
-
-            // Render the requested slide
-            // An exception is thrown here, if the slide can not be rendered.
-            if (slide_number < this.n_slides && !this.disabled)
-                this.current_slide = this.renderer.render_to_surface(slide_number);
-            else
-                this.current_slide = this.renderer.fade_to_black();
-            this.current_slide_number = slide_number;
-
-            // Have Gtk update the widget
-            this.queue_draw();
-
-            this.entering_slide(this.current_slide_number);
         }
 
         /**
-         * Redraw the current slide. Useful for example when exiting from fade_to_black
+         * Return pixel dimensions of the widget
          */
-        public void redraw() throws Renderer.RenderError {
-            this.display(this.current_slide_number, true);
-        }
-
-        /**
-         * Return the currently shown slide number
-         */
-        public int get_current_slide_number() {
-            return this.current_slide_number;
+        protected void get_pixel_dimensions(out int width, out int height) {
+            Gtk.Allocation allocation;
+            this.get_allocation(out allocation);
+            width = allocation.width*this.gdk_scale;
+            height = allocation.height*this.gdk_scale;
         }
 
         /**
@@ -333,53 +317,57 @@ namespace pdfpc {
          * the window surface.
          */
         public override bool draw(Cairo.Context cr) {
-            var metadata = this.get_renderer().metadata;
+            var metadata = this.get_metadata();
             if (!metadata.is_ready) {
                 return true;
             }
 
-            Gtk.Allocation allocation;
-            this.get_allocation(out allocation);
+            int width, height;
+            this.get_pixel_dimensions(out width, out height);
 
             // not ready yet
-            if (allocation.height <= 1 || allocation.width <= 1) {
+            if (height <= 1 || width <= 1) {
                 return true;
             }
 
-            if (renderer.width != allocation.width*this.gdk_scale ||
-                renderer.height != allocation.height*this.gdk_scale) {
-                // TODO: this is a mess.
-                // Renderer/cache/view ties need to be refactored
-                renderer.resize(allocation.width*this.gdk_scale,
-                    allocation.height*this.gdk_scale);
-                this.rebuild_cache();
+            if (this.current_slide == null ||
+                this.current_slide.get_width() != width ||
+                this.current_slide.get_height() != height) {
                 try {
-                    this.redraw();
+                    if (this.current_slide_number < this.n_slides && !this.disabled) {
+                        this.current_slide =
+                            this.renderer.render(this.current_slide_number,
+                                this.area, width, height);
+
+                        if (Options.prerender_slides != 0) {
+                            // cancel any pending pre-rendering
+                            if (this.timeout_id != 0) {
+                                GLib.Source.remove(this.timeout_id);
+                            }
+
+                            // wait before starting pre-rendering
+                            this.timeout_id =
+                                GLib.Timeout.add(1000*Options.prerender_delay,
+                                    this.prerender);
+                        }
+                    } else {
+                        this.current_slide = this.renderer.fade_to_black(width, height);
+                    }
                 } catch (Renderer.RenderError e) {
+                    GLib.printerr("The pdf page %d could not be rendered: %s\n",
+                        this.current_slide_number, e.message);
+                    return true;
                 }
-            } else {
-                cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
-                cr.set_source_surface(this.current_slide, 0, 0);
-                cr.rectangle(0, 0, this.current_slide.get_width(),
-                    this.current_slide.get_height());
-                cr.fill();
             }
 
-            // We are the only ones drawing on this context; skip everything
-            // else.
+            cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
+            cr.set_source_surface(this.current_slide, 0, 0);
+            cr.rectangle(0, 0, this.current_slide.get_width(),
+                this.current_slide.get_height());
+            cr.fill();
+
+            // We are the only ones drawing on this context; skip everything else
             return true;
-        }
-
-        /**
-         * Clear the current cache and begin building it anew
-         */
-        protected void rebuild_cache() {
-            if (this.renderer.cache != null) {
-                this.renderer.cache.invalidate();
-                if (renderer.cache.allows_prerendering()) {
-                    this.register_prerendering();
-                }
-            }
         }
     }
 }

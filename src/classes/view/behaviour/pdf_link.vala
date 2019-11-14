@@ -142,7 +142,7 @@ namespace pdfpc.View.Behaviour {
 
             // Get the link mapping table
             bool in_range = true;
-            Metadata.Pdf metadata = source.get_renderer().metadata;
+            Metadata.Pdf metadata = source.get_metadata();
             if (page_number < metadata.get_slide_count()) {
                 this.page_link_mappings = metadata.get_action_mapping(page_number);
             } else {

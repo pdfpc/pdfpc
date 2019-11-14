@@ -66,19 +66,30 @@ The following option_name's are recognized:
 .B black-on-end
 Add an additional black slide at the end of the presentation (bool, Default is false).
 .TP
+.BI cache-clean-period
+Period (in units of s) to check for expired cached content (int, Default is 60).
+.TP
+.BI cache-expiration
+Time (in units of s) to keep (pre)rendered slides in the cache (int, Default is
+600). Set to a negative value to keep cached slides permanently.
+.TP
+.BI cache-max-rtime
+Maximal time (in units of ms) it takes to render a slide for its cache to be
+protected from expiration (int, Default is 1000).
+.TP
+.BI cache-min-rtime
+Minimal time (in units of ms) it takes to render a slide for it to be cached
+(int, Default is 10).
+.TP
+.BI cache-max-usize
+Maximal size (in units of kB) of a slide image to store it uncompressed in the
+cache (int, Default is 256).
+.TP
 .B current-height
 Percentage of the height of the presenter screen to be used for the current slide (int, Default is 80).
 .TP
 .B current-size
 Percentage of the presenter screen to be used for the current slide (int, Default is 60).
-.TP
-.BI disable-caching
-see
-.B \fBpdfpc\fR(1)
-.TP
-.BI disable-compression
-see
-.B \fBpdfpc\fR(1)
 .TP
 .BI disable-input-autodetection
 Do not automatically detect type (pen or eraser) of tablet input devices (bool,
@@ -117,6 +128,15 @@ Set the pointer opacity in percent (int, default is 50).
 .TP
 .B pointer-size
 Set the initial pointer size, in pixels (int, default is 10).
+.TP
+.B prerender-delay
+Delay (in seconds) to launch the pre-rendering process after a slide change
+(int, default is 4).
+.TP
+.B prerender-slides
+Number of slides ahead of the current one to pre-render (int, default is 2). Set
+to 0 to disable the pre-rendering; set to a negative number to pre-render all at
+once.
 .TP
 .B presentation-screen
 Screen to be used for the presentation (output name, see e.g. "xrandr --listmonitors").

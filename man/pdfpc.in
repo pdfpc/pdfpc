@@ -32,9 +32,6 @@ monitors).
 .BI "\-B, \-\-list\-bindings"
 List action bindings defined
 .TP
-.BI "\-c, \-\-disable\-cache"
-Disable caching and pre-rendering of slides to save memory at the cost of speed.
-.TP
 .BI "\-C, \-\-time\-of\-day
 Display the time of the day
 .TP
@@ -68,9 +65,6 @@ Position of notes on the PDF page. Position can be either left, right, top or bo
 Allow for testing pdfpc without proper installation. Icons, configuration files,
 etc. will be loaded from the source path locations. Mostly intended for
 developers.
-.TP
-.BI "\-p, \-\-persist\-cache"
-Persist the PNG cache on disk for faster startup.
 .TP
 .BI "\-P, \-\-page"
 Go to a specific page directly after startup. In case of overlays, the first slide will be displayed.
@@ -115,10 +109,6 @@ command line arguments:
 
 If the script exits with a non-zero return value, whatever the script
 wrote to stdout is printed in the console. Otherwise nothing is printed.
-.TP
-.BI "\-z, \-\-disable\-compression"
-Disable the compression of slide images to trade memory consumption for speed.
-(Avg.  factor 30)
 .TP
 .BI "\-Z, \-\-size"
 Size of the presentation window in width:height format (forces windowed mode)
@@ -274,7 +264,7 @@ note though, that only in the normal mode the mouse bindings are configurable.
 .SS Caching / Pre-rendering
 
 .PP
-To allow fast changes between the different slides of the presentation the PDF
+To allow fast changes between the presentation slides, the PDF
 pages are pre-rendered to memory.  The progress bar on the bottom of the
 presenter screen indicates how many percent of the slides have been
 pre-rendered already.  During the initial rendering phase this will slow down
@@ -283,28 +273,16 @@ background.  After the cache is fully primed, however, the changing of slides
 should be much faster, as with normal PDF viewers.
 
 .PP
-As the pre-rendering takes a lot of memory it can be disabled using the
-\-\-disable\-cache switch at the cost of speed.
+To avoid excessive memory consumption, cached are only slides that took a
+significant time to render; this threshold is configurable. In order to further
+reduce memory consumption, the pre-rendered and cached slides are selectively
+compressed in memory. The compression factor is typically 10\-30, however, it
+takes some CPU time to compress and uncompress, so there is a trade-off. Small
+images below a certain (configurable) threshold will not be compressed.
 
 .PP
-It it also possible to store the pre-rendered slides on the disk (see
-\-\-persist-cache).  This speeds up the start of the program if the slide set
-is used next time unchanged.
-
-.SS Cache compression
-
-.PP
-The pre-rendered and cached slides can be compressed in memory to save up some
-memory.  Without compression a set of about 100 PDF pages can easily grow up to
-about 1.5 GB size.  Netbooks with only 1 GB of memory would swap heavily
-if pre-rendering is enabled in such a situation.  The compression is
-enabled by default as it does not harm rendering speed in a noticeable way on
-most systems. It does, however, slow down pre-rendering by about a factor of
-two. If you have got enough memory and want to ensure the fastest possible
-pre-rendering you can disable slide compression by using the \-z switch. But be
-warned that using the uncompressed pre-rendering storage will use about 30 times
-the memory the new compressed storage utilizes (e.g. 50 MB will become about
-1.5 GB).
+Please refer to the \fBpdfpcrc\fR(5) man page for options to fine tune the
+caching algorithm.
 
 .SS Timer
 .PP

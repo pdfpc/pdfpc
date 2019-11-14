@@ -48,9 +48,6 @@ namespace pdfpc {
             {"list-bindings", 'B', 0, 0,
                 ref Options.list_bindings,
                 "List action bindings defined", null},
-            {"disable-cache", 'c', 0, 0,
-                ref Options.disable_caching,
-                "Disable caching and pre-rendering of slides", null},
             {"time-of-day", 'C', 0, 0,
                 ref Options.use_time_of_day,
                 "Use the current time for the timer", null},
@@ -78,9 +75,6 @@ namespace pdfpc {
             {"no-install", 'N', 0, 0,
                 ref Options.no_install,
                 "Test pdfpc without installation", null},
-            {"persist-cache", 'p', 0, 0,
-                ref Options.persist_cache,
-                "Keep the cache on disk for faster startup", null},
             {"page", 'P', 0, OptionArg.INT,
                 ref Options.page,
                 "Go to page number N directly after startup", "N"},
@@ -110,10 +104,7 @@ namespace pdfpc {
                 "Enable Wayland-specific workaround", null},
             {"external-script", 'X', 0, OptionArg.STRING,
                 ref Options.external_script,
-                "Enable the execution of a particular external script", "filename"},
-            {"disable-compression", 'z', 0, 0,
-                ref Options.disable_cache_compression,
-                "Disable compression of the cached slide images", null},
+                "Enable execution of an external script", "file"},
             {"size", 'Z', 0, OptionArg.STRING,
                 ref Options.size,
                 "Size of the presentation window (implies \"-w\")", "W:H"},
@@ -273,6 +264,11 @@ namespace pdfpc {
                 // if not found, use the legacy location
                 configFileReader.readConfig(legacyUserConfig);
                 GLib.printerr("Loaded pdfpcrc from legacy location. Please move your config file to %s\n", userConfig);
+            }
+
+            // with prerendering enabled, it makes no sense not to cache a slide
+            if (Options.prerender_slides != 0) {
+                Options.cache_min_rtime = 0;
             }
 
 #if MOVIES
@@ -451,7 +447,7 @@ namespace pdfpc {
                 Options.page <= metadata.get_end_user_slide()) {
                 int u = metadata.user_slide_to_real_slide(Options.page - 1,
                     false);
-                this.controller.page_change_request(u, false);
+                this.controller.switch_to_slide_number(u, true);
             } else {
                 GLib.printerr("Argument --page/-P must be between 1 and %d\n",
                     metadata.get_end_user_slide());
