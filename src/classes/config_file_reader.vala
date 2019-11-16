@@ -247,6 +247,9 @@ namespace pdfpc {
                 case "disable-input-autodetection":
                     Options.disable_input_autodetection = bool.parse(fields[2]);
                     break;
+                case "disable-input-pressure":
+                    Options.disable_input_pressure = bool.parse(fields[2]);
+                    break;
                 case "disable-scrolling":
                     Options.disable_scrolling = bool.parse(fields[2]);
                     break;

@@ -119,6 +119,11 @@ namespace pdfpc {
         public static bool disable_input_autodetection = false;
 
         /**
+         * Config option to disable pressure sensitivity of tablet pens/erasers
+         */
+        public static bool disable_input_pressure = false;
+
+        /**
          * Config option to disable scrolling events on the presenter window.
          */
         public static bool disable_scrolling = false;

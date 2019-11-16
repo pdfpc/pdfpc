@@ -95,6 +95,10 @@ Percentage of the presenter screen to be used for the current slide (int, Defaul
 Do not automatically detect type (pen or eraser) of tablet input devices (bool,
 Default is false).
 .TP
+.BI disable-input-pressure
+Ignore pressure sensitivity of tablet input devices (pen or eraser) even when
+it is supported by the hardware (bool, Default is false).
+.TP
 .BI disable-scrolling
 Disable scrolling events on the presenter window (bool, Default is false).
 .TP
