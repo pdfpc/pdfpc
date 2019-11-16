@@ -28,6 +28,7 @@ namespace pdfpc.Drawings {
         public double blue {get; set;}
         public double alpha {get; set;}
         public double width {get; set;}
+        public double pressure {get; set;}
 
         public bool is_eraser {get; set;}
 
@@ -53,6 +54,7 @@ namespace pdfpc.Drawings {
             this.blue = 0.0;
             this.alpha = 1.0;
             this.width = 1.0;
+            this.pressure = -1.0;
             this.is_eraser = false;
         }
 
@@ -63,7 +65,13 @@ namespace pdfpc.Drawings {
                 context.set_operator(Cairo.Operator.OVER);
                 context.set_source_rgba(this.red, this.green, this.blue, this.alpha);
             }
-            context.set_line_width(this.width);
+            double lwidth = this.width;
+            if (this.pressure >= 0.0) {
+                // TODO: perhaps make this normalization adjustable
+                // and/or implement a smarter mapping
+                lwidth *= this.pressure/0.5;
+            }
+            context.set_line_width(lwidth);
             context.set_line_cap(Cairo.LineCap.ROUND);
             context.move_to(x1, y1);
             context.line_to(x2, y2);

@@ -485,8 +485,11 @@ the size of the cursor indicates the amount to erase.
 
 The color of the pen can be changed through key bindings or using the toolbox.
 
-If you are using a tablet, the pen or eraser tool will be selected based on whether the tablet
-reports a pen or eraser input device is being used, overriding the normal selection of the drawing tool.
+If you are using a tablet, the pen or eraser tool will be selected based on
+whether the tablet reports a pen or eraser input device is being used,
+overriding the normal selection of the drawing tool. Also for pressure-sensitive
+input devices, the pressure will affect the line width and the eraser size.
+Both these features can be disabled in the configuration file, if desired.
 
 .SS Monitor Plug and Play
 .PP

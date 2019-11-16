@@ -476,6 +476,10 @@ namespace pdfpc {
             return current_pen_drawing_tool.width;
         }
 
+        private void set_pen_pressure(double pressure) {
+            current_pen_drawing_tool.pressure = pressure;
+        }
+
         public void queue_pen_surface_draws() {
             if (presenter != null) {
                 presenter.pen_drawing_surface.queue_draw();
@@ -722,14 +726,23 @@ namespace pdfpc {
         }
 
         private bool on_move_pen(Gdk.EventMotion event) {
+            var dev = event.get_source_device();
             if (!Options.disable_input_autodetection) {
-                Gdk.InputSource source_type =
-                    event.get_source_device().get_source();
+                Gdk.InputSource source_type = dev.get_source();
                 if (source_type == Gdk.InputSource.ERASER) {
                     this.set_mode(AnnotationMode.ERASER);
                 } else if (source_type == Gdk.InputSource.PEN) {
                     this.set_mode(AnnotationMode.PEN);
                 }
+            }
+
+            if (!Options.disable_input_pressure && pen_is_pressed) {
+                double pressure;
+                if (dev.get_axis(event.axes, Gdk.AxisUse.PRESSURE,
+                    out pressure) != true) {
+                    pressure = -1.0;
+                }
+                set_pen_pressure(pressure);
             }
 
             double x, y;
