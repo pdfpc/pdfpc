@@ -108,8 +108,6 @@ PACKAGES
     posix
     ${MOVIE_PACKAGES}
 OPTIONS
-    --thread
-    --debug
     --enable-experimental
     ${EXTRA_VALA_OPTIONS}
 CUSTOM_VAPIS
