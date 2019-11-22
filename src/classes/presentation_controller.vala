@@ -65,16 +65,20 @@ namespace pdfpc {
                 }
             }
 
-            if (!skip_history &&
-                (this.history.is_empty ||
-                this.history.peek_head() != this.current_slide_number)) {
-                this.history.offer_head(this.current_slide_number);
+            if (!skip_history) {
+                if (this.history_bck.is_empty ||
+                    this.history_bck.peek_head() != this.current_slide_number) {
+                    this.history_bck.offer_head(this.current_slide_number);
+                }
+
+                // moving not along the history path; clear forward history
+                this.history_fwd.clear();
             }
 
             this.current_slide_number = slide_number;
 
             // start the timer unless it's the initial positioning
-            if (!this.history.is_empty) {
+            if (!this.history_bck.is_empty) {
                 this.timer.start();
             }
 
@@ -264,9 +268,10 @@ namespace pdfpc {
         protected uint last_key_event = 0;
 
         /**
-         * Stores the "history" of the slides
+         * Store the backward/forward "history" of the slides
          */
-        private Gee.ArrayQueue<int> history;
+        private Gee.ArrayQueue<int> history_bck;
+        private Gee.ArrayQueue<int> history_fwd;
 
         /**
          * Timer for the presentation. It should only be displayed on one view.
@@ -378,7 +383,8 @@ namespace pdfpc {
         public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
 
-            this.history = new Gee.ArrayQueue<int>();
+            this.history_bck = new Gee.ArrayQueue<int>();
+            this.history_fwd = new Gee.ArrayQueue<int>();
 
             this.timer = getTimerLabel(this, 0);
             this.timer.reset();
@@ -884,8 +890,10 @@ namespace pdfpc {
                 "Jump to the last previously seen slide");
             add_action("overview", this.toggle_overview,
                 "Show the overview mode");
-            add_action("histBack", this.history_back,
+            add_action("histBack", this.history_goto_back,
                 "Go back in history");
+            add_action("histFwd", this.history_goto_fwd,
+                "Go forward in history");
             add_action_with_parameter("gotoPage", GLib.VariantType.STRING,
                 this.goto_string,
                 "Jump to the specified page", "number");
@@ -1502,16 +1510,34 @@ namespace pdfpc {
         /**
          * Go back in history
          */
-        public void history_back() {
+        public void history_goto_back() {
             if (this.overview_shown) {
                 return;
             }
 
-            if (this.history.is_empty) {
+            if (this.history_bck.is_empty) {
                 return;
             }
 
-            var new_slide_number = this.history.poll_head();
+            var new_slide_number = this.history_bck.poll_head();
+            this.history_fwd.offer_head(this.current_slide_number);
+            this.switch_to_slide_number(new_slide_number, true);
+        }
+
+        /**
+         * Go forward in history
+         */
+        public void history_goto_fwd() {
+            if (this.overview_shown) {
+                return;
+            }
+
+            if (this.history_fwd.is_empty) {
+                return;
+            }
+
+            var new_slide_number = this.history_fwd.poll_head();
+            this.history_bck.offer_head(this.current_slide_number);
             this.switch_to_slide_number(new_slide_number, true);
         }
 
@@ -1682,7 +1708,8 @@ namespace pdfpc {
                     this.current_slide_number = (int) this.n_slides - 1;
                 }
 
-                this.history.clear();
+                this.history_bck.clear();
+                this.history_fwd.clear();
 
                 // Reset the drawing storage & clear the current drawings
                 this.pen_drawing.clear_storage();

@@ -36,6 +36,7 @@ bind S+m                loadBookmark
 
 # History
 bind S+BackSpace        histBack
+bind S+space            histFwd
 bind S+End              nextUnseen
 bind S+Home             prevSeen
 

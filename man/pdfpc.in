@@ -146,9 +146,8 @@ Go to the first slide
 .B End
 Go to the last slide
 .TP
-.B Shift + Backspace
-Go back in history. Note that history is defined by "jump" commands, not by
-normal slide movement.
+.B Shift + Backspace / Shift + Space
+Go back /forward in history.
 .TP
 .B Shift + Home / Shift + End
 Go to the previous / next slide, skipping over overlays that have already been
