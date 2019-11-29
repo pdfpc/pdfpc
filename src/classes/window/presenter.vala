@@ -559,9 +559,18 @@ namespace pdfpc.Window {
 
 
             var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
-            current_view_and_stricts.position = (int) (0.7*this.window_h);
+
+            // Height of the window minus the bottom part (icons, timer, etc)
+            var usable_height = (1.0 - 1.0/this.bottom_frac_inv)*this.window_h;
+
+            double wheight1, wheight2;
+            wheight1 = Options.current_height/100.0*usable_height;
+            wheight2 = current_allocated_width/page_ratio;
+            current_view_and_stricts.position = (int) double.min(wheight1, wheight2);
+
             current_view_and_stricts.wide_handle = true;
             disable_paned_handle(current_view_and_stricts);
+
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(overlay_layout);
             current_view_and_stricts.pack1(frame, true, true);
@@ -570,9 +579,17 @@ namespace pdfpc.Window {
             slide_views.pack1(current_view_and_stricts, true, true);
 
             var next_view_and_notes = new Gtk.Paned(Gtk.Orientation.VERTICAL);
-            next_view_and_notes.position = (int) (0.55*this.window_h);
+
+            // To be exact, the width of Paned handle should be subtracted...
+            var next_allocated_width = this.window_w - current_allocated_width;
+
+            wheight1 = Options.next_height/100.0*usable_height;
+            wheight2 = next_allocated_width/page_ratio;
+            next_view_and_notes.position = (int) double.min(wheight1, wheight2);
+
             next_view_and_notes.wide_handle = true;
             disable_paned_handle(next_view_and_notes);
+
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(next_view);
             next_view_and_notes.pack1(frame, true, true);
