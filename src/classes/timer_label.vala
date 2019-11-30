@@ -263,9 +263,10 @@ namespace pdfpc {
                     if (Options.timer_pace_color) {
                         // New indication of too slow/fast pace independently
                         // of the time left.
+                        var metadata = this.controller.metadata;
                         int current_slide_number =
                             this.controller.current_user_slide_number;
-                        int slide_count = this.controller.user_n_slides;
+                        int slide_count = metadata.get_end_user_slide();
 
                         // Assuming we're in the middle of the current slide
                         double expected_progress =
