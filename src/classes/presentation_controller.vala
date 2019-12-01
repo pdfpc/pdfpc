@@ -1275,14 +1275,6 @@ namespace pdfpc {
         /**
          * Set the last slide as defined by the user
          */
-        public void set_end_user_slide_overview() {
-            int user_selected = this.overview.current_slide;
-            this.metadata.set_end_user_slide(user_selected + 1);
-        }
-
-        /**
-         * Set the last slide as defined by the user
-         */
         public void set_last_saved_slide() {
             this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
             this.controllables_update();
