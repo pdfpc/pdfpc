@@ -354,7 +354,7 @@ used for making the slides), or only the "pdfpc" ones.
 Pressing the Tab key enters the overview mode, where thumbnails of the slides
 are shown in a grid.  You can select a slide to jump to with the mouse or with
 the arrow keys.  You can also define overlays and the end slide (see next
-sections) in this mode.
+sections) in this mode.  Press Escape to exit the mode without making an change.
 
 .SS Overlays
 
