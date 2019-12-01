@@ -1028,6 +1028,10 @@ namespace pdfpc.Window {
             this.slide_stack.set_visible_child_name("slides");
         }
 
+        public bool is_overview_shown() {
+            return (this.slide_stack.get_visible_child() == this.overview);
+        }
+
         /**
          * Increase font sizes for Widgets
          */
