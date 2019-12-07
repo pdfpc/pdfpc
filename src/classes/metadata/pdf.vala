@@ -478,6 +478,43 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Parse XMP metadata from the document, if exists
+         */
+        private void metadata_from_document() {
+            string meta = this.document.get_metadata();
+
+            if (meta == null) {
+                return;
+            }
+
+            XmlParser parser = new XmlParser();
+            try {
+                var tags = parser.parse(meta);
+                foreach (var entry in tags.entries) {
+                    switch (entry.key) {
+                        case "Duration":
+                            set_duration(int.parse(entry.value));
+                            break;
+                        case "EndUserSlide":
+                            set_end_user_slide(int.parse(entry.value));
+                            break;
+                        case "StartTime":
+                            Options.start_time = entry.value;
+                            break;
+                        case "EndTime":
+                            Options.end_time = entry.value;
+                            break;
+                        default:
+                            GLib.printerr("unknown XMP entry %s\n", entry.key);
+                            break;
+                    }
+                }
+            } catch (Error e) {
+                GLib.printerr("XMP parsing error: %s\n", e.message);
+            }
+        }
+
+        /**
          * Base constructor taking the file url to the pdf file
          */
         public Pdf(string? pdfFilename) {
@@ -568,6 +605,9 @@ namespace pdfpc.Metadata {
 
             // Prepopulate notes from annotations
             notes_from_document();
+
+            // Parse XMP metadata
+            metadata_from_document();
         }
 
         /**
