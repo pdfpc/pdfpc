@@ -1,0 +1,72 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pdfpc}[2019/12/03 v0.2 PDFPC]
+
+\RequirePackage{kvoptions}
+\RequirePackage{xstring}
+\RequirePackage{pdfcomment}
+\RequirePackage{hyperxmp}
+
+\SetupKeyvalOptions{
+  family=PDFPC,
+  prefix=PDFPC@
+}
+
+\DeclareStringOption{duration}
+\DeclareStringOption{starttime}
+\DeclareStringOption{endtime}
+\DeclareStringOption{enduserslide}
+\DeclareStringOption{lastminutes}
+\DeclareBoolOption{overridenote}
+
+\DeclareDefaultOption{\@unknownoptionerror}
+
+\ProcessKeyvalOptions*
+
+\ifx\PDFPC@duration\@empty
+\else
+  \IfInteger{\PDFPC@duration}{}
+    {\PackageWarningNoLine{pdfpc}{`duration' should be an integer}}%
+\fi
+
+\ifx\PDFPC@enduserslide\@empty
+\else
+  \IfInteger{\PDFPC@enduserslide}{}
+    {\PackageWarningNoLine{pdfpc}{`enduserslide' should be an integer}}%
+\fi
+
+\ifx\PDFPC@lastminutes\@empty
+\else
+  \IfInteger{\PDFPC@lastminutes}{}
+    {\PackageWarningNoLine{pdfpc}{`lastminutes' should be an integer}}%
+\fi
+
+\ifPDFPC@overridenote
+  \renewcommand{\note}[2][]{%
+    \IfStrEq{#1}{item}%
+      % Imitate a bullet
+      {\pdfpcnote{* #2}}%
+      {\pdfpcnote{#2}}%
+  }%
+\fi
+
+% Our schema
+\newcommand*{\pdfpc@schema}{%
+  \hyxmp@add@to@xml{%
+______<rdf:Description xmlns:pdfpc="https://github.com/pdfpc/pdfpc">^^J%
+  }%
+  \hyxmp@add@simple{pdfpc:Duration}{\PDFPC@duration}%
+  \hyxmp@add@simple{pdfpc:StartTime}{\PDFPC@starttime}%
+  \hyxmp@add@simple{pdfpc:EndTime}{\PDFPC@endtime}%
+  \hyxmp@add@simple{pdfpc:EndUserSlide}{\PDFPC@enduserslide}%
+  \hyxmp@add@simple{pdfpc:LastMinutes}{\PDFPC@lastminutes}%
+  \hyxmp@add@to@xml{%
+______</rdf:Description>^^J%
+  }%
+}
+
+% Piggybacking on the hyperxmp schema...
+\let\oldhyxmp@pdf@schema\hyxmp@pdf@schema
+\renewcommand{\hyxmp@pdf@schema}{{\oldhyxmp@pdf@schema}{\pdfpc@schema}}
+
+% Note command
+\newcommand{\pdfpcnote}[1]{\pdfmargincomment{#1}}
