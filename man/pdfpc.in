@@ -573,6 +573,34 @@ the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
 \fBNumberOfSlides\fR, \fBUrl\fR) and two signals (\fBOverlayChange\fR and
 \fBSlideChange\fR).
 
+.SS LaTeX package
+
+.PP
+A tiny LaTeX package is installed together with pdfpc. It provides a convenient
+way to specify notes and to define certain meta properties of the presentation.
+This functionality is often sufficient to avoid using \fB.pdfpc\fR files, thus
+allowing for preparing fully self-contained presentation slides. The usage is:
+
+.RS
+\\usepackage[options]{pdfpc}
+.RE
+
+The possible options are \fBduration\fR, \fBstarttime\fR, \fBendtime\fR,
+\fBenduserslide\fR, \fBlastminutes\fR, and \fBoverridenote\fR. The first five
+correspond to the similarly named \fB.pdfpc\fR or command-line options (and
+accept arguments in the same formats).
+
+To add a note to a slide:
+
+.RS
+\\pdfpcnote{<Text of a note>}
+.RE
+
+The \fBpdfpc\fR package can be used standalone or together with beamer. In the
+later case, it may be desirable to continue using the \\note command. To this
+end, the \fBoverridenote\fR option should be provided. Please note though, that
+this will work only in simple cases.
+
 .SH BUGS
 
 .PP
