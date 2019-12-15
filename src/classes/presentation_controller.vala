@@ -640,6 +640,12 @@ namespace pdfpc {
         public Gdk.RGBA pointer_color;
 
         /**
+         * Hide drawing custom pointer (pointer/pen/eraser) when mouse leaves
+         * the main view
+         */
+        public bool pointer_hidden = true;
+
+        /**
          * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
          */
         public double highlight_x;
@@ -679,11 +685,27 @@ namespace pdfpc {
                   Gdk.EventMask.BUTTON_PRESS_MASK
                 | Gdk.EventMask.BUTTON_RELEASE_MASK
                 | Gdk.EventMask.POINTER_MOTION_MASK
+                | Gdk.EventMask.ENTER_NOTIFY_MASK
+                | Gdk.EventMask.LEAVE_NOTIFY_MASK
             );
 
             view.motion_notify_event.connect(on_motion);
             view.button_press_event.connect(on_button_press);
             view.button_release_event.connect(on_button_release);
+            view.enter_notify_event.connect(() => {
+                    this.pointer_hidden = false;
+                    return true;
+                });
+            view.leave_notify_event.connect(() => {
+                    this.pointer_hidden = true;
+                    // make sure the pointer is cleared
+                    if (this.is_pointer_active()) {
+                        this.queue_pointer_surface_draws();
+                    } else if (this.in_drawing_mode()) {
+                        this.queue_pen_surface_draws();
+                    }
+                    return true;
+                });
         }
 
         /**

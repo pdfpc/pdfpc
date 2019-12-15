@@ -300,7 +300,7 @@ namespace pdfpc.Window {
                 context.new_path();
             }
             // Draw the pointer when not dragging
-            if (c.drag_x == -1) {
+            if (c.drag_x == -1 && !c.pointer_hidden) {
                 int x = (int)(a.width*c.pointer_x);
                 int y = (int)(a.height*c.pointer_y);
                 int r = (int)(a.height*0.001*c.pointer_size);
@@ -343,7 +343,8 @@ namespace pdfpc.Window {
                 context.set_source_surface(drawing_surface, 0, 0);
                 context.paint();
                 context.set_matrix(old_xform);
-                if (this.is_presenter && c.in_drawing_mode()) {
+                if (this.is_presenter && c.in_drawing_mode() &&
+                    !c.pointer_hidden) {
                     double width_adjustment = (double) a.width / base_width;
                     context.set_operator(Cairo.Operator.OVER);
                     context.set_line_width(2.0);
