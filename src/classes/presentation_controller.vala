@@ -656,6 +656,11 @@ namespace pdfpc {
         public bool pointer_hidden = true;
 
         /**
+         * Timer id to hide the pointer after a period of inactivity
+         */
+        protected uint pointer_timeout_id = 0;
+
+        /**
          * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
          */
         public double highlight_x;
@@ -796,16 +801,31 @@ namespace pdfpc {
             return true;
         }
 
+        protected void restart_pointer_timer() {
+            if (this.pointer_timeout_id != 0) {
+                Source.remove(this.pointer_timeout_id);
+            }
+
+            this.pointer_timeout_id = Timeout.add_seconds(2, () => {
+                    this.pointer_timeout_id = 0;
+                    this.pointer_hidden = true;
+                    this.queue_pointer_surface_draws();
+
+                    return false;
+                });
+        }
+
         private bool on_move_pointer(Gdk.EventMotion event) {
             this.device_to_normalized(event.x, event.y,
                 out pointer_x, out pointer_y);
-            if (presenter != null) {
-                presenter.pointer_drawing_surface.queue_draw();
-            }
-            if (presentation != null) {
-                presentation.pointer_drawing_surface.queue_draw();
-            }
-            update_highlight(pointer_x, pointer_y);
+
+            // restart the pointer timeout timer
+            this.restart_pointer_timer();
+            this.pointer_hidden = false;
+
+            this.queue_pointer_surface_draws();
+            this.update_highlight(pointer_x, pointer_y);
+
             return true;
         }
 
