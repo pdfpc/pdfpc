@@ -51,6 +51,8 @@ namespace pdfpc {
                 return;
             }
 
+            int old_user_slide_number = this.current_user_slide_number;
+
             if (slide_number < 0 || slide_number > this.n_slides) {
                 return;
             } else if (slide_number == this.n_slides) {
@@ -80,6 +82,12 @@ namespace pdfpc {
             // start the timer unless it's the initial positioning
             if (!this.history_bck.is_empty) {
                 this.timer.start();
+            }
+
+            // clear the highlighted selection when switching to a new page
+            if (this.current_user_slide_number != old_user_slide_number) {
+                highlight_w = 0;
+                highlight_h = 0;
             }
 
             this.controllables_update();
