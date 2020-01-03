@@ -580,7 +580,7 @@ namespace pdfpc {
 
             if (this.presenter != null) {
                 // Disable event compression for smoother drawing
-                this.presenter.get_window().set_event_compression(!in_drawing_mode());
+                this.presenter.main_view.get_window().set_event_compression(!in_drawing_mode());
             }
 
             this.controllables_update();
