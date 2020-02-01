@@ -1,3 +1,8 @@
+% Allow for defining some meta data and simple textual notes for use
+% with the pdfpc presentation application <https://pdfpc.github.io>.
+%
+% Inspired by Carsten Brandt's <https://github.com/cebe/pdfpc-latex-notes>.
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{pdfpc}[2019/12/03 v0.2 PDFPC]
 
@@ -17,6 +22,7 @@
 \DeclareStringOption{enduserslide}
 \DeclareStringOption{lastminutes}
 \DeclareBoolOption{overridenote}
+\DeclareStringOption{notesposition}
 
 \DeclareDefaultOption{\@unknownoptionerror}
 
@@ -49,6 +55,40 @@
   }%
 \fi
 
+\def\pdfpc@notespositionauto{auto}%
+\ifx\PDFPC@notesposition\@empty%
+  \def\PDFPC@notesposition{auto}%
+\fi%
+
+% Guesswork for beamer/pgfpages notes
+\ifx\PDFPC@notesposition\pdfpc@notespositionauto%
+  \def\PDFPC@notesposition{none}%
+  \def\pdfpc@onepaperheight{\paperheight}%
+  \def\pdfpc@twopaperheight{2\paperheight}%
+  \def\pdfpc@onepaperwidth{\paperwidth}%
+  \def\pdfpc@twopaperwidth{2\paperwidth}%
+  \def\pdfpc@pagecenter{\pgfpoint{.5\paperwidth}{.5\paperheight}}%
+
+  \ifx\pgfpageoptiontwoheight\pdfpc@onepaperheight%
+    \ifx\pgfpageoptiontwowidth\pdfpc@twopaperwidth%
+      \ifx\pgfpageoptionfirstcenter\pdfpc@pagecenter%
+        \def\PDFPC@notesposition{right}%
+      \else%
+        \def\PDFPC@notesposition{left}%
+      \fi%
+    \fi%
+  \fi%
+  \ifx\pgfpageoptiontwoheight\pdfpc@twopaperheight%
+    \ifx\pgfpageoptiontwowidth\pdfpc@onepaperwidth%
+      \ifx\pgfpageoptionfirstcenter\pdfpc@pagecenter%
+        \def\PDFPC@notesposition{top}%
+      \else%
+        \def\PDFPC@notesposition{bottom}%
+      \fi%
+    \fi%
+  \fi%
+\fi%
+
 % Our schema
 \newcommand*{\pdfpc@schema}{%
   \hyxmp@add@to@xml{%
@@ -59,6 +99,7 @@ ______<rdf:Description xmlns:pdfpc="https://github.com/pdfpc/pdfpc">^^J%
   \hyxmp@add@simple{pdfpc:EndTime}{\PDFPC@endtime}%
   \hyxmp@add@simple{pdfpc:EndUserSlide}{\PDFPC@enduserslide}%
   \hyxmp@add@simple{pdfpc:LastMinutes}{\PDFPC@lastminutes}%
+  \hyxmp@add@simple{pdfpc:NotesPosition}{\PDFPC@notesposition}%
   \hyxmp@add@to@xml{%
 ______</rdf:Description>^^J%
   }%

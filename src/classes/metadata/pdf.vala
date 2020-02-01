@@ -504,6 +504,10 @@ namespace pdfpc.Metadata {
                         case "EndTime":
                             Options.end_time = entry.value;
                             break;
+                        case "NotesPosition":
+                            this.notes_position =
+                                NotesPosition.from_string(entry.value);
+                            break;
                         default:
                             GLib.printerr("unknown XMP entry %s\n", entry.key);
                             break;
