@@ -41,20 +41,21 @@ namespace pdfpc {
       * Factory function for creating TimerLabels, depending if a duration was
       * given.
       */
-    TimerLabel getTimerLabel(PresentationController controller, int duration) {
+    TimerLabel getTimerLabel(PresentationController controller, int duration,
+        string? start_time_str, string? end_time_str) {
 
         uint last_minutes = Options.last_minutes;
 
         // Calculate the countdown to display until the presentation has to
         // start
         time_t start_time = 0;
-        if (Options.start_time != null) {
-            start_time = parseTime(Options.start_time);
+        if (start_time_str != null) {
+            start_time = parseTime(start_time_str);
         }
         // The same again for end_time
         time_t end_time = 0;
-        if (Options.end_time != null) {
-            end_time = parseTime(Options.end_time);
+        if (end_time_str != null) {
+            end_time = parseTime(end_time_str);
         }
 
         if (Options.use_time_of_day) {

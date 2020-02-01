@@ -244,7 +244,8 @@ namespace pdfpc {
                     this.metadata.controller = this;
 
                     this.timer = getTimerLabel(this,
-                        (int) this.metadata.get_duration() * 60);
+                        (int) metadata.get_duration() * 60,
+                        metadata.start_time, metadata.end_time);
                     this.timer.reset();
 
                     this.current_slide_number = 0;
@@ -394,7 +395,8 @@ namespace pdfpc {
             this.history_bck = new Gee.ArrayQueue<int>();
             this.history_fwd = new Gee.ArrayQueue<int>();
 
-            this.timer = getTimerLabel(this, 0);
+            this.timer = getTimerLabel(this, 0,
+                this.metadata.start_time, this.metadata.end_time);
             this.timer.reset();
 
             this.add_actions();
