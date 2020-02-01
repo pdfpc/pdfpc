@@ -75,7 +75,7 @@ namespace pdfpc.Metadata {
         /**
          * Indicates if pages contains also notes and there position (e. g. when using latex beamer)
          */
-        protected NotesPosition notes_position;
+        protected NotesPosition notes_position = NotesPosition.NONE;
 
         /**
          * Number of pages in the pdf document
@@ -113,6 +113,16 @@ namespace pdfpc.Metadata {
          * Duration of the presentation
          */
         protected uint duration;
+
+        /**
+         * Times the talk should start or end
+         */
+        public string? start_time {
+            get; protected set;
+        }
+        public string? end_time {
+            get; protected set;
+        }
 
         /**
          * The font size used for notes. -1 if none is
@@ -154,22 +164,15 @@ namespace pdfpc.Metadata {
 
                     switch (section_type) {
                         case "[duration]": {
-                            // if duration was set via command line
-                            // ignore pdfpc file
-                            if (Options.duration == uint.MAX) {
-                                this.duration = int.parse(section_content);
-                            }
+                            set_duration(int.parse(section_content));
                             break;
                         }
                         case "[end_time]": {
-                            // command line first
-                            if (Options.end_time == null) {
-                                Options.end_time = section_content;
-                            }
+                            this.end_time = section_content;
                             break;
                         }
                         case "[end_user_slide]": {
-                            this.end_user_slide = int.parse(section_content);
+                            set_end_user_slide(int.parse(section_content));
                             break;
                         }
                         case "[font_size]": {
@@ -197,10 +200,7 @@ namespace pdfpc.Metadata {
                             break;
                         }
                         case "[notes_position]": {
-                            // command line first
-                            if (Options.notes_position == null) {
-                                this.notes_position = NotesPosition.from_string(section_content);
-                            }
+                            this.notes_position = NotesPosition.from_string(section_content);
                             break;
                         }
                         case "[skip]": {
@@ -209,10 +209,7 @@ namespace pdfpc.Metadata {
                             break;
                         }
                         case "[start_time]": {
-                            // command line first
-                            if (Options.start_time == null) {
-                                Options.start_time = section_content;
-                            }
+                            this.start_time = section_content;
                             break;
                         }
                         default: {
@@ -499,10 +496,10 @@ namespace pdfpc.Metadata {
                             set_end_user_slide(int.parse(entry.value));
                             break;
                         case "StartTime":
-                            Options.start_time = entry.value;
+                            this.start_time = entry.value;
                             break;
                         case "EndTime":
-                            Options.end_time = entry.value;
+                            this.end_time = entry.value;
                             break;
                         case "NotesPosition":
                             this.notes_position =
@@ -556,10 +553,6 @@ namespace pdfpc.Metadata {
                 this.action_mapping = new Gee.ArrayList<ActionMapping>();
             }
 
-            this.notes_position = NotesPosition.from_string(Options.notes_position);
-
-            this.duration = Options.duration;
-
             fill_path_info(fname, fpcname);
 
             notes = new slides_notes();
@@ -570,6 +563,34 @@ namespace pdfpc.Metadata {
             }
             this.user_view_indexes = new int [0];
             this.document = this.open_pdf_document(this.pdf_fname);
+
+            // Parse XMP metadata
+            this.metadata_from_document();
+
+            // Command line options have the highest priority
+            if (Options.duration != uint.MAX) {
+                set_duration(Options.duration);
+            }
+
+            if (Options.start_time != null) {
+                this.start_time = Options.start_time;
+            }
+            if (Options.end_time != null) {
+                this.end_time = Options.end_time;
+            }
+            // If end_time is set, reset duration to 0
+            if (this.end_time != null) {
+                this.duration = 0;
+            }
+
+            if (Options.notes_position != null) {
+                this.notes_position =
+                    NotesPosition.from_string(Options.notes_position);
+            }
+            if (this.notes_position != NotesPosition.NONE) {
+                Options.disable_auto_grouping = true;
+                GLib.printerr("Notes position set, auto grouping disabled.\n");
+            }
 
             // Get maximal page dimensions
             this.page_count = this.document.get_n_pages();
@@ -603,15 +624,12 @@ namespace pdfpc.Metadata {
                 }
             }
 
-            if(skips_by_user) {
+            if (skips_by_user) {
                 parse_skip_line(skip_line);
             }
 
             // Prepopulate notes from annotations
             notes_from_document();
-
-            // Parse XMP metadata
-            metadata_from_document();
         }
 
         /**
