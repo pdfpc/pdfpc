@@ -68,7 +68,7 @@ namespace pdfpc {
                 text_buffer += text;
             }
         }
-        
+
         private static Gee.HashMap<string, string> tags;
     }
 }
