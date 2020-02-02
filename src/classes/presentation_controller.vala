@@ -395,10 +395,6 @@ namespace pdfpc {
             this.history_bck = new Gee.ArrayQueue<int>();
             this.history_fwd = new Gee.ArrayQueue<int>();
 
-            this.timer = getTimerLabel(this, 0,
-                this.metadata.start_time, this.metadata.end_time);
-            this.timer.reset();
-
             this.add_actions();
 
             readKeyBindings();
