@@ -59,7 +59,8 @@ List actions supported
 List monitors known to the operating system
 .TP
 .BI "\-n, \-\-notes"=P
-Position of notes on the PDF page. Position can be either left, right, top or bottom. Disable slide auto-grouping (Default: none)
+Position of second-screen beamer notes on the PDF page (left, right, top,
+bottom, or none. Default: none). Note that this disables slide auto-grouping.
 .TP
 .BI "\-N, \-\-no\-install"
 Allow for testing pdfpc without proper installation. Icons, configuration files,
@@ -576,9 +577,9 @@ the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
 .SS LaTeX package
 
 .PP
-A tiny LaTeX package is installed together with pdfpc. It provides a convenient
-way to specify notes and to define certain meta properties of the presentation.
-This functionality is often sufficient to avoid using \fB.pdfpc\fR files, thus
+A tiny LaTeX package comes with pdfpc. It provides a convenient way to specify
+notes and to define certain meta properties of the presentation. This
+functionality is often sufficient to avoid using \fB.pdfpc\fR files, thus
 allowing for preparing fully self-contained presentation slides. The usage is:
 
 .RS
@@ -600,6 +601,12 @@ The \fBpdfpc\fR package can be used standalone or together with beamer. In the
 later case, it may be desirable to continue using the \\note command. To this
 end, the \fBoverridenote\fR option should be provided. Please note though, that
 this will work only in simple cases.
+
+If you prefer using full-featured beamer notes rendered alongside the
+presentation (\\setbeameroption{show notes on second screen}), the \fBpdfpc\fR
+package will autodetect it, so using the \fB\-\-notes\fR command-line option is
+unnecessary. To override the autodetection, use the \fBnotesposition\fR option,
+accepting the same values (right/left/top/bottom/none).
 
 .SH BUGS
 
