@@ -195,7 +195,7 @@ namespace pdfpc {
             this.area = area;
             this.user_slides = user_slides;
 
-            this.current_slide_number = 0;
+            this.current_slide_number = -1;
 
             this.add_events(Gdk.EventMask.STRUCTURE_MASK);
 
