@@ -50,7 +50,7 @@ namespace pdfpc.View.Behaviour {
         /**
          * Attach a View.Pdf to this signal provider
          */
-        public void attach(View.Pdf view) {
+        protected void attach(View.Pdf view) {
             this.target = view;
 
             view.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
@@ -131,7 +131,7 @@ namespace pdfpc.View.Behaviour {
          * Handle newly entered pdf pages to create a link mapping table for
          * further requests and checks.
          */
-        public void on_entering_slide(View.Pdf source, int page_number) {
+        protected void on_entering_slide(View.Pdf source, int page_number) {
             // if target is not mapped (ie. the size is not known) post pone
             // the mapping calculatation since the results wouldn't be correct
             if (!target.get_mapped()) {

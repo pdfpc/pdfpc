@@ -187,7 +187,7 @@ namespace pdfpc {
         /**
          * Inits  the movie
          */
-        public void init_movie(ActionMapping other, Poppler.Rectangle area,
+        protected void init_movie(ActionMapping other, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
                 string uri, string? suburi, bool autostart, bool loop, bool noprogress,
                 bool noaudio, int start = 0, int stop = 0, bool temp = false) {
