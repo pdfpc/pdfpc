@@ -276,14 +276,6 @@ namespace pdfpc {
                 return;
             }
 
-            // If the slide is out of bounds render the outer most slide on
-            // each side of the document.
-            if (slide_number < 0) {
-                slide_number = 0;
-            } else if (slide_number >= this.n_slides) {
-                slide_number = this.n_slides - 1;
-            }
-
             if (this.current_slide_number != slide_number || force) {
                 // Notify all listeners
                 this.leaving_slide(this.current_slide_number, slide_number);
