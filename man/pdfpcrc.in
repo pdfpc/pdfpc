@@ -169,6 +169,10 @@ right-to-left, top-to-bottom, or botton-to-top, respectively (Default is LtoR).
 .TP
 .B toolbox-minimized
 Set the initial toolbox state minimized (bool, Default is false).
+.TP
+.B windowed-mode
+Set the initial windowed mode: none, presenter, presentation, or both (Default
+is none).
 
 .SH EXAMPLES
 
