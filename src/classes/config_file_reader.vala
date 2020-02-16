@@ -202,7 +202,8 @@ namespace pdfpc {
                             this.readOption(uncommentedLine, fields);
                             break;
                         default:
-                            GLib.printerr("Warning: Unknown command line \"%s\"\n", uncommentedLine);
+                            GLib.printerr("Warning: Invalid configuration statement \"%s\"\n",
+                                uncommentedLine);
                             break;
                     }
                 }
@@ -255,6 +256,9 @@ namespace pdfpc {
                     break;
                 case "enable-auto-srt-load":
                     Options.auto_srt = bool.parse(fields[2]);
+                    break;
+                case "final-slide":
+                    Options.final_slide_overlay = bool.parse(fields[2]);
                     break;
                 case "move-on-mapped":
                     Options.move_on_mapped = bool.parse(fields[2]);
@@ -314,8 +318,8 @@ namespace pdfpc {
                 case "toolbox-minimized":
                     Options.toolbox_minimized = bool.parse(fields[2]);
                     break;
-                case "final-slide":
-                    Options.final_slide_overlay = bool.parse(fields[2]);
+                case "windowed-mode":
+                    Options.windowed = fields[2];
                     break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
