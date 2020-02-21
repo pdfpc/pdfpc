@@ -23,6 +23,7 @@
 }
 \setbeamertemplate{footline}[my foot]
 
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
 \mode<presentation>
 
@@ -60,7 +61,7 @@
             good feeling of what \pdfpc is good for, but you will have to take
             my word for some of the features
           \item alternatively, restart \pdfpc in the windowed mode with the
-            \opt{-w} option
+            \opt{-w~both} option
         \end{itemize}
     \end{itemize}
   \end{block}
@@ -155,11 +156,10 @@
   \frametitle{Jumping to specific slides}
   \begin{itemize}
     \item Pressing \keys{G} you can enter a slide number to jump to
-      \singleitem{To come back to this slide you can use the
-        \keys{\shift+\backspace} combination or remember that we are on slide
-        \insertframenumber.}
+    \item Slide viewing history can be navigated (backward/forward) by pressing
+      \keys{\shift+\backspace} or \keys{\shift+\SPACE}, respectively
     \item Pressing \keys{\tab} (Tab) or the middle mouse button you get an
-      overview of the whole presentation, which you can use to jump around
+      overview of the whole presentation, which can be used to jump around
     \item Press \keys{M} to bookmark a present slide; press \keys{\shift+M} to
       return to it afterwards
     \item Hyperlinks also work, press \hyperlink{titlePage}{here to jump to the
@@ -237,8 +237,14 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Toolbox}
+  \frametitle{Cheatsheet \& toolbox}
   Overwhelmed with the key bindings to memorize? Fear not!
+
+  \singleitem{At any moment you can press \keys{?} to peep into the cheatsheet;
+    \keys{esc} to tuck it away}
+
+  Some frequently used actions are packed in the toolbox:
+
   \begin{itemize}
     \item Press \keys{T} to invoke the toolbox
       \singleitem{On tablet devices, it is enabled by default}
