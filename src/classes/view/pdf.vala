@@ -293,6 +293,14 @@ namespace pdfpc {
         }
 
         /**
+         * Invalidate the current slide, forcing redrawing on update
+         */
+        public void invalidate() {
+            this.current_slide_number = -1;
+            this.current_slide = null;
+        }
+
+        /**
          * Return pixel dimensions of the widget
          */
         protected void get_pixel_dimensions(out int width, out int height) {

@@ -51,6 +51,7 @@ namespace pdfpc.Window {
             int screen_num, bool windowed, int width = -1, int height = -1) {
             base(controller, false, screen_num, windowed, width, height);
 
+            this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);
 
             this.view = new View.Pdf.from_fullscreen(this,
@@ -64,6 +65,14 @@ namespace pdfpc.Window {
                 (float) ratio, false);
             frame.add(overlay_layout);
             this.add(frame);
+        }
+
+        /**
+         * Called on document reload.
+         * TODO: in principle the document geometry may change!
+         */
+        public void on_reload() {
+            this.view.invalidate();
         }
 
         /**

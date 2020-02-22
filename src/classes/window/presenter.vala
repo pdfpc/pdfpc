@@ -868,6 +868,10 @@ namespace pdfpc.Window {
          * TODO: in principle the document geometry may change!
          */
         public void on_reload() {
+            this.current_view.invalidate();
+            this.next_view.invalidate();
+            this.strict_next_view.invalidate();
+            this.strict_prev_view.invalidate();
         }
 
         public void update() {
