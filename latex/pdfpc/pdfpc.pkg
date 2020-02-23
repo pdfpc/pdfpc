@@ -1,0 +1,11 @@
+\pkg{pdfpc}
+\version{0.2}
+\author{Evgeny Stambulchik}
+\email{andreas@bilke.org}
+\uploader{Andreas Bilke}
+\license{gpl3+}
+\home{https://pdfpc.github.io/}
+\bugtracker{https://github.com/pdfpc/pdfpc/}
+\begin{summary}Companion package to add additional data for use with pdfpc application.\end{summary}
+\begin{description}Allow for defining some meta data and simple textual notes for use with the pdfpc presentation application.\end{description}
+\file{pdfpc.tar.gz}
