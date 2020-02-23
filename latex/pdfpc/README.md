@@ -1,7 +1,7 @@
 # pdfpc
 
-This packages allowes to define additional meta data within
-the PDF file which can be interpreted within the pdf presenter
+This packages allows to define additional meta data within
+the PDF file which can be interpreted by the pdf presenter
 console (pdfpc) program.
 
 ## Dependencies
