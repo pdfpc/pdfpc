@@ -1,0 +1,179 @@
+%\iffalse
+%<*package>
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
+%</package>
+%\fi
+%\iffalse
+%  Doc-Source file to use with LaTeX2e
+%
+%  This file is part of pdfpc.
+%  Copyright (C) 2020 Evgeny Stambulchik
+%
+%  This program is free software; you can redistribute it and/or modify
+%  it under the terms of the GNU General Public License as published by
+%  the Free Software Foundation; either version 2 of the License, or
+%  (at your option) any later version.
+%
+%  This program is distributed in the hope that it will be useful,
+%  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%  GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License along
+%  with this program; if not, write to the Free Software Foundation, Inc.,
+%  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+%  -------------------------------------------------------------------------------------------
+%
+%  Allow for defining some meta data and simple textual notes for use
+%  with the pdfpc presentation application <https://pdfpc.github.io>.
+%
+%  -------------------------------------------------------------------------------------------
+%
+%  Inspired by Carsten Brandt's <https://github.com/cebe/pdfpc-latex-notes>.
+%
+%  -------------------------------------------------------------------------------------------
+%
+%  Please report bugs and other problems as well as suggestions for improvements
+%  to the issue tracker at github <https://github.com/pdfpc/pdfpc/>
+%
+%  -------------------------------------------------------------------------------------------
+%\fi
+
+% Identify the package and force \LaTeXe:
+%    \begin{macrocode}
+\ProvidesPackage{pdfpc}[2019/12/03 v0.2 PDFPC]
+\NeedsTeXFormat{LaTeX2e}
+%    \end{macrocode}
+%
+% Require additional packages needed by \sty{pdfpc-movie}:
+%    \begin{macrocode}
+\RequirePackage{kvoptions}
+\RequirePackage{xstring}
+\RequirePackage{pdfcomment}
+\RequirePackage{hyperxmp}
+%    \end{macrocode}
+%
+\SetupKeyvalOptions{
+  family=PDFPC,
+  prefix=PDFPC@
+}
+%
+\DeclareStringOption{duration}
+\DeclareStringOption{starttime}
+\DeclareStringOption{endtime}
+\DeclareStringOption{enduserslide}
+\DeclareStringOption{lastminutes}
+\DeclareBoolOption{overridenote}
+\DeclareStringOption{notesposition}
+\DeclareDefaultOption{\@unknownoptionerror}
+%
+\ProcessKeyvalOptions*
+%
+\ifx\PDFPC@duration\@empty
+\else
+  \IfInteger{\PDFPC@duration}{}
+    {\PackageWarningNoLine{pdfpc}{`duration' should be an integer}}%
+\fi
+%
+\ifx\PDFPC@duration\@empty
+\ifx\PDFPC@enduserslide\@empty
+\else
+  \IfInteger{\PDFPC@enduserslide}{}
+    {\PackageWarningNoLine{pdfpc}{`enduserslide' should be an integer}}%
+\fi
+%
+\ifx\PDFPC@duration\@empty
+\ifx\PDFPC@lastminutes\@empty
+\else
+  \IfInteger{\PDFPC@lastminutes}{}
+    {\PackageWarningNoLine{pdfpc}{`lastminutes' should be an integer}}%
+\fi
+%
+\ifPDFPC@overridenote
+  \renewcommand{\note}[2][]{%
+    \IfStrEq{#1}{item}%
+      % Imitate a bullet
+      {\pdfpcnote{* #2}}%
+      {\pdfpcnote{#2}}%
+  }%
+\fi
+%
+\def\pdfpc@notespositionauto{auto}%
+\ifx\PDFPC@notesposition\@empty%
+  \def\PDFPC@notesposition{auto}%
+\fi%
+%
+% Guesswork for beamer/pgfpages notes
+%    \begin{macrocode}
+\ifx\PDFPC@notesposition\pdfpc@notespositionauto%
+  \def\PDFPC@notesposition{none}%
+  \def\pdfpc@onepaperheight{\paperheight}%
+  \def\pdfpc@twopaperheight{2\paperheight}%
+  \def\pdfpc@onepaperwidth{\paperwidth}%
+  \def\pdfpc@twopaperwidth{2\paperwidth}%
+  \def\pdfpc@pagecenter{\pgfpoint{.5\paperwidth}{.5\paperheight}}%
+
+  \ifx\pgfpageoptiontwoheight\pdfpc@onepaperheight%
+    \ifx\pgfpageoptiontwowidth\pdfpc@twopaperwidth%
+      \ifx\pgfpageoptionfirstcenter\pdfpc@pagecenter%
+        \def\PDFPC@notesposition{right}%
+      \else%
+        \def\PDFPC@notesposition{left}%
+      \fi%
+    \fi%
+  \fi%
+  \ifx\pgfpageoptiontwoheight\pdfpc@twopaperheight%
+    \ifx\pgfpageoptiontwowidth\pdfpc@onepaperwidth%
+      \ifx\pgfpageoptionfirstcenter\pdfpc@pagecenter%
+        \def\PDFPC@notesposition{top}%
+      \else%
+        \def\PDFPC@notesposition{bottom}%
+      \fi%
+    \fi%
+  \fi%
+\fi%
+%    \end{macrocode}
+%
+% Our schema
+%    \begin{macrocode}
+\newcommand*{\pdfpc@schema}{%
+  \hyxmp@add@to@xml{%
+______<rdf:Description xmlns:pdfpc="https://github.com/pdfpc/pdfpc">^^J%
+  }%
+  \hyxmp@add@simple{pdfpc:Duration}{\PDFPC@duration}%
+  \hyxmp@add@simple{pdfpc:StartTime}{\PDFPC@starttime}%
+  \hyxmp@add@simple{pdfpc:EndTime}{\PDFPC@endtime}%
+  \hyxmp@add@simple{pdfpc:EndUserSlide}{\PDFPC@enduserslide}%
+  \hyxmp@add@simple{pdfpc:LastMinutes}{\PDFPC@lastminutes}%
+  \hyxmp@add@simple{pdfpc:NotesPosition}{\PDFPC@notesposition}%
+  \hyxmp@add@to@xml{%
+______</rdf:Description>^^J%
+  }%
+}
+%
+% Piggybacking on the hyperxmp schema...
+%    \begin{macrocode}
+\let\oldhyxmp@pdf@schema\hyxmp@pdf@schema
+\renewcommand{\hyxmp@pdf@schema}{{\oldhyxmp@pdf@schema}{\pdfpc@schema}}
+%    \end{macrocode}
+
+% Note command
+%    \begin{macrocode}
+\newcommand{\pdfpcnote}[1]{\pdfmargincomment{#1}}
+%    \end{macrocode}
+%
+\endinput
