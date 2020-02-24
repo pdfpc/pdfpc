@@ -577,9 +577,9 @@ the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
 .SS LaTeX package
 
 .PP
-A tiny LaTeX package comes with pdfpc. It provides a convenient way to specify
-notes and to define certain meta properties of the presentation. This
-functionality is often sufficient to avoid using \fB.pdfpc\fR files, thus
+A tiny LaTeX package is available for pdfpc at CTAN. It provides a convenient
+way to specify notes and to define certain meta properties of the presentation.
+This functionality is often sufficient to avoid using \fB.pdfpc\fR files, thus
 allowing for preparing fully self-contained presentation slides. The usage is:
 
 .RS
