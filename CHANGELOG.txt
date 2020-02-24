@@ -2,6 +2,44 @@
 pdfpc Changelog
 ===============
 
+Version 4.4.0
+=============
+
+*Released: February 2020*
+
+- Document reload
+- Resizable windows
+- Toggling between windowed and full screen mode
+- Cheatsheet in application for key/mouse bindings
+- PnP for monitors
+- Improved caching behaviour (pdfpc will not lock the GUI during cold start)
+- Support for XMP meta data and notes (see CTAN pdfpc package)
+- Hide pointer after some time of inactivity
+- Windowed mode is now an pdfpcrc option
+
+- Bug fixes
+
+Version 4.3.4
+=============
+
+*Released: June 2019*
+
+- Fix loading of key bindings
+
+Version 4.3.3
+=============
+
+*Released: June 2019*
+
+- Better video playback support on Mac OS X
+
+Version 4.3.2
+=============
+
+*Released: February 2019*
+
+- Fix compile error on some distributions
+
 Version 4.3.1
 =============
 
