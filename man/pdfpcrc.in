@@ -170,6 +170,10 @@ right-to-left, top-to-bottom, or botton-to-top, respectively (Default is LtoR).
 .B toolbox-minimized
 Set the initial toolbox state minimized (bool, Default is false).
 .TP
+.B transition-fps
+Frames-per-second for slide transitions (int, Default is 25). Set to 0 to
+disable all transitions.
+.TP
 .B windowed-mode
 Set the initial windowed mode: none, presenter, presentation, or both (Default
 is none).

@@ -318,6 +318,9 @@ namespace pdfpc {
                 case "toolbox-minimized":
                     Options.toolbox_minimized = bool.parse(fields[2]);
                     break;
+                case "transition-fps":
+                    Options.transition_fps = int.parse(fields[2]);
+                    break;
                 case "windowed-mode":
                     Options.windowed = fields[2];
                     break;
