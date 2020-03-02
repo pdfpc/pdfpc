@@ -108,14 +108,26 @@ namespace pdfpc {
         /**
          * ID of timeout used to delay pre-rendering
          */
-        protected uint timeout_id = 0;
+        protected uint prerender_tid = 0;
+
+        /**
+         * The transition manager object
+         */
+        protected View.TransitionManager transman = new View.TransitionManager();
+
+        /**
+         * Transition timer
+         */
+        protected uint transition_tid = 0;
+
+        public bool transitions_enabled = false;
 
         /**
          * Launch pre-rendering
          */
         protected virtual bool prerender() {
             // indicate we're running, too late to cancel even if desired
-            this.timeout_id = 0;
+            this.prerender_tid = 0;
 
             // things might have changed during prerender_delay...
             if (this.disabled) {
@@ -277,6 +289,8 @@ namespace pdfpc {
             }
 
             if (this.current_slide_number != slide_number || force) {
+                var previous_slide = this.current_slide;
+
                 // Notify all listeners
                 this.leaving_slide(this.current_slide_number, slide_number);
 
@@ -285,10 +299,42 @@ namespace pdfpc {
 
                 this.current_slide_number = slide_number;
 
-                // Have Gtk update the widget
-                this.queue_draw();
+                // Cancel any active transition timeout
+                if (this.transition_tid != 0) {
+                    GLib.Source.remove(this.transition_tid);
+                    this.transition_tid = 0;
+                }
+
+                if (!this.disabled && this.transitions_enabled) {
+                    var metadata = this.get_metadata();
+                    this.transman.init(metadata, slide_number, previous_slide);
+                } else {
+                    this.transman.disable();
+                }
+
+                if (!this.transman.is_enabled) {
+                    // Update the widget
+                    this.queue_draw();
+                } else {
+                    var delay = this.transman.frame_duration;
+                    this.transition_tid = Timeout.add(delay, () => {
+                            var inprogress = this.transman.advance();
+
+                            this.queue_draw();
+
+                            if (inprogress) {
+                                return true;
+                            } else {
+                                this.transition_tid = 0;
+                                // Stop the timer
+                                return false;
+                            }
+                        }, Priority.HIGH);
+                }
 
                 this.entering_slide(this.current_slide_number);
+            } else {
+                this.transman.disable();
             }
         }
 
@@ -341,12 +387,12 @@ namespace pdfpc {
 
                         if (Options.prerender_slides != 0) {
                             // cancel any pending pre-rendering
-                            if (this.timeout_id != 0) {
-                                GLib.Source.remove(this.timeout_id);
+                            if (this.prerender_tid != 0) {
+                                GLib.Source.remove(this.prerender_tid);
                             }
 
                             // wait before starting pre-rendering
-                            this.timeout_id =
+                            this.prerender_tid =
                                 GLib.Timeout.add(1000*Options.prerender_delay,
                                     this.prerender);
                         }
@@ -361,10 +407,13 @@ namespace pdfpc {
             }
 
             cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
-            cr.set_source_surface(this.current_slide, 0, 0);
-            cr.rectangle(0, 0, this.current_slide.get_width(),
-                this.current_slide.get_height());
-            cr.fill();
+
+            if (this.transman.is_enabled) {
+                this.transman.draw_frame(cr, this.current_slide);
+            } else {
+                cr.set_source_surface(this.current_slide, 0, 0);
+                cr.paint();
+            }
 
             // We are the only ones drawing on this context; skip everything else
             return true;

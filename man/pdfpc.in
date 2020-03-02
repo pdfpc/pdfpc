@@ -416,6 +416,13 @@ actual presentation via the \[aq]Ctrl + e\[aq] key.
 This just changes the progress display in the presenter screen, as to
 have a better overview of how many slides are left.
 
+.SS Page transitions
+.PP
+Pdfpc supports almost all standard animated PDF page transitions: blinds, box,
+cover, dissolve, fade, glitter (except the diagonal one), push, split, uncover,
+and wipe, including various alignments, angles, and directions (where
+applicable).
+
 .SS Movies
 .PP
 Pdfpc can play back movies included in the PDF file.  Movies may be started

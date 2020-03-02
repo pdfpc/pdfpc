@@ -273,6 +273,11 @@ namespace pdfpc {
         public static bool no_install = false;
 
         /**
+         * FPS of slide transitions
+         */
+        public static uint transition_fps = 25;
+
+        /**
          * Show the final slide of each overlay in "next slide" view
          * instead of the next slide.
          */

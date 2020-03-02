@@ -56,6 +56,7 @@ namespace pdfpc.Window {
 
             this.view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, true);
+            this.view.transitions_enabled = true;
 
             this.overlay_layout.add(this.view);
 
