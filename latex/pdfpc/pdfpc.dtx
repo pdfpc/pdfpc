@@ -55,7 +55,7 @@
 %
 % Identify the package and force \LaTeXe:
 %    \begin{macrocode}
-\ProvidesPackage{pdfpc}[2019/12/03 v0.2 PDFPC]
+\ProvidesPackage{pdfpc}[2019/12/03 v0.2.1 PDFPC]
 \NeedsTeXFormat{LaTeX2e}
 %    \end{macrocode}
 %
@@ -89,14 +89,12 @@
     {\PackageWarningNoLine{pdfpc}{`duration' should be an integer}}%
 \fi
 %
-\ifx\PDFPC@duration\@empty
 \ifx\PDFPC@enduserslide\@empty
 \else
   \IfInteger{\PDFPC@enduserslide}{}
     {\PackageWarningNoLine{pdfpc}{`enduserslide' should be an integer}}%
 \fi
 %
-\ifx\PDFPC@duration\@empty
 \ifx\PDFPC@lastminutes\@empty
 \else
   \IfInteger{\PDFPC@lastminutes}{}
