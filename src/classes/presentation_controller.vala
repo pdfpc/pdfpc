@@ -1737,7 +1737,6 @@ namespace pdfpc {
                 this.pen_drawing.clear_storage();
                 this.clear_pen_drawing();
 
-                this.overview.set_n_slides(this.user_n_slides);
                 this.metadata.renderer.invalidate_cache();
                 this.reload_request();
                 this.controllables_update();

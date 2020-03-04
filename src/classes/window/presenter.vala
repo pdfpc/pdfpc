@@ -872,6 +872,7 @@ namespace pdfpc.Window {
             this.next_view.invalidate();
             this.strict_next_view.invalidate();
             this.strict_prev_view.invalidate();
+            this.overview.set_n_slides(this.controller.user_n_slides);
         }
 
         public void update() {
