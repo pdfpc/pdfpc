@@ -65,8 +65,8 @@ Installation
 Sample presentations
 ====================
 
-- `Simple demo <https://github.com/pdfpc/pdfpc/releases/download/v4.3.0/pdfpc-demo.pdf>`_
-- `Embedded movies <https://github.com/pdfpc/pdfpc/releases/download/v4.3.0/pdfpc-video-example.zip>`_
+- `Simple demo <https://github.com/pdfpc/pdfpc/releases/download/v4.4.0/pdfpc-demo.pdf>`_
+- `Embedded movies <https://github.com/pdfpc/pdfpc/releases/download/v4.4.0/pdfpc-video-example.zip>`_
 
 Usage
 =====
