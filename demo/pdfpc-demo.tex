@@ -283,6 +283,39 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Slide transitions}
+
+  \pdfpc supports almost all standard PDF page transitions, either between full
+  pages or inside overlays.
+
+  \singleitem{Obviously, transitions are enabled only in the presentation
+    window}
+
+  \only<1>{
+    \setbeamercolor{block body}{bg=red!40!blue!30}
+    \begin{block}{This slide will dissolve}
+      \vskip 4cm \hfill
+    \end{block}
+  }
+  \only<2>{
+    \setbeamercolor{block body}{bg=blue!40!green!30}
+    \begin{block}{This slide will be covered from above}
+      \vskip 4cm \hfill
+    \end{block}
+  }
+  \only<3>{
+    \setbeamercolor{block body}{bg=green!40!red!30}
+    \begin{block}{This slide will be pushed to the left}
+      \vskip 4cm \hfill
+    \end{block}
+  }
+
+  \transdissolve<2>
+  \transcover[direction=90]<3>
+\end{frame}
+
+\begin{frame}
+  \transpush[direction=180]
   \frametitle{\opt{.pdfpc} files}
   \begin{itemize}
     \item The additional information needed for the presentation (duration,
