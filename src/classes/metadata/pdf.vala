@@ -501,6 +501,9 @@ namespace pdfpc.Metadata {
                         case "EndTime":
                             this.end_time = entry.value;
                             break;
+                        case "LastMinutes":
+                            Options.last_minutes = int.parse(entry.value);
+                            break;
                         case "NotesPosition":
                             this.notes_position =
                                 NotesPosition.from_string(entry.value);
