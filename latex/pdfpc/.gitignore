@@ -1,3 +1,6 @@
 *.log
 *.sty
 *.tar.gz
+*.aux
+*.out
+*.pdf
