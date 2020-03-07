@@ -579,34 +579,12 @@ the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
 .PP
 A tiny LaTeX package is available for pdfpc at CTAN. It provides a convenient
 way to specify notes and to define certain meta properties of the presentation.
-This functionality is often sufficient to avoid using \fB.pdfpc\fR files, thus
-allowing for preparing fully self-contained presentation slides. The usage is:
+For a full documentation, please consult the pdfpc package documentation. You
+can open it with:
 
 .RS
-\\usepackage[options]{pdfpc}
+$ texdoc pdfpc
 .RE
-
-The possible options are \fBduration\fR, \fBstarttime\fR, \fBendtime\fR,
-\fBenduserslide\fR, \fBlastminutes\fR, and \fBoverridenote\fR. The first five
-correspond to the similarly named \fB.pdfpc\fR or command-line options (and
-accept arguments in the same formats).
-
-To add a note to a slide:
-
-.RS
-\\pdfpcnote{<Text of a note>}
-.RE
-
-The \fBpdfpc\fR package can be used standalone or together with beamer. In the
-later case, it may be desirable to continue using the \\note command. To this
-end, the \fBoverridenote\fR option should be provided. Please note though, that
-this will work only in simple cases.
-
-If you prefer using full-featured beamer notes rendered alongside the
-presentation (\\setbeameroption{show notes on second screen}), the \fBpdfpc\fR
-package will autodetect it, so using the \fB\-\-notes\fR command-line option is
-unnecessary. To override the autodetection, use the \fBnotesposition\fR option,
-accepting the same values (right/left/top/bottom/none).
 
 .SH BUGS
 
