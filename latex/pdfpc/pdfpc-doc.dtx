@@ -1,0 +1,140 @@
+%\iffalse
+%  Doc-Source file to use with LaTeX2e
+%
+%  This file is part of pdfpc.
+%  Copyright (C) 2020 Evgeny Stambulchik
+%
+%  This program is free software; you can redistribute it and/or modify
+%  it under the terms of the GNU General Public License as published by
+%  the Free Software Foundation; either version 3 of the License, or
+%  (at your option) any later version.
+%
+%  This program is distributed in the hope that it will be useful,
+%  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%  GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License along
+%  with this program; if not, write to the Free Software Foundation, Inc.,
+%  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+%  -------------------------------------------------------------------------------------------
+%
+%  Allow for defining some meta data and simple textual notes for use
+%  with the pdfpc presentation application <https://pdfpc.github.io>.
+%
+%  -------------------------------------------------------------------------------------------
+%
+%  Inspired by Carsten Brandt's <https://github.com/cebe/pdfpc-latex-notes>.
+%
+%  -------------------------------------------------------------------------------------------
+%
+%  Please report bugs and other problems as well as suggestions for improvements
+%  to the issue tracker at github <https://github.com/pdfpc/pdfpc/>
+%
+%  -------------------------------------------------------------------------------------------
+%\fi
+
+% !TeX spellcheck=en_US
+
+\documentclass[11pt]{ltxdoc}
+
+\usepackage{iftex}
+
+\usepackage[english]{babel}
+
+\usepackage{hyperref}
+
+\newcommand*{\sty}[1]{\textsf{#1}}
+\def\param#1{\textit{\rmfamily\mdseries\ensuremath{\langle}#1\ensuremath{\rangle}}}
+
+
+\title{The \sty{pdfpc} package \\ {\large\url{https://gitlab.com/pdfpc/pdfpc}}}
+\author{Evgeny Stambulchik}
+\date{2020/03/07 (v0.2.1)}
+
+\hypersetup{pdftitle={The pdfpc package}, pdfauthor={Evgeny Stambulchik}}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+This package provides a \cmd{\pdfpcnote} command for embedding notes in a way
+compatible to the \href{http://pdfpc.github.io/}{PDF Presenter Console
+(\texttt{pdfpc}), a GPLv2+ licensed multi-monitor PDF presentation viewer
+application available on GitHub}\footnote{\url{http://pdfpc.github.io/}}.
+\end{abstract}
+
+\clearpage
+\section*{Dependencies and other requirements}
+
+\sty{pdfpc} requires the use of \LaTeXe.
+
+It depends on the following packages:
+
+\begin{multicols}{4}\sffamily\centering
+kvoptions \\ xstring \\ pdfcomment \\ hyperxmp
+\end{multicols}
+
+\section*{License}
+
+\textcopyright\ 2020 Evgeny Stambulchik
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This work consists of the following files:
+
+\begin{itemize}
+    \item "pdfpc.dtx",
+    \item "pdfpc.ins" and
+    \item "pdfpc-doc.dtx"
+\end{itemize}
+
+\clearpage
+
+\part{The documentation}
+\section*{Loading \sty{pdfpc}}
+
+Load \sty{pdfpc} by adding \cmd{\usepackage{pdfpc}} to your preamble.
+
+The following \param{options} may be given as comma-separated list:
+
+\begin{itemize}
+\item \texttt{duration}
+\item \texttt{starttime}
+\item \texttt{endtime}
+\item \texttt{enduserslide}
+\item \texttt{lastminutes}
+\item \texttt{overridenote}
+\end{itemize}
+
+The meaning and possible values are documented in \textit{pdfpcrc(5)} man page
+of the pdfpc program.
+
+To add a note to a slide:
+
+{\leftskip2.5em%
+\cmd{\pdfpcnote\{Text of a note\}}
+}\par
+
+The pdfpc package can be used standalone or together with beamer. In
+the later case, it may be desirable to continue using the \cmd{\note}
+command. To this end, the overridenote option should be provided.
+Please note though, that this will work only in simple cases.
+
+If you prefer using full-featured beamer notes rendered alongside the
+presentation (\cmd{\setbeameroption\{show notes on second screen\}}), the pdfpc
+package will autodetect it, so using the --notes command-line option is
+unnecessary. To override the autodetection, use the notesposition option,
+accepting the same values (right/left/top/bottom/none).
+
+\StopEventually{%
+    \clearpage
+    \PrintChanges}
+\clearpage
+
+\Finale
+\end{document}

@@ -1,5 +1,6 @@
 \pkg{pdfpc}
 \version{0.2.1}
+\update{true}
 \author{Evgeny Stambulchik}
 \email{andreas@bilke.org}
 \uploader{Andreas Bilke}
