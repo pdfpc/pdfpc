@@ -622,6 +622,9 @@ namespace pdfpc.Metadata {
                             this.notes_position =
                                 NotesPosition.from_string(entry.value);
                             break;
+                        case "DefaultTransition":
+                            this.set_default_transition_from_string(entry.value);
+                            break;
                         default:
                             GLib.printerr("unknown XMP entry %s\n", entry.key);
                             break;
@@ -636,12 +639,12 @@ namespace pdfpc.Metadata {
          * Base constructor taking the file url to the pdf file
          */
         public Pdf(string? pdfFilename) {
+            this.default_transition = new Poppler.PageTransition();
+            this.default_transition.duration_real = 1.0;
             if (pdfFilename != null) {
                 this.load(pdfFilename);
             }
             this.renderer = new Renderer.Pdf(this);
-            this.default_transition = new Poppler.PageTransition();
-            this.default_transition.duration_real = 1.0;
         }
 
         /**
