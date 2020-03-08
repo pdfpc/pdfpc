@@ -12,4 +12,4 @@ build-src:
 	cd $(FILE); latex $(FILE).ins
 
 build: build-src build-doc
-	cd $(FILE); ctanify $(FILE).ins $(FILE).pdf README.md
+	cd $(FILE); ctanify --no-tds $(FILE).ins $(FILE)-doc.dtx $(FILE).pdf README.md
