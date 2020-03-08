@@ -143,6 +143,13 @@ namespace pdfpc.Metadata {
         private string? notes_include = null;
 
         /**
+         * Default page transition
+         */
+        public Poppler.PageTransition default_transition {
+            get; protected set;
+        }
+
+        /**
          * Parse the given pdfpc file
          */
         void parse_pdfpc_file(out string? skip_line) {
@@ -295,6 +302,113 @@ namespace pdfpc.Metadata {
                     this.pdfpc_fname = fname + ".pdfpc";
                 }
             }
+        }
+
+        public void set_default_transition_from_string(string line) {
+            var trans = this.default_transition;
+
+            string[] tokens = line.split(":");
+
+            var trans_type = tokens[0];
+            switch (trans_type) {
+            case "blinds":
+                trans.type = Poppler.PageTransitionType.BLINDS;
+                break;
+            case "box":
+                trans.type = Poppler.PageTransitionType.BOX;
+                break;
+            case "cover":
+                trans.type = Poppler.PageTransitionType.COVER;
+                break;
+            case "dissolve":
+                trans.type = Poppler.PageTransitionType.DISSOLVE;
+                break;
+            case "fade":
+                trans.type = Poppler.PageTransitionType.FADE;
+                break;
+            case "fly":
+                trans.type = Poppler.PageTransitionType.FLY;
+                break;
+            case "glitter":
+                trans.type = Poppler.PageTransitionType.GLITTER;
+                break;
+            case "push":
+                trans.type = Poppler.PageTransitionType.PUSH;
+                break;
+            case "replace":
+                trans.type = Poppler.PageTransitionType.REPLACE;
+                break;
+            case "split":
+                trans.type = Poppler.PageTransitionType.SPLIT;
+                break;
+            case "uncover":
+                trans.type = Poppler.PageTransitionType.UNCOVER;
+                break;
+            case "wipe":
+                trans.type = Poppler.PageTransitionType.WIPE;
+                break;
+            default:
+                GLib.printerr("Unknown trans type %s\n", trans_type);
+                return;
+            }
+
+            if (tokens.length > 1) {
+                var trans_duration = double.parse(tokens[1]);
+                if (trans_duration > 0) {
+                    trans.duration_real = trans_duration;
+                } else {
+                    GLib.printerr("Transition duration must be positive\n");
+                    return;
+                }
+            }
+
+            if (tokens.length > 2) {
+                trans.angle = int.parse(tokens[2]);
+            }
+
+            if (tokens.length > 3) {
+                var alignment = tokens[3];
+                switch (alignment) {
+                case "h":
+                case "horizontal":
+                    trans.alignment =
+                        Poppler.PageTransitionAlignment.HORIZONTAL;
+                    break;
+                case "v":
+                case "vertical":
+                    trans.alignment =
+                        Poppler.PageTransitionAlignment.VERTICAL;
+                    break;
+                case "":
+                    break;
+                default:
+                    GLib.printerr("Invalid transition alignment %s\n",
+                        alignment);
+                    return;
+                }
+            }
+
+            if (tokens.length > 4) {
+                var direction = tokens[4];
+                switch (direction) {
+                case "i":
+                case "inward":
+                    trans.direction = Poppler.PageTransitionDirection.INWARD;
+                    break;
+                case "o":
+                case "outward":
+                    trans.direction = Poppler.PageTransitionDirection.OUTWARD;
+                    break;
+                case "":
+                    break;
+                default:
+                    GLib.printerr("Invalid transition direction %s\n",
+                        direction);
+                    return;
+                }
+            }
+
+            this.default_transition = trans;
         }
 
         /**
@@ -526,6 +640,8 @@ namespace pdfpc.Metadata {
                 this.load(pdfFilename);
             }
             this.renderer = new Renderer.Pdf(this);
+            this.default_transition = new Poppler.PageTransition();
+            this.default_transition.duration_real = 1.0;
         }
 
         /**

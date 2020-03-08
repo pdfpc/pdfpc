@@ -278,6 +278,11 @@ namespace pdfpc {
         public static uint transition_fps = 25;
 
         /**
+         * Default page transition
+         */
+        public static string? default_transition = null;
+
+        /**
          * Show the final slide of each overlay in "next slide" view
          * instead of the next slide.
          */

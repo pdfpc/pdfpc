@@ -78,6 +78,9 @@ namespace pdfpc {
             {"page", 'P', 0, OptionArg.INT,
                 ref Options.page,
                 "Go to page number N directly after startup", "N"},
+            {"page-transition", 'r', 0, OptionArg.STRING,
+                ref Options.default_transition,
+                "Set default page transition", "TYPE"},
             {"pdfpc-location", 'R', 0, OptionArg.STRING,
                 ref Options.pdfpc_location,
                 "Full path location to a pdfpc file", "PATH"},
@@ -442,6 +445,10 @@ namespace pdfpc {
                 GLib.printerr("Argument --page/-P must be between 1 and %d\n",
                     metadata.get_end_user_slide());
                 Process.exit(1);
+            }
+
+            if (Options.default_transition != null) {
+                metadata.set_default_transition_from_string(Options.default_transition);
             }
 
             // Handle monitor added/removed events.
