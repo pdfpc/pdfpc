@@ -70,6 +70,14 @@ developers.
 .BI "\-P, \-\-page"
 Go to a specific page directly after startup. In case of overlays, the first slide will be displayed.
 .TP
+.BI "\-r, \-\-page\-transition"=TRANSITION
+Set default page transition. The TRANSITION specification is of the form
+type:duration:angle:alignment:direction. See the \fBPage transitions\fR section
+for the list of supported types. \fBduration\fR is in seconds. The three last
+settings are optional (and indeed meaningless for some of the transition types).
+The accepted values for \fBangle\fR are 0/90/180/270; \fBalignment\fR can be
+h[orizontal] of v[ertical] and \fBdirection\fR i[nward] or o[utward].
+.TP
 .BI "\-R, \-\-pdfpc\-location"=LOCATION
 Use custom pdfpc file.
 .TP
