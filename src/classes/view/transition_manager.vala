@@ -62,7 +62,7 @@ namespace pdfpc {
          * Initialization. At this time, the next slide is not ready.
          */
         public void init(Metadata.Pdf metadata, int slide_number,
-            Cairo.ImageSurface? prev) {
+            Cairo.ImageSurface? prev, bool inverse) {
 
             this.iframe = 0;
             this.prev = prev;
@@ -104,6 +104,31 @@ namespace pdfpc {
                 default:
                     this.transition = trans;
                     break;
+                }
+
+                // For inverse transitions, "fix" the properties and/or type
+                if (inverse && this.transition != null) {
+                    switch (this.transition.type) {
+                    case Poppler.PageTransitionType.COVER:
+                        this.transition.type = Poppler.PageTransitionType.UNCOVER;
+                        break;
+                    case Poppler.PageTransitionType.UNCOVER:
+                        this.transition.type = Poppler.PageTransitionType.COVER;
+                        break;
+                    }
+
+                    this.transition.angle = (180 + this.transition.angle)%360;
+
+                    switch (this.transition.direction) {
+                    case Poppler.PageTransitionDirection.INWARD:
+                        this.transition.direction =
+                            Poppler.PageTransitionDirection.OUTWARD;
+                        break;
+                    case Poppler.PageTransitionDirection.OUTWARD:
+                        this.transition.direction =
+                            Poppler.PageTransitionDirection.INWARD;
+                        break;
+                    }
                 }
             }
 
