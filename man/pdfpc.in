@@ -429,7 +429,8 @@ have a better overview of how many slides are left.
 Pdfpc supports almost all standard animated PDF page transitions: blinds, box,
 cover, dissolve, fade, glitter (except the diagonal one), push, split, uncover,
 and wipe, including various alignments, angles, and directions (where
-applicable).
+applicable). The transitions are enabled only for sequential (either forward or
+backward) movement; in the later case, the transition is "inverted".
 
 .SS Movies
 .PP

@@ -289,6 +289,21 @@ namespace pdfpc {
             }
 
             if (this.current_slide_number != slide_number || force) {
+                bool trans_inverse = false;
+                bool sequential_move = false;
+                if (slide_number == this.current_slide_number + 1) {
+                    sequential_move = true;
+                } else if (slide_number + 1 == this.current_slide_number) {
+                    sequential_move = true;
+                    trans_inverse = true;
+                }
+                int trans_slide_number;
+                if (trans_inverse) {
+                    trans_slide_number = this.current_slide_number;
+                } else {
+                    trans_slide_number = slide_number;
+                }
+
                 var previous_slide = this.current_slide;
 
                 // Notify all listeners
@@ -305,9 +320,11 @@ namespace pdfpc {
                     this.transition_tid = 0;
                 }
 
-                if (!this.disabled && this.transitions_enabled) {
+                if (!this.disabled && this.transitions_enabled &&
+                    sequential_move) {
                     var metadata = this.get_metadata();
-                    this.transman.init(metadata, slide_number, previous_slide);
+                    this.transman.init(metadata,
+                        trans_slide_number, previous_slide, trans_inverse);
                 } else {
                     this.transman.disable();
                 }
