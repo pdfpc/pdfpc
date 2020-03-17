@@ -111,6 +111,9 @@ namespace pdfpc {
             {"size", 'Z', 0, OptionArg.STRING,
                 ref Options.size,
                 "Size of the presentation window (implies \"-w\")", "W:H"},
+            {"presenter-size", 'A', 0, OptionArg.STRING,
+                ref Options.presenter_size,
+                "Size of the presenter window (implies \"-w\")", "W:H"},
             {"presenter-screen", '1', 0, OptionArg.STRING,
                 ref Options.presenter_screen,
                 "Monitor to be used for the presenter", "M"},
@@ -286,6 +289,22 @@ namespace pdfpc {
                 Options.windowed = "both";
             }
 
+            int presenter_width = -1, presenter_height = -1;
+            if (Options.presenter_size != null) {
+                int colonIndex = Options.presenter_size.index_of(":");
+
+                presenter_width = int.parse(Options.presenter_size.substring(0, colonIndex));
+                presenter_height = int.parse(Options.presenter_size.substring(colonIndex + 1));
+
+                if (presenter_width < 1 || presenter_width < 1) {
+                    GLib.printerr("Failed to parse --presenter-size=%s\n", Options.presenter_size);
+                    Process.exit(1);
+
+                }
+
+                Options.windowed = "both";
+            }
+
             bool presenter_windowed = false;
             bool presentation_windowed = false;
             switch (Options.windowed) {
@@ -415,7 +434,8 @@ namespace pdfpc {
             if (!single_screen_mode || !Options.display_switch) {
                 this.controller.presenter =
                     new Window.Presenter(this.controller,
-                        presenter_monitor, presenter_windowed);
+                        presenter_monitor, presenter_windowed,
+                        presenter_width, presenter_height);
 
             }
             if (!single_screen_mode || Options.display_switch) {

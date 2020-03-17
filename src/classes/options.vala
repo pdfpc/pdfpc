@@ -228,9 +228,14 @@ namespace pdfpc {
         public static string? presenter_screen = null;
 
         /**
-         * Size of the presenter window
+         * Size of the presentation window
          */
         public static string? size = null;
+
+        /**
+         * Size of the presenter window
+         */
+        public static string? presenter_size = null;
 
         /**
          * Pointer color
