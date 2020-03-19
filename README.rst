@@ -42,11 +42,11 @@ Installation
 
 - On macOS with MacPorts::
 
-    # Nice macOS integration, but no video support currently
-    sudo port -v install pdfpc +quartz
+    # Nice macOS integration, including video support
+    sudo port -v install pdfpc +quartz +video
 
-    # Video support, but window placing might not work well
-    sudo port -v install pdfpc +x11
+    # Less well integrated due to using X11 server, video supported
+    sudo port -v install pdfpc +x11 +video
 
 - On Windows 10 (with *Windows Subsystem for Linux (WSL)*)::
 
@@ -109,6 +109,20 @@ On macOS with Homebrew, the easiest way is to install all dependencies of the
 pdfpc package without pdfpc itself::
 
     brew install --only-dependencies pdfpc
+
+On macOS with MacPorts, you can install all dependencies using the `port` command::
+
+    # list dependencies for the +quartz +video variant
+    # (good macOS integration)
+    port deps pdfpc +quartz +video
+    # install dependencies
+    sudo port -v install cmake vala pkgconfig gtk3 +quartz poppler libgee librsvg gstreamer1-gst-plugins-good +gtk3
+
+    # list dependencies for the +x11 +video variant
+    # (using X11 server)
+    port deps pdfpc +x11 +video
+    # install dependencies
+    sudo port -v install cmake vala pkgconfig gtk3 +x11 poppler libgee librsvg gstreamer1-gst-plugins-good +gtk3 +x11
 
 On Windows, a Cygwin installation with the following dependencies is needed:
 
