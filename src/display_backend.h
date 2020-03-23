@@ -27,5 +27,6 @@
 
 bool is_Wayland_backend();
 bool is_X11_backend();
+bool is_Quartz_backend();
 
 #endif

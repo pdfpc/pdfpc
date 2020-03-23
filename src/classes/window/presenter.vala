@@ -789,7 +789,7 @@ namespace pdfpc.Window {
                 int width = icon_height;
                 int height = icon_height;
 
-                if (!Pdfpc.is_Wayland_backend()) {
+                if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
                     width *= this.gdk_scale;
                     height *= this.gdk_scale;
                 }
