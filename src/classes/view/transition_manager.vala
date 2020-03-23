@@ -79,9 +79,10 @@ namespace pdfpc {
                 var page = metadata.get_document().get_page(slide_number);
 
                 var trans = page.get_transition();
-                // If it is the simple replace transition, assume the
+                // If undefined or is the simple replace transition, assume the
                 // user-defined one
-                if (trans.type == Poppler.PageTransitionType.REPLACE) {
+                if (trans == null ||
+                    trans.type == Poppler.PageTransitionType.REPLACE) {
                     trans = metadata.default_transition;
                 }
 
