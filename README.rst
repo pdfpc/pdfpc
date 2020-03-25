@@ -31,6 +31,10 @@ Installation
 
     sudo pacman -S pdfpc
 
+- On Gentoo::
+
+    sudo emerge --ask pdfpc
+
 - On FreeBSD::
 
     It is available under graphics/pdfpc. A pre-built binary is also available.
