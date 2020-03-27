@@ -182,7 +182,7 @@ namespace pdfpc.Window {
             var monitor_geometry = this.monitor.get_geometry();
             this.window_w = monitor_geometry.width;
             this.window_h = monitor_geometry.height;
-            if ((Pdfpc.is_Wayland_backend() || Pdfpc.is_Quartz_backend()) && Options.wayland_workaround) {
+            if (Pdfpc.is_Wayland_backend() && Options.wayland_workaround) {
                 // See issue 214. Wayland is doing some double scaling therefore
                 // we are lying about the actual screen size
                 this.window_w /= this.gdk_scale;
