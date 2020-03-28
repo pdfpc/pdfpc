@@ -31,6 +31,9 @@
 #ifdef GDK_WINDOWING_WAYLAND
 #include <gdk/gdkwayland.h>
 #endif
+#ifdef GDK_WINDOWING_QUARTZ
+#include <gdk/gdkquartz.h>
+#endif
 
 bool is_Wayland_backend() {
     GdkDisplay *gdk_display = gdk_display_get_default();
@@ -54,3 +57,13 @@ bool is_X11_backend() {
     return false;
 }
 
+bool is_Quartz_backend() {
+    GdkDisplay *gdk_display = gdk_display_get_default();
+    #ifdef GDK_WINDOWING_QUARTZ
+    if (GDK_IS_QUARTZ_DISPLAY(gdk_display)) {
+        return true;
+    }
+    #endif
+
+    return false;
+}
