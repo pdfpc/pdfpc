@@ -16,6 +16,11 @@ entry, iconview, textview *, window {
     color: white;
 }
 
+textview * selection {
+  background-color: white;
+  color: black;
+}
+
 entry {
     background-image: none;
 }
