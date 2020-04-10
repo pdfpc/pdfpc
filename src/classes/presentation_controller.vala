@@ -510,7 +510,7 @@ namespace pdfpc {
         }
 
         protected void update_pen_drawing() {
-            pen_drawing.switch_to_slide(this.current_slide_number);
+            pen_drawing.switch_to_slide(this.current_user_slide_number);
             this.queue_pen_surface_draws();
         }
 
