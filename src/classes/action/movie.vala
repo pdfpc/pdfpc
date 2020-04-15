@@ -698,7 +698,7 @@ namespace pdfpc {
                 bin.add_many(queue, sink);
                 tee.link(queue);
                 if ((conf.window.is_presenter && !notes_mode) ||
-                    (!conf.window.is_presenter && notes_mode)) {
+                    !conf.window.is_presenter) {
                     Gst.Element ad_element = this.add_video_control(queue, bin,
                         conf.rect);
                     ad_element.link(sink);
