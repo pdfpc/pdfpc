@@ -303,7 +303,7 @@ The timer is started if you are navigating away from the first page for the
 first time.  This feature is quite useful as you may want to show the title page
 of your presentation while people are still entering the room and the
 presentation has not really begun yet.  If you want to start over you can
-use the \[aq]r\[aq] key which will make the presenter reset the timer.
+use the \[aq]Ctrl + t\[aq] key which will make the presenter reset the timer.
 .PP
 
 If a duration is given, the timer also provides hints aiding the presenter to
