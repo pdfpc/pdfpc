@@ -182,7 +182,7 @@ namespace pdfpc {
                     this.register_controllable(value);
 
                     this.init_pen_and_pointer();
-                    this.register_mouse_handlers();
+                    this.register_mouse_handlers(this.presenter.main_view);
                 }
             }
         }
@@ -201,6 +201,7 @@ namespace pdfpc {
                 _presentation = value;
                 if (value != null) {
                     this.register_controllable(value);
+                    this.register_mouse_handlers(this.presentation.main_view);
                 }
             }
         }
@@ -715,14 +716,10 @@ namespace pdfpc {
         /**
          * Convert device coordinates to normalized ones
          */
-        private void device_to_normalized(double dev_x, double dev_y,
-            out double x, out double y) {
-            var view = this.presenter.main_view;
-            Gtk.Allocation a;
-            view.get_allocation(out a);
-
-            x = dev_x/a.width;
-            y = dev_y/a.height;
+        private void device_to_normalized(Gdk.Window window, double dev_x, double dev_y,
+                                          out double x, out double y) {
+            x = dev_x/window.get_width();
+            y = dev_y/window.get_height();
         }
 
         private void queue_pointer_surface_draws() {
@@ -734,8 +731,7 @@ namespace pdfpc {
             }
         }
 
-        protected void register_mouse_handlers() {
-            var view = presenter.main_view;
+        protected void register_mouse_handlers(View.Pdf view) {
             view.set_events(
                   Gdk.EventMask.BUTTON_PRESS_MASK
                 | Gdk.EventMask.BUTTON_RELEASE_MASK
@@ -779,14 +775,14 @@ namespace pdfpc {
 
         private bool on_button_press(Gdk.EventButton event) {
             if (this.annotation_mode == AnnotationMode.POINTER) {
-                this.device_to_normalized(event.x, event.y,
+                this.device_to_normalized(event.window, event.x, event.y,
                     out drag_x, out drag_y);
                 this.highlight.width = 0;
                 this.highlight.height = 0;
                 return true;
             } else if (this.in_drawing_mode()) {
                 double x, y;
-                this.device_to_normalized(event.x, event.y, out x, out y);
+                this.device_to_normalized(event.window, event.x, event.y, out x, out y);
                 move_pen(x, y);
                 pen_is_pressed = true;
                 return true;
@@ -798,14 +794,14 @@ namespace pdfpc {
         private bool on_button_release(Gdk.EventButton event) {
             if (this.annotation_mode == AnnotationMode.POINTER) {
                 double x, y;
-                this.device_to_normalized(event.x, event.y, out x, out y);
+                this.device_to_normalized(event.window, event.x, event.y, out x, out y);
                 update_highlight(x, y);
                 drag_x = -1;
                 drag_y = -1;
                 return true;
             } else if (this.in_drawing_mode()) {
                 double x, y;
-                this.device_to_normalized(event.x, event.y, out x, out y);
+                this.device_to_normalized(event.window, event.x, event.y, out x, out y);
                 move_pen(x, y);
                 pen_is_pressed = false;
                 return true;
@@ -835,7 +831,7 @@ namespace pdfpc {
             }
 
             double x, y;
-            this.device_to_normalized(event.x, event.y, out x, out y);
+            this.device_to_normalized(event.window, event.x, event.y, out x, out y);
             move_pen(x, y);
 
             return true;
@@ -856,7 +852,7 @@ namespace pdfpc {
         }
 
         private bool on_move_pointer(Gdk.EventMotion event) {
-            this.device_to_normalized(event.x, event.y,
+            this.device_to_normalized(event.window, event.x, event.y,
                 out pointer_x, out pointer_y);
 
             // restart the pointer timeout timer
