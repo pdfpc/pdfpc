@@ -966,6 +966,7 @@ namespace pdfpc.Window {
             int current_user_slide_number =
                 this.controller.current_user_slide_number;
             this.custom_slide_count(current_user_slide_number + 1);
+            this.timer.on_slide_change();
         }
 
         public void custom_slide_count(int current) {

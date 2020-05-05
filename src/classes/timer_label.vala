@@ -191,6 +191,17 @@ namespace pdfpc {
         }
 
         /**
+         * When the user changes slides
+         */
+        public virtual bool on_slide_change() {
+            if (this.time > 0) {
+                update_time();
+                this.format_time();
+            }
+            return true;
+        }
+
+        /**
          * Shows the corresponding time
          */
         protected abstract void format_time();
@@ -283,6 +294,15 @@ namespace pdfpc {
                             context.remove_class("too-fast");
                             context.remove_class("too-slow");
                         }
+
+                        // How long do we have in this slide
+                        double per_slide = (double)duration/slide_count;
+                        int expected_slide_time = (int) per_slide * (current_slide_number+1);
+                        int delta = expected_slide_time - this.time;
+                        int delta_abs = delta < 0 ? -1 * delta : delta;
+                        int minutes = delta_abs / 60;
+                        int seconds = delta_abs % 60;
+                        prefix = "[%s%.2u:%.2u] ".printf(delta < 0 ? "-" : "", minutes, seconds);
                     } else {
                         // Old "last-minutes" warning
                         if (timeInSecs < this.last_minutes * 60)
