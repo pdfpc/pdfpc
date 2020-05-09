@@ -343,8 +343,7 @@ namespace pdfpc.Window {
                 context.set_source_surface(drawing_surface, 0, 0);
                 context.paint();
                 context.set_matrix(old_xform);
-                if (this.is_presenter && c.in_drawing_mode() &&
-                    !c.pointer_hidden) {
+                if (this.is_presenter && c.in_drawing_mode()) {
                     double width_adjustment = (double) a.width / base_width;
                     context.set_operator(Cairo.Operator.OVER);
                     context.set_line_width(2.0);
