@@ -20,6 +20,10 @@ pdfpc uses the "gtksink" ``gstreamer`` plugin. On modern Debian-based systems,
 it is part of the ``gstreamer1.0-gtk3`` package; install it with::
 
     sudo apt-get install gstreamer1.0-gtk3
+    
+On Arch linux, install it with:
+ 
+    sudo pacman -S gst-plugin-gtk
 
 Try loading the video file you want to play with the following command:
 ``gst-play-1.0 --videosink gtksink <your video>``.
