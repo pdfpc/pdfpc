@@ -624,7 +624,7 @@ namespace pdfpc.Window {
             full_layout.attach(bottom_row, 0, this.bottom_frac_inv - 1, 1, 1);
 
             Gtk.Overlay full_overlay = new Gtk.Overlay();
-            full_overlay.add_overlay(full_layout);
+            full_overlay.add(full_layout);
 
             // maybe should be calculated based on screen dimensions?
             this.toolbox_icon_height = 36;
@@ -665,8 +665,6 @@ namespace pdfpc.Window {
             toolbox.halign = Gtk.Align.START;
             toolbox.valign = Gtk.Align.START;
 
-            toolbox.set_child_visible(Options.toolbox_shown);
-
             /* Toolbox handle consisting of an image + eventbox */
             var himage = this.load_icon("move.svg", 30);
             himage.show();
@@ -694,7 +692,7 @@ namespace pdfpc.Window {
             button_panel.set_homogeneous(true);
 
             if (Options.toolbox_minimized) {
-                button_panel.set_child_visible(false);
+                button_panel.hide();
             }
             if (tbox_inverse) {
                 this.toolbox.pack_end(button_panel);
@@ -703,8 +701,12 @@ namespace pdfpc.Window {
             }
 
             tb.clicked.connect(() => {
-                    var state = button_panel.get_child_visible();
-                    button_panel.set_child_visible(!state);
+                    var state = button_panel.visible;
+                    if (state) {
+                        button_panel.hide();
+                    } else {
+                        button_panel.show();
+                    }
                 });
 
             tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg");
@@ -742,13 +744,13 @@ namespace pdfpc.Window {
 
             scale_button = add_toolbox_sbutton(button_panel, tbox_inverse,
                 "linewidth.svg");
-            scale_button.set_child_visible(false);
+            scale_button.hide();
             scale_button.value_changed.connect((val) => {
                 this.controller.set_pen_size(val);
             });
 
             color_button = add_toolbox_cbutton(button_panel, tbox_inverse);
-            color_button.set_child_visible(false);
+            color_button.hide();
             color_button.color_set.connect(() => {
                     var rgba = color_button.rgba;
                     this.controller.pen_drawing.pen.set_rgba(rgba);
@@ -756,6 +758,7 @@ namespace pdfpc.Window {
                 });
 
             this.toolbox_container = new Gtk.Fixed();
+
             this.toolbox_container.put(toolbox, tbox_x, tbox_y);
 
             full_overlay.add_overlay(this.toolbox_container);
@@ -850,17 +853,28 @@ namespace pdfpc.Window {
         }
 
         protected void update_toolbox() {
-            toolbox.set_child_visible(Options.toolbox_shown);
+            if (Options.toolbox_shown) {
+                toolbox_container.show();
+            } else {
+                toolbox_container.hide();
+            }
 
             var controller = this.controller;
 
             var rgba = controller.pen_drawing.pen.get_rgba();
             color_button.set_rgba(rgba);
-            color_button.set_child_visible(controller.is_pen_active());
+            if (controller.is_pen_active()) {
+                color_button.show();
+            } else {
+                color_button.hide();
+            }
 
             scale_button.set_value(controller.get_pen_size());
-            scale_button.set_child_visible(controller.is_pen_active() ||
-                controller.is_eraser_active());
+            if (controller.is_pen_active() || controller.is_eraser_active()) {
+                scale_button.show();
+            } else {
+                scale_button.hide();
+            }
         }
 
         /**
