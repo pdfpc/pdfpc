@@ -504,6 +504,11 @@ namespace pdfpc {
                     }
                 });
 
+            var im_module = Environment.get_variable("GTK_IM_MODULE");
+            if (im_module == "xim") {
+                GLib.printerr("Warning: XIM is known to cause problems\n");
+            }
+
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
             Gtk.main();
