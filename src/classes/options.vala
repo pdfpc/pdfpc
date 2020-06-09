@@ -129,6 +129,11 @@ namespace pdfpc {
         public static bool disable_scrolling = false;
 
         /**
+         * Config option to disable tooltips.
+         */
+        public static bool disable_tooltips = false;
+
+        /**
          * Commandline option to disable the auto detection of overlay slides
          */
         public static bool disable_auto_grouping = false;
