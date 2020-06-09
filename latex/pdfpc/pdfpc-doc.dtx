@@ -50,7 +50,7 @@
 
 \title{The \sty{pdfpc} package \\ {\large\url{https://github.com/pdfpc/pdfpc}}}
 \author{Evgeny Stambulchik}
-\date{2020/03/09 (v0.3.0)}
+\date{2020/06/10 (v0.4.0)}
 
 \hypersetup{pdftitle={The pdfpc package}, pdfauthor={Evgeny Stambulchik}}
 
@@ -99,7 +99,7 @@ This work consists of the following files:
 \part{The documentation}
 \section*{Loading \sty{pdfpc}}
 
-Load \sty{pdfpc} by adding \cmd{\usepackage{pdfpc}} to your preamble.
+Load \sty{pdfpc} by adding \cmd{\usepackage\{pdfpc\}} to your preamble.
 
 The following \param{options} may be given as comma-separated list:
 
@@ -109,12 +109,13 @@ The following \param{options} may be given as comma-separated list:
 \item \texttt{endtime}
 \item \texttt{enduserslide}
 \item \texttt{lastminutes}
+\item \texttt{hidenotes}
 \item \texttt{overridenote}
 \item \texttt{defaulttransition}
 \end{itemize}
 
-The meaning and possible values are documented in \textit{pdfpcrc(5)} man page
-of the pdfpc program.
+The meaning and possible values of most of these options are documented in
+\textit{pdfpcrc(5)} man page of the pdfpc program. The rest are explained below.
 
 To add a note to a slide (must not be longer than one paragraph):
 
@@ -124,14 +125,18 @@ To add a note to a slide (must not be longer than one paragraph):
 
 The pdfpc package can be used standalone or together with beamer. In
 the later case, it may be desirable to continue using the \cmd{\note}
-command. To this end, the overridenote option should be provided.
+command. To this end, the \texttt{overridenote} option should be provided.
 Please note though, that this will work only in simple cases.
 
 If you prefer using full-featured beamer notes rendered alongside the
 presentation (\cmd{\setbeameroption\{show notes on second screen\}}), the pdfpc
-package will autodetect it, so using the --notes command-line option is
-unnecessary. To override the autodetection, use the notesposition option,
-accepting the same values (right/left/top/bottom/none).
+package will autodetect it, so using the \texttt{--notes} command-line option is
+unnecessary. To override the autodetection, use the \texttt{notesposition}
+option, accepting the same values (right/left/top/bottom/none).
+
+When sharing slides, one may want to omit the (private) notes, by using the
+\texttt{hidenotes} option. Enabling it together with \texttt{overridenote} will
+disable the beamer notes as well.
 
 \StopEventually{%
     \clearpage

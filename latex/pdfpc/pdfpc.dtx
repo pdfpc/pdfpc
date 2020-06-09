@@ -55,7 +55,7 @@
 %
 % Identify the package and force \LaTeXe:
 %    \begin{macrocode}
-\ProvidesPackage{pdfpc}[2020/03/09 v0.3.0 PDFPC]
+\ProvidesPackage{pdfpc}[2020/06/10 v0.4.0 PDFPC]
 \NeedsTeXFormat{LaTeX2e}
 %    \end{macrocode}
 %
@@ -77,6 +77,7 @@
 \DeclareStringOption{endtime}
 \DeclareStringOption{enduserslide}
 \DeclareStringOption{lastminutes}
+\DeclareBoolOption{hidenotes}
 \DeclareBoolOption{overridenote}
 \DeclareStringOption{notesposition}
 \DeclareStringOption{defaulttransition}
@@ -173,7 +174,11 @@ ______</rdf:Description>^^J%
 
 % Note command
 %    \begin{macrocode}
-\newcommand{\pdfpcnote}[1]{\pdfmargincomment{#1}}
+\ifPDFPC@hidenotes%
+  \newcommand{\pdfpcnote}[1]{}
+\else%
+  \newcommand{\pdfpcnote}[1]{\pdfmargincomment{#1}}
+\fi%
 %    \end{macrocode}
 %
 \endinput
