@@ -103,7 +103,7 @@ it is supported by the hardware (bool, Default is false).
 Disable scrolling events on the presenter window (bool, Default is false).
 .TP
 .BI disable-tooltips
-Disable toolbox button tooltips (bool, Default is false).
+Disable tooltips for the toolbox (bool, Default is false).
 .TP
 .BI enable-auto-srt-load
 Try loading video subtitle files automatically. For each video media, pdfpc will
