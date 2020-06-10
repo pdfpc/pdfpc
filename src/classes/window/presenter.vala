@@ -215,11 +215,16 @@ namespace pdfpc.Window {
         }
 
         protected Gtk.Button add_toolbox_button(Gtk.Box panel,
-            bool tbox_inverse, string icon_fname) {
+            bool tbox_inverse, string icon_fname, string? tooltip = null) {
             var bimage = this.load_icon(icon_fname, toolbox_icon_height);
             bimage.show();
             var button = new Gtk.Button();
             button.add(bimage);
+            button.can_focus = false;
+            button.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
+            if (!Options.disable_tooltips) {
+                button.set_tooltip_text(tooltip);
+            }
             if (tbox_inverse) {
                 panel.pack_end(button);
             } else {
@@ -230,8 +235,13 @@ namespace pdfpc.Window {
         }
 
         protected Gtk.ColorButton add_toolbox_cbutton(Gtk.Box panel,
-            bool tbox_inverse) {
+            bool tbox_inverse, string? tooltip = null) {
             var button = new Gtk.ColorButton();
+            button.can_focus = false;
+            button.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
+            if (!Options.disable_tooltips) {
+                button.set_tooltip_text(tooltip);
+            }
             if (tbox_inverse) {
                 panel.pack_end(button);
             } else {
@@ -242,7 +252,7 @@ namespace pdfpc.Window {
         }
 
         protected Gtk.ScaleButton add_toolbox_sbutton(Gtk.Box panel,
-            bool tbox_inverse, string icon_fname) {
+            bool tbox_inverse, string icon_fname, string? tooltip = null) {
 
             var button = new Gtk.ScaleButton(Gtk.IconSize.DIALOG,
                 0, 50, 2, null);
@@ -253,6 +263,11 @@ namespace pdfpc.Window {
 
             button.set_relief(Gtk.ReliefStyle.NORMAL);
             button.get_adjustment().set_page_increment(4);
+
+            button.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
+            if (!Options.disable_tooltips) {
+                button.set_tooltip_text(tooltip);
+            }
 
             if (tbox_inverse) {
                 panel.pack_end(button);
@@ -684,7 +699,8 @@ namespace pdfpc.Window {
             }
 
             Gtk.Button tb;
-            tb = add_toolbox_button(this.toolbox, tbox_inverse, "settings.svg");
+            tb = add_toolbox_button(this.toolbox, tbox_inverse, "settings.svg",
+                "Toggle toolbox panel");
 
             /* Toolbox panel that contains the buttons */
             var button_panel = new Gtk.Box(toolbox_orientation, 0);
@@ -709,47 +725,56 @@ namespace pdfpc.Window {
                     }
                 });
 
-            tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg",
+                "Normal mode");
             tb.clicked.connect(() => {
                     this.controller.set_normal_mode();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg",
+                "Pointer mode");
             tb.clicked.connect(() => {
                     this.controller.set_pointer_mode();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg",
+                "Pen mode");
             tb.clicked.connect(() => {
                     this.controller.set_pen_mode();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg",
+                "Eraser mode");
             tb.clicked.connect(() => {
                     this.controller.set_eraser_mode();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg",
+                "Freeze presentation window");
             tb.clicked.connect(() => {
                     this.controller.toggle_freeze();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "blank.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "blank.svg",
+                "Black presentation window");
             tb.clicked.connect(() => {
                     this.controller.fade_to_black();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "hidden.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "hidden.svg",
+                "Hide presentation window");
             tb.clicked.connect(() => {
                     this.controller.hide_presentation();
                 });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg");
+            tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg",
+                "Pause/resume timer");
             tb.clicked.connect(() => {
                     this.controller.toggle_pause();
                 });
 
             scale_button = add_toolbox_sbutton(button_panel, tbox_inverse,
-                "linewidth.svg");
+                "linewidth.svg", "Drawing tool size");
             scale_button.hide();
             scale_button.value_changed.connect((val) => {
                 this.controller.set_pen_size(val);
             });
 
-            color_button = add_toolbox_cbutton(button_panel, tbox_inverse);
+            color_button = add_toolbox_cbutton(button_panel, tbox_inverse,
+                "Pen color");
             color_button.hide();
             color_button.color_set.connect(() => {
                     var rgba = color_button.rgba;
