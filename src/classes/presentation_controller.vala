@@ -124,9 +124,25 @@ namespace pdfpc {
         public bool in_zoom { get; protected set; default = false; }
 
         /**
-         * Stores the drawing status before zooming in
+         * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
+         */
+        public struct ScaledRectangle {
+            double x;
+            double y;
+            double width;
+            double height;
+        }
+
+        /**
+         * Highlighted area (in the pointer mode)
+         */
+        public ScaledRectangle highlight;
+
+        /**
+         * Stores the drawing & highlight states prior to zooming in
          */
         protected bool zoom_stack_drawing = false;
+        protected ScaledRectangle zoom_stack_highlight;
 
         /**
          * The number of slides in the presentation
@@ -681,18 +697,6 @@ namespace pdfpc {
          * Timer id to hide the pointer after a period of inactivity
          */
         protected uint pointer_timeout_id = 0;
-
-        /**
-         * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
-         */
-        public struct ScaledRectangle {
-            double x;
-            double y;
-            double width;
-            double height;
-        }
-
-        public ScaledRectangle highlight;
 
         public double drag_x = -1;
         public double drag_y = -1;
@@ -1848,7 +1852,11 @@ namespace pdfpc {
                     return;
                 }
 
-                this.zoom_request(highlight);
+                this.zoom_request(this.highlight);
+
+                /* keep the state to be altered by zoom */
+                this.zoom_stack_highlight = this.highlight;
+                this.zoom_stack_drawing   = this.pen_drawing_present;
 
                 // update the selection
                 if (this.highlight.width > this.highlight.height) {
@@ -1865,7 +1873,6 @@ namespace pdfpc {
 
                 // switch off the drawings
                 if (this.pen_drawing_present) {
-                    this.zoom_stack_drawing = true;
                     this.toggle_drawings();
                 }
 
@@ -1873,16 +1880,13 @@ namespace pdfpc {
             } else {
                 this.zoom_request(null);
 
-                // clear the highlighted area
-                this.highlight.width = 0;
-                this.highlight.height = 0;
-
                 this.in_zoom = false;
 
-                // restore the drawings
+                // restore the drawings and the highlighted area
                 if (this.zoom_stack_drawing) {
                     this.toggle_drawings();
                 }
+                this.highlight = this.zoom_stack_highlight;
             }
 
             this.queue_pointer_surface_draws();
