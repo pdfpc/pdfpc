@@ -450,6 +450,7 @@ namespace pdfpc.Window {
             this.controller.hide_overview_request.connect(this.hide_overview);
             this.controller.increase_font_size_request.connect(this.increase_font_size);
             this.controller.decrease_font_size_request.connect(this.decrease_font_size);
+            this.controller.zoom_request.connect(this.on_zoom);
 
             // TODO: update the page aspect ratio on document reload
             float page_ratio = (float)
@@ -1077,6 +1078,11 @@ namespace pdfpc.Window {
             } catch (Error e) {
                 GLib.printerr("Warning: failed to set CSS for notes.\n");
             }
+        }
+
+        private void on_zoom(PresentationController.ScaledRectangle? rect) {
+            this.main_view.display(this.controller.current_slide_number,
+                true, rect);
         }
 
         public void show_help_window(bool onoff) {

@@ -86,8 +86,9 @@ namespace pdfpc {
 
             // clear the highlighted selection when switching to a new page
             if (this.current_user_slide_number != old_user_slide_number) {
-                highlight_w = 0;
-                highlight_h = 0;
+                this.highlight.width = 0;
+                this.highlight.height = 0;
+                this.in_zoom = false;
             }
 
             this.controllables_update();
@@ -116,6 +117,16 @@ namespace pdfpc {
          * Stores if the view is frozen
          */
         public bool frozen { get; protected set; default = false; }
+
+        /**
+         * Zoomed-in mode enabled?
+         */
+        public bool in_zoom { get; protected set; default = false; }
+
+        /**
+         * Stores the drawing status before zooming in
+         */
+        protected bool zoom_stack_drawing = false;
 
         /**
          * The number of slides in the presentation
@@ -232,6 +243,11 @@ namespace pdfpc {
          * Signal: Decrease font sizes
          */
         public signal void decrease_font_size_request();
+
+        /**
+         * Signal: Zoom in/out
+         */
+        public signal void zoom_request(ScaledRectangle? rect);
 
         /**
          * Controllables which are registered with this presentation controller.
@@ -556,6 +572,10 @@ namespace pdfpc {
                 return;
             }
 
+            if (this.in_zoom) {
+                return;
+            }
+
             this.annotation_mode = mode;
 
             switch (mode) {
@@ -609,6 +629,10 @@ namespace pdfpc {
         }
 
         public void toggle_drawings() {
+            if (this.in_zoom) {
+                return;
+            }
+
             pen_drawing_present = !pen_drawing_present;
             if (!pen_drawing_present && in_drawing_mode()) {
                 this.set_mode(AnnotationMode.NORMAL);
@@ -661,10 +685,15 @@ namespace pdfpc {
         /**
          * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
          */
-        public double highlight_x;
-        public double highlight_y;
-        public double highlight_w;
-        public double highlight_h;
+        public struct ScaledRectangle {
+            double x;
+            double y;
+            double width;
+            double height;
+        }
+
+        public ScaledRectangle highlight;
+
         public double drag_x = -1;
         public double drag_y = -1;
         public double pointer_x;
@@ -739,8 +768,8 @@ namespace pdfpc {
             if (this.annotation_mode == AnnotationMode.POINTER) {
                 this.device_to_normalized(event.x, event.y,
                     out drag_x, out drag_y);
-                highlight_w = 0;
-                highlight_h = 0;
+                this.highlight.width = 0;
+                this.highlight.height = 0;
                 return true;
             } else if (this.in_drawing_mode()) {
                 double x, y;
@@ -829,10 +858,10 @@ namespace pdfpc {
 
         private void update_highlight(double x, double y) {
             if (drag_x!=-1) {
-                highlight_w=Math.fabs(drag_x-x);
-                highlight_h=Math.fabs(drag_y-y);
-                highlight_x=(drag_x<x?drag_x:x);
-                highlight_y=(drag_y<y?drag_y:y);
+                this.highlight.width=Math.fabs(drag_x-x);
+                this.highlight.height=Math.fabs(drag_y-y);
+                this.highlight.x=(drag_x<x?drag_x:x);
+                this.highlight.y=(drag_y<y?drag_y:y);
                 queue_pointer_surface_draws();
             }
         }
@@ -1008,6 +1037,9 @@ namespace pdfpc {
 
             add_action("toggleToolbox", this.toggle_toolbox,
                 "Toggle the toolbox");
+
+            add_action("zoom", this.zoom_highlighted,
+                "Zoom in the highlighted area");
 
             add_action("showHelp", this.show_help,
                 "Show a help screen");
@@ -1799,6 +1831,66 @@ namespace pdfpc {
             this.controllables_update();
         }
 
+        protected void zoom_highlighted() {
+            if (!this.in_zoom) {
+                this.toggle_zoom();
+            }
+        }
+
+        /**
+         * Zoom in the highlighted area
+         */
+        protected void toggle_zoom() {
+            if (!this.in_zoom) {
+                if (this.annotation_mode != AnnotationMode.POINTER ||
+                    this.highlight.width  <= 0.01 ||
+                    this.highlight.height <= 0.01) {
+                    return;
+                }
+
+                this.zoom_request(highlight);
+
+                // update the selection
+                if (this.highlight.width > this.highlight.height) {
+                    this.highlight.height /= this.highlight.width;
+                    this.highlight.width = 1;
+                    this.highlight.x = 0;
+                    this.highlight.y = (1 - this.highlight.height)/2;
+                } else {
+                    this.highlight.width /= this.highlight.height;
+                    this.highlight.height = 1;
+                    this.highlight.x = (1 - this.highlight.width)/2;
+                    this.highlight.y = 0;
+                }
+
+                // switch off the drawings
+                if (this.pen_drawing_present) {
+                    this.zoom_stack_drawing = true;
+                    this.toggle_drawings();
+                }
+
+                this.in_zoom = true;
+            } else {
+                this.zoom_request(null);
+
+                // clear the highlighted area
+                this.highlight.width = 0;
+                this.highlight.height = 0;
+
+                this.in_zoom = false;
+
+                // restore the drawings
+                if (this.zoom_stack_drawing) {
+                    this.toggle_drawings();
+                }
+            }
+
+            this.queue_pointer_surface_draws();
+        }
+
+        /**
+         * Show help
+         */
         public void show_help() {
             if (this.presenter != null) {
                 this.presenter.show_help_window(true);
@@ -1814,6 +1906,9 @@ namespace pdfpc {
             }
             if (this.timer.is_paused()) {
                 this.toggle_pause();
+            }
+            if (this.in_zoom) {
+                this.toggle_zoom();
             }
         }
 

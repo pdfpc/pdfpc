@@ -53,6 +53,7 @@ namespace pdfpc.Window {
 
             this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);
+            this.controller.zoom_request.connect(this.on_zoom);
 
             this.view = new View.Pdf.from_fullscreen(this,
                 Metadata.Area.CONTENT, true);
@@ -94,6 +95,11 @@ namespace pdfpc.Window {
 
             bool force = old_disabled != this.view.disabled;
             this.view.display(this.controller.current_slide_number, force);
+        }
+
+        private void on_zoom(PresentationController.ScaledRectangle? rect) {
+            this.main_view.display(this.controller.current_slide_number,
+                true, rect);
         }
     }
 }

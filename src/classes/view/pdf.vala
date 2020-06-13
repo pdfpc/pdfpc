@@ -123,6 +123,11 @@ namespace pdfpc {
         public bool transitions_enabled = false;
 
         /**
+         * Zoom area
+         */
+        protected PresentationController.ScaledRectangle? zoom_area = null;
+
+        /**
          * Launch pre-rendering
          */
         protected virtual bool prerender() {
@@ -281,9 +286,11 @@ namespace pdfpc {
         }
 
         /**
-         * Display a specific slide number
+         * Display a specific slide number, optionally zooming in a
+         * rectangular area
          */
-        public void display(int slide_number, bool force=false) {
+        public void display(int slide_number, bool force = false,
+            PresentationController.ScaledRectangle? rect = null) {
             if (this.n_slides == 0) {
                 return;
             }
@@ -313,6 +320,8 @@ namespace pdfpc {
                 this.current_slide = null;
 
                 this.current_slide_number = slide_number;
+
+                this.zoom_area = rect;
 
                 // Cancel any active transition timeout
                 if (this.transition_tid != 0) {
@@ -400,7 +409,8 @@ namespace pdfpc {
                     if (this.current_slide_number < this.n_slides && !this.disabled) {
                         this.current_slide =
                             this.renderer.render(this.current_slide_number,
-                                this.area, width, height);
+                                this.area, width, height,
+                                false, false, this.zoom_area);
 
                         if (Options.prerender_slides != 0) {
                             // cancel any pending pre-rendering

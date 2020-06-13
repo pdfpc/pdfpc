@@ -88,6 +88,8 @@ bind KP_Add             increaseSize
 bind minus              decreaseSize
 bind KP_Subtract        decreaseSize
 
+bind z                  zoom
+
 # Drawings
 bind c                  clearDrawing
 bind d                  toggleDrawings
