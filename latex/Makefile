@@ -6,10 +6,7 @@ validate: build
 	cd $(FILE); ctan-o-mat $(FILE).pkg
 
 build-doc:
-	cd $(FILE); pdflatex $(FILE)-doc.dtx; mv $(FILE)-doc.pdf $(FILE).pdf
+	cd $(FILE); pdflatex $(FILE)-doc.tex; pdflatex $(FILE)-doc.tex
 
-build-src:
-	cd $(FILE); latex $(FILE).ins
-
-build: build-src build-doc
-	cd $(FILE); ctanify --no-tds $(FILE).ins $(FILE)-doc.dtx $(FILE).pdf README.md
+build: build-doc
+	cd $(FILE); ctanify --no-tds $(FILE).sty $(FILE)-doc.tex $(FILE)-doc.pdf README.md

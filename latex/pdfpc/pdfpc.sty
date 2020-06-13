@@ -1,25 +1,3 @@
-%\iffalse
-%<*package>
-%% \CharacterTable
-%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
-%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
-%%   Digits        \0\1\2\3\4\5\6\7\8\9
-%%   Exclamation   \!     Double quote  \"     Hash (number) \#
-%%   Dollar        \$     Percent       \%     Ampersand     \&
-%%   Acute accent  \'     Left paren    \(     Right paren   \)
-%%   Asterisk      \*     Plus          \+     Comma         \,
-%%   Minus         \-     Point         \.     Solidus       \/
-%%   Colon         \:     Semicolon     \;     Less than     \<
-%%   Equals        \=     Greater than  \>     Question mark \?
-%%   Commercial at \@     Left bracket  \[     Backslash     \\
-%%   Right bracket \]     Circumflex    \^     Underscore    \_
-%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
-%%   Right brace   \}     Tilde         \~}
-%</package>
-%\fi
-%\iffalse
-%  Doc-Source file to use with LaTeX2e
-%
 %  This file is part of pdfpc.
 %  Copyright (C) 2020 Evgeny Stambulchik
 %
@@ -51,21 +29,15 @@
 %  to the issue tracker at github <https://github.com/pdfpc/pdfpc/>
 %
 %  -------------------------------------------------------------------------------------------
-%\fi
 %
-% Identify the package and force \LaTeXe:
-%    \begin{macrocode}
 \ProvidesPackage{pdfpc}[2020/06/10 v0.4.0 PDFPC]
 \NeedsTeXFormat{LaTeX2e}
-%    \end{macrocode}
 %
 % Require additional packages needed by \sty{pdfpc}:
-%    \begin{macrocode}
 \RequirePackage{kvoptions}
 \RequirePackage{xstring}
 \RequirePackage{pdfcomment}
 \RequirePackage{hyperxmp}
-%    \end{macrocode}
 %
 \SetupKeyvalOptions{
   family=PDFPC,
@@ -118,7 +90,6 @@
 \fi%
 %
 % Guesswork for beamer/pgfpages notes
-%    \begin{macrocode}
 \ifx\PDFPC@notesposition\pdfpc@notespositionauto%
   \def\PDFPC@notesposition{none}%
   \def\pdfpc@onepaperheight{\paperheight}%
@@ -146,10 +117,8 @@
     \fi%
   \fi%
 \fi%
-%    \end{macrocode}
 %
 % Our schema
-%    \begin{macrocode}
 \newcommand*{\pdfpc@schema}{%
   \hyxmp@add@to@xml{%
 ______<rdf:Description xmlns:pdfpc="https://github.com/pdfpc/pdfpc">^^J%
@@ -167,18 +136,14 @@ ______</rdf:Description>^^J%
 }
 %
 % Piggybacking on the hyperxmp schema...
-%    \begin{macrocode}
 \let\oldhyxmp@pdf@schema\hyxmp@pdf@schema
 \renewcommand{\hyxmp@pdf@schema}{{\oldhyxmp@pdf@schema}{\pdfpc@schema}}
-%    \end{macrocode}
-
+%
 % Note command
-%    \begin{macrocode}
 \ifPDFPC@hidenotes%
   \newcommand{\pdfpcnote}[1]{}
 \else%
   \newcommand{\pdfpcnote}[1]{\pdfmargincomment{#1}}
 \fi%
-%    \end{macrocode}
 %
 \endinput
