@@ -285,13 +285,13 @@ namespace pdfpc.Window {
 
             // Draw the highlighted area, but ignore very short drags
             // made unintentionally by mouse clicks
-            if (c.highlight_w > 0.01 && c.highlight_h > 0.01) {
+            if (c.highlight.width > 0.01 && c.highlight.height > 0.01) {
                 context.rectangle(0, 0, a.width, a.height);
                 context.new_sub_path();
-                context.rectangle((int)(c.highlight_x*a.width),
-                                  (int)(c.highlight_y*a.height),
-                                  (int)(c.highlight_w*a.width),
-                                  (int)(c.highlight_h*a.height));
+                context.rectangle((int)(c.highlight.x*a.width),
+                                  (int)(c.highlight.y*a.height),
+                                  (int)(c.highlight.width*a.width),
+                                  (int)(c.highlight.height*a.height));
 
                 context.set_fill_rule(Cairo.FillRule.EVEN_ODD);
                 context.set_source_rgba(0,0,0,0.5);

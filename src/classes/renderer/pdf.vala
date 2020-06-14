@@ -61,7 +61,8 @@ namespace pdfpc {
          */
         public Cairo.ImageSurface render(int slide_number,
             Metadata.Area area, int width, int height,
-            bool force_cache = false, bool permanent_cache = false)
+            bool force_cache = false, bool permanent_cache = false,
+            PresentationController.ScaledRectangle? zoom_area = null)
             throws Renderer.RenderError {
 
             var metadata = this.metadata;
@@ -72,13 +73,17 @@ namespace pdfpc {
                     "The requested slide '%i' does not exist.", slide_number);
             }
 
-            CachedPageProps props = new CachedPageProps(slide_number,
-                width, height);
+            CachedPageProps props = null;
 
-            // Check for the page in the cache
-            Cairo.ImageSurface cache_content;
-            if ((cache_content = this.cache.retrieve(props)) != null) {
-                return cache_content;
+            // We never cache a zoomed-in slide
+            if (zoom_area == null) {
+                props = new CachedPageProps(slide_number, width, height);
+
+                // Check for the page in the cache
+                Cairo.ImageSurface cache_content;
+                if ((cache_content = this.cache.retrieve(props)) != null) {
+                    return cache_content;
+                }
             }
 
             // Measure the time to render the page
@@ -103,7 +108,7 @@ namespace pdfpc {
             corrected_page_width = metadata.get_corrected_page_width(full_page_width);
             corrected_page_height = metadata.get_corrected_page_height(full_page_height);
 
-            double scaling_factor, v_offset, h_offset;
+            double scaling_factor, h_offset, v_offset;
             if (width/corrected_page_width < height/corrected_page_height) {
                 scaling_factor = width/corrected_page_width;
                 h_offset = 0;
@@ -113,10 +118,29 @@ namespace pdfpc {
                 h_offset = (width/scaling_factor - corrected_page_width)/2;
                 v_offset = 0;
             }
+
+            if (zoom_area != null) {
+                double zoom, h_zoom_offset, v_zoom_offset;
+                if (zoom_area.width > zoom_area.height) {
+                    zoom = 1/zoom_area.width;
+                    h_zoom_offset = 0;
+                    v_zoom_offset = (zoom_area.width - zoom_area.height)/2;
+                } else {
+                    zoom = 1/zoom_area.height;
+                    h_zoom_offset = (zoom_area.height - zoom_area.width)/2;
+                    v_zoom_offset = 0;
+                }
+                h_offset -= corrected_page_width*(zoom_area.x - h_zoom_offset);
+                v_offset -= corrected_page_height*(zoom_area.y - v_zoom_offset);
+
+                scaling_factor *= zoom;
+            }
+
             cr.scale(scaling_factor, scaling_factor);
 
             cr.translate(-metadata.get_horizontal_offset(area, full_page_width) + h_offset,
                 -metadata.get_vertical_offset(area, full_page_height) + v_offset);
+
             page.render(cr);
 
             timer.stop();
@@ -127,8 +151,10 @@ namespace pdfpc {
             }
 
             // If the cache is enabled store the newly rendered pixmap, but
-            // only if it has taken a significant time to render
-            if (force_cache || rtime > Options.cache_min_rtime/1000.0) {
+            // only if it has taken a significant time to render;
+            // but never cache a zoomed-in slide
+            if (zoom_area == null &&
+                (force_cache || rtime > Options.cache_min_rtime/1000.0)) {
                 // keep very "precious" slides permanently
                 if (rtime > Options.cache_max_rtime) {
                     permanent_cache = true;
