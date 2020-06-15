@@ -916,7 +916,7 @@ namespace pdfpc.Metadata {
         /**
          * Return the width of the first page of the loaded pdf document.
          *
-         * If slides contains also notes, this method returns the width of the content part only
+         * If slides also contain notes, return the width of the content part only
          *
          * In presentations all pages will have the same size in most cases,
          * therefore this value is assumed to be useful.
@@ -926,7 +926,7 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Fixes the page width if pdfpc uses notes in slit mode
+         * Fixes the page width if pdfpc uses notes in split mode
          */
          public double get_corrected_page_width(double page_width) {
             if (    this.notes_position == NotesPosition.LEFT
@@ -940,7 +940,7 @@ namespace pdfpc.Metadata {
         /**
          * Return the height of the first page of the loaded pdf document.
          *
-         * If slides contains also notes, this method returns the height of the content part only
+         * If slides also contain notes, return the height of the content part only
          *
          * In presentations all pages will have the same size in most cases,
          * therefore this value is assumed to be useful.
@@ -950,7 +950,7 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Fixes the page height if pdfpc uses notes in slit mode
+         * Fixes the page height if pdfpc uses notes in split mode
          */
          public double get_corrected_page_height(double page_height) {
             if (    this.notes_position == NotesPosition.TOP
@@ -964,56 +964,52 @@ namespace pdfpc.Metadata {
         /**
          * Return the horizontal offset of the given area on the page
          */
-        public double get_horizontal_offset(Area area, double page_width = 0) {
+        public double get_horizontal_offset(bool notes_area,
+            double page_width = 0) {
             if (page_width == 0) {
                 page_width = this.original_page_width;
             }
 
-            switch (area) {
-                case Area.CONTENT:
-                    switch (this.notes_position) {
-                        case NotesPosition.LEFT:
-                            return page_width / 2;
-                        default:
-                            return 0;
-                    }
-                case Area.NOTES:
-                    switch (this.notes_position) {
-                        case NotesPosition.RIGHT:
-                            return page_width / 2;
-                        default:
-                            return 0;
-                    }
-                default:
-                    return 0;
+            if (notes_area) {
+                switch (this.notes_position) {
+                    case NotesPosition.RIGHT:
+                        return page_width / 2;
+                    default:
+                        return 0;
+                }
+            } else {
+                switch (this.notes_position) {
+                    case NotesPosition.LEFT:
+                        return page_width / 2;
+                    default:
+                        return 0;
+                }
             }
         }
 
         /**
          * Return the vertical offset of the given area on the page
          */
-        public double get_vertical_offset(Area area, double page_height = 0) {
+        public double get_vertical_offset(bool notes_area,
+            double page_height = 0) {
             if (page_height == 0) {
                 page_height = this.original_page_height;
             }
 
-            switch (area) {
-                case Area.CONTENT:
-                    switch (this.notes_position) {
-                        case NotesPosition.TOP:
-                            return page_height / 2;
-                        default:
-                            return 0;
-                    }
-                case Area.NOTES:
-                    switch (this.notes_position) {
-                        case NotesPosition.BOTTOM:
-                            return page_height / 2;
-                        default:
-                            return 0;
-                    }
-                default:
-                    return 0;
+            if (notes_area) {
+                switch (this.notes_position) {
+                    case NotesPosition.BOTTOM:
+                        return page_height / 2;
+                    default:
+                        return 0;
+                }
+            } else {
+                switch (this.notes_position) {
+                    case NotesPosition.TOP:
+                        return page_height / 2;
+                    default:
+                        return 0;
+                }
             }
         }
 
@@ -1134,15 +1130,12 @@ namespace pdfpc.Metadata {
             }
             return this.action_mapping;
         }
-    }
 
-    /**
-     * Defines an area on a pdf page
-     */
-    public enum Area {
-        FULL,
-        CONTENT,
-        NOTES;
+        public bool has_beamer_notes {
+            get {
+                return (this.notes_position != NotesPosition.NONE);
+            }
+        }
     }
 
     /**

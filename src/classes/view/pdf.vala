@@ -101,9 +101,9 @@ namespace pdfpc {
         protected int gdk_scale = 1;
 
         /**
-         * The area of the pdf which shall be displayed
+         * Whether the PDF area to be displayed is (beamer) notes
          */
-        protected Metadata.Area area;
+        protected bool notes_area;
 
         /**
          * ID of timeout used to delay pre-rendering
@@ -178,7 +178,7 @@ namespace pdfpc {
                     // pixmap in the cache if it is enabled. This
                     // is exactly what we want.
                     try {
-                        this.renderer.render(*p_slide, this.area, width, height,
+                        this.renderer.render(*p_slide, this.notes_area, width, height,
                             true);
                     } catch(Renderer.RenderError e) {
                         GLib.printerr("Could pre-render page '%i': %s\n",
@@ -204,12 +204,12 @@ namespace pdfpc {
         /**
          * Default constructor restricted to Pdf renderers as input parameter
          */
-        protected Pdf(Renderer.Pdf renderer, Metadata.Area area,
+        protected Pdf(Renderer.Pdf renderer, bool notes_area,
             bool clickable_links, PresentationController controller,
             int gdk_scale_factor, bool user_slides) {
             this.renderer = renderer;
             this.gdk_scale = gdk_scale_factor;
-            this.area = area;
+            this.notes_area = notes_area;
             this.user_slides = user_slides;
 
             this.current_slide_number = -1;
@@ -229,13 +229,13 @@ namespace pdfpc {
          * metadata and rendering chain to be used with the pdf view.
          */
         public Pdf.from_fullscreen(Window.Fullscreen window,
-            Metadata.Area area, bool clickable_links, bool user_slides=false) {
+            bool notes_area, bool clickable_links, bool user_slides=false) {
             var controller = window.controller;
             var metadata = controller.metadata;
 
             var renderer = metadata.renderer;
 
-            this(renderer, area, clickable_links, controller, window.gdk_scale,
+            this(renderer, notes_area, clickable_links, controller, window.gdk_scale,
                 user_slides);
         }
 
@@ -409,7 +409,7 @@ namespace pdfpc {
                     if (this.current_slide_number < this.n_slides && !this.disabled) {
                         this.current_slide =
                             this.renderer.render(this.current_slide_number,
-                                this.area, width, height,
+                                this.notes_area, width, height,
                                 false, false, this.zoom_area);
 
                         if (Options.prerender_slides != 0) {

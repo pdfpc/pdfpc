@@ -48,7 +48,7 @@ namespace pdfpc.Window {
         /**
          * View showing the current slide
          */
-        public View.Pdf current_view;
+        protected View.Pdf current_view;
 
         /**
          * View showing a preview of the next slide
@@ -60,6 +60,14 @@ namespace pdfpc.Window {
          */
         protected View.Pdf strict_next_view;
         protected View.Pdf strict_prev_view;
+
+        /**
+         * A stack of text box (for editing) and rendered view of notes
+         * for the current slide
+         */
+        protected Gtk.Stack notes_stack;
+        protected Gtk.TextView notes_editor;
+        protected View.Pdf notes_view;
 
         /**
          * Timer for the presenation
@@ -115,11 +123,6 @@ namespace pdfpc.Window {
          * Indication that the notes are read-only (coming from PDF annotations)
          */
         protected Gtk.Image locked_icon;
-
-        /**
-         * Text box for displaying notes for the slides
-         */
-        protected Gtk.TextView notes_view;
 
         /**
          * CSS provider for setting note font size
@@ -479,28 +482,35 @@ namespace pdfpc.Window {
             int current_allocated_width = (int) Math.floor(
                 this.window_w*Options.current_size/100.0);
             this.current_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.NOTES, true);
+                false, true);
 
             this.next_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, false, true);
+                false, false, true);
 
             this.strict_next_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, false);
+                false, false);
             this.strict_prev_view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, false);
+                false, false);
 
             this.css_provider = new Gtk.CssProvider();
             Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
-                css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+                this.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
+            this.bottom_text_css_provider = new Gtk.CssProvider();
+            Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
+                this.bottom_text_css_provider,
+                Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
+
+            Gtk.AspectFrame frame;
 
             // TextView for notes in the slides
-            this.notes_view = new Gtk.TextView();
-            this.notes_view.name = "notesView";
-            this.notes_view.editable = false;
-            this.notes_view.cursor_visible = false;
-            this.notes_view.wrap_mode = Gtk.WrapMode.WORD;
-            this.notes_view.buffer.text = "";
-            this.notes_view.key_press_event.connect(this.on_key_press_notes_view);
+            this.notes_editor = new Gtk.TextView();
+            this.notes_editor.name = "notesView";
+            this.notes_editor.editable = false;
+            this.notes_editor.cursor_visible = false;
+            this.notes_editor.wrap_mode = Gtk.WrapMode.WORD;
+            this.notes_editor.buffer.text = "";
+            this.notes_editor.key_press_event.connect(this.on_key_press_notes_editor);
             if (this.metadata.font_size >= 0) {
                 // LEGACY font size detection
                 // Before, we had the font size in absolute (device) units.
@@ -510,11 +520,19 @@ namespace pdfpc.Window {
                 }
                 this.set_font_size(this.metadata.font_size);
             }
+            var notes_sw = new Gtk.ScrolledWindow(null, null);
+            notes_sw.add(this.notes_editor);
+            notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 
-            this.bottom_text_css_provider = new Gtk.CssProvider();
-            Gtk.StyleContext.add_provider_for_screen(this.screen_to_use,
-                this.bottom_text_css_provider,
-                Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
+            this.notes_view = new View.Pdf.from_fullscreen(this,
+                true, false);
+            frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
+            frame.add(this.notes_view);
+
+            this.notes_stack = new Gtk.Stack();
+            this.notes_stack.add_named(notes_sw, "editor");
+            this.notes_stack.add_named(frame, "view");
+            this.notes_stack.homogeneous = true;
 
             // The countdown timer is centered in the 90% bottom part of the screen
             this.timer = this.controller.getTimer();
@@ -550,8 +568,6 @@ namespace pdfpc.Window {
             this.overview.hexpand = true;
             this.overview.set_n_slides(this.controller.user_n_slides);
             this.controller.set_overview(this.overview);
-
-            Gtk.AspectFrame frame;
 
             var slide_views = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
             slide_views.position = current_allocated_width;
@@ -610,10 +626,7 @@ namespace pdfpc.Window {
             frame.add(next_view);
             next_view_and_notes.pack1(frame, true, true);
 
-            var notes_sw = new Gtk.ScrolledWindow(null, null);
-            notes_sw.add(this.notes_view);
-            notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-            next_view_and_notes.pack2(notes_sw, true, true);
+            next_view_and_notes.pack2(this.notes_stack, true, true);
             slide_views.pack2(next_view_and_notes, true, true);
 
             var help_sw = create_help_window();
@@ -912,11 +925,12 @@ namespace pdfpc.Window {
             this.next_view.invalidate();
             this.strict_next_view.invalidate();
             this.strict_prev_view.invalidate();
+            this.notes_view.invalidate();
             this.overview.set_n_slides(this.controller.user_n_slides);
         }
 
         public void update() {
-            if (!metadata.is_ready) {
+            if (!this.metadata.is_ready) {
                 return;
             }
             int current_slide_number = this.controller.current_slide_number;
@@ -944,6 +958,13 @@ namespace pdfpc.Window {
                 this.strict_prev_view.disabled = true;
             }
             this.strict_prev_view.display(current_slide_number - 1);
+
+            if (this.metadata.has_beamer_notes) {
+                this.notes_stack.set_visible_child_name("view");
+                this.notes_view.display(current_slide_number);
+            } else {
+                this.notes_stack.set_visible_child_name("editor");
+            }
 
             this.update_slide_count();
             this.update_note();
@@ -1012,7 +1033,7 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Edit a note. Basically give focus to notes_view
+         * Edit a note. Basically give focus to notes_editor
          */
         public void edit_note() {
             // Ignore events coming from the presentation view
@@ -1022,25 +1043,26 @@ namespace pdfpc.Window {
 
             // Disallow editing notes imported from PDF annotations
             int number = this.controller.current_user_slide_number;
-            if (this.metadata.get_notes().is_note_read_only(number)) {
+            if (this.metadata.get_notes().is_note_read_only(number) ||
+                this.metadata.has_beamer_notes) {
                 blink_lock_icon();
                 return;
             }
 
-            this.notes_view.editable = true;
-            this.notes_view.cursor_visible = true;
-            this.notes_view.grab_focus();
+            this.notes_editor.editable = true;
+            this.notes_editor.cursor_visible = true;
+            this.notes_editor.grab_focus();
             this.controller.set_ignore_input_events(true);
         }
 
         /**
          * Handle key presses when editing a note
          */
-        protected bool on_key_press_notes_view(Gtk.Widget source, Gdk.EventKey key) {
+        protected bool on_key_press_notes_editor(Gtk.Widget source, Gdk.EventKey key) {
             if (key.keyval == Gdk.Key.Escape) { /* Escape */
-                this.notes_view.editable = false;
-                this.notes_view.cursor_visible = false;
-                this.metadata.get_notes().set_note(this.notes_view.buffer.text,
+                this.notes_editor.editable = false;
+                this.notes_editor.cursor_visible = false;
+                this.metadata.get_notes().set_note(this.notes_editor.buffer.text,
                     this.controller.current_user_slide_number);
                 this.controller.set_ignore_input_events(false);
                 return true;
@@ -1055,7 +1077,7 @@ namespace pdfpc.Window {
         protected void update_note() {
             string this_note = this.metadata.get_notes().get_note_for_slide(
                 this.controller.current_user_slide_number);
-            this.notes_view.buffer.text = this_note;
+            this.notes_editor.buffer.text = this_note;
         }
 
         public void show_overview() {
@@ -1101,7 +1123,7 @@ namespace pdfpc.Window {
         }
 
         private int get_font_size() {
-            Gtk.StyleContext style_context = this.notes_view.get_style_context();
+            Gtk.StyleContext style_context = this.notes_editor.get_style_context();
             Pango.FontDescription font_desc;
             style_context.get(style_context.get_state(), "font", out font_desc, null);
 

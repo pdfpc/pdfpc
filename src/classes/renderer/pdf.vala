@@ -60,7 +60,7 @@ namespace pdfpc {
          * RenderError.SLIDE_DOES_NOT_EXIST error is thrown.
          */
         public Cairo.ImageSurface render(int slide_number,
-            Metadata.Area area, int width, int height,
+            bool notes_area, int width, int height,
             bool force_cache = false, bool permanent_cache = false,
             PresentationController.ScaledRectangle? zoom_area = null)
             throws Renderer.RenderError {
@@ -77,7 +77,8 @@ namespace pdfpc {
 
             // We never cache a zoomed-in slide
             if (zoom_area == null) {
-                props = new CachedPageProps(slide_number, width, height);
+                props = new CachedPageProps(slide_number,
+                    width, height, notes_area);
 
                 // Check for the page in the cache
                 Cairo.ImageSurface cache_content;
@@ -138,8 +139,8 @@ namespace pdfpc {
 
             cr.scale(scaling_factor, scaling_factor);
 
-            cr.translate(-metadata.get_horizontal_offset(area, full_page_width) + h_offset,
-                -metadata.get_vertical_offset(area, full_page_height) + v_offset);
+            cr.translate(-metadata.get_horizontal_offset(notes_area, full_page_width) + h_offset,
+                -metadata.get_vertical_offset(notes_area, full_page_height) + v_offset);
 
             page.render(cr);
 
