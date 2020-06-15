@@ -55,8 +55,7 @@ namespace pdfpc.Window {
             this.controller.update_request.connect(this.update);
             this.controller.zoom_request.connect(this.on_zoom);
 
-            this.view = new View.Pdf.from_fullscreen(this,
-                Metadata.Area.CONTENT, true);
+            this.view = new View.Pdf.from_fullscreen(this, false, true);
             this.view.transitions_enabled = true;
 
             this.overlay_layout.add(this.view);

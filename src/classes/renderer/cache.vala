@@ -170,11 +170,13 @@ namespace pdfpc.Renderer {
         public uint index;
         public uint width;
         public uint height;
+        public bool notes_area;
 
-        public CachedPageProps(uint index, uint width, uint height) {
-            this.index  = index;
-            this.width  = width;
-            this.height = height;
+        public CachedPageProps(uint index, uint width, uint height, bool notes_area) {
+            this.index      = index;
+            this.width      = width;
+            this.height     = height;
+            this.notes_area = notes_area;
         }
 
         protected uint hash() {
@@ -182,9 +184,10 @@ namespace pdfpc.Renderer {
         }
 
         protected bool equal_to(CachedPageProps other) {
-            return this.index == other.index &&
-                   this.width == other.width &&
-                   this.height == other.height;
+            return this.index      == other.index  &&
+                   this.width      == other.width  &&
+                   this.height     == other.height &&
+                   this.notes_area == other.notes_area;
         }
     }
 
