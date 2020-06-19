@@ -9,7 +9,6 @@ console (pdfpc) program.
 `pdfpc` depends on these packages:
 [`kvoptions`](https://ctan.org/pkg/kvoptions),
 [`xstring`](https://ctan.org/pkg/xstring),
-[`pdfcomment`](https://ctan.org/pkg/pdfcomment),
 [`hyperxmp`](https://ctan.org/pkg/hyperxmp)
 
 ## Usage

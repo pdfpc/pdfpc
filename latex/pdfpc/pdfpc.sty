@@ -30,13 +30,12 @@
 %
 %  -------------------------------------------------------------------------------------------
 %
-\ProvidesPackage{pdfpc}[2020/06/10 v0.4.0 PDFPC]
+\ProvidesPackage{pdfpc}[2020/06/19 v0.5.0 PDFPC]
 \NeedsTeXFormat{LaTeX2e}
 %
 % Require additional packages needed by \sty{pdfpc}:
 \RequirePackage{kvoptions}
 \RequirePackage{xstring}
-\RequirePackage{pdfcomment}
 \RequirePackage{hyperxmp}
 %
 \SetupKeyvalOptions{
@@ -141,9 +140,16 @@ ______</rdf:Description>^^J%
 %
 % Note command
 \ifPDFPC@hidenotes%
-  \newcommand{\pdfpcnote}[1]{}
+  \newcommand{\pdfpcnote}[1]{}%
 \else%
-  \newcommand{\pdfpcnote}[1]{\pdfmargincomment{#1}}
+  \newcommand{\pdfpcnote}[1]{%
+    \edef\\{\string\n}%
+    \pdfannot width 0pt height 0pt depth 0pt {%
+       /Subtype /Text%
+       /Contents (#1)%
+    }%
+    \relax%
+  }%
 \fi%
 %
 \endinput

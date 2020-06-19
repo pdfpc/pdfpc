@@ -43,7 +43,7 @@
 
 \title{The \sty{pdfpc} package \\ {\large\url{https://github.com/pdfpc/pdfpc}}}
 \author{Evgeny Stambulchik}
-\date{2020/06/10 (v0.4.0)}
+\date{2020/06/19 (v0.5.0)}
 
 \hypersetup{pdftitle={The pdfpc package}, pdfauthor={Evgeny Stambulchik}}
 
@@ -66,8 +66,8 @@ GitHub}\footnote{\url{https://pdfpc.github.io/}}.
 
 It depends on the following packages:
 
-\begin{multicols}{4}\sffamily\centering
-kvoptions \\ xstring \\ pdfcomment \\ hyperxmp
+\begin{multicols}{3}\sffamily\centering
+kvoptions \\ xstring \\ hyperxmp
 \end{multicols}
 
 \section*{License}
@@ -110,11 +110,8 @@ The following \param{options} may be given as comma-separated list:
 The meaning and possible values of most of these options are documented in
 \textit{pdfpcrc(5)} man page of the pdfpc program. The rest are explained below.
 
-To add a note to a slide (must not be longer than one paragraph):
-
-{\leftskip2.5em%
-\cmd{\pdfpcnote\{Text of a note\}}
-}\par
+To add a note to a slide, use \cmd{\pdfpcnote\{Text of a note\}}. A line break
+in the body of the note can be inserted with \cmd{\\}.
 
 The pdfpc package can be used standalone or together with beamer. In
 the later case, it may be desirable to continue using the \cmd{\note}
