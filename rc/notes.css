@@ -1,0 +1,35 @@
+body {
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    background-color: black;
+    color: white;
+}
+
+a {
+    color: #4682b4;
+    text-decoration: none;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table thead th {
+    background-color: #444;
+    text-align: center;
+}
+
+table tr {
+    border-top: 1px solid #ccc;
+}
+
+table tr:nth-child(2n) {
+    background-color: #444;
+}
+
+table tr th, table tr td {
+    border: 1px solid #ccc;
+}
+
+img {
+    max-width: 100%;
+}

@@ -68,6 +68,12 @@ namespace pdfpc.Window {
         protected Gtk.Stack notes_stack;
         protected Gtk.TextView notes_editor;
         protected View.Pdf notes_view;
+        protected View.MarkdownView mdview;
+
+        /**
+         * Zoom level of the MD notes view
+         */
+        protected double mdview_zoom = 1.0;
 
         /**
          * Timer for the presenation
@@ -529,9 +535,14 @@ namespace pdfpc.Window {
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(this.notes_view);
 
+            // The Markdown rendering widget
+            this.mdview = new View.MarkdownView();
+
+            // The full notes stack
             this.notes_stack = new Gtk.Stack();
             this.notes_stack.add_named(notes_sw, "editor");
             this.notes_stack.add_named(frame, "view");
+            this.notes_stack.add_named(this.mdview, "mdview");
             this.notes_stack.homogeneous = true;
 
             // The countdown timer is centered in the 90% bottom part of the screen
@@ -963,7 +974,7 @@ namespace pdfpc.Window {
                 this.notes_stack.set_visible_child_name("view");
                 this.notes_view.display(current_slide_number);
             } else {
-                this.notes_stack.set_visible_child_name("editor");
+                this.notes_stack.set_visible_child_name("mdview");
             }
 
             this.update_slide_count();
@@ -1049,6 +1060,7 @@ namespace pdfpc.Window {
                 return;
             }
 
+            this.notes_stack.set_visible_child_name("editor");
             this.notes_editor.editable = true;
             this.notes_editor.cursor_visible = true;
             this.notes_editor.grab_focus();
@@ -1060,11 +1072,14 @@ namespace pdfpc.Window {
          */
         protected bool on_key_press_notes_editor(Gtk.Widget source, Gdk.EventKey key) {
             if (key.keyval == Gdk.Key.Escape) { /* Escape */
+                var this_note = this.notes_editor.buffer.text;
                 this.notes_editor.editable = false;
                 this.notes_editor.cursor_visible = false;
-                this.metadata.get_notes().set_note(this.notes_editor.buffer.text,
+                this.metadata.get_notes().set_note(this_note,
                     this.controller.current_user_slide_number);
                 this.controller.set_ignore_input_events(false);
+                this.mdview.render(this_note);
+                this.notes_stack.set_visible_child_name("mdview");
                 return true;
             } else {
                 return false;
@@ -1078,6 +1093,9 @@ namespace pdfpc.Window {
             string this_note = this.metadata.get_notes().get_note_for_slide(
                 this.controller.current_user_slide_number);
             this.notes_editor.buffer.text = this_note;
+
+            // render the note
+            this.mdview.render(this_note);
         }
 
         public void show_overview() {
@@ -1107,6 +1125,9 @@ namespace pdfpc.Window {
             font_size += 2;
             this.metadata.font_size = font_size;
             set_font_size(font_size);
+
+            this.mdview_zoom *= Math.pow(2, 0.25);
+            this.mdview.apply_zoom(this.mdview_zoom);
         }
 
         /**
@@ -1120,6 +1141,9 @@ namespace pdfpc.Window {
             }
             this.metadata.font_size = font_size;
             set_font_size(font_size);
+
+            this.mdview_zoom /= Math.pow(2, 0.25);
+            this.mdview.apply_zoom(this.mdview_zoom);
         }
 
         private int get_font_size() {
