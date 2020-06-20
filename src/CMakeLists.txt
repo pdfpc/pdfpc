@@ -4,6 +4,8 @@ pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(GEE REQUIRED gee-0.8)
 pkg_check_modules(POPPLER REQUIRED poppler-glib>=0.22)
 pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.22)
+pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
+pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 list (FIND GTK_STATIC_LIBRARIES "X11" _index)
 if (${_index} GREATER -1)
     set(WITH_X11 1)
@@ -42,6 +44,8 @@ include_directories(
     ${GSTREAMER_INCLUDE_DIRS}
     ${GSTINTERFACES_INCLUDE_DIRS}
     ${GSTVIDEO_INCLUDE_DIRS}
+    ${WEBKIT_INCLUDE_DIRS}
+    ${MARKDOWN_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -56,6 +60,8 @@ link_directories(
     ${GSTREAMER_LIBRARY_DIRS}
     ${GSTINTERFACES_LIBRARY_DIRS}
     ${GSTVIDEO_LIBRARY_DIRS}
+    ${WEBKIT_LIBRARY_DIRS}
+    ${MARKDOWN_LIBRARY_DIRS}
 )
 
 if(${WITH_X11})
@@ -99,6 +105,7 @@ endif()
 vala_precompile(VALA_C
     ${VALA_SRC}
 PACKAGES
+    webkit2gtk-4.0
     gio-2.0
     gee-0.8
     poppler-glib
@@ -113,6 +120,7 @@ OPTIONS
 CUSTOM_VAPIS
     ${CMAKE_CURRENT_BINARY_DIR}/paths.vala
     ${CMAKE_CURRENT_SOURCE_DIR}/custom_binding.vapi
+    ${CMAKE_CURRENT_SOURCE_DIR}/libmarkdown.vapi
 )
 
 add_executable(pdfpc
@@ -127,6 +135,8 @@ target_link_libraries(pdfpc
     ${GIO_LIBRARIES}
     ${GEE_LIBRARIES}
     ${POPPLER_LIBRARIES}
+    ${MARKDOWN_LIBRARIES}
+    ${WEBKIT_LIBRARIES}
     ${GTK_LIBRARIES}
     ${GTHREAD_LIBRARIES}
     ${PANGOCAIRO_LIBRARIES}
