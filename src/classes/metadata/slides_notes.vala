@@ -58,9 +58,6 @@ namespace pdfpc {
                 }
                 if (notes[slide_number] == null) {
                     notes[slide_number] = new slide_note();
-                } else {
-                    GLib.printerr("Found conflicting notes for slide %d\n", slide_number + 1);
-                    GLib.printerr("Using '%s' instead of '%s'\n", note_text.strip(), notes[slide_number].note_text.strip());
                 }
                 notes[slide_number].note_text = note_text;
                 notes[slide_number].is_native = is_native;
