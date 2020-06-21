@@ -71,11 +71,6 @@ namespace pdfpc.Window {
         protected View.MarkdownView mdview;
 
         /**
-         * Zoom level of the MD notes view
-         */
-        protected double mdview_zoom = 1.0;
-
-        /**
          * Timer for the presenation
          */
         protected TimerLabel? timer;
@@ -517,15 +512,6 @@ namespace pdfpc.Window {
             this.notes_editor.wrap_mode = Gtk.WrapMode.WORD;
             this.notes_editor.buffer.text = "";
             this.notes_editor.key_press_event.connect(this.on_key_press_notes_editor);
-            if (this.metadata.font_size >= 0) {
-                // LEGACY font size detection
-                // Before, we had the font size in absolute (device) units.
-                // These were typically larger than 1000
-                if (this.metadata.font_size >= 1000) {
-                    this.metadata.font_size /= Pango.SCALE;
-                }
-                this.set_font_size(this.metadata.font_size);
-            }
             var notes_sw = new Gtk.ScrolledWindow(null, null);
             notes_sw.add(this.notes_editor);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
@@ -544,6 +530,16 @@ namespace pdfpc.Window {
             this.notes_stack.add_named(frame, "view");
             this.notes_stack.add_named(this.mdview, "mdview");
             this.notes_stack.homogeneous = true;
+
+            if (this.metadata.font_size >= 0) {
+                // LEGACY font size detection
+                // Before, we had the font size in absolute (device) units.
+                // These were typically larger than 1000
+                if (this.metadata.font_size >= 1000) {
+                    this.metadata.font_size /= Pango.SCALE;
+                }
+                this.set_font_size(this.metadata.font_size);
+            }
 
             // The countdown timer is centered in the 90% bottom part of the screen
             this.timer = this.controller.getTimer();
@@ -1125,9 +1121,6 @@ namespace pdfpc.Window {
             font_size += 2;
             this.metadata.font_size = font_size;
             set_font_size(font_size);
-
-            this.mdview_zoom *= Math.pow(2, 0.25);
-            this.mdview.apply_zoom(this.mdview_zoom);
         }
 
         /**
@@ -1141,9 +1134,6 @@ namespace pdfpc.Window {
             }
             this.metadata.font_size = font_size;
             set_font_size(font_size);
-
-            this.mdview_zoom /= Math.pow(2, 0.25);
-            this.mdview.apply_zoom(this.mdview_zoom);
         }
 
         private int get_font_size() {
@@ -1163,6 +1153,10 @@ namespace pdfpc.Window {
             } catch (Error e) {
                 GLib.printerr("Warning: failed to set CSS for notes.\n");
             }
+
+            // 20pt is set in notes.css
+            var mdview_zoom = size/20.0;
+            this.mdview.apply_zoom(mdview_zoom);
         }
 
         private void on_zoom(PresentationController.ScaledRectangle? rect) {
