@@ -5,7 +5,7 @@ DESTINATION
 )
 
 install(FILES
-    pdfpc.css
+    pdfpc.css notes.css
 DESTINATION
     ${CMAKE_INSTALL_PREFIX}/share/pixmaps/pdfpc/
 )
