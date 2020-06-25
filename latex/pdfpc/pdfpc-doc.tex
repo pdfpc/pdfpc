@@ -104,6 +104,7 @@ The following \param{options} may be given as comma-separated list:
 \item \texttt{lastminutes}
 \item \texttt{hidenotes}
 \item \texttt{overridenote}
+\item \texttt{disablemarkdown}
 \item \texttt{defaulttransition} (needs pdfpc v4.5 or higher)
 \end{itemize}
 
@@ -111,7 +112,10 @@ The meaning and possible values of most of these options are documented in
 \textit{pdfpcrc(5)} man page of the pdfpc program. The rest are explained below.
 
 To add a note to a slide, use \cmd{\pdfpcnote\{Text of a note\}}. A line break
-in the body of the note can be inserted with \cmd{\\}.
+in the body of the note can be inserted with \cmd{\\}. The notes are rendered
+according to the Markdown syntax by default. If you prefer the plain text format
+(which was the case with \texttt{pdfpc}-4.4 and below), use the
+\texttt{disablemarkdown} option.
 
 The pdfpc package can be used standalone or together with beamer. In
 the later case, it may be desirable to continue using the \cmd{\note}
