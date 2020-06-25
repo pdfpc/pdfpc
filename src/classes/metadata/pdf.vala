@@ -78,6 +78,12 @@ namespace pdfpc.Metadata {
         protected NotesPosition notes_position = NotesPosition.NONE;
 
         /**
+         * Assume notes are formatted in Markdown. False by default for backward
+         * compatibility.
+         */
+        public bool enable_markdown = false;
+
+        /**
          * Number of pages in the pdf document
          */
         protected uint page_count;
@@ -624,6 +630,9 @@ namespace pdfpc.Metadata {
                             break;
                         case "DefaultTransition":
                             this.set_default_transition_from_string(entry.value);
+                            break;
+                        case "EnableMarkdown":
+                            this.enable_markdown = bool.parse(entry.value);
                             break;
                         default:
                             GLib.printerr("unknown XMP entry %s\n", entry.key);

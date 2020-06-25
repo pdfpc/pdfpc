@@ -60,14 +60,20 @@ namespace pdfpc.View {
             return true;
         }
 
-        public void render(string? text = "") {
+        public void render(string? text = "", bool plain_text = false) {
             Markdown.DocumentFlags flags = Markdown.DocumentFlags.NO_EXT;
 
-            var md = new Markdown.Document.from_string(text.data, flags);
-            md.compile(flags);
-
             string html;
-            md.document(out html);
+            if (text != "" && plain_text) {
+                html = "<pre>%s</pre>".printf(text.replace("&", "&amp;")
+                                                  .replace("<", "&lt;")
+                                                  .replace(">", "&gt;"));
+            } else {
+                var md = new Markdown.Document.from_string(text.data, flags);
+                md.compile(flags);
+
+                md.document(out html);
+            }
 
             // Form a minimal compliant Unicode HTML document
             const string tmpl =

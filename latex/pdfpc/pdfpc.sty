@@ -51,6 +51,7 @@
 \DeclareBoolOption{hidenotes}
 \DeclareBoolOption{overridenote}
 \DeclareStringOption{notesposition}
+\DeclareBoolOption[false]{disablemarkdown}
 \DeclareStringOption{defaulttransition}
 \DeclareDefaultOption{\@unknownoptionerror}
 %
@@ -128,6 +129,11 @@ ______<rdf:Description xmlns:pdfpc="https://github.com/pdfpc/pdfpc">^^J%
   \hyxmp@add@simple{pdfpc:EndUserSlide}{\PDFPC@enduserslide}%
   \hyxmp@add@simple{pdfpc:LastMinutes}{\PDFPC@lastminutes}%
   \hyxmp@add@simple{pdfpc:NotesPosition}{\PDFPC@notesposition}%
+  \ifPDFPC@disablemarkdown%
+    \hyxmp@add@simple{pdfpc:EnableMarkdown}{false}%
+  \else%
+    \hyxmp@add@simple{pdfpc:EnableMarkdown}{true}%
+  \fi
   \hyxmp@add@simple{pdfpc:DefaultTransition}{\PDFPC@defaulttransition}%
   \hyxmp@add@to@xml{%
 ______</rdf:Description>^^J%
