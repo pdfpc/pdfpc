@@ -30,6 +30,10 @@ paned separator {
     background-color: black;
 }
 
+.customization separator {
+    background-color: steelblue;
+}
+
 .toolbox button:not(.color) * {
     background-color: gray;
 }

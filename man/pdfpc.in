@@ -569,6 +569,11 @@ With GTK3 it is possible to modify the appearance of pdfpc. There are two
 locations where pdfpc is looking for files. The default location is
 @CMAKE_INSTALL_PREFIX@/share/pixmaps/pdfpc/pdfpc.css. It can be copied
 to $XDG_CONFIG_HOME/pdfpc/pdfpc.css and modified to the user's liking.
+.PP
+The geometry of various views (the current/next etc slide) in the presenter
+window can be adjusted at run time in the "Customization" mode, which is
+activated by pressing Shift+c. In this mode, mouse-draggable handles will
+appear. Exit the customization with Escape.
 
 .SS Desktop integration
 
