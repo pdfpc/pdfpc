@@ -124,6 +124,11 @@ namespace pdfpc {
         public bool in_zoom { get; protected set; default = false; }
 
         /**
+         * Customization mode enabled?
+         */
+        public bool in_customization { get; protected set; default = false; }
+
+        /**
          * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
          */
         public struct ScaledRectangle {
@@ -1045,6 +1050,9 @@ namespace pdfpc {
             add_action("zoom", this.zoom_highlighted,
                 "Zoom in the highlighted area");
 
+            add_action("customize", this.customize_gui,
+                "Customize the GUI");
+
             add_action("showHelp", this.show_help,
                 "Show a help screen");
 
@@ -1841,6 +1849,13 @@ namespace pdfpc {
             }
         }
 
+        protected void customize_gui() {
+            if (this.presenter != null) {
+                this.presenter.set_customizable(true);
+                this.in_customization = true;
+            }
+        }
+
         /**
          * Zoom in the highlighted area
          */
@@ -1913,6 +1928,10 @@ namespace pdfpc {
             }
             if (this.in_zoom) {
                 this.toggle_zoom();
+            }
+            if (this.in_customization && this.presenter != null) {
+                this.presenter.set_customizable(false);
+                this.in_customization = false;
             }
         }
 

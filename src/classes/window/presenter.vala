@@ -70,6 +70,10 @@ namespace pdfpc.Window {
         protected View.Pdf notes_view;
         protected View.MarkdownView mdview;
 
+        protected Gtk.Paned slide_views;
+        protected Gtk.Paned current_view_and_stricts;
+        protected Gtk.Paned next_view_and_notes;
+
         /**
          * Timer for the presenation
          */
@@ -330,14 +334,57 @@ namespace pdfpc.Window {
             return help_sw;
         }
 
-        private void disable_paned_handle(Gtk.Paned paned) {
+        private void enable_paned_handle(Gtk.Paned paned, bool onoff) {
+            var handle = paned.get_handle_window();
+            if (handle != null) {
+                Gdk.EventMask emask;
+                Gdk.Cursor cursor;
+                Gtk.StyleContext context = this.get_style_context();
+                if (onoff) {
+                    cursor = handle.get_data<Gdk.Cursor>("cursor");
+                    emask  = handle.get_data<Gdk.EventMask>("emask");
+                    context.add_class("customization");
+                } else {
+                    cursor = null;
+                    emask = 0;
+                    context.remove_class("customization");
+                }
+                handle.set_cursor(cursor);
+                handle.set_events(emask);
+            }
+        }
+
+        /**
+         * A wrapper for the Gtk.Paned constructor providing the
+         * enable/disable functionality which is missing in Gtk
+         */
+        protected Gtk.Paned create_paned(Gtk.Orientation orientation)
+        {
+            var paned = new Gtk.Paned(orientation);
+            paned.wide_handle = true;
             paned.map.connect(() => {
                     var handle = paned.get_handle_window();
-                    if (handle != null) {
-                        handle.set_cursor(null);
-                        handle.set_events(0);
+                    if (handle != null &&
+                        !handle.get_data<bool>("initialized")) {
+                        // save default cursor and event mask of the handle
+                        handle.set_data<Gdk.Cursor>("cursor",
+                            handle.get_cursor());
+                        handle.set_data<Gdk.EventMask>("emask",
+                            handle.get_events());
+                        handle.set_data<bool>("initialized", true);
+
+                        // start in the disabled state
+                        this.enable_paned_handle(paned, false);
                     }
                 });
+
+            return paned;
+        }
+
+        public void set_customizable(bool onoff) {
+            enable_paned_handle(this.slide_views, onoff);
+            enable_paned_handle(this.current_view_and_stricts, onoff);
+            enable_paned_handle(this.next_view_and_notes, onoff);
         }
 
         /**
@@ -576,10 +623,8 @@ namespace pdfpc.Window {
             this.overview.set_n_slides(this.controller.user_n_slides);
             this.controller.set_overview(this.overview);
 
-            var slide_views = new Gtk.Paned(Gtk.Orientation.HORIZONTAL);
-            slide_views.position = current_allocated_width;
-            slide_views.wide_handle = true;
-            disable_paned_handle(slide_views);
+            this.slide_views = create_paned(Gtk.Orientation.HORIZONTAL);
+            this.slide_views.position = current_allocated_width;
 
             var strict_views = new Gtk.Grid();
             strict_views.column_homogeneous = true;
@@ -594,10 +639,13 @@ namespace pdfpc.Window {
 
             this.overlay_layout.add(this.current_view);
 
-            this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.POINTER_MOTION_MASK);
+            this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK   |
+                                          Gdk.EventMask.BUTTON_RELEASE_MASK |
+                                          Gdk.EventMask.POINTER_MOTION_MASK);
 
 
-            var current_view_and_stricts = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            this.current_view_and_stricts =
+                create_paned(Gtk.Orientation.VERTICAL);
 
             // Height of the window minus the bottom part (icons, timer, etc)
             var usable_height = (1.0 - 1.0/this.bottom_frac_inv)*this.window_h;
@@ -605,41 +653,37 @@ namespace pdfpc.Window {
             double wheight1, wheight2;
             wheight1 = Options.current_height/100.0*usable_height;
             wheight2 = current_allocated_width/page_ratio;
-            current_view_and_stricts.position = (int) double.min(wheight1, wheight2);
-
-            current_view_and_stricts.wide_handle = true;
-            disable_paned_handle(current_view_and_stricts);
+            this.current_view_and_stricts.position =
+                (int) double.min(wheight1, wheight2);
 
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(overlay_layout);
-            current_view_and_stricts.pack1(frame, true, true);
-            current_view_and_stricts.pack2(strict_views, true, true);
+            this.current_view_and_stricts.pack1(frame, true, true);
+            this.current_view_and_stricts.pack2(strict_views, true, true);
 
-            slide_views.pack1(current_view_and_stricts, true, true);
+            this.slide_views.pack1(this.current_view_and_stricts, true, true);
 
-            var next_view_and_notes = new Gtk.Paned(Gtk.Orientation.VERTICAL);
+            this.next_view_and_notes = create_paned(Gtk.Orientation.VERTICAL);
 
             // To be exact, the width of Paned handle should be subtracted...
             var next_allocated_width = this.window_w - current_allocated_width;
 
             wheight1 = Options.next_height/100.0*usable_height;
             wheight2 = next_allocated_width/page_ratio;
-            next_view_and_notes.position = (int) double.min(wheight1, wheight2);
-
-            next_view_and_notes.wide_handle = true;
-            disable_paned_handle(next_view_and_notes);
+            this.next_view_and_notes.position =
+                (int) double.min(wheight1, wheight2);
 
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(next_view);
-            next_view_and_notes.pack1(frame, true, true);
+            this.next_view_and_notes.pack1(frame, true, true);
 
-            next_view_and_notes.pack2(this.notes_stack, true, true);
-            slide_views.pack2(next_view_and_notes, true, true);
+            this.next_view_and_notes.pack2(this.notes_stack, true, true);
+            this.slide_views.pack2(this.next_view_and_notes, true, true);
 
             var help_sw = create_help_window();
 
             this.slide_stack = new Gtk.Stack();
-            this.slide_stack.add_named(slide_views, "slides");
+            this.slide_stack.add_named(this.slide_views, "slides");
             this.slide_stack.add_named(this.overview, "overview");
             this.slide_stack.add_named(help_sw, "help");
             this.slide_stack.homogeneous = true;
