@@ -90,6 +90,8 @@ bind KP_Subtract        decreaseSize
 
 bind z                  zoom
 
+bind A                  toggleMaxCurrent
+
 bind C                  customize
 
 # Drawings

@@ -171,6 +171,11 @@ namespace pdfpc {
         public static uint next_height = 70;
 
         /**
+         * Maximize the main view of the presenter in the drawing modes
+         */
+        public static bool maximize_in_drawing = false;
+
+        /**
          * Minimum width for the overview miniatures
          */
         public static int min_overview_width = 150;
