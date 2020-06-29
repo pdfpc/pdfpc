@@ -387,6 +387,37 @@ namespace pdfpc.Window {
             enable_paned_handle(this.next_view_and_notes, onoff);
         }
 
+        public bool current_view_maximized {
+            get; protected set; default = false;
+        }
+
+        public void maximize_current_view(bool onoff) {
+            if (this.current_view_maximized == onoff) {
+                // nothing to do
+                return;
+            }
+
+            int width, height;
+            if (onoff) {
+                width  = this.window_w;
+                height = this.current_view_and_stricts.get_allocated_height();
+                // save the current positions
+                this.slide_views.set_data<int>("position",
+                    this.slide_views.position);
+                this.current_view_and_stricts.set_data<int>("position",
+                    this.current_view_and_stricts.position);
+            } else {
+                // get the saved positions
+                width  = this.slide_views.get_data<int>("position");
+                height = this.current_view_and_stricts.get_data<int>("position");
+            }
+
+            this.slide_views.position = width;
+            this.current_view_and_stricts.position = height;
+
+            this.current_view_maximized = onoff;
+        }
+
         /**
          * (Re)load icons
          **/

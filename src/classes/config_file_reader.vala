@@ -263,6 +263,9 @@ namespace pdfpc {
                 case "final-slide":
                     Options.final_slide_overlay = bool.parse(fields[2]);
                     break;
+                case "maximize-in-drawing":
+                    Options.maximize_in_drawing = bool.parse(fields[2]);
+                    break;
                 case "move-on-mapped":
                     Options.move_on_mapped = bool.parse(fields[2]);
                     break;

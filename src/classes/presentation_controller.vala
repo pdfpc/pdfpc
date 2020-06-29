@@ -626,6 +626,10 @@ namespace pdfpc {
             hide_or_show_pen_surfaces();
 
             if (this.presenter != null) {
+                if (Options.maximize_in_drawing) {
+                    this.presenter.maximize_current_view(this.in_drawing_mode());
+                }
+
                 // Disable event compression for smoother drawing
                 this.presenter.main_view.get_window().set_event_compression(!in_drawing_mode());
             }
@@ -1049,6 +1053,9 @@ namespace pdfpc {
 
             add_action("zoom", this.zoom_highlighted,
                 "Zoom in the highlighted area");
+
+            add_action("toggleMaxCurrent", this.toggle_max_current_view,
+                "(Un)maximize the current slide view");
 
             add_action("customize", this.customize_gui,
                 "Customize the GUI");
@@ -1846,6 +1853,13 @@ namespace pdfpc {
         protected void zoom_highlighted() {
             if (!this.in_zoom) {
                 this.toggle_zoom();
+            }
+        }
+
+        protected void toggle_max_current_view() {
+            if (this.presenter != null) {
+                var onoff = !this.presenter.current_view_maximized;
+                this.presenter.maximize_current_view(onoff);
             }
         }
 
