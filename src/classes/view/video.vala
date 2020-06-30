@@ -30,7 +30,7 @@ namespace pdfpc {
         private List<Gtk.Widget> videos = null;
 
         public Video() {
-            this.videos = new List[Gtk.Widget]();
+            this.videos = new List<Gtk.Widget>();
         }
 
         public void add_video(Gtk.Widget video, Gdk.Rectangle position) {
