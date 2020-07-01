@@ -389,7 +389,7 @@ namespace pdfpc {
 
             foreach (var sink in this.sinks) {
                 var parent = sink.parent as View.Video;
-                parent.remove_video();
+                parent.remove_video(sink);
             }
         }
 
@@ -739,7 +739,7 @@ namespace pdfpc {
                             this.scalex = (double) this.video_w/rect.width;
                             this.scaley = (double) this.video_h/rect.height;
                         }
-                        video_surface.resize_video(rect);
+                        video_surface.resize_video(video_area, rect);
                     });
                 this.sinks.add(video_area);
 

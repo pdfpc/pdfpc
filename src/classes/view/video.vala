@@ -27,28 +27,30 @@ namespace pdfpc {
      * video.
      */
     public class View.Video: Gtk.Fixed {
-        private Gtk.Widget video = null;
+        private List<Gtk.Widget> videos = null;
+
+        public Video() {
+            this.videos = new List<Gtk.Widget>();
+        }
 
         public void add_video(Gtk.Widget video, Gdk.Rectangle position) {
-            if (this.video == null) {
+            video.set_size_request(position.width, position.height);
+            this.put(video, position.x, position.y);
+            this.videos.append(video);
+            this.show_all();
+        }
+
+        public void resize_video(Gtk.Widget video, Gdk.Rectangle position) {
+            if (this.videos.find(video) != null) {
                 video.set_size_request(position.width, position.height);
-                this.put(video, position.x, position.y);
-                this.video = video;
-                this.show_all();
+                this.move(video, position.x, position.y);
             }
         }
 
-        public void resize_video(Gdk.Rectangle position) {
-            if (this.video != null) {
-                this.video.set_size_request(position.width, position.height);
-                this.move(this.video, position.x, position.y);
-            }
-        }
-
-        public void remove_video() {
-            if (this.video != null) {
-                this.remove(this.video);
-                this.video = null;
+        public void remove_video(Gtk.Widget video) {
+            if (this.videos.find(video) != null) {
+                this.remove(video);
+                this.videos.remove(video);
             }
         }
     }
