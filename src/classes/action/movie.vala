@@ -691,8 +691,7 @@ namespace pdfpc {
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue, sink);
                 tee.link(queue);
-                if ((conf.window.is_presenter) ||
-                    !conf.window.is_presenter) {
+                if (conf.window.is_presenter) {
                     Gst.Element ad_element = this.add_video_control(queue, bin,
                         conf.rect);
                     ad_element.link(sink);
