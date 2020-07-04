@@ -96,19 +96,24 @@ namespace pdfpc {
 
             this.controllables_update();
 
-            if (slide_duration > 0) {
-                this.start_autoadvance_timer(slide_duration);
-            }
+            this.start_autoadvance_timer(slide_duration);
         }
 
         protected void start_autoadvance_timer(double duration) {
+            if (duration < 0) {
+                return;
+            }
+
             if (this.autoadvance_timer_id != 0) {
                 GLib.Source.remove(this.autoadvance_timer_id);
             }
 
             this.autoadvance_timer_id =
                 GLib.Timeout.add((int) (1000*duration), () => {
-                    this.switch_to_slide_number(this.current_slide_number + 1);
+                    if (!this.timer.is_paused()) {
+                        var next_slide = this.current_slide_number + 1;
+                        this.switch_to_slide_number(next_slide);
+                    }
                     this.autoadvance_timer_id = 0;
                     return GLib.Source.REMOVE;
                 });
@@ -1767,6 +1772,10 @@ namespace pdfpc {
          */
         protected void start() {
             this.timer.start();
+            // start the autoadvancing on the initial page, if needed
+            double slide_duration =
+                this.metadata.get_slide_duration(this.current_user_slide_number);
+            this.start_autoadvance_timer(slide_duration);
             this.controllables_update();
         }
 
