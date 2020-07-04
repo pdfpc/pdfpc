@@ -418,6 +418,19 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Return slide duration
+         */
+        public double get_slide_duration(int slide_number) {
+            if (slide_number >= 0 && slide_number < this.get_slide_count()) {
+
+                var page = this.document.get_page(slide_number);
+                return page.get_duration();
+            } else {
+                return -1;
+            }
+        }
+
+        /**
          * Deactivate all active mappings
          */
         private void deactivate_mappings() {

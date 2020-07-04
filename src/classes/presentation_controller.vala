@@ -51,6 +51,9 @@ namespace pdfpc {
                 return;
             }
 
+            double slide_duration =
+                this.metadata.get_slide_duration(slide_number);
+
             int old_user_slide_number = this.current_user_slide_number;
 
             if (slide_number < 0 || slide_number > this.n_slides) {
@@ -92,6 +95,23 @@ namespace pdfpc {
             }
 
             this.controllables_update();
+
+            if (slide_duration > 0) {
+                this.start_autoadvance_timer(slide_duration);
+            }
+        }
+
+        protected void start_autoadvance_timer(double duration) {
+            if (this.autoadvance_timer_id != 0) {
+                GLib.Source.remove(this.autoadvance_timer_id);
+            }
+
+            this.autoadvance_timer_id =
+                GLib.Timeout.add((int) (1000*duration), () => {
+                    this.switch_to_slide_number(this.current_slide_number + 1);
+                    this.autoadvance_timer_id = 0;
+                    return GLib.Source.REMOVE;
+                });
         }
 
         /**
@@ -706,6 +726,11 @@ namespace pdfpc {
          * Timer id to hide the pointer after a period of inactivity
          */
         protected uint pointer_timeout_id = 0;
+
+        /**
+         * Timer id to to autoadvance to the next slide
+         */
+        protected uint autoadvance_timer_id = 0;
 
         public double drag_x = -1;
         public double drag_y = -1;

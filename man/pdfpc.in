@@ -431,6 +431,8 @@ cover, dissolve, fade, glitter (except the diagonal one), push, split, uncover,
 and wipe, including various alignments, angles, and directions (where
 applicable). The transitions are enabled only for sequential (either forward or
 backward) movement; in the later case, the transition is "inverted".
+.PP
+Advancing slides automatically is also supported.
 
 .SS Movies
 .PP
