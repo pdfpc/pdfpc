@@ -936,6 +936,50 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Return the next slide in the overlay (or -1 if doesn't exist),
+         * but skipping over slides with automatic advancing
+         */
+        public int next_in_overlay(int slide_number) {
+            if (slide_number < 0 ||
+                slide_number >= this.get_slide_count() - 1) {
+                return -1;
+            } else {
+                var next_slide_number = slide_number  + 1;
+                while (this.real_slide_to_user_slide(slide_number) ==
+                       this.real_slide_to_user_slide(next_slide_number)) {
+                    if (this.get_slide_duration(next_slide_number) <= 0) {
+                        return next_slide_number;
+                    }
+                    next_slide_number++;
+                }
+
+                return -1;
+            }
+        }
+
+        /**
+         * Return the previous slide in the overlay (or -1 if doesn't exist),
+         * but skipping over slides with automatic advancing
+         */
+        public int prev_in_overlay(int slide_number) {
+            if (slide_number < 1 ||
+                slide_number >= this.get_slide_count()) {
+                return -1;
+            } else {
+                var prev_slide_number = slide_number - 1;
+                while (this.real_slide_to_user_slide(slide_number) ==
+                    this.real_slide_to_user_slide(prev_slide_number)) {
+                    if (this.get_slide_duration(prev_slide_number) <= 0) {
+                        return prev_slide_number;
+                    }
+                    prev_slide_number--;
+                }
+
+                return -1;
+            }
+        }
+
+        /**
          * Return the width of the first page of the loaded pdf document.
          *
          * If slides also contain notes, return the width of the content part only

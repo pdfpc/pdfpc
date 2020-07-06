@@ -1028,28 +1028,26 @@ namespace pdfpc.Window {
             this.next_view.display(
                 this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset)
             );
-            if (this.controller.skip_next()) {
-                this.strict_next_view.disabled = false;
-            } else {
-                this.strict_next_view.disabled = true;
-            }
-            this.strict_next_view.display(current_slide_number + 1);
-            if (this.controller.skip_previous()) {
-                this.strict_prev_view.disabled = false;
-            } else {
-                this.strict_prev_view.disabled = true;
-            }
-            this.strict_prev_view.display(current_slide_number - 1);
+
+            var next_slide_number =
+                this.metadata.next_in_overlay(current_slide_number);
+            this.strict_next_view.disabled = (next_slide_number < 0);
+            this.strict_next_view.display(next_slide_number);
+
+            var prev_slide_number =
+                this.metadata.prev_in_overlay(current_slide_number);
+            this.strict_prev_view.disabled = (prev_slide_number < 0);
+            this.strict_prev_view.display(prev_slide_number);
 
             if (this.metadata.has_beamer_notes) {
                 this.notes_stack.set_visible_child_name("view");
                 this.notes_view.display(current_slide_number);
             } else {
                 this.notes_stack.set_visible_child_name("mdview");
+                this.update_note();
             }
 
             this.update_slide_count();
-            this.update_note();
 
             this.update_status_icons();
 
