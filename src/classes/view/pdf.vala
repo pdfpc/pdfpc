@@ -341,6 +341,7 @@ namespace pdfpc {
                 if (!this.transman.is_enabled) {
                     // Update the widget
                     this.queue_draw();
+                    this.entering_slide(this.current_slide_number);
                 } else {
                     var delay = this.transman.frame_duration;
                     this.transition_tid = Timeout.add(delay, () => {
@@ -352,13 +353,12 @@ namespace pdfpc {
                                 return true;
                             } else {
                                 this.transition_tid = 0;
+                                this.entering_slide(this.current_slide_number);
                                 // Stop the timer
                                 return false;
                             }
                         }, Priority.HIGH);
                 }
-
-                this.entering_slide(this.current_slide_number);
             } else {
                 this.transman.disable();
             }
