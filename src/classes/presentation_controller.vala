@@ -51,9 +51,6 @@ namespace pdfpc {
                 return;
             }
 
-            double slide_duration =
-                this.metadata.get_slide_duration(slide_number);
-
             int old_user_slide_number = this.current_user_slide_number;
 
             if (slide_number < 0 || slide_number > this.n_slides) {
@@ -95,11 +92,9 @@ namespace pdfpc {
             }
 
             this.controllables_update();
-
-            this.start_autoadvance_timer(slide_duration);
         }
 
-        protected void start_autoadvance_timer(double duration) {
+        public void start_autoadvance_timer(double duration) {
             if (duration < 0) {
                 return;
             }
