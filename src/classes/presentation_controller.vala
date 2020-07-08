@@ -1764,7 +1764,7 @@ namespace pdfpc {
             this.running = true;
             this.timer.start();
             // start the autoadvancing on the initial page, if needed
-            this.start_autoadvance_timer(this.current_user_slide_number);
+            this.start_autoadvance_timer(this.current_slide_number);
             this.controllables_update();
         }
 
@@ -1775,7 +1775,7 @@ namespace pdfpc {
             this.running = !this.running;
             this.timer.pause();
             if (this.running) {
-                this.start_autoadvance_timer(this.current_user_slide_number);
+                this.start_autoadvance_timer(this.current_slide_number);
             }
             this.controllables_update();
         }
