@@ -103,8 +103,7 @@ namespace pdfpc.Window {
         }
 
         private void on_entering_slide(View.Pdf source, int slide_number) {
-            double slide_duration = metadata.get_slide_duration(slide_number);
-            this.controller.start_autoadvance_timer(slide_duration);
+            this.controller.start_autoadvance_timer(slide_number);
         }
     }
 }

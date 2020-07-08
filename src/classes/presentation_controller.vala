@@ -81,6 +81,7 @@ namespace pdfpc {
 
             // start the timer unless it's the initial positioning
             if (!this.history_bck.is_empty) {
+                this.running = true;
                 this.timer.start();
             }
 
@@ -94,8 +95,14 @@ namespace pdfpc {
             this.controllables_update();
         }
 
-        public void start_autoadvance_timer(double duration) {
+        public void start_autoadvance_timer(int slide_number) {
+            double duration = this.metadata.get_slide_duration(slide_number);
             if (duration < 0) {
+                return;
+            }
+
+            // no autoadvance if paused/not started yet
+            if (!this.running) {
                 return;
             }
 
@@ -105,7 +112,7 @@ namespace pdfpc {
 
             this.autoadvance_timer_id =
                 GLib.Timeout.add((int) (1000*duration), () => {
-                    if (!this.timer.is_paused()) {
+                    if (this.running) {
                         var next_slide = this.current_slide_number + 1;
                         this.switch_to_slide_number(next_slide);
                     }
@@ -113,6 +120,11 @@ namespace pdfpc {
                     return GLib.Source.REMOVE;
                 });
         }
+
+        /**
+         * Started & not paused
+         */
+        public bool running { get; protected set; default = false; }
 
         /**
          * The current slide in "user indices"
@@ -1558,6 +1570,7 @@ namespace pdfpc {
          * Go to the named slide
          */
         public void goto_string(Variant? page) {
+            this.running = true;
             this.timer.start();
 
             int destination = int.parse(page.get_string()) - 1;
@@ -1748,11 +1761,10 @@ namespace pdfpc {
          * Start the presentation (-> timer)
          */
         protected void start() {
+            this.running = true;
             this.timer.start();
             // start the autoadvancing on the initial page, if needed
-            double slide_duration =
-                this.metadata.get_slide_duration(this.current_user_slide_number);
-            this.start_autoadvance_timer(slide_duration);
+            this.start_autoadvance_timer(this.current_user_slide_number);
             this.controllables_update();
         }
 
@@ -1760,7 +1772,11 @@ namespace pdfpc {
          * Pause the timer
          */
         public void toggle_pause() {
+            this.running = !this.running;
             this.timer.pause();
+            if (this.running) {
+                this.start_autoadvance_timer(this.current_user_slide_number);
+            }
             this.controllables_update();
         }
 
