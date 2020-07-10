@@ -106,19 +106,27 @@ namespace pdfpc {
                 return;
             }
 
-            if (this.autoadvance_timer_id != 0) {
-                GLib.Source.remove(this.autoadvance_timer_id);
+            if (this.autoadvance_timeout_id != 0) {
+                GLib.Source.remove(this.autoadvance_timeout_id);
+                this.autoadvance_timeout_id = 0;
             }
 
-            this.autoadvance_timer_id =
-                GLib.Timeout.add((int) (1000*duration), () => {
-                    if (this.running) {
-                        var next_slide = this.current_slide_number + 1;
-                        this.switch_to_slide_number(next_slide);
-                    }
-                    this.autoadvance_timer_id = 0;
-                    return GLib.Source.REMOVE;
-                });
+            var next_slide = this.current_slide_number + 1;
+            if (duration > 0) {
+                this.autoadvance_timeout_id =
+                    GLib.Timeout.add((int) (1000*duration), () => {
+                        // check again - the paused state might be enabled
+                        // meantime
+                        if (this.running) {
+                            this.switch_to_slide_number(next_slide);
+                        }
+                        this.autoadvance_timeout_id = 0;
+                        return GLib.Source.REMOVE;
+                    });
+            } else {
+                // duration = 0, go to the next slide immediately
+                this.switch_to_slide_number(next_slide);
+            }
         }
 
         /**
@@ -740,9 +748,9 @@ namespace pdfpc {
         protected uint pointer_timeout_id = 0;
 
         /**
-         * Timer id to to autoadvance to the next slide
+         * Timeout id to autoadvance to the next slide
          */
-        protected uint autoadvance_timer_id = 0;
+        protected uint autoadvance_timeout_id = 0;
 
         public double drag_x = -1;
         public double drag_y = -1;
