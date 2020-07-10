@@ -102,7 +102,7 @@ namespace pdfpc.Window {
                 true, rect);
         }
 
-        private void on_entering_slide(View.Pdf source, int slide_number) {
+        private void on_entering_slide(int slide_number) {
             this.controller.start_autoadvance_timer(slide_number);
         }
     }
