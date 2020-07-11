@@ -451,6 +451,21 @@ namespace pdfpc {
                 return true;
             }
 
+            int width, height;
+            this.get_pixel_dimensions(out width, out height);
+            // Re-render the slide on resize events
+            if (width  != this.buffer.get_width() ||
+                height != this.buffer.get_height()) {
+                try {
+                    this.buffer =
+                        this.renderer.render(this.current_slide_number,
+                            this.notes_area, width, height,
+                            false, false, this.zoom_area);
+                } catch (Renderer.RenderError e) {
+                    return true;
+                }
+            }
+
             cr.scale((1.0/this.gdk_scale), (1.0/this.gdk_scale));
             cr.set_source_surface(this.buffer, 0, 0);
             cr.paint();
