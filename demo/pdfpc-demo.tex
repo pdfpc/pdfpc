@@ -331,7 +331,21 @@
 \end{frame}
 
 \begin{frame}
-  \transpush[direction=180]
+  \transpush<1>[direction=180]
+  \frametitle{Slide duration}
+
+  \pdfpc will also advance slides automatically if slide duration is specified.
+  \singleitem{Go ahead to see it in action!}
+  \vskip 1cm
+
+  \transduration<2-12>{0.2}
+  {\Huge\hfill
+  \onslide<2->H\onslide<3->e\onslide<4->l\onslide<5->l\onslide<6->o\onslide<7->,
+  \onslide<8->w\onslide<9->o\onslide<10->r\onslide<11->l\onslide<12->d\onslide<13->!
+  \hfill}
+\end{frame}
+
+\begin{frame}
   \frametitle{\opt{.pdfpc} files}
   \begin{itemize}
     \item The additional information needed for the presentation (duration,

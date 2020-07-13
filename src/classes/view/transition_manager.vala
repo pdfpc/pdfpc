@@ -40,9 +40,10 @@ namespace pdfpc {
         protected uint iframe = 0;
 
         /**
-         * Slide to transition from
+         * Slides to transition between
          */
         protected Cairo.ImageSurface prev;
+        protected Cairo.ImageSurface next;
 
         /**
          * Dimensions of the slide
@@ -53,25 +54,17 @@ namespace pdfpc {
         /**
          * The constructor
          */
-        public TransitionManager() {
+        public TransitionManager(Metadata.Pdf metadata, int slide_number,
+            Cairo.ImageSurface prev, Cairo.ImageSurface next, bool inverse) {
 
             this.fps = Options.transition_fps;
-        }
-
-        /**
-         * Initialization. At this time, the next slide is not ready.
-         */
-        public void init(Metadata.Pdf metadata, int slide_number,
-            Cairo.ImageSurface? prev, bool inverse) {
-
             this.iframe = 0;
             this.prev = prev;
+            this.next = next;
             this.transition = null;
 
-            if (prev != null) {
-                this.width = prev.get_width();
-                this.height = prev.get_height();
-            }
+            this.width  = prev.get_width();
+            this.height = prev.get_height();
 
             if (this.fps > 0 &&
                 slide_number >= 0 &&
@@ -139,14 +132,10 @@ namespace pdfpc {
             }
         }
 
-        public void disable() {
-            this.transition = null;
-            this.prev = null;
-        }
-
         public bool is_enabled {
             get {
-                if (this.prev != null && this.transition != null) {
+                if (this.prev != null && this.next != null &&
+                    this.transition != null) {
                     return true;
                 } else {
                     return false;
@@ -182,7 +171,7 @@ namespace pdfpc {
          * For most of the transitions, first paint one slide, then set a
          * dynamically changing clip region, then paint the other slide.
          */
-        public void draw_frame(Cairo.Context cr, Cairo.ImageSurface next) {
+        public void draw_frame(Cairo.Context cr) {
 
             if (!this.is_enabled) {
                 return;

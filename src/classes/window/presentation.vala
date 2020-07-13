@@ -57,6 +57,7 @@ namespace pdfpc.Window {
 
             this.view = new View.Pdf.from_fullscreen(this, false, true);
             this.view.transitions_enabled = true;
+            this.view.entering_slide.connect(this.on_entering_slide);
 
             this.overlay_layout.add(this.view);
 
@@ -99,6 +100,10 @@ namespace pdfpc.Window {
         private void on_zoom(PresentationController.ScaledRectangle? rect) {
             this.main_view.display(this.controller.current_slide_number,
                 true, rect);
+        }
+
+        private void on_entering_slide(int slide_number) {
+            this.controller.start_autoadvance_timer(slide_number);
         }
     }
 }

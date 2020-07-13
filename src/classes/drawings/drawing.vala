@@ -142,9 +142,8 @@ namespace pdfpc.Drawings {
         }
 
         /*
-         * Switch to slide, based on number. Ordinarily drawing slide numbers should be
-         * the number of the first slide of an overly set, so all slides in an overlay set
-         * share the same drawing.
+         * Switch to a user slide, based on its number; all slides in an
+         * overlay set share the same drawing.
          */
         public void switch_to_slide(int slide_number) {
             if (slide_number != this.current_slide) {

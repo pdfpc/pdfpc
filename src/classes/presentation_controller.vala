@@ -81,6 +81,7 @@ namespace pdfpc {
 
             // start the timer unless it's the initial positioning
             if (!this.history_bck.is_empty) {
+                this.running = true;
                 this.timer.start();
             }
 
@@ -93,6 +94,45 @@ namespace pdfpc {
 
             this.controllables_update();
         }
+
+        public void start_autoadvance_timer(int slide_number) {
+            double duration = this.metadata.get_slide_duration(slide_number);
+            if (duration < 0) {
+                return;
+            }
+
+            // no autoadvance if paused/not started yet
+            if (!this.running) {
+                return;
+            }
+
+            if (this.autoadvance_timeout_id != 0) {
+                GLib.Source.remove(this.autoadvance_timeout_id);
+                this.autoadvance_timeout_id = 0;
+            }
+
+            var next_slide = this.current_slide_number + 1;
+            if (duration > 0) {
+                this.autoadvance_timeout_id =
+                    GLib.Timeout.add((int) (1000*duration), () => {
+                        // check again - the paused state might be enabled
+                        // meantime
+                        if (this.running) {
+                            this.switch_to_slide_number(next_slide);
+                        }
+                        this.autoadvance_timeout_id = 0;
+                        return GLib.Source.REMOVE;
+                    });
+            } else {
+                // duration = 0, go to the next slide immediately
+                this.switch_to_slide_number(next_slide);
+            }
+        }
+
+        /**
+         * Started & not paused
+         */
+        public bool running { get; protected set; default = false; }
 
         /**
          * The current slide in "user indices"
@@ -548,7 +588,6 @@ namespace pdfpc {
 
         protected void update_pen_drawing() {
             pen_drawing.switch_to_slide(this.current_user_slide_number);
-            this.queue_pen_surface_draws();
         }
 
         private void hide_or_show_pen_surfaces() {
@@ -706,6 +745,11 @@ namespace pdfpc {
          * Timer id to hide the pointer after a period of inactivity
          */
         protected uint pointer_timeout_id = 0;
+
+        /**
+         * Timeout id to autoadvance to the next slide
+         */
+        protected uint autoadvance_timeout_id = 0;
 
         public double drag_x = -1;
         public double drag_y = -1;
@@ -1346,24 +1390,6 @@ namespace pdfpc {
         }
 
         /**
-         * Was the previous slide a skip one?
-         */
-        public bool skip_previous() {
-            return this.current_slide_number > 0 &&
-                this.current_user_slide_number ==
-                    this.metadata.real_slide_to_user_slide(this.current_slide_number - 1);
-        }
-
-        /**
-         * Is the next slide a skip one?
-         */
-        public bool skip_next() {
-            return this.current_slide_number < this.n_slides - 1 &&
-                this.current_user_slide_number ==
-                    this.metadata.real_slide_to_user_slide(this.current_slide_number + 1);
-        }
-
-        /**
          * Set the last slide as defined by the user
          */
         private void set_end_user_slide() {
@@ -1551,6 +1577,7 @@ namespace pdfpc {
          * Go to the named slide
          */
         public void goto_string(Variant? page) {
+            this.running = true;
             this.timer.start();
 
             int destination = int.parse(page.get_string()) - 1;
@@ -1741,7 +1768,10 @@ namespace pdfpc {
          * Start the presentation (-> timer)
          */
         protected void start() {
+            this.running = true;
             this.timer.start();
+            // start the autoadvancing on the initial page, if needed
+            this.start_autoadvance_timer(this.current_slide_number);
             this.controllables_update();
         }
 
@@ -1749,7 +1779,11 @@ namespace pdfpc {
          * Pause the timer
          */
         public void toggle_pause() {
+            this.running = !this.running;
             this.timer.pause();
+            if (this.running) {
+                this.start_autoadvance_timer(this.current_slide_number);
+            }
             this.controllables_update();
         }
 
