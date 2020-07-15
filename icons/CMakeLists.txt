@@ -13,6 +13,7 @@ install(FILES
     move.svg
     settings.svg
     linewidth.svg
+    spotlight.svg
 DESTINATION
     share/pixmaps/pdfpc
 )

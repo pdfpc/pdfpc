@@ -151,6 +151,13 @@ Screen to be used for the presentation (output name, see e.g. "xrandr --listmoni
 .B presenter-screen
 Screen to be used for the presenter (output name).
 .TP
+.B spotlight-opacity
+Set opacity of the area outside of the spotlight, in percent (int, default is
+50).
+.TP
+.B spotlight-size
+Set the initial spotlight size, in pixels (int, default is 100).
+.TP
 .B switch-screens
 Switch the presentation and the presenter screen (bool, Default is false).
 .TP

@@ -446,6 +446,7 @@ namespace pdfpc {
         public enum AnnotationMode {
             NORMAL,
             POINTER,
+            SPOTLIGHT,
             PEN,
             ERASER;
 
@@ -459,6 +460,8 @@ namespace pdfpc {
                         return NORMAL;
                     case "pointer":
                         return POINTER;
+                    case "spotlight":
+                        return SPOTLIGHT;
                     case "pen":
                         return PEN;
                     case "eraser":
@@ -472,10 +475,59 @@ namespace pdfpc {
         private AnnotationMode annotation_mode = AnnotationMode.NORMAL;
 
         /**
+         * Generic pointer tool
+         */
+        public class PointerTool {
+            protected double red;
+            protected double green;
+            protected double blue;
+            protected double alpha;
+            public double size;
+
+            public bool is_spotlight {get; protected set;}
+
+            public PointerTool(bool is_spotlight = false) {
+                this.red   = 0.0;
+                this.green = 0.0;
+                this.blue  = 0.0;
+                this.alpha = 0.5;
+                this.size  = 1.0;
+
+                this.is_spotlight = is_spotlight;
+            }
+
+            public Gdk.RGBA get_rgba() {
+                Gdk.RGBA color = Gdk.RGBA();
+
+                color.red   = this.red;
+                color.green = this.green;
+                color.blue  = this.blue;
+                color.alpha = this.alpha;
+
+                return color;
+            }
+
+            public void set_rgba(Gdk.RGBA color) {
+                this.red   = color.red;
+                this.green = color.green;
+                this.blue  = color.blue;
+                this.alpha = color.alpha;
+            }
+        }
+
+        protected PointerTool pointer;
+        protected PointerTool spotlight;
+        public PointerTool? current_pointer { get; protected set; }
+
+        /**
          * Instantiate a new controller
          */
         public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
+
+            this.pointer   = new PointerTool(false);
+            this.spotlight = new PointerTool(true);
+            this.current_pointer = null;
 
             this.history_bck = new Gee.ArrayQueue<int>();
             this.history_fwd = new Gee.ArrayQueue<int>();
@@ -524,6 +576,10 @@ namespace pdfpc {
             return this.annotation_mode == AnnotationMode.POINTER;
         }
 
+        public bool is_spotlight_active() {
+            return this.annotation_mode == AnnotationMode.SPOTLIGHT;
+        }
+
         public bool is_eraser_active() {
             return annotation_mode == AnnotationMode.ERASER;
         }
@@ -534,6 +590,10 @@ namespace pdfpc {
 
         public bool in_drawing_mode() {
             return is_eraser_active() || is_pen_active();
+        }
+
+        public bool in_pointing_mode() {
+            return is_pointer_active() || is_spotlight_active();
         }
 
         private void move_pen(double x, double y) {
@@ -610,7 +670,7 @@ namespace pdfpc {
         }
 
         private void hide_or_show_pointer_surfaces() {
-            if (this.annotation_mode == AnnotationMode.POINTER) {
+            if (this.in_pointing_mode()) {
                 if (presenter != null) {
                     presenter.enable_pointer(true);
                 }
@@ -643,6 +703,11 @@ namespace pdfpc {
                 break;
 
                 case AnnotationMode.POINTER:
+                    this.current_pointer = this.pointer;
+                break;
+
+                case AnnotationMode.SPOTLIGHT:
+                    this.current_pointer = this.spotlight;
                 break;
 
                 case AnnotationMode.PEN:
@@ -692,6 +757,10 @@ namespace pdfpc {
             this.set_mode(AnnotationMode.ERASER);
         }
 
+        public void set_spotlight_mode() {
+            this.set_mode(AnnotationMode.SPOTLIGHT);
+        }
+
         public void toggle_drawings() {
             if (this.in_zoom) {
                 return;
@@ -713,27 +782,39 @@ namespace pdfpc {
         }
 
         private void init_pen_and_pointer() {
-            pointer_size = Options.pointer_size;
-            if (pointer_size > 500) {
-                pointer_size = 500;
+            this.pointer.size = Options.pointer_size;
+            if (this.pointer.size > 500) {
+                this.pointer.size = 500;
             }
-            if (pointer_color.parse(Options.pointer_color) != true) {
+            var rgba = Gdk.RGBA();
+            if (rgba.parse(Options.pointer_color) != true) {
                 GLib.printerr("Cannot parse color specification '%s'\n",
                     Options.pointer_color);
-                pointer_color.parse("red");
+                rgba.parse("red");
             }
             if (Options.pointer_opacity >= 0 && Options.pointer_opacity <= 100) {
-                pointer_color.alpha = (double) Options.pointer_opacity/100.0;
+                rgba.alpha = (double) Options.pointer_opacity/100.0;
             } else {
-                pointer_color.alpha = 1.0;
+                rgba.alpha = 1.0;
             }
+            this.pointer.set_rgba(rgba);
+
+            this.spotlight.size = Options.spotlight_size;
+            if (this.spotlight.size > 500) {
+                this.spotlight.size = 500;
+            }
+            rgba.parse("black");
+            if (Options.spotlight_opacity >= 0 && Options.spotlight_opacity <= 100) {
+                rgba.alpha = (double) Options.spotlight_opacity/100.0;
+            } else {
+                rgba.alpha = 0.5;
+            }
+            this.spotlight.set_rgba(rgba);
 
             this.update_request.connect(this.update_pen_drawing);
         }
 
-        public uint pointer_size;
-        private uint pointer_step = 5;
-        public Gdk.RGBA pointer_color;
+        protected uint pointer_step = 5;
 
         /**
          * Hide drawing custom pointer (pointer/pen/eraser) when mouse leaves
@@ -798,7 +879,7 @@ namespace pdfpc {
             view.leave_notify_event.connect(() => {
                     this.pointer_hidden = true;
                     // make sure the pointer is cleared
-                    if (this.is_pointer_active()) {
+                    if (this.in_pointing_mode()) {
                         this.queue_pointer_surface_draws();
                     } else if (this.in_drawing_mode()) {
                         this.queue_pen_surface_draws();
@@ -812,7 +893,7 @@ namespace pdfpc {
          * them to the presentation controller
          */
         private bool on_motion(Gdk.EventMotion event) {
-            if (this.annotation_mode == AnnotationMode.POINTER) {
+            if (this.in_pointing_mode()) {
                 return on_move_pointer(event);
             } else if (this.in_drawing_mode()) {
                 return on_move_pen(event);
@@ -925,13 +1006,17 @@ namespace pdfpc {
 
 
         public void increase_pointer_size() {
-            if (pointer_size<500) pointer_size+=pointer_step;
-            queue_pointer_surface_draws();
+            if (this.current_pointer.size < 500) {
+                this.current_pointer.size += this.pointer_step;
+                this.queue_pointer_surface_draws();
+            }
         }
 
         public void decrease_pointer_size() {
-            if (pointer_size>pointer_step) pointer_size-=pointer_step;
-            queue_pointer_surface_draws();
+            if (this.current_pointer.size > this.pointer_step) {
+                this.current_pointer.size -= this.pointer_step;
+                this.queue_pointer_surface_draws();
+            }
         }
 
         /**
@@ -1077,7 +1162,8 @@ namespace pdfpc {
 
             add_action_with_parameter("switchMode", GLib.VariantType.STRING,
                 this.set_mode_to_string,
-                "Switch annotation mode (normal|pointer|pen|eraser)", "mode");
+                "Switch annotation mode (normal|pointer|pen|eraser|spotlight)",
+                "mode");
 
             add_action("increaseSize", this.increase_size,
                 "Increase the size of notes|pointer|pen|eraser");
@@ -1842,16 +1928,17 @@ namespace pdfpc {
         protected void increase_size() {
             switch (this.annotation_mode) {
                 case AnnotationMode.NORMAL:
-                this.increase_font_size();
+                    this.increase_font_size();
                 break;
 
                 case AnnotationMode.POINTER:
-                this.increase_pointer_size();
+                case AnnotationMode.SPOTLIGHT:
+                    this.increase_pointer_size();
                 break;
 
                 case AnnotationMode.PEN:
                 case AnnotationMode.ERASER:
-                this.increase_pen_size();
+                    this.increase_pen_size();
                 break;
             }
         }
@@ -1862,16 +1949,17 @@ namespace pdfpc {
         protected void decrease_size() {
             switch (this.annotation_mode) {
                 case AnnotationMode.NORMAL:
-                this.decrease_font_size();
+                    this.decrease_font_size();
                 break;
 
                 case AnnotationMode.POINTER:
-                this.decrease_pointer_size();
+                case AnnotationMode.SPOTLIGHT:
+                    this.decrease_pointer_size();
                 break;
 
                 case AnnotationMode.PEN:
                 case AnnotationMode.ERASER:
-                this.decrease_pen_size();
+                    this.decrease_pen_size();
                 break;
             }
         }

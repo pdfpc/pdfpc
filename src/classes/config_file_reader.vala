@@ -296,6 +296,12 @@ namespace pdfpc {
                 case "presenter-screen":
                     Options.presenter_screen = fields[2];
                     break;
+                case "spotlight-opacity":
+                    Options.spotlight_opacity = int.parse(fields[2]);
+                    break;
+                case "spotlight-size":
+                    Options.spotlight_size = int.parse(fields[2]);
+                    break;
                 case "switch-screens":
                     bool switch_screens = bool.parse(fields[2]);
                     if (switch_screens) {

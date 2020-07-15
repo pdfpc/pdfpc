@@ -285,7 +285,8 @@ namespace pdfpc.Window {
 
             // Draw the highlighted area, but ignore very short drags
             // made unintentionally by mouse clicks
-            if (c.highlight.width > 0.01 && c.highlight.height > 0.01) {
+            if (!c.current_pointer.is_spotlight &&
+                c.highlight.width > 0.01 && c.highlight.height > 0.01) {
                 context.rectangle(0, 0, a.width, a.height);
                 context.new_sub_path();
                 context.rectangle((int)(c.highlight.x*a.width),
@@ -300,15 +301,22 @@ namespace pdfpc.Window {
                 context.new_path();
             }
             // Draw the pointer when not dragging
-            if (c.drag_x == -1 && !c.pointer_hidden) {
+            if (c.drag_x == -1 &&
+                (!c.pointer_hidden || c.current_pointer.is_spotlight)) {
                 int x = (int)(a.width*c.pointer_x);
                 int y = (int)(a.height*c.pointer_y);
-                int r = (int)(a.height*0.001*c.pointer_size);
+                int r = (int)(a.height*0.001*c.current_pointer.size);
 
-                context.set_source_rgba(c.pointer_color.red,
-                                        c.pointer_color.green,
-                                        c.pointer_color.blue,
-                                        c.pointer_color.alpha);
+                Gdk.RGBA rgba = c.current_pointer.get_rgba();
+                context.set_source_rgba(rgba.red,
+                                        rgba.green,
+                                        rgba.blue,
+                                        rgba.alpha);
+                if (c.current_pointer.is_spotlight) {
+                    context.rectangle(0, 0, a.width, a.height);
+                    context.new_sub_path();
+                    context.set_fill_rule(Cairo.FillRule.EVEN_ODD);
+                }
                 context.arc(x, y, r, 0, 2*Math.PI);
                 context.fill();
             }

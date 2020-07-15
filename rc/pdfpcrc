@@ -80,6 +80,8 @@ bind 3                  switchMode pen
 bind KP_3               switchMode pen
 bind 4                  switchMode eraser
 bind KP_4               switchMode eraser
+bind 5                  switchMode spotlight
+bind KP_5               switchMode spotlight
 
 # Mode-sensitive size adjustment (notes|pointer|pen|eraser)
 bind plus               increaseSize
