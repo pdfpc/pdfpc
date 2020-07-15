@@ -155,6 +155,11 @@ namespace pdfpc.Window {
         protected Gtk.Image eraser_icon;
 
         /**
+         * Indication that the spotlight tool is selected
+         */
+        protected Gtk.Image spotlight_icon;
+
+        /**
          * The overview of slides
          */
         protected Overview overview = null;
@@ -443,6 +448,7 @@ namespace pdfpc.Window {
             this.highlight_icon = this.load_icon("highlight.svg", icon_height);
             this.pen_icon = this.load_icon("pen.svg", icon_height);
             this.eraser_icon = this.load_icon("eraser.svg", icon_height);
+            this.spotlight_icon = this.load_icon("spotlight.svg", icon_height);
 
             this.status.pack_start(this.blank_icon, false, false);
             this.status.pack_start(this.hidden_icon, false, false);
@@ -454,6 +460,7 @@ namespace pdfpc.Window {
             this.status.pack_start(this.highlight_icon, false, false);
             this.status.pack_start(this.pen_icon, false, false);
             this.status.pack_start(this.eraser_icon, false, false);
+            this.status.pack_start(this.spotlight_icon, false, false);
         }
 
         /**
@@ -494,6 +501,11 @@ namespace pdfpc.Window {
                 this.pen_icon.show();
             } else {
                 this.pen_icon.hide();
+            }
+            if (this.controller.is_spotlight_active()) {
+                this.spotlight_icon.show();
+            } else {
+                this.spotlight_icon.hide();
             }
         }
 
@@ -840,6 +852,11 @@ namespace pdfpc.Window {
                 "Eraser mode");
             tb.clicked.connect(() => {
                     this.controller.set_eraser_mode();
+                });
+            tb = add_toolbox_button(button_panel, tbox_inverse, "spotlight.svg",
+                "Spotlight mode");
+            tb.clicked.connect(() => {
+                    this.controller.set_spotlight_mode();
                 });
             tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg",
                 "Freeze presentation window");

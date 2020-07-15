@@ -258,6 +258,16 @@ namespace pdfpc {
         public static uint pointer_size = 10;
 
         /**
+         * Spotlight opacity (i.e., opacity of the outside area) (0 - 100)
+         */
+        public static int spotlight_opacity = 50;
+
+        /**
+         * Spotlight size
+         */
+        public static uint spotlight_size = 100;
+
+        /**
          * Try to automatically load video srt file
          */
         public static bool auto_srt = false;
