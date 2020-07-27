@@ -21,7 +21,7 @@ it is part of the ``gstreamer1.0-gtk3`` package; install it with::
 
     sudo apt-get install gstreamer1.0-gtk3
     
-On Arch linux, install it with:
+On Arch Linux and derived (e.g., Manjaro) distributions, install it with::
  
     sudo pacman -S gst-plugin-gtk
 
