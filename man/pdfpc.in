@@ -640,7 +640,9 @@ is a little
 which handles dual screens and beamer notes.
 
 .BR dspdfviewer (1)
-is also specialized for beamer-produced wide PDF with notes.
+is a specialized
+.URL https://github.com/dannyedel/dspdfviewer "Dual-Screen PDF Viewer for latex-beamer"
+for beamer-produced wide PDF with notes on the right.
 
 Many PDF viewers have full-screen presentation modes, but without dual-monitor preview or notes or a timer. These include
 .BR zathura (1),
