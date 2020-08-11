@@ -118,6 +118,30 @@ namespace pdfpc {
         };
 
         /**
+         * Parse the commandline and apply all immediate options there
+         * requiering immediate action to according static class members.
+         */
+         protected void parse_immediate_command_line_options(ref unowned string[] args) {
+            var context = new OptionContext("<pdf-file>");
+            OptionEntry[] immediate_options = { // Extract immediate options
+                options[7],
+                options[9],
+                options[16],
+                {null}
+            };
+            context.add_main_entries(immediate_options, null);
+
+            // Leave help generation for when all options are available.
+            context.set_help_enabled(false);
+
+            try {
+                context.parse(ref args);
+            } catch(OptionError e) {
+                // Ignore unrecognized options at this time, deal with them later.
+            }
+        }
+
+        /**
          * Parse the commandline and apply all found options to there according
          * static class members.
          *
@@ -207,7 +231,7 @@ namespace pdfpc {
             // intialize Options for the first time to invoke static construct
             new Options();
 
-            string pdfFilename = this.parse_command_line_options(ref args);
+            this.parse_immediate_command_line_options(ref args);
 
             if (Options.version) {
                 print_version();
@@ -255,6 +279,8 @@ namespace pdfpc {
                 configFileReader.readConfig(legacyUserConfig);
                 GLib.printerr("Loaded pdfpcrc from legacy location. Please move your config file to %s\n", userConfig);
             }
+
+            string pdfFilename = this.parse_command_line_options(ref args);
 
             // with prerendering enabled, it makes no sense not to cache a slide
             if (Options.prerender_slides != 0) {
