@@ -124,9 +124,6 @@ namespace pdfpc {
          * Returns the name of the pdf file to open (or null if not present)
          */
         protected string? parse_command_line_options(ref unowned string[] args) {
-            // intialize Options for the first time to invoke static construct
-            new Options();
-
             var context = new OptionContext("<pdf-file>");
             context.add_main_entries(options, null);
 
@@ -206,6 +203,9 @@ namespace pdfpc {
             Gtk.init(ref args);
 
             var display = Gdk.Display.get_default();
+
+            // intialize Options for the first time to invoke static construct
+            new Options();
 
             string pdfFilename = this.parse_command_line_options(ref args);
 
