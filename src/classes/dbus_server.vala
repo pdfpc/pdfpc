@@ -84,9 +84,8 @@ namespace pdfpc {
         }
 
         public string get_notes() throws GLib.Error {
-            var notes = this.controller.metadata.get_notes();
             return
-                notes.get_note_for_slide(controller.current_user_slide_number);
+                this.controller.metadata.get_note(controller.current_slide_number);
         }
     }
 }
