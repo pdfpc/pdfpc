@@ -31,29 +31,42 @@
  */
 
 namespace pdfpc.Metadata {
+    protected class SlideNote {
+        public string note_text = null;
+
+        /**
+         * Native PDF annotation flag
+         */
+        public bool is_native = false;
+    }
+
+    protected class PageMeta {
+        /**
+         * PDF page label
+         */
+        public string label;
+
+        /**
+         * User slide #
+         */
+        public int user_slide;
+
+        /**
+         * Note
+         */
+        public SlideNote note;
+    }
+
+
+    public errordomain MetaFileError {
+        INVALID_FORMAT
+    }
+
     /**
-     * Metadata for Pdf files
+     * Metadata for PDF files
      */
     public class Pdf: Object {
-        /**
-         * Unique Resource Locator for the given slideset
-         */
-        protected string url;
-
-        /**
-         * Return the registered url
-         */
-        public string get_url() {
-            return this.url;
-        }
-
-        public string? pdf_fname = null;
-        protected string? pdfpc_fname = null;
-
-        /**
-         * Poppler document which belongs to the associated pdf file
-         */
-        protected Poppler.Document document;
+        public weak PresentationController controller = null;
 
         /**
          * Renderer to be used for rendering the slides
@@ -62,43 +75,56 @@ namespace pdfpc.Metadata {
             get; protected set;
         }
 
-        /**
-         * Pdf page width
-         */
-        protected double original_page_width = 0;
+        public string? pdf_fname {
+            get; protected set; default = null;
+        }
+        protected string? pdfpc_fname = null;
 
         /**
-         * Pdf page height
+         * Poppler document of the associated PDF file
          */
-        protected double original_page_height = 0;
+        protected Poppler.Document document;
 
         /**
-         * Indicates if pages contains also notes and there position (e. g. when using latex beamer)
-         */
-        protected NotesPosition notes_position = NotesPosition.NONE;
-
-        /**
-         * Assume notes are formatted in Markdown. False by default for backward
-         * compatibility.
-         */
-        public bool enable_markdown = false;
-
-        /**
-         * Number of pages in the pdf document
+         * Number of pages in the PDF document
          */
         protected uint page_count;
 
         /**
-         * Notes for the slides (text only)
+         * PDF page dimensions
          */
-        protected slides_notes notes;
+        protected double original_page_width = 0;
+        protected double original_page_height = 0;
 
         /**
-         * The a virtual mapping of "real pages" to "user-view pages". The
-         * indexes in the vector are the user-view slide, the contents are the
-         * real slide numbers.
+         * Variables used to keep track of the action mappings for the current
+         * page.
          */
-        private int[] user_view_indexes;
+        private int mapping_page_num = -1;
+        private Gee.List<ActionMapping> action_mapping;
+        private ActionMapping[] blanks = {
+#if MOVIES
+            new ControlledMovie(),
+#endif
+            new LinkAction()
+        };
+
+        // BEGIN .pdfpc meta
+
+        /**
+         * Per-page meta information
+         */
+        private Gee.List<PageMeta> pages;
+
+        /**
+         * Position of the LaTeX Beamer notes (when present)
+         */
+        protected NotesPosition notes_position = NotesPosition.NONE;
+
+        /**
+         * Assume notes are formatted in Markdown
+         */
+        public bool enable_markdown { get; protected set; default = true; }
 
         /**
          * The "end slide" defined by the user
@@ -111,42 +137,21 @@ namespace pdfpc.Metadata {
         private int last_saved_slide = -1;
 
         /**
-         * Were the skips modified by the user?
-         */
-        protected bool skips_by_user;
-
-        /**
          * Duration of the presentation
          */
         protected uint duration;
 
         /**
-         * Times the talk should start or end
+         * The start/end times of the talk
          */
-        public string? start_time {
-            get; protected set;
-        }
-        public string? end_time {
-            get; protected set;
-        }
+        public string? start_time { get; protected set; }
+        public string? end_time { get; protected set; }
 
         /**
          * The font size used for notes. -1 if none is
          * specified in pdfpc file.
          */
-        private int _font_size = -1;
-        public int font_size { get { return _font_size; } set { _font_size = value; } }
-
-        public bool is_ready {
-            get {
-                return (this.document != null);
-            }
-        }
-
-        /**
-         * A file to read additional notes from
-         */
-        private string? notes_include = null;
+        public int font_size = -1;
 
         /**
          * Default page transition
@@ -155,17 +160,303 @@ namespace pdfpc.Metadata {
             get; protected set;
         }
 
+        // END .pdfpc meta
+
+
+        public bool is_ready {
+            get {
+                return (this.document != null);
+            }
+        }
+
         /**
-         * Parse the given pdfpc file
+         * Unique Resource Locator for the given slideset
          */
-        void parse_pdfpc_file(out string? skip_line) {
+        public string? get_url() {
+            if (pdf_fname != null) {
+                return File.new_for_commandline_arg(pdf_fname).get_uri();
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Set a note for a given slide (not a user_slide!)
+         */
+        public void set_note(string note_text, int slide_number,
+            bool is_native = false) {
+
+            var page = this.pages.get(slide_number);
+            if (page != null) {
+                if (page.note == null) {
+                    page.note = new SlideNote();
+                }
+                page.note.note_text = note_text;
+                page.note.is_native = is_native;
+            }
+        }
+
+        /**
+         * Return the text of a note
+         */
+        public string get_note(int slide_number) {
+            var page = this.pages.get(slide_number);
+            if (page != null && page.note != null) {
+                return page.note.note_text;
+            } else {
+                return "";
+            }
+        }
+
+        public bool is_note_read_only(int slide_number) {
+            var page = this.pages.get(slide_number);
+            if (page != null && page.note != null) {
+                return page.note.is_native;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Save the metadata to disk
+         */
+        public void save_to_disk() {
+            Json.Builder builder = new Json.Builder();
+            builder.begin_object();
+
+            // Our "magic" header
+            builder.set_member_name("pdfpc_format");
+            builder.add_int_value(1);
+
+            if (Options.duration > 0) {
+                builder.set_member_name("duration");
+                builder.add_int_value(Options.duration);
+            }
+            if (Options.end_time != null) {
+                builder.set_member_name("end_time");
+                builder.add_string_value(Options.end_time);
+            }
+            if (Options.start_time != null) {
+                builder.set_member_name("start_time");
+                builder.add_string_value(Options.start_time);
+            }
+            if (Options.last_minutes != 5) {
+                builder.set_member_name("last_minutes");
+                builder.add_int_value(Options.last_minutes);
+            }
+            if (this.end_user_slide >= 0) {
+                builder.set_member_name("end_slide");
+                builder.add_int_value(this.end_user_slide);
+            }
+            if (this.last_saved_slide >= 0) {
+                builder.set_member_name("saved_slide");
+                builder.add_int_value(this.last_saved_slide);
+            }
+            if (Options.default_transition != null) {
+                builder.set_member_name("default_transition");
+                builder.add_string_value(Options.default_transition);
+            }
+
+            // Notes
+            if (Options.notes_position != null) {
+                builder.set_member_name("notes_position");
+                builder.add_string_value(this.notes_position.to_string());
+            }
+            builder.set_member_name("enable_markdown");
+            builder.add_boolean_value(this.enable_markdown);
+            if (this.font_size > 0) {
+                builder.set_member_name("font_size");
+                builder.add_int_value(this.font_size);
+            }
+            builder.set_member_name("pages");
+            builder.begin_array();
+            int idx = 0, overlay = 0;
+            string label = "";
+            foreach (var page in this.pages) {
+                if (label != page.label) {
+                    label = page.label;
+                    overlay = 0;
+                }
+                if (page.note != null &&
+                    page.note.is_native != true &&
+                    page.note.note_text != null) {
+                    builder.begin_object();
+                    builder.set_member_name("idx");
+                    builder.add_int_value(idx);
+                    builder.set_member_name("label");
+                    builder.add_string_value(label);
+                    builder.set_member_name("overlay");
+                    builder.add_int_value(overlay);
+                    builder.set_member_name("note");
+                    builder.add_string_value(page.note.note_text);
+                    builder.end_object();
+                }
+                idx++;
+                overlay++;
+            }
+            builder.end_array();
+
+	    builder.end_object();
+
+	    Json.Generator generator = new Json.Generator();
+            Json.Node root = builder.get_root();
+	    generator.set_root(root);
+	    string contents = generator.to_data(null);
+
+            try {
+                if (contents != "") {
+                    GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
+                }
+            } catch (Error e) {
+                GLib.printerr("Failed to store metadata on disk: %s\n",
+                    e.message);
+                GLib.printerr("The metadata was:\n%s\n", contents);
+                Process.exit(1);
+            }
+        }
+
+        private void parse_pdfpc_page(Json.Node node) throws GLib.Error {
+	    if (node.get_node_type() != Json.NodeType.OBJECT) {
+                throw new MetaFileError.INVALID_FORMAT("Unexpected element type %s",
+                    node.type_name());
+	    }
+	    unowned Json.Object obj = node.get_object();
+            string page_label = "", text = "";
+            int idx = 0, overlay = 0;
+            foreach (unowned string name in obj.get_members()) {
+                unowned Json.Node item = obj.get_member(name);
+                switch (name) {
+                case "idx":
+		    idx = (int) item.get_int();
+		    break;
+                case "label":
+		    page_label = item.get_string();
+		    break;
+                case "overlay":
+		    overlay = (int) item.get_int();
+		    break;
+                case "note":
+		    text = item.get_string();
+		    break;
+		default:
+                    GLib.printerr("Unknown page item \"%s\"\n", name);
+		    break;
+		}
+	    }
+
+            if (page_label != "" && text != "") {
+                // first, try fast access by index
+                var page = this.pages.get(idx);
+                if (page != null &&
+                    page.label == page_label &&
+                    slide_get_overlay(idx) == overlay) {
+                    set_note(text, idx);
+                } else {
+                    int slide_number = -1;
+                    for (int i = 0; i < this.page_count; i++) {
+                        page = this.pages.get(i);
+                        if (page.label == page_label) {
+                            slide_number = i + overlay;
+                            break;
+                        }
+                    }
+                    page = this.pages.get(slide_number);
+                    if (page != null && page.label == page_label) {
+                        set_note(text, slide_number);
+                    }
+                }
+            }
+        }
+
+        private void parse_pdfpc_pages(Json.Node node) throws GLib.Error {
+            if (node.get_node_type () != Json.NodeType.ARRAY) {
+                throw new MetaFileError.INVALID_FORMAT("Unexpected element type %s",
+                    node.type_name());
+            }
+
+            unowned Json.Array array = node.get_array();
+
+            foreach (unowned Json.Node item in array.get_elements()) {
+                parse_pdfpc_page(item);
+            }
+        }
+
+        private void parse_pdfpc_file() throws GLib.Error {
+            Json.Parser parser = new Json.Parser();
+            try {
+                parser.load_from_file(this.pdfpc_fname);
+                Json.Node node = parser.get_root();
+	        if (node.get_node_type() != Json.NodeType.OBJECT) {
+                    throw new MetaFileError.INVALID_FORMAT(
+                        "Unexpected element type %s", node.type_name());
+	        }
+
+	        unowned Json.Object obj = node.get_object();
+                foreach (unowned string name in obj.get_members()) {
+                    unowned Json.Node item = obj.get_member(name);
+                    switch (name) {
+                    case "pdfpc_format":
+			int format = (int) item.get_int();
+                        // In future, parse depending on the version
+                        if (format != 1) {
+                            throw new MetaFileError.INVALID_FORMAT(
+                                "Unsupported pdfpc format version %d", format);
+                        }
+			break;
+                    case "duration":
+			this.duration = (uint) item.get_int();
+			break;
+                    case "start_time":
+			this.start_time = item.get_string();
+			break;
+                    case "end_time":
+			this.end_time = item.get_string();
+			break;
+                    case "end_slide":
+			this.end_user_slide = (int) item.get_int();
+			break;
+                    case "last_minutes":
+			Options.last_minutes = (int) item.get_int();
+			break;
+                    case "notes_position":
+			this.notes_position =
+                            NotesPosition.from_string(item.get_string());
+			break;
+                     case "default_transition":
+			this.set_default_transition_from_string(item.get_string());
+			break;
+                   case "enable_markdown":
+			this.enable_markdown = item.get_boolean();
+			break;
+                   case "font_size":
+			this.font_size = (int) item.get_int();
+			break;
+                   case "pages":
+			this.parse_pdfpc_pages(item);
+			break;
+		    default:
+                        GLib.printerr("Unknown item \"%s\"\n", name);
+			break;
+		    }
+	        }
+
+            } catch (GLib.Error e) {
+                throw e;
+            }
+        }
+
+        /**
+         * Parse the given pdfpc file, old format
+         */
+        void parse_pdfpc_file_old(out string? notes_content,
+            out string? skip_line) {
+            notes_content = null;
             skip_line = null;
             try {
                 string content;
                 GLib.FileUtils.get_contents(this.pdfpc_fname, out content);
                 GLib.Regex regex = new GLib.Regex("(\\[[A-Za-z_]+\\])");
 
-                string? notes_content = null;
 
                 string[] config_sections = regex.split_full(content);
                 // config_sections[0] is empty
@@ -208,17 +499,12 @@ namespace pdfpc.Metadata {
                             notes_content = section_content;
                             break;
                         }
-                        case "[notes_include]": {
-                            this.notes_include = section_content;
-                            break;
-                        }
                         case "[notes_position]": {
                             this.notes_position = NotesPosition.from_string(section_content);
                             break;
                         }
                         case "[skip]": {
                             skip_line = section_content;
-                            skips_by_user = true;
                             break;
                         }
                         case "[start_time]": {
@@ -231,12 +517,8 @@ namespace pdfpc.Metadata {
                         }
                     }
                 }
-
-                if (this.notes_include != null) {
-                    parse_notes_file();
-                }
-                if (notes_content != null) {
-                    notes.parse_lines(notes_content.split("\n"));
+                if (skip_line != null) {
+                    Options.disable_auto_grouping = true;
                 }
             } catch (Error e) {
                 GLib.printerr("%s\n", e.message);
@@ -246,49 +528,56 @@ namespace pdfpc.Metadata {
 
 
         /**
-         * Parse an additonal notes file
+         * Parse the line for the skip slides, old pdfpc format
          */
-        void parse_notes_file() {
-            try {
-                string content;
-                string full_notes_include = this.notes_include;
-                if (!GLib.Path.is_absolute(this.notes_include)) {
-                    full_notes_include = GLib.Path.build_filename(GLib.Path.get_dirname(this.pdfpc_fname), this.notes_include);
-                }
-                GLib.FileUtils.get_contents(full_notes_include, out content);
-                if (content.substring(0, "[notes]".length) == "[notes]") {
-                    var notes_content = content.substring("[notes]".length + 1);
-                    notes.parse_lines(notes_content.split("\n"), true);
-                } else {
-                    GLib.printerr("File %s does not start with [notes]\n", this.notes_include);
-                    Process.exit(1);
-                }
-            } catch (Error e) {
-                GLib.printerr("%s\n", e.message);
-                Process.exit(1);
-            }
-        }
-
-        /**
-         * Parse the line for the skip slides
-         */
-        void parse_skip_line(string line) {
-            int s = 0; // Counter over real slides
+        void parse_skip_line_old(string line) {
             string[] fields = line.split(",");
             for (int f = 0; f < fields.length - 1; ++f) {
-                if ( fields[f] == "")
-                    continue;
-                int current_skip = int.parse(fields[f]) - 1;
-                while (s < current_skip) {
-                    user_view_indexes += s;
-                    ++s;
+                if (fields[f] != "") {
+                    int current_skip = int.parse(fields[f]) - 1;
+                    add_overlay(current_skip);
                 }
-                ++s;
             }
-            // Now we have to reach the end
-            while (s < this.page_count) {
-                user_view_indexes += s;
-                ++s;
+        }
+
+        /**
+         * Parse the notes section of the pdfpc file, old format
+         */
+        void parse_notes_old(string[] lines) {
+            string long_line = string.joinv("\n", lines);
+            string[] notes_sections = long_line.split("### ");
+
+            try {
+                // match [,],# with leading \ in the file. Use
+                // regex grouping to get only the [,],# character
+                var unescape_regex = new Regex("\\\\([\\[\\]#])");
+
+                for (int notes_section = 0; notes_section < notes_sections.length; ++notes_section) {
+                    if (notes_sections[notes_section].length == 0) {
+                        continue;
+                    }
+                    int first_newline = notes_sections[notes_section].index_of("\n");
+                    var header_string = notes_sections[notes_section][0:first_newline];
+                    var notes = notes_sections[notes_section][first_newline + 1:notes_sections[notes_section].length];
+                    var notes_unescaped = unescape_regex.replace(notes, notes.length, 0, "\\1");
+
+                    int user_slide = int.parse(header_string) - 1;
+                    int slide_number =
+                        user_slide_to_real_slide(user_slide, false);
+                    // Assign to all slides from the same user slide
+                    for (int i = slide_number; i < this.page_count; i++) {
+                        var page = this.pages.get(i);
+                        if (page.user_slide == user_slide) {
+                            set_note(notes_unescaped, i, false);
+                        } else {
+                            break;
+                        }
+                    }
+
+                }
+            } catch (RegexError e) {
+                GLib.printerr("Parsing notes file failed.\n");
+                Process.exit(1);
             }
         }
 
@@ -451,130 +740,12 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Save the metadata to disk, if needed (i.e. if the user did something
-         * with the notes or the skips)
-         */
-        public void save_to_disk() {
-            string contents =   format_command_line_options()
-                              + format_skips()
-                              + format_end_user_slide()
-                              + format_last_saved_slide()
-                              + format_font_size()
-                              + format_notes_include()
-                              + format_notes();
-
-            try {
-                if (contents != "" || GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
-                    GLib.FileUtils.set_contents(this.pdfpc_fname, contents);
-                }
-            } catch (Error e) {
-                GLib.printerr("Failed to store metadata on disk: %s\nThe metadata was:\n\n%s", e.message, contents);
-                Process.exit(1);
-            }
-        }
-
-        /**
-         * Format the [note_include] section
-         */
-        protected string format_notes_include() {
-            string contents = "";
-
-            if (this.notes_include != null) {
-                contents += "[notes_include]\n" + this.notes_include;
-            }
-
-            return contents;
-        }
-
-        /**
-         * Format the skip information for saving to disk
-         */
-        protected string format_skips() {
-            string contents = "";
-            if (this.user_view_indexes.length <= this.page_count && this.skips_by_user) {
-                contents += "[skip]\n";
-                int user_slide = 0;
-                for (int slide = 0; slide < this.page_count; ++slide) {
-                    if (slide != user_view_indexes[user_slide]) {
-                        contents += "%d,".printf(slide + 1);
-                    } else {
-                        ++user_slide;
-                    }
-                }
-                contents += "\n";
-            }
-
-            return contents;
-        }
-
-        protected string format_end_user_slide() {
-            string contents = "";
-            if (this.end_user_slide >= 0) {
-                contents += "[end_user_slide]\n%d\n".printf(this.end_user_slide);
-            }
-
-            return contents;
-        }
-
-        protected string format_last_saved_slide() {
-            string contents = "";
-            if (this.last_saved_slide >= 0) {
-                contents += "[last_saved_slide]\n%d\n".printf(this.last_saved_slide);
-            }
-
-            return contents;
-        }
-
-        protected string format_font_size() {
-            string contents = "";
-            if (this.font_size >= 0) {
-                contents += "[font_size]\n%d\n".printf(this.font_size);
-            }
-
-            return contents;
-        }
-
-        /**
-         * Format the notes for saving to disk
-         */
-        protected string format_notes() {
-            string contents = "";
-            if (this.notes.has_notes()) {
-                contents += ("[notes]\n" + this.notes.format_to_save());
-            }
-
-            return contents;
-        }
-
-        protected string format_command_line_options() {
-            string contents = "";
-            if (this.duration != uint.MAX) {
-                contents += "[duration]\n%u\n".printf(duration);
-            }
-            if (Options.end_time != null) {
-                contents += "[end_time]\n%s\n".printf(Options.end_time);
-            }
-            if (this.notes_position != NotesPosition.NONE) {
-                contents += "[notes_position]\n%s\n".printf(this.notes_position.to_string());
-            }
-            if (Options.last_minutes != 5) {
-                contents += "[last_minutes]\n%u\n".printf(Options.last_minutes);
-            }
-            if (Options.start_time != null) {
-                contents += "[start_time]\n%s\n".printf(Options.start_time);
-            }
-
-            return contents;
-        }
-
-        /**
          * Fill the slide notes from pdf text annotations.
          */
         private void notes_from_document() {
             for (int i = 0; i < this.page_count; i++) {
                 var page = this.document.get_page(i);
-                int user_slide = real_slide_to_user_slide(i);
-                string note_text = this.notes.get_note_for_slide(user_slide);
+                string note_text = this.get_note(i);
 
                 // We never overwrite existing notes
                 if (note_text != "") {
@@ -602,7 +773,7 @@ namespace pdfpc.Metadata {
                     }
                 }
                 if (note_text != "") {
-                    this.notes.set_note(note_text, user_slide, true);
+                    this.set_note(note_text, i, true);
                 }
             }
         }
@@ -689,8 +860,6 @@ namespace pdfpc.Metadata {
                 Process.exit(1);
             }
 
-            this.url = File.new_for_commandline_arg(fname).get_uri();
-
             if (this.action_mapping != null) {
                 this.deactivate_mappings();
             } else {
@@ -699,20 +868,44 @@ namespace pdfpc.Metadata {
 
             fill_path_info(fname, fpcname);
 
-            notes = new slides_notes();
-            skips_by_user = false;
-            string? skip_line = null;
-            if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
-                parse_pdfpc_file(out skip_line);
-            }
-            this.user_view_indexes = new int [0];
             this.document = this.open_pdf_document(this.pdf_fname);
+            this.page_count = this.document.get_n_pages();
+            this.pages = new Gee.ArrayList<PageMeta>();
+            for (int i = 0; i < this.page_count; i++) {
+                var page = new PageMeta();
+                page.user_slide = i;
+                page.label = this.document.get_page(i).label;
+                this.pages.add(page);
+            }
+
+            // Get maximal page dimensions
+            for (int i = 0; i < this.page_count; i++) {
+                double width1, height1;
+                this.document.get_page(i).get_size(out width1, out height1);
+                if (this.original_page_width < width1) {
+                    this.original_page_width = width1;
+                }
+                if (this.original_page_height < height1) {
+                    this.original_page_height = height1;
+                }
+            }
+
+            string notes_content_old = null, skip_line_old = null;
+            if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
+                try {
+                    parse_pdfpc_file();
+                } catch (GLib.Error e) {
+                    GLib.printerr("%s\n", e.message);
+                    // Try old-style format
+                    parse_pdfpc_file_old(out notes_content_old, out skip_line_old);
+                }
+            }
 
             // Parse XMP metadata
             this.metadata_from_document();
 
             // Command line options have the highest priority
-            if (Options.duration != uint.MAX) {
+            if (Options.duration != 0) {
                 set_duration(Options.duration);
             }
 
@@ -736,40 +929,29 @@ namespace pdfpc.Metadata {
                 GLib.printerr("Notes position set, auto grouping disabled.\n");
             }
 
-            // Get maximal page dimensions
-            this.page_count = this.document.get_n_pages();
-            for (int i = 0; i < this.page_count; ++i) {
-                double width1, height1;
-                this.document.get_page(i).get_size(out width1, out height1);
-                if (this.original_page_width < width1) {
-                    this.original_page_width = width1;
-                }
-                if (this.original_page_height < height1) {
-                    this.original_page_height = height1;
-                }
-            }
-
-            if (Options.disable_auto_grouping && !skips_by_user) {
-                // Ignore overlayed slides
-                for (int i = 0; i < this.page_count; ++i) {
-                    this.user_view_indexes += i;
-                }
-            }
-
-            if (!Options.disable_auto_grouping && !skips_by_user) {
-                // Auto-detect which pages to skip
+            if (!Options.disable_auto_grouping) {
                 string previous_label = null;
+                int user_slide = -1;
                 for (int i = 0; i < this.page_count; ++i) {
-                    string this_label = this.document.get_page(i).label;
+                    var page = this.pages.get(i);
+                    // Auto-detect which pages to skip
+                    string this_label = page.label;
                     if (this_label != previous_label) {
-                        this.user_view_indexes += i;
+                        user_slide++;
                         previous_label = this_label;
                     }
+                    page.user_slide = user_slide;
                 }
             }
 
-            if (skips_by_user) {
-                parse_skip_line(skip_line);
+            if (notes_content_old != null) {
+                this.parse_notes_old(notes_content_old.split("\n"));
+                // No Markdown in the old-style pdfpc files
+                this.enable_markdown = false;
+            }
+
+            if (skip_line_old != null) {
+                this.parse_skip_line_old(skip_line_old);
             }
 
             // Prepopulate notes from annotations
@@ -787,7 +969,12 @@ namespace pdfpc.Metadata {
          * Return the number of user slides
          */
         public int get_user_slide_count() {
-            return this.user_view_indexes.length;
+            if (this.page_count > 0) {
+                var page = this.pages.get((int) this.page_count - 1);
+                return page.user_slide + 1;
+            } else {
+                return 0;
+            }
         }
 
         /**
@@ -798,7 +985,7 @@ namespace pdfpc.Metadata {
             if (this.end_user_slide >= 0)
                 return this.end_user_slide;
             else
-                return this.get_user_slide_count();
+                return this.get_user_slide_count() - 1;
         }
 
         /**
@@ -823,71 +1010,63 @@ namespace pdfpc.Metadata {
             this.last_saved_slide = slide;
         }
 
-         /**
-         * Toggle the skip flag for one slide
-         *
-         * We require to be provided also with the user_slide_number, as this
-         * info should be available and so we do not need to perform a search.
+        /**
+         * Add current slide as an overlay
          *
          * Returns the offset to move the current user_slide_number
          */
-        public int toggle_skip(int slide_number, int user_slide_number) {
-            if (slide_number == 0 || user_slide_number == 0) {
-                return 0; // We cannot skip the first slide
+        public int add_overlay(int slide_number) {
+            if (slide_number <= 0) {
+                // We cannot skip the first slide
+                return 0;
             }
-            int l = this.user_view_indexes.length;
-            if (l < 2) {
-                return 0; // Can no longer skip...
+            var page = this.pages.get(slide_number - 1);
+            if (page == null) {
+                // Something is terribly wrong...
+                return 0;
             }
-            skips_by_user = true;
-            int converted_user_slide = user_slide_to_real_slide(user_slide_number);
-            int offset;
-            if (converted_user_slide == slide_number) { // Activate skip
-                int[] new_indexes = new int[ l-1 ];
-                for (int i = 0; i < user_slide_number; ++i) {
-                    new_indexes[i] = this.user_view_indexes[i];
-                }
-                for (int i = user_slide_number + 1; i < l; ++i) {
-                    new_indexes[i-1] = this.user_view_indexes[i];
-                }
-                this.user_view_indexes = new_indexes;
-                if (this.end_user_slide >= 0 && user_slide_number < this.end_user_slide) {
-                    --this.end_user_slide;
-                }
-                offset = -1;
-            } else { // Deactivate skip
-                int[] new_indexes = new int[ l+1 ];
-                for (int i = 0; i <= user_slide_number; ++i) {
-                    new_indexes[i] = this.user_view_indexes[i];
-                }
-                new_indexes[user_slide_number+1] = slide_number;
-                for (int i = user_slide_number+1; i < l; ++i) {
-                    new_indexes[i+1] = this.user_view_indexes[i];
-                }
-                this.user_view_indexes = new_indexes;
-                if (this.end_user_slide >= 0 && user_slide_number < this.end_user_slide) {
-                    ++this.end_user_slide;
-                }
-                offset = +1;
+            int prev_user_slide_number = page.user_slide;
+
+            page = this.pages.get(slide_number);
+            if (page == null || page.user_slide == prev_user_slide_number) {
+                // Nothing to do
+                return 0;
             }
 
-            return offset;
+            for (int i = slide_number; i < this.page_count; i++) {
+                page = this.pages.get(i);
+                page.user_slide--;
+            }
+            return -1;
         }
 
         /**
          * Transform from user slide numbers to real slide numbers
          *
-         * If lastSlide is true, the last page of an overlay will be return,
+         * If lastSlide is true, the last page of an overlay will be returned,
          * otherwise, the first one
          */
         public int user_slide_to_real_slide(int number, bool lastSlide = true) {
-            if (lastSlide && number + 1 < user_view_indexes.length) {
-                return this.user_view_indexes[number+1] - 1;
-            } else if (number < user_view_indexes.length) {
-                return this.user_view_indexes[number];
+            if (number < 0) {
+                return 0;
             } else {
-                return (int)this.page_count;
+                if (lastSlide) {
+                    for (int i = (int)this.page_count - 1; i >= 0; i--) {
+                        var page = this.pages.get(i);
+                        if (page.user_slide == number) {
+                            return i;
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < this.page_count; i++) {
+                        var page = this.pages.get(i);
+                        if (page.user_slide == number) {
+                            return i;
+                        }
+                    }
+                }
             }
+            return -1;
         }
 
         /**
@@ -897,31 +1076,14 @@ namespace pdfpc.Metadata {
          * last user slide.
          */
         public int real_slide_to_user_slide(int number) {
-
-            // is this not a valid page?
-            if (number > this.page_count) {
-                return (int)this.get_user_slide_count() - 1;
+            if (this.page_count == 0 || number < 0) {
+                return -1;
+            } else if (number >= this.page_count) {
+                return this.get_user_slide_count() - 1;
+            } else {
+                var page = this.pages.get(number);
+                return page.user_slide;
             }
-
-            // is number a real page of the last user page?
-            if (number >= this.user_view_indexes[this.get_user_slide_count()-1]) {
-                return (int)this.get_user_slide_count()-1;
-            }
-
-            // Here we could do a binary search
-            int user_slide = 0;
-            for (int u = 0; u < this.get_user_slide_count(); ++u) {
-                int real_slide = this.user_view_indexes[u];
-                if (number == real_slide) {
-                    user_slide = u;
-                    break;
-                } else if (number < real_slide) {
-                    user_slide = u - 1;
-                    break;
-                }
-            }
-
-            return user_slide;
         }
 
         /**
@@ -933,6 +1095,15 @@ namespace pdfpc.Metadata {
             int last_slide = user_slide_to_real_slide(user_slide, true);
 
             return (number == last_slide);
+        }
+
+        /**
+         * Get the overlay index of the given slide
+         */
+        public int slide_get_overlay(int number) {
+            int user_slide = real_slide_to_user_slide(number);
+            int first_slide = user_slide_to_real_slide(user_slide, false);
+            return number - first_slide;
         }
 
         /**
@@ -994,14 +1165,14 @@ namespace pdfpc.Metadata {
         /**
          * Fixes the page width if pdfpc uses notes in split mode
          */
-         public double get_corrected_page_width(double page_width) {
+        public double get_corrected_page_width(double page_width) {
             if (    this.notes_position == NotesPosition.LEFT
                  || this.notes_position == NotesPosition.RIGHT) {
                  return page_width / 2;
             } else {
                 return page_width;
             }
-         }
+        }
 
         /**
          * Return the height of the first page of the loaded pdf document.
@@ -1018,14 +1189,14 @@ namespace pdfpc.Metadata {
         /**
          * Fixes the page height if pdfpc uses notes in split mode
          */
-         public double get_corrected_page_height(double page_height) {
+        public double get_corrected_page_height(double page_height) {
             if (    this.notes_position == NotesPosition.TOP
                  || this.notes_position == NotesPosition.BOTTOM) {
                  return page_height / 2;
             } else {
                 return page_height;
             }
-         }
+        }
 
         /**
          * Return the horizontal offset of the given area on the page
@@ -1098,13 +1269,6 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Return the notes for the presentation
-         */
-        public slides_notes get_notes() {
-            return this.notes;
-        }
-
-        /**
          * Get the duration of the presentation
          */
         public uint get_duration() {
@@ -1122,15 +1286,12 @@ namespace pdfpc.Metadata {
          * Open a given pdf document url and return a Poppler.Document for it.
          */
         protected Poppler.Document open_pdf_document(string fname) {
-            var file = File.new_for_commandline_arg(fname);
+            var uri = File.new_for_commandline_arg(fname).get_uri();
 
             Poppler.Document document = null;
 
             try {
-                document = new Poppler.Document.from_file(
-                    file.get_uri(),
-                    null
-                );
+                document = new Poppler.Document.from_file(uri, null);
             } catch(GLib.Error e) {
                 GLib.printerr("Unable to open pdf file \"%s\": %s\n",
                               fname, e.message);
@@ -1139,20 +1300,6 @@ namespace pdfpc.Metadata {
 
             return document;
         }
-
-        /**
-         * Variables used to keep track of the action mappings for the current
-         * page.
-         */
-        private int mapping_page_num = -1;
-        private Gee.List<ActionMapping> action_mapping;
-        private ActionMapping[] blanks = {
-#if MOVIES
-            new ControlledMovie(),
-#endif
-            new LinkAction()
-        };
-        public weak PresentationController controller = null;
 
         /**
          * Return the action mappings (link and annotation mappings) for the
@@ -1175,8 +1322,6 @@ namespace pdfpc.Metadata {
                         }
                     }
                 }
-                // Free the mapping memory; already in lock
-                //Poppler.Page.free_link_mapping(link_mappings);
 
                 GLib.List<Poppler.AnnotMapping> annot_mappings;
                 annot_mappings = this.get_document().get_page(page_num).get_annot_mapping();
@@ -1189,8 +1334,6 @@ namespace pdfpc.Metadata {
                         }
                     }
                 }
-                // Free the mapping memory; already in lock
-                //Poppler.Page.free_annot_mapping(annot_mappings);
 
                 this.mapping_page_num = page_num;
             }

@@ -6,6 +6,7 @@ pkg_check_modules(POPPLER REQUIRED poppler-glib>=0.22)
 pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.22)
 pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
 pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
+pkg_check_modules(JSON REQUIRED json-glib-1.0)
 list (FIND GTK_STATIC_LIBRARIES "X11" _index)
 if (${_index} GREATER -1)
     set(WITH_X11 1)
@@ -46,6 +47,7 @@ include_directories(
     ${GSTVIDEO_INCLUDE_DIRS}
     ${WEBKIT_INCLUDE_DIRS}
     ${MARKDOWN_INCLUDE_DIRS}
+    ${JSON_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -62,6 +64,7 @@ link_directories(
     ${GSTVIDEO_LIBRARY_DIRS}
     ${WEBKIT_LIBRARY_DIRS}
     ${MARKDOWN_LIBRARY_DIRS}
+    ${JSON_LIBRARY_DIRS}
 )
 
 if(${WITH_X11})
@@ -106,6 +109,7 @@ vala_precompile(VALA_C
     ${VALA_SRC}
 PACKAGES
     webkit2gtk-4.0
+    json-glib-1.0
     gio-2.0
     gee-0.8
     poppler-glib
@@ -137,6 +141,7 @@ target_link_libraries(pdfpc
     ${POPPLER_LIBRARIES}
     ${MARKDOWN_LIBRARIES}
     ${WEBKIT_LIBRARIES}
+    ${JSON_LIBRARIES}
     ${GTK_LIBRARIES}
     ${GTHREAD_LIBRARIES}
     ${PANGOCAIRO_LIBRARIES}

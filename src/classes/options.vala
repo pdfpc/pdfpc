@@ -141,10 +141,8 @@ namespace pdfpc {
         /**
          * Commandline option providing the talk duration, which will be used to
          * display a timer
-         *
-         * Same problem as above with default value
          */
-        public static uint duration = uint.MAX;
+        public static uint duration = 0;
 
         /**
          * Commandline option providing the time from which on the timer should
@@ -273,9 +271,10 @@ namespace pdfpc {
         public static bool auto_srt = false;
 
         /**
-         * Page which should be displayed after startup
+         * Page number which should be displayed after startup;
+         * "h" stands for human (numerated from 1, not 0)
          */
-        public static int page = 1;
+        public static int page_hnum = 1;
 
         /**
          * Flag if the version string should be printed on startup

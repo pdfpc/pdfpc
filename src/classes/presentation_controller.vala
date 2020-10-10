@@ -1147,7 +1147,7 @@ namespace pdfpc {
                 },
                 "Freeze the presentation screen");
 
-            add_action("overlay", this.toggle_skip,
+            add_action("overlay", this.add_overlay,
                 "Mark the current slide as an overlay slide");
             add_action("note", this.controllables_edit_note,
                 "Edit notes for the current slide");
@@ -1479,7 +1479,7 @@ namespace pdfpc {
          * Set the last slide as defined by the user
          */
         private void set_end_user_slide() {
-            this.metadata.set_end_user_slide(this.current_user_slide_number + 1);
+            this.metadata.set_end_user_slide(this.current_user_slide_number);
             this.controllables_update();
         }
 
@@ -1487,7 +1487,7 @@ namespace pdfpc {
          * Set the last slide as defined by the user
          */
         public void set_last_saved_slide() {
-            this.metadata.set_last_saved_slide(this.current_user_slide_number + 1);
+            this.metadata.set_last_saved_slide(this.current_user_slide_number);
             this.controllables_update();
             presenter.session_saved();
         }
@@ -1641,7 +1641,7 @@ namespace pdfpc {
          * Go to the last displayed slide
          */
         public void goto_last_saved_slide() {
-            var new_user_slide_number = this.metadata.get_last_saved_slide() - 1;
+            var new_user_slide_number = this.metadata.get_last_saved_slide();
             var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
             this.switch_to_slide_number(new_slide_number);
@@ -1653,7 +1653,7 @@ namespace pdfpc {
          * Go to the last slide
          */
         public void goto_last() {
-            var new_user_slide_number = this.metadata.get_end_user_slide() - 1;
+            var new_user_slide_number = this.metadata.get_end_user_slide();
             var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
             this.switch_to_slide_number(new_slide_number);
@@ -1837,15 +1837,13 @@ namespace pdfpc {
         /**
          * Toggle skip for current slide
          */
-        protected void toggle_skip() {
-            if (overview_shown) {
-                int user_selected = this.overview.current_slide;
-                int slide_number = this.metadata.user_slide_to_real_slide(user_selected);
-                if (this.metadata.toggle_skip(slide_number, user_selected) != 0) {
+        protected void add_overlay() {
+            if (this.metadata.add_overlay(this.current_slide_number) != 0) {
+                if (overview_shown) {
                     this.overview.remove_current(this.user_n_slides);
+                } else {
+                    this.overview.set_n_slides(this.user_n_slides);
                 }
-            } else {
-                this.overview.set_n_slides(this.user_n_slides);
                 this.controllables_update();
             }
         }

@@ -986,7 +986,7 @@ namespace pdfpc.Window {
         }
 
         public void custom_slide_count(int current) {
-            int total = this.metadata.get_end_user_slide();
+            int total = this.metadata.get_end_user_slide() + 1;
             this.slide_progress.set_text("%d/%u".printf(current, total));
         }
 
@@ -1032,21 +1032,25 @@ namespace pdfpc.Window {
             if (!this.metadata.is_ready) {
                 return;
             }
+
             int current_slide_number = this.controller.current_slide_number;
-            int current_user_slide_number = this.controller.current_user_slide_number;
+            int current_user_slide_number =
+                this.controller.current_user_slide_number;
 
             this.current_view.display(current_slide_number);
-            int next_view_slide_offset = 0;
-            if (   !Options.final_slide_overlay
-                || (Options.final_slide_overlay && current_slide_number == this.metadata.user_slide_to_real_slide(current_user_slide_number))
-               ){
-                next_view_slide_offset = 1;
+
+            var next_view_user_slide = current_user_slide_number;
+            if (!Options.final_slide_overlay ||
+                this.metadata.is_user_slide(current_slide_number)) {
+                next_view_user_slide++;
             }
-            this.next_view.display(
-                this.metadata.user_slide_to_real_slide(current_user_slide_number + next_view_slide_offset)
-            );
 
             var next_slide_number =
+                this.metadata.user_slide_to_real_slide(next_view_user_slide);
+            this.next_view.disabled = (next_slide_number < 0);
+            this.next_view.display(next_slide_number);
+
+            next_slide_number =
                 this.metadata.next_in_overlay(current_slide_number);
             this.strict_next_view.disabled = (next_slide_number < 0);
             this.strict_next_view.display(next_slide_number);
@@ -1140,7 +1144,7 @@ namespace pdfpc.Window {
 
             // Disallow editing notes imported from PDF annotations
             int number = this.controller.current_user_slide_number;
-            if (this.metadata.get_notes().is_note_read_only(number) ||
+            if (this.metadata.is_note_read_only(number) ||
                 this.metadata.has_beamer_notes) {
                 blink_lock_icon();
                 return;
@@ -1161,8 +1165,8 @@ namespace pdfpc.Window {
                 var this_note = this.notes_editor.buffer.text;
                 this.notes_editor.editable = false;
                 this.notes_editor.cursor_visible = false;
-                this.metadata.get_notes().set_note(this_note,
-                    this.controller.current_user_slide_number);
+                this.metadata.set_note(this_note,
+                    this.controller.current_slide_number);
                 this.controller.set_ignore_input_events(false);
                 this.mdview.render(this_note, !this.metadata.enable_markdown);
                 this.notes_stack.set_visible_child_name("mdview");
@@ -1176,8 +1180,8 @@ namespace pdfpc.Window {
          * Update the text of the current note
          */
         protected void update_note() {
-            string this_note = this.metadata.get_notes().get_note_for_slide(
-                this.controller.current_user_slide_number);
+            string this_note = this.metadata.get_note(
+                this.controller.current_slide_number);
             this.notes_editor.buffer.text = this_note;
 
             // render the note

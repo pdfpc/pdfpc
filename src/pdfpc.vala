@@ -76,7 +76,7 @@ namespace pdfpc {
                 ref Options.no_install,
                 "Test pdfpc without installation", null},
             {"page", 'P', 0, OptionArg.INT,
-                ref Options.page,
+                ref Options.page_hnum,
                 "Go to page number N directly after startup", "N"},
             {"page-transition", 'r', 0, OptionArg.STRING,
                 ref Options.default_transition,
@@ -436,9 +436,9 @@ namespace pdfpc {
                 this.controller.presenter.update();
             }
 
-            if (Options.page >= 1 &&
-                Options.page <= metadata.get_end_user_slide()) {
-                int u = metadata.user_slide_to_real_slide(Options.page - 1,
+            if (Options.page_hnum >= 1 &&
+                Options.page_hnum <= metadata.get_end_user_slide() + 1) {
+                int u = metadata.user_slide_to_real_slide(Options.page_hnum - 1,
                     false);
                 this.controller.switch_to_slide_number(u, true);
             } else {
