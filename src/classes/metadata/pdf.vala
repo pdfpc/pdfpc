@@ -52,6 +52,11 @@ namespace pdfpc.Metadata {
         public int user_slide;
 
         /**
+         * User slide #
+         */
+        public bool forced_overlay;
+
+        /**
          * Note
          */
         public SlideNote note;
@@ -277,20 +282,24 @@ namespace pdfpc.Metadata {
                     label = page.label;
                     overlay = 0;
                 }
+                builder.begin_object();
+                builder.set_member_name("idx");
+                builder.add_int_value(idx);
+                builder.set_member_name("label");
+                builder.add_string_value(label);
+                builder.set_member_name("overlay");
+                builder.add_int_value(overlay);
+                if (page.forced_overlay) {
+                    builder.set_member_name("forced_overlay");
+                    builder.add_boolean_value(true);
+                }
                 if (page.note != null &&
                     page.note.is_native != true &&
                     page.note.note_text != null) {
-                    builder.begin_object();
-                    builder.set_member_name("idx");
-                    builder.add_int_value(idx);
-                    builder.set_member_name("label");
-                    builder.add_string_value(label);
-                    builder.set_member_name("overlay");
-                    builder.add_int_value(overlay);
                     builder.set_member_name("note");
                     builder.add_string_value(page.note.note_text);
-                    builder.end_object();
                 }
+                builder.end_object();
                 idx++;
                 overlay++;
             }
@@ -323,6 +332,7 @@ namespace pdfpc.Metadata {
 	    unowned Json.Object obj = node.get_object();
             string page_label = "", text = "";
             int idx = 0, overlay = 0;
+            bool forced_overlay = false;
             foreach (unowned string name in obj.get_members()) {
                 unowned Json.Node item = obj.get_member(name);
                 switch (name) {
@@ -335,6 +345,9 @@ namespace pdfpc.Metadata {
                 case "overlay":
 		    overlay = (int) item.get_int();
 		    break;
+                case "forced_overlay":
+		    forced_overlay = item.get_boolean();
+		    break;
                 case "note":
 		    text = item.get_string();
 		    break;
@@ -343,6 +356,10 @@ namespace pdfpc.Metadata {
 		    break;
 		}
 	    }
+
+            if (forced_overlay) {
+                this.add_overlay(idx);
+            }
 
             if (page_label != "" && text != "") {
                 // first, try fast access by index
@@ -934,9 +951,10 @@ namespace pdfpc.Metadata {
                 int user_slide = -1;
                 for (int i = 0; i < this.page_count; ++i) {
                     var page = this.pages.get(i);
-                    // Auto-detect which pages to skip
+                    // Auto-detect which pages to skip, but respect overlays
+                    // forcefully set by the user
                     string this_label = page.label;
-                    if (this_label != previous_label) {
+                    if (this_label != previous_label && !page.forced_overlay) {
                         user_slide++;
                         previous_label = this_label;
                     }
@@ -1020,18 +1038,19 @@ namespace pdfpc.Metadata {
                 // We cannot skip the first slide
                 return 0;
             }
-            var page = this.pages.get(slide_number - 1);
-            if (page == null) {
+            var prev_page = this.pages.get(slide_number - 1);
+            if (prev_page == null) {
                 // Something is terribly wrong...
                 return 0;
             }
-            int prev_user_slide_number = page.user_slide;
+            int prev_user_slide_number = prev_page.user_slide;
 
-            page = this.pages.get(slide_number);
+            var page = this.pages.get(slide_number);
             if (page == null || page.user_slide == prev_user_slide_number) {
                 // Nothing to do
                 return 0;
             }
+            page.forced_overlay = true;
 
             for (int i = slide_number; i < this.page_count; i++) {
                 page = this.pages.get(i);
