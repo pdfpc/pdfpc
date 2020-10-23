@@ -52,7 +52,7 @@ namespace pdfpc.Metadata {
         public int user_slide;
 
         /**
-         * User slide #
+         * User-defined overlay
          */
         public bool forced_overlay;
 
@@ -278,10 +278,19 @@ namespace pdfpc.Metadata {
             int idx = 0, overlay = 0;
             string label = "";
             foreach (var page in this.pages) {
+                // Skip pages with no user-defined metadata
+                if (!page.forced_overlay &&
+                    (page.note == null   ||
+                     page.note.is_native ||
+                     page.note.note_text == null)) {
+                    continue;
+                }
+
                 if (label != page.label) {
                     label = page.label;
                     overlay = 0;
                 }
+
                 builder.begin_object();
                 builder.set_member_name("idx");
                 builder.add_int_value(idx);
@@ -330,8 +339,8 @@ namespace pdfpc.Metadata {
                     node.type_name());
 	    }
 	    unowned Json.Object obj = node.get_object();
-            string page_label = "", text = "";
-            int idx = 0, overlay = 0;
+            string page_label = "", note = "";
+            int idx = -1, overlay = 0, slide_number = -1;
             bool forced_overlay = false;
             foreach (unowned string name in obj.get_members()) {
                 unowned Json.Node item = obj.get_member(name);
@@ -349,7 +358,7 @@ namespace pdfpc.Metadata {
 		    forced_overlay = item.get_boolean();
 		    break;
                 case "note":
-		    text = item.get_string();
+		    note = item.get_string();
 		    break;
 		default:
                     GLib.printerr("Unknown page item \"%s\"\n", name);
@@ -357,19 +366,15 @@ namespace pdfpc.Metadata {
 		}
 	    }
 
-            if (forced_overlay) {
-                this.add_overlay(idx);
-            }
-
-            if (page_label != "" && text != "") {
+            // Try to lookup the page by label; if fails, use the page index
+            if (page_label != "") {
                 // first, try fast access by index
                 var page = this.pages.get(idx);
                 if (page != null &&
                     page.label == page_label &&
                     slide_get_overlay(idx) == overlay) {
-                    set_note(text, idx);
+                    slide_number = idx;
                 } else {
-                    int slide_number = -1;
                     for (int i = 0; i < this.page_count; i++) {
                         page = this.pages.get(i);
                         if (page.label == page_label) {
@@ -378,10 +383,20 @@ namespace pdfpc.Metadata {
                         }
                     }
                     page = this.pages.get(slide_number);
-                    if (page != null && page.label == page_label) {
-                        set_note(text, slide_number);
+                    if (page == null || page.label != page_label) {
+                        // Return to fallback
+                        slide_number = idx;
                     }
                 }
+            } else {
+                slide_number = idx;
+            }
+
+            if (forced_overlay) {
+                this.add_overlay(slide_number);
+            }
+            if (note != "") {
+                this.set_note(note, slide_number);
             }
         }
 
