@@ -225,7 +225,7 @@ namespace pdfpc.Metadata {
         /**
          * Save the metadata to disk
          */
-        public void save_to_disk() {
+        protected void save_to_disk() {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
@@ -329,7 +329,6 @@ namespace pdfpc.Metadata {
                 GLib.printerr("Failed to store metadata on disk: %s\n",
                     e.message);
                 GLib.printerr("The metadata was:\n%s\n", contents);
-                Process.exit(1);
             }
         }
 
@@ -480,7 +479,7 @@ namespace pdfpc.Metadata {
         /**
          * Parse the given pdfpc file, old format
          */
-        void parse_pdfpc_file_old(out string? notes_content,
+        private void parse_pdfpc_file_old(out string? notes_content,
             out string? skip_line) {
             notes_content = null;
             skip_line = null;
@@ -552,6 +551,16 @@ namespace pdfpc.Metadata {
                 if (skip_line != null) {
                     Options.disable_auto_grouping = true;
                 }
+
+                var pdfpc_bak = this.pdfpc_fname + "~";
+                int status = GLib.FileUtils.rename(this.pdfpc_fname, pdfpc_bak);
+                if (status != 0) {
+                    GLib.printerr("Failed renaming %s to %s\n",
+                        this.pdfpc_fname, pdfpc_bak);
+                } else {
+                    GLib.printerr("The legacy pdfpc file was saved as %s\n",
+                        pdfpc_bak);
+                }
             } catch (Error e) {
                 GLib.printerr("%s\n", e.message);
                 Process.exit(1);
@@ -562,7 +571,7 @@ namespace pdfpc.Metadata {
         /**
          * Parse the line for the skip slides, old pdfpc format
          */
-        void parse_skip_line_old(string line) {
+        private void parse_skip_line_old(string line) {
             string[] fields = line.split(",");
             for (int f = 0; f < fields.length - 1; ++f) {
                 if (fields[f] != "") {
@@ -575,7 +584,7 @@ namespace pdfpc.Metadata {
         /**
          * Parse the notes section of the pdfpc file, old format
          */
-        void parse_notes_old(string[] lines) {
+        private void parse_notes_old(string[] lines) {
             string long_line = string.joinv("\n", lines);
             string[] notes_sections = long_line.split("### ");
 
@@ -616,7 +625,7 @@ namespace pdfpc.Metadata {
         /**
          * Fill the path information starting from the user provided filename
          */
-        void fill_path_info(string fname, string? fpcname = null) {
+        protected void fill_path_info(string fname, string? fpcname = null) {
             if (fpcname != null) {
                 this.pdfpc_fname = fpcname;
                 this.pdf_fname = fname;
