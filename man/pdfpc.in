@@ -337,20 +337,21 @@ many minutes you are overtime.
 .SS Notes
 
 .PP
-Textual notes can be displayed for each slide.  A few types of PDF annotations
-are understood by pdfpc and will be automatically imported and displayed (only
-their textual content, no formatting attributes are preserved).  The PDF
-annotations can be made using many PDF editors and even viewers.  These "native"
-PDF notes cannot be edited in pdfpc.
+Textual notes can be displayed for each slide.  pdfpc understands the Markdown
+syntax, which allows for rendering anything from plain text to a very rich
+formatting, if so desired.  A few types of PDF annotations are understood by
+pdfpc and will be automatically imported and displayed. The PDF annotations can
+be made using many PDF editors and even viewers;  when using LaTeX, the
+\fBpdfpc\fR package (see below) provides a convenient macro.  These "native" PDF
+notes cannot be edited in pdfpc.
 .PP
-In addition, while in the presentation mode, pressing \[aq]Ctrl + n\[aq] will allow you
-to take notes for the current user slide.  To exit the note editing mode, press
-the Escape key.  Note that while editing a note, the keybindings stop working,
-i.e. you are not able to change slides. These notes are stored in the .pdfpc
-file in a plain text format, easy to edit also from outside the program; see
-the section about the pdfpc format below.  These notes take precedence over the
-native PDF annotations, i.e., if a user-proveded note exists for a given slide,
-any PDF annotations on that page will be silently ignored.
+In addition, while in the presentation mode, pressing \[aq]Ctrl + n\[aq] will
+allow you to take or edit notes for the current user slide.  To exit the note
+editing mode, press the Escape key.  These notes are stored in the .pdfpc file.
+They take precedence over the native PDF annotations, i.e., if a user-provided
+note exists for a given slide, any PDF annotations on that page will be silently
+ignored. While editing a note, the normal keybindings are disabled, e.g., you
+are not able to change slides.
 .PP
 Although mixing the
 two types of notes is possible, for a given presentation one will likely want to
@@ -528,13 +529,14 @@ full setup at the computer in advance.
 
 .SS pdfpc files
 .PP
-Some additional information is stored in a file with the extension
-"pdfpc".  When pdfpc is invoked with a PDF file, it automatically checks for
-and loads the associated .pdfpc file, if it exists.  This means that you
-normally do not have to deal with this kind of files explicitly.
+Notes, user-defined overlays, and some additional information is stored in a
+file with extension "pdfpc".  When pdfpc is invoked with a PDF file, it
+automatically checks for and loads the associated .pdfpc file, if it exists.
+This means that you normally do not have to deal with this kind of files
+explicitly.
 .PP
-Beside internal configuration, the following command-line
-options are stored within the pdfpc file for later usage:
+Beside internal configuration, the following command-line options are saved in
+the pdfpc file for later usage:
 
 .IP \[bu] 2
 duration
@@ -545,30 +547,9 @@ last_minutes
 .IP \[bu] 2
 notes (position)
 .IP \[bu] 2
+page_transition
+.IP \[bu] 2
 start_time
-
-.PP
-There are, however, cases where you may want to edit this file manually.
-The most typical case is if you add or remove some slides after you have
-edited notes or defined overlays.
-It may be quicker to edit the pdfpc file than to re-enter the whole
-information.
-
-.PP
-There is also the possibility of including notes from a different file.
-If pdfpc encounters a [notes_include] section with the .pdfpc file
-it reads the notes
-.B
-only
-from the included file. Changing notes within pdfpc is then forbidden.
-
-.PP
-The files are plain-text files that should be fairly self-explanatory.
-A couple of things to note:
-.IP \[bu] 2
-The slide numbers of the notes refer to user slides
-.IP \[bu] 2
-Slide indexes start at 1
 
 .SS Appearance
 
