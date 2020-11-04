@@ -230,7 +230,7 @@ namespace pdfpc.Metadata {
             builder.begin_object();
 
             // Our "magic" header
-            builder.set_member_name("pdfpc_format");
+            builder.set_member_name("pdfpcFormat");
             builder.add_int_value(1);
 
             if (Options.duration > 0) {
@@ -238,39 +238,39 @@ namespace pdfpc.Metadata {
                 builder.add_int_value(Options.duration);
             }
             if (Options.end_time != null) {
-                builder.set_member_name("end_time");
+                builder.set_member_name("endTime");
                 builder.add_string_value(Options.end_time);
             }
             if (Options.start_time != null) {
-                builder.set_member_name("start_time");
+                builder.set_member_name("startTime");
                 builder.add_string_value(Options.start_time);
             }
             if (Options.last_minutes != 5) {
-                builder.set_member_name("last_minutes");
+                builder.set_member_name("lastMinutes");
                 builder.add_int_value(Options.last_minutes);
             }
             if (this.end_user_slide >= 0) {
-                builder.set_member_name("end_slide");
+                builder.set_member_name("endSlide");
                 builder.add_int_value(this.end_user_slide);
             }
             if (this.last_saved_slide >= 0) {
-                builder.set_member_name("saved_slide");
+                builder.set_member_name("savedSlide");
                 builder.add_int_value(this.last_saved_slide);
             }
             if (Options.default_transition != null) {
-                builder.set_member_name("default_transition");
+                builder.set_member_name("defaultTransition");
                 builder.add_string_value(Options.default_transition);
             }
 
             // Notes
             if (Options.notes_position != null) {
-                builder.set_member_name("notes_position");
+                builder.set_member_name("beamerNotePosition");
                 builder.add_string_value(this.notes_position.to_string());
             }
-            builder.set_member_name("enable_markdown");
+            builder.set_member_name("enableMarkdown");
             builder.add_boolean_value(this.enable_markdown);
             if (this.font_size > 0) {
-                builder.set_member_name("font_size");
+                builder.set_member_name("noteFontSize");
                 builder.add_int_value(this.font_size);
             }
             builder.set_member_name("pages");
@@ -299,7 +299,7 @@ namespace pdfpc.Metadata {
                 builder.set_member_name("overlay");
                 builder.add_int_value(overlay);
                 if (page.forced_overlay) {
-                    builder.set_member_name("forced_overlay");
+                    builder.set_member_name("forcedOverlay");
                     builder.add_boolean_value(true);
                 }
                 if (page.note != null &&
@@ -353,7 +353,7 @@ namespace pdfpc.Metadata {
                 case "overlay":
 		    overlay = (int) item.get_int();
 		    break;
-                case "forced_overlay":
+                case "forcedOverlay":
 		    forced_overlay = item.get_boolean();
 		    break;
                 case "note":
@@ -426,7 +426,7 @@ namespace pdfpc.Metadata {
                 foreach (unowned string name in obj.get_members()) {
                     unowned Json.Node item = obj.get_member(name);
                     switch (name) {
-                    case "pdfpc_format":
+                    case "pdfpcFormat":
 			int format = (int) item.get_int();
                         // In future, parse depending on the version
                         if (format != 1) {
@@ -437,29 +437,29 @@ namespace pdfpc.Metadata {
                     case "duration":
 			this.duration = (uint) item.get_int();
 			break;
-                    case "start_time":
+                    case "startTime":
 			this.start_time = item.get_string();
 			break;
-                    case "end_time":
+                    case "endTime":
 			this.end_time = item.get_string();
 			break;
-                    case "end_slide":
+                    case "endSlide":
 			this.end_user_slide = (int) item.get_int();
 			break;
-                    case "last_minutes":
+                    case "lastMinutes":
 			Options.last_minutes = (int) item.get_int();
 			break;
-                    case "notes_position":
+                    case "beamerNotePosition":
 			this.notes_position =
                             NotesPosition.from_string(item.get_string());
 			break;
-                     case "default_transition":
+                     case "defaultTransition":
 			this.set_default_transition_from_string(item.get_string());
 			break;
-                   case "enable_markdown":
+                   case "enableMarkdown":
 			this.enable_markdown = item.get_boolean();
 			break;
-                   case "font_size":
+                   case "noteFontSize":
 			this.font_size = (int) item.get_int();
 			break;
                    case "pages":
