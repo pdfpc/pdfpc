@@ -278,37 +278,37 @@ namespace pdfpc.Metadata {
             int idx = 0, overlay = 0;
             string label = "";
             foreach (var page in this.pages) {
-                // Skip pages with no user-defined metadata
-                if (!page.forced_overlay &&
-                    (page.note == null   ||
-                     page.note.is_native ||
-                     page.note.note_text == null)) {
-                    continue;
-                }
-
                 if (label != page.label) {
                     label = page.label;
                     overlay = 0;
                 }
 
-                builder.begin_object();
-                builder.set_member_name("idx");
-                builder.add_int_value(idx);
-                builder.set_member_name("label");
-                builder.add_string_value(label);
-                builder.set_member_name("overlay");
-                builder.add_int_value(overlay);
-                if (page.forced_overlay) {
-                    builder.set_member_name("forcedOverlay");
-                    builder.add_boolean_value(true);
+                // Only save pages with user-defined metadata
+                if (page.forced_overlay ||
+                    (page.note != null    &&
+                     !page.note.is_native &&
+                     page.note.note_text != null)) {
+
+                    builder.begin_object();
+                    builder.set_member_name("idx");
+                    builder.add_int_value(idx);
+                    builder.set_member_name("label");
+                    builder.add_string_value(label);
+                    builder.set_member_name("overlay");
+                    builder.add_int_value(overlay);
+                    if (page.forced_overlay) {
+                        builder.set_member_name("forcedOverlay");
+                        builder.add_boolean_value(true);
+                    }
+                    if (page.note != null &&
+                        page.note.is_native != true &&
+                        page.note.note_text != null) {
+                        builder.set_member_name("note");
+                        builder.add_string_value(page.note.note_text);
+                    }
+                    builder.end_object();
                 }
-                if (page.note != null &&
-                    page.note.is_native != true &&
-                    page.note.note_text != null) {
-                    builder.set_member_name("note");
-                    builder.add_string_value(page.note.note_text);
-                }
-                builder.end_object();
+
                 idx++;
                 overlay++;
             }
