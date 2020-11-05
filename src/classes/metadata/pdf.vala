@@ -114,6 +114,11 @@ namespace pdfpc.Metadata {
             new LinkAction()
         };
 
+        /**
+         * Current version of the .pdfpc format
+         */
+        protected int format_version = 1;
+
         // BEGIN .pdfpc meta
 
         /**
@@ -166,7 +171,6 @@ namespace pdfpc.Metadata {
         }
 
         // END .pdfpc meta
-
 
         public bool is_ready {
             get {
@@ -231,7 +235,7 @@ namespace pdfpc.Metadata {
 
             // Our "magic" header
             builder.set_member_name("pdfpcFormat");
-            builder.add_int_value(1);
+            builder.add_int_value(this.format_version);
 
             if (Options.duration > 0) {
                 builder.set_member_name("duration");
@@ -429,7 +433,7 @@ namespace pdfpc.Metadata {
                     case "pdfpcFormat":
 			int format = (int) item.get_int();
                         // In future, parse depending on the version
-                        if (format != 1) {
+                        if (format != this.format_version) {
                             throw new MetaFileError.INVALID_FORMAT(
                                 "Unsupported pdfpc format version %d", format);
                         }
