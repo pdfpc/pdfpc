@@ -55,9 +55,9 @@ namespace pdfpc {
         public static bool single_screen = false;
 
         /**
-         * Commandline option to run in windowed mode
+         * Type of the windowed mode
          */
-        public static string windowed = "none";
+        public static string windowed = null;
 
         /**
          * Commandline option to enable Wayland specific scaling workarounds
