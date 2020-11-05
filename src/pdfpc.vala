@@ -290,6 +290,7 @@ namespace pdfpc {
             bool presentation_windowed = false;
             switch (Options.windowed) {
             case "none":
+            case null:
                 break;
             case "presenter":
                 presenter_windowed = true;
