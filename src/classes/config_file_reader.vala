@@ -319,7 +319,10 @@ namespace pdfpc {
                     Options.toolbox_minimized = bool.parse(fields[2]);
                     break;
                 case "windowed-mode":
-                    Options.windowed = fields[2];
+                    // don't override command-line setting
+                    if (Options.windowed == null) {
+                        Options.windowed = fields[2];
+                    }
                     break;
                 default:
                     GLib.printerr("Unknown option %s in pdfpcrc\n", fields[1]);
