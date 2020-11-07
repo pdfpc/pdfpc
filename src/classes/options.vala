@@ -148,7 +148,7 @@ namespace pdfpc {
          * Commandline option providing the time from which on the timer should
          * change its color.
          */
-        public static uint last_minutes = 5;
+        public static uint last_minutes = 0;
 
         /**
          * Commandline option providing the size of the current slide in

@@ -119,6 +119,13 @@ namespace pdfpc.Metadata {
          */
         protected int format_version = 1;
 
+        /**
+         * Flag that the .pdfpc metadata have been modified by user, either
+         * at run time or via command-line options and, thus, must be saved
+         * on exit
+         */
+        private bool dirty_state = false;
+
         // BEGIN .pdfpc meta
 
         /**
@@ -154,14 +161,16 @@ namespace pdfpc.Metadata {
         /**
          * The start/end times of the talk
          */
-        public string? start_time { get; protected set; }
-        public string? end_time { get; protected set; }
+        protected string? start_time = null;
+        protected string? end_time = null;
+
+        protected uint last_minutes = 5;
 
         /**
          * The font size used for notes. -1 if none is
          * specified in pdfpc file.
          */
-        public int font_size = -1;
+        protected int font_size = -1;
 
         /**
          * Default page transition
@@ -200,8 +209,14 @@ namespace pdfpc.Metadata {
                 if (page.note == null) {
                     page.note = new SlideNote();
                 }
-                page.note.note_text = note_text;
-                page.note.is_native = is_native;
+                if (page.note.note_text != note_text) {
+                    page.note.note_text = note_text;
+                    this.dirty_state = true;
+                }
+                if (page.note.is_native != is_native) {
+                    page.note.is_native = is_native;
+                    this.dirty_state = true;
+                }
             }
         }
 
@@ -237,21 +252,21 @@ namespace pdfpc.Metadata {
             builder.set_member_name("pdfpcFormat");
             builder.add_int_value(this.format_version);
 
-            if (Options.duration > 0) {
+            if (this.duration > 0) {
                 builder.set_member_name("duration");
-                builder.add_int_value(Options.duration);
+                builder.add_int_value(this.duration);
             }
-            if (Options.end_time != null) {
+            if (this.end_time != null) {
                 builder.set_member_name("endTime");
-                builder.add_string_value(Options.end_time);
+                builder.add_string_value(this.end_time);
             }
-            if (Options.start_time != null) {
+            if (this.start_time != null) {
                 builder.set_member_name("startTime");
-                builder.add_string_value(Options.start_time);
+                builder.add_string_value(this.start_time);
             }
-            if (Options.last_minutes != 5) {
+            if (this.last_minutes != 5) {
                 builder.set_member_name("lastMinutes");
-                builder.add_int_value(Options.last_minutes);
+                builder.add_int_value(this.last_minutes);
             }
             if (this.end_user_slide >= 0) {
                 builder.set_member_name("endSlide");
@@ -261,13 +276,15 @@ namespace pdfpc.Metadata {
                 builder.set_member_name("savedSlide");
                 builder.add_int_value(this.last_saved_slide);
             }
-            if (Options.default_transition != null) {
+            if (this.default_transition.type !=
+                Poppler.PageTransitionType.REPLACE) {
                 builder.set_member_name("defaultTransition");
-                builder.add_string_value(Options.default_transition);
+                var trans_str = this.get_default_transition_string();
+                builder.add_string_value(trans_str);
             }
 
             // Notes
-            if (Options.notes_position != null) {
+            if (this.notes_position != NotesPosition.NONE) {
                 builder.set_member_name("beamerNotePosition");
                 builder.add_string_value(this.notes_position.to_string());
             }
@@ -450,8 +467,11 @@ namespace pdfpc.Metadata {
                     case "endSlide":
 			this.end_user_slide = (int) item.get_int();
 			break;
+                    case "savedSlide":
+			this.last_saved_slide = (int) item.get_int();
+			break;
                     case "lastMinutes":
-			Options.last_minutes = (int) item.get_int();
+			this.last_minutes = (int) item.get_int();
 			break;
                     case "beamerNotePosition":
 			this.notes_position =
@@ -503,7 +523,7 @@ namespace pdfpc.Metadata {
 
                     switch (section_type) {
                         case "[duration]": {
-                            set_duration(int.parse(section_content));
+                            this.duration = int.parse(section_content);
                             break;
                         }
                         case "[end_time]": {
@@ -511,7 +531,7 @@ namespace pdfpc.Metadata {
                             break;
                         }
                         case "[end_user_slide]": {
-                            set_end_user_slide(int.parse(section_content));
+                            this.end_user_slide = int.parse(section_content);
                             break;
                         }
                         case "[font_size]": {
@@ -523,11 +543,7 @@ namespace pdfpc.Metadata {
                             break;
                         }
                         case "[last_minutes]": {
-                            // command line first
-                            // 5 is the default value
-                            if (Options.last_minutes == 5) {
-                                Options.last_minutes = int.parse(section_content);
-                            }
+                            this.last_minutes = int.parse(section_content);
                             break;
                         }
                         case "[notes]": {
@@ -551,9 +567,6 @@ namespace pdfpc.Metadata {
                             break;
                         }
                     }
-                }
-                if (skip_line != null) {
-                    Options.disable_auto_grouping = true;
                 }
 
                 var pdfpc_bak = this.pdfpc_fname + "~";
@@ -749,6 +762,73 @@ namespace pdfpc.Metadata {
             }
 
             this.default_transition = trans;
+            this.dirty_state = true;
+        }
+
+        string get_default_transition_string() {
+            string str = "";
+            switch (this.default_transition.type) {
+            case Poppler.PageTransitionType.BLINDS:
+                str = "blinds";
+                break;
+            case Poppler.PageTransitionType.BOX:
+                str = "box";
+                break;
+            case Poppler.PageTransitionType.COVER:
+                str = "cover";
+                break;
+            case Poppler.PageTransitionType.DISSOLVE:
+                str = "dissolve";
+                break;
+            case Poppler.PageTransitionType.FADE:
+                str = "fade";
+                break;
+            case Poppler.PageTransitionType.FLY:
+                str = "fly";
+                break;
+            case Poppler.PageTransitionType.GLITTER:
+                str = "glitter";
+                break;
+            case Poppler.PageTransitionType.PUSH:
+                str = "push";
+                break;
+            case Poppler.PageTransitionType.REPLACE:
+                str = "replace";
+                break;
+            case Poppler.PageTransitionType.SPLIT:
+                str = "split";
+                break;
+            case Poppler.PageTransitionType.UNCOVER:
+                str = "uncover";
+                break;
+            case Poppler.PageTransitionType.WIPE:
+                str = "wipe";
+                break;
+            }
+
+            str += ":" + this.default_transition.duration_real.to_string();
+
+            str += ":" + this.default_transition.angle.to_string();
+
+            switch (this.default_transition.alignment) {
+            case Poppler.PageTransitionAlignment.HORIZONTAL:
+                str += ":h";
+                break;
+            case Poppler.PageTransitionAlignment.VERTICAL:
+                str += ":v";
+                break;
+            }
+
+            switch (this.default_transition.direction) {
+            case Poppler.PageTransitionDirection.INWARD:
+                str += ":i";
+                break;
+            case Poppler.PageTransitionDirection.OUTWARD:
+                str += ":o";
+                break;
+            }
+
+            return str;
         }
 
         /**
@@ -778,7 +858,7 @@ namespace pdfpc.Metadata {
          * Called on quit
          */
         public void quit() {
-            if (this.is_ready) {
+            if (this.is_ready && this.dirty_state) {
                 this.save_to_disk();
             }
             this.deactivate_mappings();
@@ -839,10 +919,10 @@ namespace pdfpc.Metadata {
                 foreach (var entry in tags.entries) {
                     switch (entry.key) {
                         case "Duration":
-                            set_duration(int.parse(entry.value));
+                            this.duration = int.parse(entry.value);
                             break;
                         case "EndUserSlide":
-                            set_end_user_slide(int.parse(entry.value));
+                            this.end_user_slide = int.parse(entry.value);
                             break;
                         case "StartTime":
                             this.start_time = entry.value;
@@ -851,7 +931,7 @@ namespace pdfpc.Metadata {
                             this.end_time = entry.value;
                             break;
                         case "LastMinutes":
-                            Options.last_minutes = int.parse(entry.value);
+                            this.last_minutes = int.parse(entry.value);
                             break;
                         case "NotesPosition":
                             this.notes_position =
@@ -936,6 +1016,7 @@ namespace pdfpc.Metadata {
             }
 
             string notes_content_old = null, skip_line_old = null;
+            bool old_pdfpc = false;
             if (GLib.FileUtils.test(this.pdfpc_fname, (GLib.FileTest.IS_REGULAR))) {
                 try {
                     parse_pdfpc_file();
@@ -943,38 +1024,64 @@ namespace pdfpc.Metadata {
                     GLib.printerr("%s\n", e.message);
                     // Try old-style format
                     parse_pdfpc_file_old(out notes_content_old, out skip_line_old);
+                    old_pdfpc = true;
                 }
             }
 
             // Parse XMP metadata
             this.metadata_from_document();
 
-            // Command line options have the highest priority
+            // Prepopulate notes from annotations
+            this.notes_from_document();
+
+            // After having .pdfpc and/or XMP parsed, we declare
+            // the state is "clean" (except for the legacy .pdfpc format,
+            // in which case we want to recreate it in the new format anyway).
+            // Command-line options overriding anything will set it dirty.
+            if (!old_pdfpc) {
+                this.dirty_state = false;
+            }
+
+            // Command line options have the highest priority, apply them now
             if (Options.duration != 0) {
-                set_duration(Options.duration);
+                this.set_duration(Options.duration);
             }
 
             if (Options.start_time != null) {
-                this.start_time = Options.start_time;
+                this.set_start_time(Options.start_time);
             }
             if (Options.end_time != null) {
-                this.end_time = Options.end_time;
+                this.set_end_time(Options.end_time);
             }
             // If end_time is set, reset duration to 0
             if (this.end_time != null) {
-                this.duration = 0;
+                this.set_duration(0);
+            }
+
+            if (Options.last_minutes != 0) {
+                this.set_last_minutes(Options.last_minutes);
             }
 
             if (Options.notes_position != null) {
-                this.notes_position =
+                var new_notes_position =
                     NotesPosition.from_string(Options.notes_position);
+                this.set_notes_position(new_notes_position);
             }
-            if (this.notes_position != NotesPosition.NONE) {
-                Options.disable_auto_grouping = true;
+
+            if (Options.default_transition != null) {
+                this.set_default_transition_from_string(Options.default_transition);
+            }
+
+            bool disable_auto_grouping = Options.disable_auto_grouping;
+            // Force it if there are beamer notes or custom overlays defined
+            if (!disable_auto_grouping &&
+                (this.notes_position != NotesPosition.NONE ||
+                 skip_line_old != null)) {
+                disable_auto_grouping = true;
                 GLib.printerr("Notes position set, auto grouping disabled.\n");
             }
 
-            if (!Options.disable_auto_grouping) {
+            if (!disable_auto_grouping) {
                 string previous_label = null;
                 int user_slide = -1;
                 for (int i = 0; i < this.page_count; ++i) {
@@ -999,9 +1106,6 @@ namespace pdfpc.Metadata {
             if (skip_line_old != null) {
                 this.parse_skip_line_old(skip_line_old);
             }
-
-            // Prepopulate notes from annotations
-            notes_from_document();
         }
 
         /**
@@ -1024,36 +1128,98 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Return the last slide defined by the user. It may be different as
-         * get_user_slide_count()!
+         * Get/set the last user-defined slide
          */
         public int get_end_user_slide() {
-            if (this.end_user_slide >= 0)
+            if (this.end_user_slide >= 0) {
                 return this.end_user_slide;
-            else
+            } else {
                 return this.get_user_slide_count() - 1;
+            }
         }
-
-        /**
-         * Set the last slide defined by the user
-         */
         public void set_end_user_slide(int slide) {
-            this.end_user_slide = slide;
+            if (this.end_user_slide != slide) {
+                this.end_user_slide = slide;
+                this.dirty_state = true;
+            }
         }
 
         /**
-         * Return the last displayed slide defined by the user. It may be different as
-         * get_user_slide_count()!
+         * Get/set font size of notes
+         */
+        public int get_font_size() {
+            return this.font_size;
+        }
+        public void set_font_size(int size) {
+            if (this.font_size != size) {
+                this.font_size = size;
+                this.dirty_state = true;
+            }
+        }
+
+        /**
+         * Get/set the last bookmarked slide
          */
         public int get_last_saved_slide() {
             return this.last_saved_slide;
         }
+        public void set_last_saved_slide(int slide) {
+            if (this.last_saved_slide != slide) {
+                this.last_saved_slide = slide;
+                this.dirty_state = true;
+            }
+        }
 
         /**
-         * Set the last slide defined by the user
+         * Get/set last minutes
          */
-        public void set_last_saved_slide(int slide) {
-            this.last_saved_slide = slide;
+        public uint get_last_minutes() {
+            return this.last_minutes;
+        }
+        public void set_last_minutes(uint last_minutes) {
+            if (this.last_minutes != last_minutes) {
+                this.last_minutes = last_minutes;
+                this.dirty_state = true;
+            }
+        }
+
+        /**
+         * Get/set the start time
+         */
+        public string? get_start_time() {
+            return this.start_time;
+        }
+        public void set_start_time(string? timestr) {
+            if (this.start_time != timestr) {
+                this.start_time = timestr;
+                this.dirty_state = true;
+            }
+        }
+
+        /**
+         * Get/set the end time
+         */
+        public string? get_end_time() {
+            return this.end_time;
+        }
+        public void set_end_time(string? timestr) {
+            if (this.end_time != timestr) {
+                this.end_time = timestr;
+                this.dirty_state = true;
+            }
+        }
+
+        /**
+         * Get/set notes position
+         */
+        public NotesPosition get_notes_position() {
+            return this.notes_position;
+        }
+        public void set_notes_position(NotesPosition position) {
+            if (this.notes_position != position) {
+                this.notes_position = position;
+                this.dirty_state = true;
+            }
         }
 
         /**
@@ -1084,6 +1250,9 @@ namespace pdfpc.Metadata {
                 page = this.pages.get(i);
                 page.user_slide--;
             }
+
+            this.dirty_state = true;
+
             return -1;
         }
 
@@ -1316,17 +1485,16 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Get the duration of the presentation
+         * Get/set the duration of the presentation
          */
         public uint get_duration() {
             return this.duration;
         }
-
-        /**
-         * Get the duration of the presentation
-         */
         public void set_duration(uint d) {
-            this.duration = d;
+            if (this.duration != d) {
+                this.duration = d;
+                this.dirty_state = true;
+            }
         }
 
         /**

@@ -330,7 +330,7 @@ namespace pdfpc {
 
                     this.timer = getTimerLabel(this,
                         (int) metadata.get_duration() * 60,
-                        metadata.start_time, metadata.end_time);
+                        metadata.get_start_time(), metadata.get_end_time());
                     this.timer.reset();
 
                     this.current_slide_number = 0;

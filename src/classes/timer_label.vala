@@ -44,7 +44,7 @@ namespace pdfpc {
     TimerLabel getTimerLabel(PresentationController controller, int duration,
         string? start_time_str, string? end_time_str) {
 
-        uint last_minutes = Options.last_minutes;
+        uint last_minutes = controller.metadata.get_last_minutes();
 
         // Calculate the countdown to display until the presentation has to
         // start
