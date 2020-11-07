@@ -167,10 +167,9 @@ namespace pdfpc.Metadata {
         protected uint last_minutes = 5;
 
         /**
-         * The font size used for notes. -1 if none is
-         * specified in pdfpc file.
+         * The font size used for notes
          */
-        protected int font_size = -1;
+        protected int font_size = 20;
 
         /**
          * Default page transition
@@ -536,6 +535,11 @@ namespace pdfpc.Metadata {
                         }
                         case "[font_size]": {
                             this.font_size = int.parse(section_content);
+                            // Long time ago, the font size was in device units.
+                            // These were typically larger than 1000.
+                            if (this.font_size >= 1000) {
+                                this.font_size /= Pango.SCALE;
+                            }
                             break;
                         }
                         case "[last_saved_slide]": {

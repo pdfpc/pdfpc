@@ -622,16 +622,7 @@ namespace pdfpc.Window {
             this.notes_stack.homogeneous = true;
 
             var meta_font_size = this.metadata.get_font_size();
-            if (meta_font_size >= 0) {
-                // LEGACY font size detection
-                // Before, we had the font size in absolute (device) units.
-                // These were typically larger than 1000
-                if (meta_font_size >= 1000) {
-                    meta_font_size /= Pango.SCALE;
-                    this.metadata.set_font_size(meta_font_size);
-                }
-                this.set_font_size(meta_font_size);
-            }
+            this.apply_font_size(meta_font_size);
 
             // The countdown timer is centered in the 90% bottom part of the screen
             this.timer = this.controller.getTimer();
@@ -1213,34 +1204,26 @@ namespace pdfpc.Window {
          * Increase font sizes for Widgets
          */
         public void increase_font_size() {
-            int font_size = get_font_size();
+            int font_size = this.metadata.get_font_size();
             font_size += 2;
             this.metadata.set_font_size(font_size);
-            set_font_size(font_size);
+            this.apply_font_size(font_size);
         }
 
         /**
          * Decrease font sizes for Widgets
          */
         public void decrease_font_size() {
-            int font_size = get_font_size();
+            int font_size = this.metadata.get_font_size();
             font_size -= 2;
             if (font_size < 2) {
                 font_size = 2;
             }
             this.metadata.set_font_size(font_size);
-            set_font_size(font_size);
+            this.apply_font_size(font_size);
         }
 
-        private int get_font_size() {
-            Gtk.StyleContext style_context = this.notes_editor.get_style_context();
-            Pango.FontDescription font_desc;
-            style_context.get(style_context.get_state(), "font", out font_desc, null);
-
-            return font_desc.get_size()/Pango.SCALE;
-        }
-
-        private void set_font_size(int size) {
+        private void apply_font_size(int size) {
             const string text_css_template = "#notesView { font-size: %dpt; }";
             var css = text_css_template.printf(size);
 
