@@ -621,14 +621,16 @@ namespace pdfpc.Window {
             this.notes_stack.add_named(this.mdview, "mdview");
             this.notes_stack.homogeneous = true;
 
-            if (this.metadata.font_size >= 0) {
+            var meta_font_size = this.metadata.get_font_size();
+            if (meta_font_size >= 0) {
                 // LEGACY font size detection
                 // Before, we had the font size in absolute (device) units.
                 // These were typically larger than 1000
-                if (this.metadata.font_size >= 1000) {
-                    this.metadata.font_size /= Pango.SCALE;
+                if (meta_font_size >= 1000) {
+                    meta_font_size /= Pango.SCALE;
+                    this.metadata.set_font_size(meta_font_size);
                 }
-                this.set_font_size(this.metadata.font_size);
+                this.set_font_size(meta_font_size);
             }
 
             // The countdown timer is centered in the 90% bottom part of the screen
@@ -1213,7 +1215,7 @@ namespace pdfpc.Window {
         public void increase_font_size() {
             int font_size = get_font_size();
             font_size += 2;
-            this.metadata.font_size = font_size;
+            this.metadata.set_font_size(font_size);
             set_font_size(font_size);
         }
 
@@ -1226,7 +1228,7 @@ namespace pdfpc.Window {
             if (font_size < 2) {
                 font_size = 2;
             }
-            this.metadata.font_size = font_size;
+            this.metadata.set_font_size(font_size);
             set_font_size(font_size);
         }
 
