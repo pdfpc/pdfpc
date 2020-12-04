@@ -959,6 +959,10 @@ namespace pdfpc {
                 set_pen_pressure(pressure);
             }
 
+            // restart the pointer timeout timer
+            this.restart_pointer_timer();
+            this.pointer_hidden = false;
+
             double x, y;
             this.device_to_normalized(event.x, event.y, out x, out y);
             move_pen(x, y);
@@ -975,6 +979,7 @@ namespace pdfpc {
                     this.pointer_timeout_id = 0;
                     this.pointer_hidden = true;
                     this.queue_pointer_surface_draws();
+                    this.queue_pen_surface_draws();
 
                     return false;
                 });
