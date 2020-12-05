@@ -141,7 +141,7 @@ namespace pdfpc.Metadata {
         /**
          * Assume notes are formatted in Markdown
          */
-        public bool enable_markdown { get; protected set; default = true; }
+        public bool disable_markdown { get; protected set; default = false; }
 
         /**
          * The "end slide" defined by the user
@@ -287,8 +287,8 @@ namespace pdfpc.Metadata {
                 builder.set_member_name("beamerNotePosition");
                 builder.add_string_value(this.notes_position.to_string());
             }
-            builder.set_member_name("enableMarkdown");
-            builder.add_boolean_value(this.enable_markdown);
+            builder.set_member_name("disableMarkdown");
+            builder.add_boolean_value(this.disable_markdown);
             if (this.font_size > 0) {
                 builder.set_member_name("noteFontSize");
                 builder.add_int_value(this.font_size);
@@ -479,8 +479,8 @@ namespace pdfpc.Metadata {
                      case "defaultTransition":
 			this.set_default_transition_from_string(item.get_string());
 			break;
-                   case "enableMarkdown":
-			this.enable_markdown = item.get_boolean();
+                   case "disableMarkdown":
+			this.disable_markdown = item.get_boolean();
 			break;
                    case "noteFontSize":
 			this.font_size = (int) item.get_int();
@@ -944,8 +944,8 @@ namespace pdfpc.Metadata {
                         case "DefaultTransition":
                             this.set_default_transition_from_string(entry.value);
                             break;
-                        case "EnableMarkdown":
-                            this.enable_markdown = bool.parse(entry.value);
+                        case "DisableMarkdown":
+                            this.disable_markdown = bool.parse(entry.value);
                             break;
                         default:
                             GLib.printerr("unknown XMP entry %s\n", entry.key);
@@ -1104,7 +1104,7 @@ namespace pdfpc.Metadata {
             if (notes_content_old != null) {
                 this.parse_notes_old(notes_content_old.split("\n"));
                 // No Markdown in the old-style pdfpc files
-                this.enable_markdown = false;
+                this.disable_markdown = true;
             }
 
             if (skip_line_old != null) {
