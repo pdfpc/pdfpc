@@ -141,7 +141,7 @@ namespace pdfpc.Metadata {
         /**
          * Assume notes are formatted in Markdown
          */
-        public bool disable_markdown { get; protected set; default = false; }
+        protected bool disable_markdown = false;
 
         /**
          * The "end slide" defined by the user
@@ -874,7 +874,7 @@ namespace pdfpc.Metadata {
         private void notes_from_document() {
             for (int i = 0; i < this.page_count; i++) {
                 var page = this.document.get_page(i);
-                string note_text = this.get_note(i);
+                string note_text = "";
 
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
                 foreach(unowned Poppler.AnnotMapping am in anns) {
@@ -1071,6 +1071,21 @@ namespace pdfpc.Metadata {
                 this.set_default_transition_from_string(Options.default_transition);
             }
 
+            if (Options.notes_format != null) {
+                if (Options.notes_format == "plain") {
+                    this.set_disable_markdown(true);
+                } else if (Options.notes_format == "markdown") {
+                    this.set_disable_markdown(false);
+                } else {
+                    GLib.printerr("Unknown format \"%s\"\n",
+                        Options.notes_format);
+                    Process.exit(1);
+                }
+                var new_notes_position =
+                    NotesPosition.from_string(Options.notes_position);
+                this.set_notes_position(new_notes_position);
+            }
+
             bool disable_auto_grouping = Options.disable_auto_grouping;
             // Force it if there are beamer notes or custom overlays defined
             if (!disable_auto_grouping &&
@@ -1217,6 +1232,19 @@ namespace pdfpc.Metadata {
         public void set_notes_position(NotesPosition position) {
             if (this.notes_position != position) {
                 this.notes_position = position;
+                this.dirty_state = true;
+            }
+        }
+
+        /**
+         * Get/set disable_markdown flag
+         */
+        public bool get_disable_markdown() {
+            return this.disable_markdown;
+        }
+        public void set_disable_markdown(bool onoff) {
+            if (this.disable_markdown != onoff) {
+                this.disable_markdown = onoff;
                 this.dirty_state = true;
             }
         }

@@ -43,6 +43,9 @@ presentation.
 .BI "\-e, \-\-end\-time"=T
 End time of the presentation. (Format: HH:MM (24h))
 .TP
+.BI "\-f, \-\-note\-format"=FORMAT
+Enforce format of notes (plain or markdown. Default: markdown)
+.TP
 .BI "\-g, \-\-disable\-auto\-grouping"
 Disable auto detection of overlay groups. (Default: enabled)
 .TP

@@ -1161,7 +1161,8 @@ namespace pdfpc.Window {
                 this.metadata.set_note(this_note,
                     this.controller.current_slide_number);
                 this.controller.set_ignore_input_events(false);
-                this.mdview.render(this_note, this.metadata.disable_markdown);
+                this.mdview.render(this_note,
+                    this.metadata.get_disable_markdown());
                 this.notes_stack.set_visible_child_name("mdview");
                 return true;
             } else {
@@ -1178,7 +1179,7 @@ namespace pdfpc.Window {
             this.notes_editor.buffer.text = this_note;
 
             // render the note
-            this.mdview.render(this_note, this.metadata.disable_markdown);
+            this.mdview.render(this_note, this.metadata.get_disable_markdown());
         }
 
         public void show_overview() {
