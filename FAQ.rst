@@ -26,7 +26,9 @@ On Arch Linux and derived (e.g., Manjaro) distributions, install it with::
     sudo pacman -S gst-plugin-gtk
 
 Try loading the video file you want to play with the following command:
-``gst-play-1.0 --videosink gtksink <your video>``.
+``gst-play-1.0 --videosink gtksink <your video>`` (if ``gst-play-1.0`` is not
+found, you may need to install a package that provides it, e.g.,
+``gstreamer1.0-plugins-base-apps``).
 If the video plays with no errors or warnings, go ahead and `submit an issue
 <https://github.com/pdfpc/pdfpc/issues>`_. Otherwise, the command will likely
 output some good hints for why gstreamer cannot decode the video.
