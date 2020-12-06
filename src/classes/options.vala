@@ -221,6 +221,11 @@ namespace pdfpc {
         public static bool list_monitors = false;
 
         /**
+         * Commandline option to choose which format to parse notes in
+         */
+        public static string? notes_format = null;
+
+        /**
          * Position of notes on slides
          */
         public static string? notes_position = null;
