@@ -876,11 +876,6 @@ namespace pdfpc.Metadata {
                 var page = this.document.get_page(i);
                 string note_text = this.get_note(i);
 
-                // We never overwrite existing notes
-                if (note_text != "") {
-                    continue;
-                }
-
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
