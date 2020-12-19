@@ -2,6 +2,38 @@
 pdfpc Changelog
 ===============
 
+Version 4.5.0
+=============
+
+*Released: December 2020*
+
+- **Switch to GPLv3+ licence**
+- JSON format for pdfpc file
+- Markdown support for text notes
+- Render LaTeX beamer and text notes in the same place
+- Zoom feature in highlighted areas
+- Spotlight mode
+- Page transitions
+- Automatic slide advancing
+- Video controls in presentation window
+- Min/max current slide view in presenter
+- Consistency with pdfpc/command line overriding of options
+- Allow GUI customization
+- Fix some UI glitches
+- Man page fixes
+
+Version 4.4.1
+=============
+
+*Released: November 2020*
+
+Bug fix release:
+
+- Compatibility with pdfpc LaTeX package
+- Some UI glitches
+- Icon rendering with HiDPI
+- Allow multiple videos per slide
+
 Version 4.4.0
 =============
 
