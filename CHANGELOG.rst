@@ -11,16 +11,16 @@ Version 4.5.0
 - JSON format for pdfpc file
 - Markdown support for text notes
 - Render LaTeX beamer and text notes in the same place
+- Per-overlay notes
 - Zoom feature in highlighted areas
 - Spotlight mode
 - Page transitions
 - Automatic slide advancing
 - Video controls in presentation window
-- Min/max current slide view in presenter
+- Max/unmax current slide view in presenter
 - Consistency with pdfpc/command line overriding of options
-- Allow GUI customization
-- Fix some UI glitches
-- Man page fixes
+- Allow run-time GUI customization
+- Assorted bug fixes
 
 Version 4.4.1
 =============
