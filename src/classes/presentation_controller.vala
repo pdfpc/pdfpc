@@ -134,6 +134,10 @@ namespace pdfpc {
          */
         public bool running { get; protected set; default = false; }
 
+        public bool is_paused() {
+            return this.timer.is_paused();
+        }
+
         /**
          * The current slide in "user indices"
          */
@@ -594,6 +598,21 @@ namespace pdfpc {
 
         public bool in_pointing_mode() {
             return is_pointer_active() || is_spotlight_active();
+        }
+
+        public string get_mode_string() {
+            switch (this.annotation_mode) {
+                case POINTER:
+                    return "pointer";
+                case SPOTLIGHT:
+                    return "spotlight";
+                case PEN:
+                    return "pen";
+                case ERASER:
+                    return "eraser";
+                default:
+                    return "normal";
+            }
         }
 
         private void move_pen(double x, double y) {
