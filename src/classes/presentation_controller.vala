@@ -1004,6 +1004,41 @@ namespace pdfpc {
                 });
         }
 
+        private void pointer_move(Variant? point) {
+            if (!this.in_pointing_mode()) {
+                return;
+            }
+
+            try {
+                GLib.Regex regex = new GLib.Regex("([^,]+),([^,]+)");
+                string[] parts = regex.split(point.get_string());
+                if (parts.length != 4) {
+                    return;
+                }
+                pointer_x += double.parse(parts[1]);
+                if (pointer_x > 1.0) {
+                    pointer_x = 1.0;
+                } else if (pointer_x < 0.0) {
+                    pointer_x = 0.0;
+                }
+                this.pointer_y += double.parse(parts[2]);
+                if (pointer_y > 1.0) {
+                    pointer_y = 1.0;
+                } else if (pointer_y < 0.0) {
+                    pointer_y = 0.0;
+                }
+            } catch (Error e) {
+                return;
+            }
+
+            // restart the pointer timeout timer
+            this.restart_pointer_timer();
+            this.pointer_hidden = false;
+
+            this.queue_pointer_surface_draws();
+            this.update_highlight(pointer_x, pointer_y);
+        }
+
         private bool on_move_pointer(Gdk.EventMotion event) {
             this.device_to_normalized(event.x, event.y,
                 out pointer_x, out pointer_y);
@@ -1213,6 +1248,10 @@ namespace pdfpc {
 
             add_action("customize", this.customize_gui,
                 "Customize the GUI");
+
+            add_action_with_parameter("pointerMove", GLib.VariantType.STRING,
+                this.pointer_move,
+                "Move pointer by vector", "(x,y)");
 
             add_action("showHelp", this.show_help,
                 "Show a help screen");
