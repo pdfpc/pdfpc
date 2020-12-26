@@ -78,6 +78,9 @@ namespace pdfpc {
             {"no-install", 'N', 0, 0,
                 ref Options.no_install,
                 "Test pdfpc without installation", null},
+            {"rest-port", 'p', 0, OptionArg.INT,
+                ref Options.rest_port,
+                "REST port number [8088]", null},
             {"page", 'P', 0, OptionArg.INT,
                 ref Options.page_hnum,
                 "Go to page number N directly after startup", "N"},
@@ -102,6 +105,9 @@ namespace pdfpc {
             {"version", 'v', 0, 0,
                 ref Options.version,
                 "Output version information and exit", null},
+            {"enable-rest-server", 'V', 0, 0,
+                ref Options.enable_rest,
+                "Enable REST server", null},
             {"windowed", 'w', 0, OptionArg.STRING,
                 ref Options.windowed,
                 "Run in the given windowed mode", "MODE"},
@@ -511,6 +517,12 @@ namespace pdfpc {
             var im_module = Environment.get_variable("GTK_IM_MODULE");
             if (im_module == "xim") {
                 GLib.printerr("Warning: XIM is known to cause problems\n");
+            }
+
+            // Start the REST server
+            if (Options.enable_rest) {
+                RestServer rs = new RestServer(metadata, Options.rest_port);
+                rs.start();
             }
 
             // Enter the Glib eventloop

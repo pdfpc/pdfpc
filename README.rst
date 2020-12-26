@@ -101,12 +101,14 @@ In order to compile and run pdfpc, the following requirements need to be met:
 - discount (aka markdown2)
 - webkit2gtk
 - json-glib
+- libsoup
 
 E.g., on Ubuntu 18.04 onward, you can install these dependencies with::
 
     sudo apt-get install cmake valac libgee-0.8-dev libpoppler-glib-dev
     libgtk-3-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
-    libjson-glib-dev libmarkdown2-dev libwebkit2gtk-4.0-dev gstreamer1.0-gtk3
+    libjson-glib-dev libmarkdown2-dev libwebkit2gtk-4.0-dev libsoup2.4-dev
+    gstreamer1.0-gtk3
 
 (the last one is a run-time dependence). You should also consider installing all
 plugins to support required video formats; chances are they are already present

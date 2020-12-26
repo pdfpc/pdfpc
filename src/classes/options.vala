@@ -312,6 +312,16 @@ namespace pdfpc {
          */
         public static bool final_slide_overlay = false;
 
+        /**
+         * Run REST server
+         */
+        public static bool enable_rest = false;
+
+        /**
+         * REST server port
+         */
+        public static int rest_port = 8088;
+
         public class BindTuple {
             public string type;
             public uint keyCode;

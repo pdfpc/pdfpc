@@ -7,6 +7,7 @@ pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.22)
 pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
 pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 pkg_check_modules(JSON REQUIRED json-glib-1.0)
+pkg_check_modules(SOUP REQUIRED libsoup-2.4)
 list (FIND GTK_STATIC_LIBRARIES "X11" _index)
 if (${_index} GREATER -1)
     set(WITH_X11 1)
@@ -48,6 +49,7 @@ include_directories(
     ${WEBKIT_INCLUDE_DIRS}
     ${MARKDOWN_INCLUDE_DIRS}
     ${JSON_INCLUDE_DIRS}
+    ${SOUP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -65,6 +67,7 @@ link_directories(
     ${WEBKIT_LIBRARY_DIRS}
     ${MARKDOWN_LIBRARY_DIRS}
     ${JSON_LIBRARY_DIRS}
+    ${SOUP_LIBRARY_DIRS}
 )
 
 if(${WITH_X11})
