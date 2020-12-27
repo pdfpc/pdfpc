@@ -519,12 +519,6 @@ namespace pdfpc {
                 GLib.printerr("Warning: XIM is known to cause problems\n");
             }
 
-            // Start the REST server
-            if (Options.enable_rest) {
-                RestServer rs = new RestServer(metadata, Options.rest_port);
-                rs.start();
-            }
-
             // Enter the Glib eventloop
             // Everything from this point on is completely signal based
             Gtk.main();

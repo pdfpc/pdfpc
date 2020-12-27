@@ -8,6 +8,7 @@ pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
 pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 pkg_check_modules(JSON REQUIRED json-glib-1.0)
 pkg_check_modules(SOUP REQUIRED libsoup-2.4)
+pkg_check_modules(QRENCODE REQUIRED libqrencode)
 list (FIND GTK_STATIC_LIBRARIES "X11" _index)
 if (${_index} GREATER -1)
     set(WITH_X11 1)
@@ -50,6 +51,7 @@ include_directories(
     ${MARKDOWN_INCLUDE_DIRS}
     ${JSON_INCLUDE_DIRS}
     ${SOUP_INCLUDE_DIRS}
+    ${QRENCODE_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -68,6 +70,7 @@ link_directories(
     ${MARKDOWN_LIBRARY_DIRS}
     ${JSON_LIBRARY_DIRS}
     ${SOUP_LIBRARY_DIRS}
+    ${QRENCODE_LIBRARY_DIRS}
 )
 
 if(${WITH_X11})
@@ -128,6 +131,7 @@ CUSTOM_VAPIS
     ${CMAKE_CURRENT_BINARY_DIR}/paths.vala
     ${CMAKE_CURRENT_SOURCE_DIR}/custom_binding.vapi
     ${CMAKE_CURRENT_SOURCE_DIR}/libmarkdown.vapi
+    ${CMAKE_CURRENT_SOURCE_DIR}/libqrencode.vapi
 )
 
 add_executable(pdfpc
@@ -145,6 +149,7 @@ target_link_libraries(pdfpc
     ${MARKDOWN_LIBRARIES}
     ${WEBKIT_LIBRARIES}
     ${JSON_LIBRARIES}
+    ${QRENCODE_LIBRARIES}
     ${GTK_LIBRARIES}
     ${GTHREAD_LIBRARIES}
     ${PANGOCAIRO_LIBRARIES}

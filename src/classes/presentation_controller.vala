@@ -320,6 +320,11 @@ namespace pdfpc {
         protected Gee.List<Controllable> controllables;
 
         /**
+         * The REST server object
+         */
+        public RestServer rest_server { get; protected set; }
+
+        /**
          * The metadata of the presentation
          */
         private Metadata.Pdf _metadata;
@@ -341,6 +346,13 @@ namespace pdfpc {
 
                     this.pen_drawing = Drawings.create(metadata);
                     current_pen_drawing_tool = pen_drawing.pen;
+
+                    // Start the REST server
+                    if (Options.enable_rest) {
+                        this.rest_server =
+                            new RestServer(metadata, Options.rest_port);
+                        this.rest_server.start();
+                    }
                 }
             }
         }
@@ -1253,6 +1265,9 @@ namespace pdfpc {
                 this.pointer_move,
                 "Move pointer by vector", "(x,y)");
 
+            add_action("showQRcode", this.show_qrcode,
+                "Show QR code");
+
             add_action("showHelp", this.show_help,
                 "Show a help screen");
 
@@ -2110,6 +2125,15 @@ namespace pdfpc {
         public void show_help() {
             if (this.presenter != null) {
                 this.presenter.show_help_window(true);
+            }
+        }
+
+        /**
+         * Show QR code
+         */
+        public void show_qrcode() {
+            if (this.presenter != null && this.rest_server != null) {
+                this.presenter.show_qrcode_window(true);
             }
         }
 

@@ -718,10 +718,25 @@ namespace pdfpc.Window {
 
             var help_sw = create_help_window();
 
+            var qrcode_da = new QRCode(this.controller, 0.5*this.window_h);
+            qrcode_da.key_press_event.connect((event) => {
+                    // Close this window on some reasonable keystrokes
+                    switch (event.keyval) {
+                    case Gdk.Key.Escape:
+                    case Gdk.Key.Return:
+                    case Gdk.Key.q:
+                        this.show_qrcode_window(false);
+                        return true;
+                    default:
+                        return false;
+                    }
+                });
+
             this.slide_stack = new Gtk.Stack();
             this.slide_stack.add_named(this.slide_views, "slides");
             this.slide_stack.add_named(this.overview, "overview");
             this.slide_stack.add_named(help_sw, "help");
+            this.slide_stack.add_named(qrcode_da, "qrcode");
             this.slide_stack.homogeneous = true;
 
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
@@ -1249,6 +1264,17 @@ namespace pdfpc.Window {
             if (onoff) {
                 this.slide_stack.set_visible_child_name("help");
                 this.slide_stack.get_child_by_name("help").grab_focus();
+                this.controller.set_ignore_input_events(true);
+            } else {
+                this.slide_stack.set_visible_child_name("slides");
+                this.controller.set_ignore_input_events(false);
+            }
+        }
+
+        public void show_qrcode_window(bool onoff) {
+            if (onoff) {
+                this.slide_stack.set_visible_child_name("qrcode");
+                this.slide_stack.get_child_by_name("qrcode").grab_focus();
                 this.controller.set_ignore_input_events(true);
             } else {
                 this.slide_stack.set_visible_child_name("slides");
