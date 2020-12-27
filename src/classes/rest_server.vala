@@ -26,7 +26,7 @@ namespace pdfpc {
         private Metadata.Pdf metadata;
         private int port_num;
 
-	private Json.Node app_data() {
+        private Json.Node app_data() {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
@@ -35,11 +35,11 @@ namespace pdfpc {
             builder.set_member_name("api");
             builder.add_int_value(this.api_version);
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
-	private Json.Node meta_data() {
+        private Json.Node meta_data() {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
@@ -67,22 +67,22 @@ namespace pdfpc {
             builder.set_member_name("font_size");
             builder.add_int_value(metadata.get_font_size());
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
-	private Json.Node error_data(string message) {
+        private Json.Node error_data(string message) {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
             builder.set_member_name("message");
             builder.add_string_value(message);
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
-	private Json.Node pointer_data() {
+        private Json.Node pointer_data() {
             var controller = this.metadata.controller;
 
             Json.Builder builder = new Json.Builder();
@@ -96,11 +96,11 @@ namespace pdfpc {
             builder.set_member_name("y");
             builder.add_double_value(controller.pointer_y);
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
-	private Json.Node state_data() {
+        private Json.Node state_data() {
             var controller = this.metadata.controller;
 
             Json.Builder builder = new Json.Builder();
@@ -147,13 +147,13 @@ namespace pdfpc {
             builder.add_double_value(controller.highlight.width);
             builder.set_member_name("height");
             builder.add_double_value(controller.highlight.height);
-	    builder.end_object();
+            builder.end_object();
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
-	private Json.Node slide_data(int slide_number) {
+        private Json.Node slide_data(int slide_number) {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
@@ -168,11 +168,11 @@ namespace pdfpc {
             builder.set_member_name("note_url");
             builder.add_string_value("/notes/" + slide_number.to_string());
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
-	private Json.Node note_data(int slide_number) {
+        private Json.Node note_data(int slide_number) {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
@@ -184,19 +184,19 @@ namespace pdfpc {
             builder.add_string_value("/notes/" + slide_number.to_string() +
                 "/html");
 
-	    builder.end_object();
+            builder.end_object();
             return builder.get_root();
         }
 
 
-	private uint8[]? get_slide_png(int slide_number, int width, int height) {
+        private uint8[]? get_slide_png(int slide_number, int width, int height) {
             try {
                 var surface = metadata.renderer.render(slide_number,
                     false, width, height);
 
                 var pixbuf = Gdk.pixbuf_get_from_surface(surface,
                 0, 0, surface.get_width(), surface.get_height());
-	        uint8[] png_data;
+                uint8[] png_data;
                 pixbuf.save_to_buffer(out png_data,
                     "png", "compression", "1", null);
                 return png_data;
@@ -205,7 +205,7 @@ namespace pdfpc {
             }
         }
 
-	private void default_handler(Soup.Server server, Soup.Message msg,
+        private void default_handler(Soup.Server server, Soup.Message msg,
             string path, GLib.HashTable<string, string>? query,
             Soup.ClientContext client) {
 
@@ -293,17 +293,17 @@ namespace pdfpc {
                     parser.load_from_data((string) body.data,
                         (ssize_t) body.length);
                     Json.Node node = parser.get_root();
-	            if (node.get_node_type() == Json.NodeType.OBJECT) {
-	                unowned Json.Object obj = node.get_object();
+                    if (node.get_node_type() == Json.NodeType.OBJECT) {
+                        unowned Json.Object obj = node.get_object();
                         string action = null, argument = null;
                         foreach (unowned string name in obj.get_members()) {
                             unowned Json.Node item = obj.get_member(name);
                             switch (name) {
                             case "action":
-			        action = item.get_string();
+                                action = item.get_string();
                                 break;
                             case "argument":
-			        argument = item.get_string();
+                                argument = item.get_string();
                                 break;
                             }
                         }
@@ -345,19 +345,19 @@ namespace pdfpc {
             }
 
             Json.Generator generator = new Json.Generator();
-	    generator.set_root(root);
-	    string response = generator.to_data(null);
+            generator.set_root(root);
+            string response = generator.to_data(null);
 
-	    msg.set_response("application/json", Soup.MemoryUse.COPY,
+            msg.set_response("application/json", Soup.MemoryUse.COPY,
                 response.data);
-	}
+        }
 
-	public RestServer(Metadata.Pdf metadata, int port_num) {
-	    this.metadata = metadata;
-	    this.port_num = port_num;
+        public RestServer(Metadata.Pdf metadata, int port_num) {
+            this.metadata = metadata;
+            this.port_num = port_num;
 
-	    this.add_handler(null, default_handler);
-	}
+            this.add_handler(null, default_handler);
+        }
 
         public void start() {
             try {
@@ -366,6 +366,44 @@ namespace pdfpc {
                 GLib.printerr("Error starting REST server: %s\n", e.message);
                 Process.exit(1);
             }
+        }
+
+        public string? get_connection_info() {
+            string ipaddr4;
+
+            // no truly OS-neutral API to find out the IP(s) we bound to;
+            // doing some dirty guess
+            try {
+                char hostname[256];
+                Posix.gethostname(hostname);
+
+                Resolver resolver = Resolver.get_default();
+
+                List<InetAddress> addresses =
+                    resolver.lookup_by_name((string) hostname, null);
+                InetAddress address4 = addresses.nth_data(0);
+                ipaddr4 = address4.to_string();
+            } catch (Error e) {
+                return null;
+            }
+
+            Json.Builder builder = new Json.Builder();
+            builder.begin_object();
+
+            builder.set_member_name("address");
+            builder.add_string_value(ipaddr4);
+            builder.set_member_name("port");
+            builder.add_int_value(this.port_num);
+            builder.set_member_name("ssl");
+            builder.add_boolean_value(this.is_https());
+
+            builder.end_object();
+            Json.Node root = builder.get_root();
+
+            Json.Generator generator = new Json.Generator();
+            generator.set_root(root);
+
+            return generator.to_data(null);
         }
     }
 }
