@@ -490,7 +490,7 @@ screens. It is also possible to increase and decrease the pointer size.
 Additionally, when the pointer is enabled, it is possible to highlight some area
 of the current slide using the drag mouse motion. The area outside the selected
 region will be dimmed. You can zoom in the selected area by pressing 'z'; press
-'Escape' to exit the zoom mode. You can highlight another region while zoomed
+\(aqEscape\(aq to exit the zoom mode. You can highlight another region while zoomed
 in, but there will be no further action on pressing 'z'. Drawing is also
 disabled in this mode.
 
