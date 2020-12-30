@@ -89,6 +89,12 @@ if (MOVIES)
 else ()
     LIST(REMOVE_ITEM VALA_SRC classes/action/movie.vala)
 endif ()
+if (REST)
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D REST)
+else ()
+    LIST(REMOVE_ITEM VALA_SRC classes/rest_server.vala)
+    LIST(REMOVE_ITEM VALA_SRC classes/window/qrcode.vala)
+endif ()
 
 # Check for some compiler flags to suppress excessive Vala-triggered warnings
 # Since gcc >= 4.4 can silently ignore unrecognized -W-no* flags, we test

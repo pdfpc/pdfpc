@@ -188,6 +188,9 @@ gstreamer dependencies.  The requirement for these packages
 can be removed by compiling without support for movie playback by passing
 *-DMOVIES=OFF* to the cmake command.
 
+To disable support for the built-in REST Web server, pass *-DREST=OFF* to cmake.
+In this case, libsoup and libqrencode are not needed.
+
 Compilation troubleshooting
 ---------------------------
 

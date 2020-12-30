@@ -78,9 +78,11 @@ namespace pdfpc {
             {"no-install", 'N', 0, 0,
                 ref Options.no_install,
                 "Test pdfpc without installation", null},
+#if REST
             {"rest-port", 'p', 0, OptionArg.INT,
                 ref Options.rest_port,
                 "REST port number [8088]", null},
+#endif
             {"page", 'P', 0, OptionArg.INT,
                 ref Options.page_hnum,
                 "Go to page number N directly after startup", "N"},
@@ -105,9 +107,11 @@ namespace pdfpc {
             {"version", 'v', 0, 0,
                 ref Options.version,
                 "Output version information and exit", null},
+#if REST
             {"enable-rest-server", 'V', 0, 0,
                 ref Options.enable_rest,
                 "Enable REST server", null},
+#endif
             {"windowed", 'w', 0, OptionArg.STRING,
                 ref Options.windowed,
                 "Run in the given windowed mode", "MODE"},

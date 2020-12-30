@@ -311,7 +311,7 @@ namespace pdfpc {
          * instead of the next slide.
          */
         public static bool final_slide_overlay = false;
-
+#if REST
         /**
          * Run REST server
          */
@@ -321,7 +321,7 @@ namespace pdfpc {
          * REST server port
          */
         public static int rest_port = 8088;
-
+#endif
         public class BindTuple {
             public string type;
             public uint keyCode;

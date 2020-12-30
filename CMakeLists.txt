@@ -11,6 +11,7 @@ include(GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 option(MOVIES "Compile support for movie playback (requires gdk-x11)" ON)
+option(REST "Compile support for REST server (requires libsoup and libqrencode)" ON)
 
 add_subdirectory(src)
 add_subdirectory(icons)

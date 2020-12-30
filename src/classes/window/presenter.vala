@@ -717,7 +717,7 @@ namespace pdfpc.Window {
             this.slide_views.pack2(this.next_view_and_notes, true, true);
 
             var help_sw = create_help_window();
-
+#if REST
             var qrcode_da = new QRCode(this.controller, 0.5*this.window_h);
             qrcode_da.key_press_event.connect((event) => {
                     // Close this window on some reasonable keystrokes
@@ -731,12 +731,14 @@ namespace pdfpc.Window {
                         return false;
                     }
                 });
-
+#endif
             this.slide_stack = new Gtk.Stack();
             this.slide_stack.add_named(this.slide_views, "slides");
             this.slide_stack.add_named(this.overview, "overview");
             this.slide_stack.add_named(help_sw, "help");
+#if REST
             this.slide_stack.add_named(qrcode_da, "qrcode");
+#endif
             this.slide_stack.homogeneous = true;
 
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
