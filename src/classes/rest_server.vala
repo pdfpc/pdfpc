@@ -25,6 +25,8 @@ namespace pdfpc {
         private int api_version = 1;
         private Metadata.Pdf metadata;
         private int port_num;
+        private bool locked = false;
+        private string? client_host = null;
 
         private Json.Node app_data() {
             Json.Builder builder = new Json.Builder();
@@ -209,6 +211,13 @@ namespace pdfpc {
             string path, GLib.HashTable<string, string>? query,
             Soup.ClientContext client) {
 
+            // Once locked, serve only the single client
+            if (this.locked && this.client_host != client.get_host()) {
+                msg.status_code = 403;
+                printerr("Refused to serve client %s\n", client.get_host());
+                return;
+            }
+
             msg.status_code = 200;
 
             Json.Node root;
@@ -287,6 +296,12 @@ namespace pdfpc {
                     msg.status_code = 500;
                 }
             } else if (path == "/control" && msg.method == "PUT") {
+                if (!this.locked) {
+                    this.locked = true;
+                    this.client_host = client.get_host();
+                    // At this point the QR code may be withdrawn
+                    this.metadata.controller.hide_qrcode();
+                }
                 var body = msg.request_body;
                 Json.Parser parser = new Json.Parser();
                 try {

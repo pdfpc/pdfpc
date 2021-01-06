@@ -2132,11 +2132,16 @@ namespace pdfpc {
         }
 #if REST
         /**
-         * Show QR code
+         * Show/hide QR code
          */
         public void show_qrcode() {
             if (this.presenter != null && this.rest_server != null) {
                 this.presenter.show_qrcode_window(true);
+            }
+        }
+        public void hide_qrcode() {
+            if (this.presenter != null && this.rest_server != null) {
+                this.presenter.show_qrcode_window(false);
             }
         }
 #endif
