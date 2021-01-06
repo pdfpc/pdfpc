@@ -321,6 +321,11 @@ namespace pdfpc {
          * REST server port
          */
         public static int rest_port = 8088;
+
+        /**
+         * REST password
+         */
+        public static string? rest_passwd = null;
 #endif
         public class BindTuple {
             public string type;

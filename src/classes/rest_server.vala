@@ -321,8 +321,6 @@ namespace pdfpc {
                             }
                             // FIXME: use a sound logic or separate REST path
                             if (action == "pointerMove") {
-                                // int64 msec = GLib.get_real_time()/1000;
-                                // print("%ld %s\n", (long) msec, argument);
                                 root = this.pointer_data();
                             } else {
                                 root = this.state_data();
@@ -357,6 +355,38 @@ namespace pdfpc {
             this.port_num = port_num;
 
             this.add_handler(null, default_handler);
+
+            // If the password is not set, generate a random one
+            if (Options.rest_passwd == null) {
+                Options.rest_passwd = "";
+                var r = new Rand();
+                int i = 0;
+                while (i < 8) {
+                    char c = (char) r.int_range(0, 0x7f);
+                    if (c.isalnum () == true) {
+			Options.rest_passwd.data[i] = c;
+                        i++;
+		    }
+                }
+                Options.rest_passwd.data[i] = '\0';
+            }
+
+            // Perhaps optionally, the entire "/" path should be protected
+            var auth = new Soup.AuthDomainBasic(
+                Soup.AUTH_DOMAIN_REALM, "pdfpc REST service",
+                Soup.AUTH_DOMAIN_ADD_PATH, "/control"
+                );
+            auth.set_auth_callback((domain, msg, username, password) => {
+                    if (username == "pdfpc" &&
+                        password == Options.rest_passwd) {
+                        return true;
+                    } else {
+                        printerr("Authorization failed: user=%s, pass=%s\n",
+                            username, password);
+                        return false;
+                    }
+                });
+            this.add_auth_domain(auth);
         }
 
         public void start() {
@@ -396,6 +426,8 @@ namespace pdfpc {
             builder.add_int_value(this.port_num);
             builder.set_member_name("ssl");
             builder.add_boolean_value(this.is_https());
+            builder.set_member_name("password");
+            builder.add_string_value(Options.rest_passwd);
 
             builder.end_object();
             Json.Node root = builder.get_root();
