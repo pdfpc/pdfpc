@@ -296,6 +296,9 @@ namespace pdfpc {
                 case "presenter-screen":
                     Options.presenter_screen = fields[2];
                     break;
+                case "rest-https":
+                    Options.rest_https = bool.parse(fields[2]);
+                    break;
                 case "spotlight-opacity":
                     Options.spotlight_opacity = int.parse(fields[2]);
                     break;

@@ -323,6 +323,11 @@ namespace pdfpc {
         public static int rest_port = 8088;
 
         /**
+         * Enable HTTPS protocol for REST
+         */
+        public static bool rest_https = false;
+
+        /**
          * REST password
          */
         public static string? rest_passwd = null;

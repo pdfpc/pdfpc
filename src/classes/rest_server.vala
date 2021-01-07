@@ -366,6 +366,23 @@ namespace pdfpc {
         }
 
         public RestServer(Metadata.Pdf metadata, int port_num) {
+            TlsCertificate cert = null;
+            if (Options.rest_https) {
+                var user_conf_dir = GLib.Environment.get_user_config_dir();
+                var cert_fname = Path.build_filename(user_conf_dir, "pdfpc",
+                    "cert.pem");
+                var key_fname = Path.build_filename(user_conf_dir, "pdfpc",
+                    "key.pem");
+                try {
+                    cert = new TlsCertificate.from_files(cert_fname, key_fname);
+                } catch (Error e) {
+                    GLib.printerr("Error loading TLS certificate: %s\n",
+                        e.message);
+                    Process.exit(1);
+                }
+            }
+            Object(tls_certificate: cert);
+
             this.metadata = metadata;
             this.port_num = port_num;
 
@@ -406,7 +423,11 @@ namespace pdfpc {
 
         public void start() {
             try {
-                this.listen_all(this.port_num, 0);
+                var options = 0;
+                if (Options.rest_https) {
+                    options = Soup.ServerListenOptions.HTTPS;
+                }
+                this.listen_all(this.port_num, options);
             } catch (Error e) {
                 GLib.printerr("Error starting REST server: %s\n", e.message);
                 Process.exit(1);
