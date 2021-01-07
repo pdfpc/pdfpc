@@ -320,7 +320,7 @@ namespace pdfpc {
         /**
          * REST server port
          */
-        public static int rest_port = 8088;
+        public static int rest_port = 0;
 
         /**
          * Enable HTTPS protocol for REST

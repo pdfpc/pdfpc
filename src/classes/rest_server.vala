@@ -384,6 +384,9 @@ namespace pdfpc {
             Object(tls_certificate: cert);
 
             this.metadata = metadata;
+            if (port_num == 0) {
+                port_num = 8088;
+            }
             this.port_num = port_num;
 
             this.add_handler(null, default_handler);
