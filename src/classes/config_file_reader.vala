@@ -296,6 +296,7 @@ namespace pdfpc {
                 case "presenter-screen":
                     Options.presenter_screen = fields[2];
                     break;
+#if REST
                 case "rest-https":
                     Options.rest_https = bool.parse(fields[2]);
                     break;
@@ -308,6 +309,7 @@ namespace pdfpc {
                 case "rest-passwd":
                     Options.rest_passwd = fields[2];
                     break;
+#endif
                 case "spotlight-opacity":
                     Options.spotlight_opacity = int.parse(fields[2]);
                     break;
