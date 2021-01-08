@@ -7,8 +7,6 @@ pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.22)
 pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
 pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 pkg_check_modules(JSON REQUIRED json-glib-1.0)
-pkg_check_modules(SOUP REQUIRED libsoup-2.4)
-pkg_check_modules(QRENCODE REQUIRED libqrencode)
 list (FIND GTK_STATIC_LIBRARIES "X11" _index)
 if (${_index} GREATER -1)
     set(WITH_X11 1)
@@ -30,6 +28,11 @@ if (MOVIES)
         gstreamer-audio-1.0
         gstreamer-video-1.0
     )
+endif ()
+
+if (REST)
+    pkg_check_modules(SOUP REQUIRED libsoup-2.4)
+    pkg_check_modules(QRENCODE REQUIRED libqrencode)
 endif ()
 
 if ("${POPPLER_VERSION}" VERSION_GREATER 0.53 AND "${VALA_VERSION}" VERSION_GREATER 0.36.3)
