@@ -151,6 +151,16 @@ Screen to be used for the presentation (output name, see e.g. "xrandr --listmoni
 .B presenter-screen
 Screen to be used for the presenter (output name).
 .TP
+.B rest-https
+Run the REST server in the TLS mode (bool, Default is false).
+.TP
+.B rest-port
+Port of the REST server (int, Default is 8088).
+.TP
+.B rest-passwd
+Password to authenticate against the REST server (string, if not set, a randomly
+generated one is used).
+.TP
 .B spotlight-opacity
 Set opacity of the area outside of the spotlight, in percent (int, default is
 50).

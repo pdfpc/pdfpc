@@ -70,6 +70,9 @@ Allow for testing pdfpc without proper installation. Icons, configuration files,
 etc. will be loaded from the source path locations. Mostly intended for
 developers.
 .TP
+.BI "\-p, \-\-rest\-port"
+Port the REST server binds to. (Default: 8088)
+.TP
 .BI "\-P, \-\-page"
 Go to a specific page directly after startup. In case of overlays, the first slide will be displayed.
 .TP
@@ -97,6 +100,9 @@ Start time of the presentation to be used as a countdown. (Format: HH:MM (24h))
 Try loading video subtitle files automatically. For each video media, pdfpc will
 append ".srt" to the media URI and attempt to load a subtitle file (in the SRT
 format) from that location.
+.TP
+.BI "\-V, \-\-enable\-rest\-server"
+Enable REST server for remote control of pdfpc.
 .TP
 .BI "\-W, \-\-wayland\-workaround"
 Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
@@ -589,6 +595,15 @@ In addition to \fBTriggerAction*\fR, the pdfpc DBus interface exposes
 the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
 \fBNumberOfSlides\fR, \fBUrl\fR) and two signals (\fBOverlayChange\fR and
 \fBSlideChange\fR).
+
+.SS Remote control
+
+.PP
+Pdfpc has a built-in REST server. When enabled (off by default), it allows for
+controlling presentations over network, e.g., using a mobile device as a smart
+controller. (This section will be extended with more details when the REST
+interface sufficiently stabilizes.)
+
 
 .SS LaTeX package
 
