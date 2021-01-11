@@ -214,7 +214,8 @@ namespace pdfpc {
             // Once locked, serve only the single client
             if (this.locked && this.client_host != client.get_host()) {
                 msg.status_code = 403;
-                printerr("Refused to serve client %s\n", client.get_host());
+                GLib.printerr("Refused to serve client %s\n",
+                    client.get_host());
                 return;
             }
 
@@ -308,7 +309,7 @@ namespace pdfpc {
                     parser.load_from_data((string) body.data,
                         (ssize_t) body.length);
                     Json.Node node = parser.get_root();
-                    if (node.get_node_type() == Json.NodeType.OBJECT) {
+                    if (node != null && node.get_node_type() == Json.NodeType.OBJECT) {
                         unowned Json.Object obj = node.get_object();
                         string action = null, argument = null;
                         foreach (unowned string name in obj.get_members()) {
@@ -357,12 +358,14 @@ namespace pdfpc {
                 msg.status_code = 404;
             }
 
-            Json.Generator generator = new Json.Generator();
-            generator.set_root(root);
-            string response = generator.to_data(null);
+            if (root != null) {
+                Json.Generator generator = new Json.Generator();
+                generator.set_root(root);
+                string response = generator.to_data(null);
 
-            msg.set_response("application/json", Soup.MemoryUse.COPY,
-                response.data);
+                msg.set_response("application/json", Soup.MemoryUse.COPY,
+                    response.data);
+            }
         }
 
         public RestServer(Metadata.Pdf metadata, int port_num) {
@@ -416,7 +419,7 @@ namespace pdfpc {
                         password == Options.rest_passwd) {
                         return true;
                     } else {
-                        printerr("Authorization failed: user=%s, pass=%s\n",
+                        GLib.printerr("Authorization failed: user=%s, pass=%s\n",
                             username, password);
                         return false;
                     }
