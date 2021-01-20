@@ -914,7 +914,8 @@ namespace pdfpc.Window {
                 load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons",
                     filename);
             } else {
-                load_icon_path = Path.build_filename(Paths.ICON_PATH, filename);
+                load_icon_path = Path.build_filename(Paths.SHARE_PATH, "icons",
+                    filename);
             }
             File icon_file = File.new_for_path(load_icon_path);
 

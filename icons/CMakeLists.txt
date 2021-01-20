@@ -15,6 +15,6 @@ install(FILES
     linewidth.svg
     spotlight.svg
 DESTINATION
-    share/pixmaps/pdfpc
+    share/pdfpc/icons
 )
 

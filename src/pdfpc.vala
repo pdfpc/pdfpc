@@ -174,9 +174,9 @@ namespace pdfpc {
 
             string distCssPath;
             if (Options.no_install) {
-                distCssPath = Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpc.css");
+                distCssPath = Path.build_filename(Paths.SOURCE_PATH, "css/pdfpc.css");
             } else {
-                distCssPath = Path.build_filename(Paths.ICON_PATH, "pdfpc.css");
+                distCssPath = Path.build_filename(Paths.SHARE_PATH, "css/pdfpc.css");
             }
             var legacyUserCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
             var userCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpc.css");

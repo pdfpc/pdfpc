@@ -30,9 +30,9 @@ namespace pdfpc.View {
 
             string css_path;
             if (Options.no_install) {
-                css_path = Path.build_filename(Paths.SOURCE_PATH, "rc/notes.css");
+                css_path = Path.build_filename(Paths.SOURCE_PATH, "css/notes.css");
             } else {
-                css_path = Path.build_filename(Paths.ICON_PATH, "notes.css");
+                css_path = Path.build_filename(Paths.SHARE_PATH, "css/notes.css");
             }
 
             try {
