@@ -149,11 +149,13 @@ ______</rdf:Description>^^J%
   \newcommand{\pdfpcnote}[1]{}%
 \else%
   \newcommand{\pdfpcnote}[1]{%
-    \edef\\{\string\n}%
-    \pdfannot width 0pt height 0pt depth 0pt {%
-       /Subtype /Text%
-       /Contents (#1)%
-       /F 6%
+    {%
+      \edef\\{\string\n}%
+      \pdfannot width 0pt height 0pt depth 0pt {%
+         /Subtype /Text%
+         /Contents (#1)%
+         /F 6%
+      }%
     }%
     \relax%
   }%
