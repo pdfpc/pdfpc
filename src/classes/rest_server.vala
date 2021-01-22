@@ -27,6 +27,7 @@ namespace pdfpc {
         private int port_num;
         private bool locked = false;
         private string? client_host = null;
+        private string static_root = ".";
 
         private Json.Node app_data() {
             Json.Builder builder = new Json.Builder();
@@ -164,11 +165,11 @@ namespace pdfpc {
             builder.add_int_value(user_slide);
 
             builder.set_member_name("image_url");
-            builder.add_string_value("/slides/" + slide_number.to_string() +
+            builder.add_string_value("/api/slides/" + slide_number.to_string() +
                 "/image");
 
             builder.set_member_name("note_url");
-            builder.add_string_value("/notes/" + slide_number.to_string());
+            builder.add_string_value("/api/notes/" + slide_number.to_string());
 
             builder.end_object();
             return builder.get_root();
@@ -179,11 +180,11 @@ namespace pdfpc {
             builder.begin_object();
 
             builder.set_member_name("raw_url");
-            builder.add_string_value("/notes/" + slide_number.to_string() +
+            builder.add_string_value("/api/notes/" + slide_number.to_string() +
                 "/raw");
 
             builder.set_member_name("html_url");
-            builder.add_string_value("/notes/" + slide_number.to_string() +
+            builder.add_string_value("/api/notes/" + slide_number.to_string() +
                 "/html");
 
             builder.end_object();
@@ -207,7 +208,33 @@ namespace pdfpc {
             }
         }
 
-        private void default_handler(Soup.Server server, Soup.Message msg,
+        private void static_handler(Soup.Server server, Soup.Message msg,
+            string path, GLib.HashTable? query, Soup.ClientContext client) {
+
+	    var fname = this.static_root + msg.uri.get_path();
+            if (fname.has_suffix("/")) {
+                fname += "index.html";
+            }
+
+            uint8[] raw_datau8;
+            var file = File.new_for_path(fname);
+
+            try {
+                file.load_contents(null, out raw_datau8, null);
+
+                bool result_uncertain;
+                var mime = GLib.ContentType.guess(fname, raw_datau8,
+                    out result_uncertain);
+                msg.set_response(mime, Soup.MemoryUse.COPY, raw_datau8);
+
+                msg.status_code = 200;
+            } catch (Error e) {
+                GLib.printerr("Failed opening file %s: %s\n", fname, e.message);
+                msg.status_code = 404;
+            }
+	}
+
+        private void api_handler(Soup.Server server, Soup.Message msg,
             string path, GLib.HashTable<string, string>? query,
             Soup.ClientContext client) {
 
@@ -223,16 +250,16 @@ namespace pdfpc {
 
             Json.Node root;
 
-            if (path == "/") {
+            if (path == "/api") {
                 root = this.app_data();
-            } else if (path == "/state") {
+            } else if (path == "/api/state") {
                 root = this.state_data();
-            } else if (path == "/meta") {
+            } else if (path == "/api/meta") {
                 root = this.meta_data();
-            } else if (path.has_prefix("/slides/")) {
+            } else if (path.has_prefix("/api/slides/")) {
                 try {
                     GLib.Regex regex =
-                        new GLib.Regex("/slides/(\\d+)(/image)?");
+                        new GLib.Regex("/api/slides/(\\d+)(/image)?");
                     string[] parts = regex.split(path);
                     int nparts = parts.length;
 
@@ -268,10 +295,10 @@ namespace pdfpc {
                     root = this.error_data(e.message);
                     msg.status_code = 500;
                 }
-            } else if (path.has_prefix("/notes/")) {
+            } else if (path.has_prefix("/api/notes/")) {
                 try {
                     GLib.Regex regex =
-                        new GLib.Regex("/notes/(\\d+)(/html)?");
+                        new GLib.Regex("/api/notes/(\\d+)(/html)?");
                     string[] parts = regex.split(path);
                     int nparts = parts.length;
 
@@ -296,7 +323,7 @@ namespace pdfpc {
                     root = this.error_data(e.message);
                     msg.status_code = 500;
                 }
-            } else if (path == "/control" && msg.method == "PUT") {
+            } else if (path == "/api/control" && msg.method == "PUT") {
                 if (!this.locked) {
                     this.locked = true;
                     this.client_host = client.get_host();
@@ -392,7 +419,21 @@ namespace pdfpc {
             }
             this.port_num = port_num;
 
-            this.add_handler(null, default_handler);
+            // If defined as an absolute path, use it as is
+            if (Options.rest_static_root.has_prefix("/")) {
+                this.static_root = Options.rest_static_root;
+            } else {
+                if (Options.no_install) {
+                    this.static_root = Path.build_filename(Paths.SOURCE_PATH,
+                        Options.rest_static_root);
+                } else {
+                    this.static_root = Path.build_filename(Paths.SHARE_PATH,
+                        Options.rest_static_root);
+                }
+            }
+
+            this.add_handler("/api", api_handler);
+            this.add_handler("/", static_handler);
 
             // If the password is not set, generate a random one
             if (Options.rest_passwd == null) {
@@ -412,7 +453,7 @@ namespace pdfpc {
             // Perhaps optionally, the entire "/" path should be protected
             var auth = new Soup.AuthDomainBasic(
                 Soup.AUTH_DOMAIN_REALM, "pdfpc REST service",
-                Soup.AUTH_DOMAIN_ADD_PATH, "/control"
+                Soup.AUTH_DOMAIN_ADD_PATH, "/api/control"
                 );
             auth.set_auth_callback((domain, msg, username, password) => {
                     if (username == "pdfpc" &&

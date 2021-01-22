@@ -309,6 +309,9 @@ namespace pdfpc {
                 case "rest-passwd":
                     Options.rest_passwd = fields[2];
                     break;
+                case "rest-static-root":
+                    Options.rest_static_root = fields[2];
+                    break;
 #endif
                 case "spotlight-opacity":
                     Options.spotlight_opacity = int.parse(fields[2]);

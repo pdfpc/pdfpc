@@ -161,6 +161,11 @@ Port of the REST server (int, Default is 8088).
 Password to authenticate against the REST server (string, if not set, a randomly
 generated one is used).
 .TP
+.B rest-static-root
+Root path to serve static HTML content. If begins with "/", it is interpreted as
+the absolute path; otherwise, relative to @CMAKE_INSTALL_PREFIX@/share/pdfpc
+(string, Default is "www").
+.TP
 .B spotlight-opacity
 Set opacity of the area outside of the spotlight, in percent (int, default is
 50).

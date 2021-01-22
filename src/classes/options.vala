@@ -331,6 +331,11 @@ namespace pdfpc {
          * REST password
          */
         public static string? rest_passwd = null;
+
+        /**
+         * REST root path for serving static content
+         */
+        public static string rest_static_root = "www";
 #endif
         public class BindTuple {
             public string type;
