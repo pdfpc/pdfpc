@@ -246,11 +246,19 @@ namespace pdfpc {
                 return;
             }
 
+            var headers = msg.response_headers;
+            headers.append("Access-Control-Allow-Origin", "*");
+            headers.append("Access-Control-Allow-Methods", "GET,PUT");
+            headers.append("Access-Control-Allow-Headers", "*");
+
             msg.status_code = 200;
 
             Json.Node root;
 
-            if (path == "/api") {
+            if (msg.method == "OPTIONS") {
+                root = null;
+                msg.status_code = 204;
+            } else if (path == "/api") {
                 root = this.app_data();
             } else if (path == "/api/state") {
                 root = this.state_data();
@@ -463,6 +471,14 @@ namespace pdfpc {
                         GLib.printerr("Authorization failed: user=%s, pass=%s\n",
                             username, password);
                         return false;
+                    }
+                });
+            auth.set_filter((domain, msg) => {
+                    // Don't try to authenticate preflight CORS requests
+                    if (msg.method == "OPTIONS") {
+                        return false;
+                    } else {
+                        return true;
                     }
                 });
             this.add_auth_domain(auth);
