@@ -179,23 +179,28 @@ namespace pdfpc {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
-            builder.set_member_name("raw_url");
-            builder.add_string_value("/api/notes/" + slide_number.to_string() +
-                "/raw");
+            var basestr = "/api/notes/" + slide_number.to_string();
+            if (this.metadata.has_beamer_notes) {
+                builder.set_member_name("image_url");
+                builder.add_string_value(basestr + "/image");
+            } else {
+                builder.set_member_name("raw_url");
+                builder.add_string_value(basestr + "/raw");
 
-            builder.set_member_name("html_url");
-            builder.add_string_value("/api/notes/" + slide_number.to_string() +
-                "/html");
+                builder.set_member_name("html_url");
+                builder.add_string_value(basestr + "/html");
+            }
 
             builder.end_object();
             return builder.get_root();
         }
 
 
-        private uint8[]? get_slide_png(int slide_number, int width, int height) {
+        private uint8[]? get_slide_png(int slide_number, int width, int height,
+            bool notes_area = false) {
             try {
                 var surface = metadata.renderer.render(slide_number,
-                    false, width, height);
+                    notes_area, width, height);
 
                 var pixbuf = Gdk.pixbuf_get_from_surface(surface,
                 0, 0, surface.get_width(), surface.get_height());
@@ -277,7 +282,7 @@ namespace pdfpc {
                         msg.status_code = 400;
                     } else {
                         slide_number = int.parse(parts[1]);
-                        if (nparts == 4) {
+                        if (nparts == 4 && query != null) {
                             var wstr = query.get("w");
                             var hstr = query.get("h");
                             if (wstr != null && hstr != null) {
@@ -306,7 +311,7 @@ namespace pdfpc {
             } else if (path.has_prefix("/api/notes/")) {
                 try {
                     GLib.Regex regex =
-                        new GLib.Regex("/api/notes/(\\d+)(/html)?");
+                        new GLib.Regex("/api/notes/(\\d+)(/.+)?");
                     string[] parts = regex.split(path);
                     int nparts = parts.length;
 
@@ -317,12 +322,42 @@ namespace pdfpc {
                     } else {
                         slide_number = int.parse(parts[1]);
                         if (nparts == 4) {
-                            var note = metadata.get_note(slide_number);
-                            var doc = Renderer.MD.render(note,
-                                metadata.get_disable_markdown());
-                            msg.set_response("text/html",
-                                Soup.MemoryUse.COPY, doc.data);
-                            return;
+                            var type = parts[2];
+                            switch (type) {
+                            case "/html":
+                                var note = metadata.get_note(slide_number);
+                                var doc = Renderer.MD.render(note,
+                                    metadata.get_disable_markdown());
+                                msg.set_response("text/html",
+                                    Soup.MemoryUse.COPY, doc.data);
+                                return;
+                            case "/image":
+                                string wstr = null, hstr = null;
+                                if (query != null) {
+                                    wstr = query.get("w");
+                                    hstr = query.get("h");
+                                }
+                                if (wstr != null && hstr != null) {
+                                    var width = int.parse(wstr);
+                                    var height = int.parse(hstr);
+                                    if (width > 0 && height > 0) {
+                                        var png_data = get_slide_png(slide_number,
+                                            width, height, true);
+                                        if (png_data != null) {
+                                            msg.set_response("image/png",
+                                                Soup.MemoryUse.COPY, png_data);
+                                            return;
+                                        }
+                                    }
+                                }
+                                root = this.error_data("Rendering failed");
+                                msg.status_code = 500;
+                                break;
+                            default:
+                                root = this.error_data("Bad request");
+                                msg.status_code = 400;
+                                break;
+                            }
                         } else {
                             root = this.note_data(slide_number);
                         }
