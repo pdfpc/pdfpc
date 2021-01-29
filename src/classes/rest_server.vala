@@ -59,8 +59,6 @@ namespace pdfpc {
             builder.add_string_value(Options.start_time);
             builder.set_member_name("last_minutes");
             builder.add_int_value(Options.last_minutes);
-            builder.set_member_name("end_slide");
-            builder.add_int_value(metadata.get_end_user_slide());
             builder.set_member_name("default_transition");
             builder.add_string_value(Options.default_transition);
 
