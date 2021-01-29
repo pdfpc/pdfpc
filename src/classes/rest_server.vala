@@ -65,9 +65,6 @@ namespace pdfpc {
             builder.set_member_name("note_is_image");
             builder.add_boolean_value(metadata.has_beamer_notes);
 
-            builder.set_member_name("font_size");
-            builder.add_int_value(metadata.get_font_size());
-
             builder.end_object();
             return builder.get_root();
         }
@@ -134,6 +131,9 @@ namespace pdfpc {
             builder.add_int_value(controller.current_user_slide_number);
             builder.set_member_name("end_user_slide");
             builder.add_int_value(metadata.get_end_user_slide());
+
+            builder.set_member_name("note_font_size");
+            builder.add_int_value(metadata.get_font_size());
 
             builder.set_member_name("in_zoom");
             builder.add_boolean_value(controller.in_zoom);
