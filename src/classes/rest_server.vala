@@ -508,9 +508,7 @@ namespace pdfpc {
             // Perhaps optionally, the entire "/" path should be protected
             var auth = new Soup.AuthDomainBasic(
                 Soup.AUTH_DOMAIN_REALM, "pdfpc REST service",
-                Soup.AUTH_DOMAIN_ADD_PATH, "/api/helo",
-                Soup.AUTH_DOMAIN_ADD_PATH, "/api/control"
-                );
+                Soup.AUTH_DOMAIN_ADD_PATH, "/api");
             auth.set_auth_callback((domain, msg, username, password) => {
                     if (username == "pdfpc" &&
                         password == Options.rest_passwd) {
@@ -526,7 +524,14 @@ namespace pdfpc {
                     if (msg.method == "OPTIONS") {
                         return false;
                     } else {
-                        return true;
+                        var path = msg.uri.get_path();
+                        // Also, don't authenticate image or html "resources"
+                        if (path.has_prefix("/api/slides") ||
+                            path.has_prefix("/api/notes")) {
+                            return false;
+                        } else {
+                            return true;
+                        }
                     }
                 });
             this.add_auth_domain(auth);
