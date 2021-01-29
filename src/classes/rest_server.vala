@@ -62,6 +62,13 @@ namespace pdfpc {
             builder.set_member_name("default_transition");
             builder.add_string_value(Options.default_transition);
 
+            double aspect_ratio = metadata.get_page_width()/
+                metadata.get_page_height();
+            char[] buf = new char[double.DTOSTR_BUF_SIZE];
+
+            builder.set_member_name("aspect_ratio");
+            builder.add_string_value(aspect_ratio.format(buf, "%.4f"));
+
             builder.set_member_name("note_is_image");
             builder.add_boolean_value(metadata.has_beamer_notes);
 
