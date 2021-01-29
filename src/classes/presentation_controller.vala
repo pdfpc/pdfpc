@@ -1019,7 +1019,7 @@ namespace pdfpc {
                 });
         }
 
-        private void pointer_move(Variant? point) {
+        private void move_pointer(Variant? point) {
             if (!this.in_pointing_mode()) {
                 return;
             }
@@ -1264,8 +1264,8 @@ namespace pdfpc {
             add_action("customize", this.customize_gui,
                 "Customize the GUI");
 
-            add_action_with_parameter("pointerMove", GLib.VariantType.STRING,
-                this.pointer_move,
+            add_action_with_parameter("movePointer", GLib.VariantType.STRING,
+                this.move_pointer,
                 "Move pointer by vector", "(x,y)");
 #if REST
             add_action("showQRcode", this.show_qrcode,

@@ -406,7 +406,7 @@ namespace pdfpc {
                                     argument);
                             }
                             // FIXME: use a sound logic or separate REST path
-                            if (action == "pointerMove") {
+                            if (action == "movePointer") {
                                 root = this.pointer_data();
                             } else {
                                 root = this.state_data();
