@@ -29,7 +29,7 @@ namespace pdfpc {
         private string? client_host = null;
         private string static_root = ".";
 
-        private Json.Node app_data() {
+        private Json.Node helo_data() {
             Json.Builder builder = new Json.Builder();
             builder.begin_object();
 
@@ -261,15 +261,31 @@ namespace pdfpc {
             headers.append("Access-Control-Allow-Methods", "GET,PUT");
             headers.append("Access-Control-Allow-Headers", "*");
 
+            if (msg.method == "OPTIONS") {
+                msg.status_code = 204;
+                return;
+            }
+
+            // This must be the first call of the session
+            if (path == "/api/helo") {
+                if (!this.locked) {
+                    this.locked = true;
+                    this.client_host = client.get_host();
+                    // At this point the QR code may be withdrawn
+                    this.metadata.controller.hide_qrcode();
+                }
+            } else if (!this.locked) {
+                // Anything else is forbidden until "lock-in" is in effect
+                msg.status_code = 412;
+                return;
+            }
+
             msg.status_code = 200;
 
             Json.Node root;
 
-            if (msg.method == "OPTIONS") {
-                root = null;
-                msg.status_code = 204;
-            } else if (path == "/api") {
-                root = this.app_data();
+            if (path == "/api/helo") {
+                root = this.helo_data();
             } else if (path == "/api/state") {
                 root = this.state_data();
             } else if (path == "/api/meta") {
@@ -372,12 +388,6 @@ namespace pdfpc {
                     msg.status_code = 500;
                 }
             } else if (path == "/api/control" && msg.method == "PUT") {
-                if (!this.locked) {
-                    this.locked = true;
-                    this.client_host = client.get_host();
-                    // At this point the QR code may be withdrawn
-                    this.metadata.controller.hide_qrcode();
-                }
                 var body = msg.request_body;
                 Json.Parser parser = new Json.Parser();
                 try {
@@ -400,10 +410,7 @@ namespace pdfpc {
                         }
                 
                         if (action != null) {
-                            if (argument == "") {
-                                argument = null;
-                            }
-                            if (argument == null) {
+                            if (argument == "" || argument == null) {
                                 this.metadata.controller.trigger_action(action,
                                     null);
                             } else {
@@ -501,6 +508,7 @@ namespace pdfpc {
             // Perhaps optionally, the entire "/" path should be protected
             var auth = new Soup.AuthDomainBasic(
                 Soup.AUTH_DOMAIN_REALM, "pdfpc REST service",
+                Soup.AUTH_DOMAIN_ADD_PATH, "/api/helo",
                 Soup.AUTH_DOMAIN_ADD_PATH, "/api/control"
                 );
             auth.set_auth_callback((domain, msg, username, password) => {
