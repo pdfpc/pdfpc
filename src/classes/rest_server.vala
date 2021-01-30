@@ -259,7 +259,8 @@ namespace pdfpc {
             var headers = msg.response_headers;
             headers.append("Access-Control-Allow-Origin", "*");
             headers.append("Access-Control-Allow-Methods", "GET,PUT");
-            headers.append("Access-Control-Allow-Headers", "*");
+            headers.append("Access-Control-Allow-Headers",
+                "authorization,content-type");
 
             if (msg.method == "OPTIONS") {
                 msg.status_code = 204;
