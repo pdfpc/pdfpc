@@ -29,6 +29,7 @@
 \mode<presentation>
 
 \title{\pdfpc video demo}
+\subtitle{(for v4.6.0)}
 \author[E. Stambulchik]{Written by
                   \href{https://github.com/fnevgeny}{Evgeny Stambulchik}}
 \date{\today}
@@ -65,10 +66,10 @@
   \end{itemize}
 
   \begin{block}{}
-    The first approach is standards-compatible, but currently has a limited
-    support for playback options (in part due to third-party software
-    limitations). The second solution is more versatile, but is \pdfpc-specific
-    (meaning the video playback will work {\em only} in \pdfpc).
+    The first approach is standards-compatible, but currently lacks the option
+    to automatically start the playback. The second solution is more versatile,
+    but is \pdfpc-specific (meaning the video playback will work {\em only} in
+    \pdfpc).
   \end{block}
 
   \begin{alertblock}{}
@@ -126,7 +127,10 @@
   \begin{itemize}
     \item \opt{showcontrols} -- always show the position bar control;
     \item \opt{once} -- play the video once and stop (this is the default);
-    \item \opt{loop} or \opt{repeat} -- play the video in the loop.
+    \item \opt{loop} or \opt{repeat} -- play the video in the loop;
+    \item \opt{start=<time>s} -- skip the first \opt{<time>} seconds of the
+           video;
+    \item \opt{duration=<time>s} -- let the video play for \opt{<time>} seconds.
   \end{itemize}
     
   \vspace{20pt}
@@ -170,7 +174,7 @@
 \begin{frame}[fragile]
   \frametitle{The non-standard method}
 
-  If you {\em desperately} need a finer control of the movie playback, consider
+  If you {\em desperately} need the playback autostart, consider
   using the \opt{\textbackslash href\{run:\}} hack.
 
   The syntax is like
