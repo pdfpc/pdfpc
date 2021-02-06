@@ -36,6 +36,7 @@
 % Require additional packages needed by \sty{pdfpc}:
 \RequirePackage{kvoptions}
 \RequirePackage{xstring}
+\RequirePackage{iftex}
 \RequirePackage{hyperxmp}
 %
 \SetupKeyvalOptions{
@@ -145,20 +146,39 @@ ______</rdf:Description>^^J%
 \renewcommand{\hyxmp@pdf@schema}{{\oldhyxmp@pdf@schema}{\pdfpc@schema}}
 %
 % Note command
+\ifLuaTeX%
+  \protected\def\pdfannot {\pdfextension annot }%
+\fi%
 \ifPDFPC@hidenotes%
   \newcommand{\pdfpcnote}[1]{}%
 \else%
-  \newcommand{\pdfpcnote}[1]{%
-    {%
-      \edef\\{\string\n}%
-      \pdfannot width 0pt height 0pt depth 0pt {%
-         /Subtype /Text%
-         /Contents (#1)%
-         /F 6%
+  \ifXeTeX%
+    \newcommand{\pdfpcnote}[1]{%
+      {%
+        \edef\\{\string\n}%
+        \special{pdf: ann width 0pt height 0pt depth 0pt%
+           <<%
+             /Subtype /Text%
+             /Contents (#1)%
+             /F 6%
+           >>%
+        }%
       }%
+      \relax%
     }%
-    \relax%
-  }%
+  \else%
+    \newcommand{\pdfpcnote}[1]{%
+      {%
+        \edef\\{\string\n}%
+        \pdfannot width 0pt height 0pt depth 0pt {%
+           /Subtype /Text%
+           /Contents (#1)%
+           /F 6%
+        }%
+      }%
+      \relax%
+    }%
+  \fi%
 \fi%
 %
 \endinput
