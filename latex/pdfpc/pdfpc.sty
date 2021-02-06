@@ -146,9 +146,6 @@ ______</rdf:Description>^^J%
 \renewcommand{\hyxmp@pdf@schema}{{\oldhyxmp@pdf@schema}{\pdfpc@schema}}
 %
 % Note command
-\ifLuaTeX%
-  \protected\def\pdfannot {\pdfextension annot }%
-\fi%
 \ifPDFPC@hidenotes%
   \newcommand{\pdfpcnote}[1]{}%
 \else%
@@ -167,6 +164,9 @@ ______</rdf:Description>^^J%
       \relax%
     }%
   \else%
+    \ifLuaTeX%
+      \protected\def\pdfannot {\pdfextension annot }%
+    \fi%
     \newcommand{\pdfpcnote}[1]{%
       {%
         \edef\\{\string\n}%
