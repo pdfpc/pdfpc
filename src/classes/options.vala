@@ -311,7 +311,32 @@ namespace pdfpc {
          * instead of the next slide.
          */
         public static bool final_slide_overlay = false;
+#if REST
+        /**
+         * Run REST server
+         */
+        public static bool enable_rest = false;
 
+        /**
+         * REST server port
+         */
+        public static int rest_port = 0;
+
+        /**
+         * Enable HTTPS protocol for REST
+         */
+        public static bool rest_https = false;
+
+        /**
+         * REST password
+         */
+        public static string? rest_passwd = null;
+
+        /**
+         * REST root path for serving static content
+         */
+        public static string rest_static_root = "www";
+#endif
         public class BindTuple {
             public string type;
             public uint keyCode;

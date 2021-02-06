@@ -134,6 +134,10 @@ namespace pdfpc {
          */
         public bool running { get; protected set; default = false; }
 
+        public bool is_paused() {
+            return this.timer.is_paused();
+        }
+
         /**
          * The current slide in "user indices"
          */
@@ -315,6 +319,12 @@ namespace pdfpc {
          */
         protected Gee.List<Controllable> controllables;
 
+#if REST
+        /**
+         * The REST server object
+         */
+        public RestServer rest_server { get; protected set; }
+#endif
         /**
          * The metadata of the presentation
          */
@@ -337,6 +347,15 @@ namespace pdfpc {
 
                     this.pen_drawing = Drawings.create(metadata);
                     current_pen_drawing_tool = pen_drawing.pen;
+
+#if REST
+                    // Start the REST server
+                    if (Options.enable_rest) {
+                        this.rest_server =
+                            new RestServer(metadata, Options.rest_port);
+                        this.rest_server.start();
+                    }
+#endif
                 }
             }
         }
@@ -594,6 +613,21 @@ namespace pdfpc {
 
         public bool in_pointing_mode() {
             return is_pointer_active() || is_spotlight_active();
+        }
+
+        public string get_mode_string() {
+            switch (this.annotation_mode) {
+                case POINTER:
+                    return "pointer";
+                case SPOTLIGHT:
+                    return "spotlight";
+                case PEN:
+                    return "pen";
+                case ERASER:
+                    return "eraser";
+                default:
+                    return "normal";
+            }
         }
 
         private void move_pen(double x, double y) {
@@ -985,6 +1019,41 @@ namespace pdfpc {
                 });
         }
 
+        private void move_pointer(Variant? point) {
+            if (!this.in_pointing_mode()) {
+                return;
+            }
+
+            try {
+                GLib.Regex regex = new GLib.Regex("([^,]+),([^,]+)");
+                string[] parts = regex.split(point.get_string());
+                if (parts.length != 4) {
+                    return;
+                }
+                pointer_x += double.parse(parts[1]);
+                if (pointer_x > 1.0) {
+                    pointer_x = 1.0;
+                } else if (pointer_x < 0.0) {
+                    pointer_x = 0.0;
+                }
+                this.pointer_y += double.parse(parts[2]);
+                if (pointer_y > 1.0) {
+                    pointer_y = 1.0;
+                } else if (pointer_y < 0.0) {
+                    pointer_y = 0.0;
+                }
+            } catch (Error e) {
+                return;
+            }
+
+            // restart the pointer timeout timer
+            this.restart_pointer_timer();
+            this.pointer_hidden = false;
+
+            this.queue_pointer_surface_draws();
+            this.update_highlight(pointer_x, pointer_y);
+        }
+
         private bool on_move_pointer(Gdk.EventMotion event) {
             this.device_to_normalized(event.x, event.y,
                 out pointer_x, out pointer_y);
@@ -1195,6 +1264,13 @@ namespace pdfpc {
             add_action("customize", this.customize_gui,
                 "Customize the GUI");
 
+            add_action_with_parameter("movePointer", GLib.VariantType.STRING,
+                this.move_pointer,
+                "Move pointer by vector", "(x,y)");
+#if REST
+            add_action("showQRcode", this.show_qrcode,
+                "Show QR code");
+#endif
             add_action("showHelp", this.show_help,
                 "Show a help screen");
 
@@ -2054,7 +2130,21 @@ namespace pdfpc {
                 this.presenter.show_help_window(true);
             }
         }
-
+#if REST
+        /**
+         * Show/hide QR code
+         */
+        public void show_qrcode() {
+            if (this.presenter != null && this.rest_server != null) {
+                this.presenter.show_qrcode_window(true);
+            }
+        }
+        public void hide_qrcode() {
+            if (this.presenter != null && this.rest_server != null) {
+                this.presenter.show_qrcode_window(false);
+            }
+        }
+#endif
         protected void exit_state() {
             if (this.faded_to_black) {
                 this.fade_to_black();
