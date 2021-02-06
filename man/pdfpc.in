@@ -454,36 +454,17 @@ progress bar.  Switching slides automatically stops playback, and movies
 will be reset after leaving and returning to a slide.
 
 .PP
-Movies may be included in PDF files as "screen annotations".  pdfpc does
-not yet support options that modify the playback of these movies.  In LaTeX,
-such movies may be added to a presentation with the "movie15" or "multimedia"
-package. Note that the poster, autoplay, and repeat options are not yet
-supported. (Also, run ps2pdf with the \-dNOSAFER flag.)
+Movies may be included in PDF files as "screen annotations". In LaTeX, such
+movies may be added to a presentation with the "multimedia" package. Note that
+the poster and autoplay options are not yet supported.
 
 .PP
-As a perhaps simpler option, pdfpc will play back movies linked from a
-hyperlink of type "launch".  A query string may be added to the URL of the
-movie to enable the "autostart", "loop" and "noprogress" properties, if
-necessary.  (E.g., a link to "movie.avi?autostart&loop&noprogress" will add a
-video that starts playing automatically, loops when it reaches the end, and
-does not show the progress bar.)
-
-In LaTeX, such links are created with
-
-.RS
-\\usepackage{hyperref}
-.br
-\\href{run:<movie file>}{<placeholder content>}
-.RE
-
-.PP
-The movie will playback in the area taken by the placeholder content.  Using
-a frame of the movie will ensure the correct aspect ratio.
+pdfpc will also play back movies linked from a hyperlink of type "launch".
 
 .PP
 See
 .URL http://pdfpc.github.io/demo/pdfpc-video-example.zip "our website"
-for a full example.
+for a detailed explanation with examples.
 
 .PP
 See the bugs section for further information.

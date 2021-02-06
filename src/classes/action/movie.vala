@@ -309,6 +309,7 @@ namespace pdfpc {
             bool temp = false;
             bool noprogress = false;
             bool loop = false;
+            int start = 0, stop = 0;
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents())) {
@@ -362,6 +363,11 @@ namespace pdfpc {
                 noprogress = !movie.show_controls();
                 #if NEW_POPPLER
                 loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
+                start = (int) (movie.get_start()/1000000000L);
+                int duration = (int) (movie.get_duration()/1000000000L);
+                if (duration > 0) {
+                    stop = start + duration;
+                }
                 #endif
                 break;
 
@@ -372,7 +378,7 @@ namespace pdfpc {
             Type type = Type.from_instance(this);
             ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
             this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, false, loop, noprogress, false, 0, 0, temp);
+                suburi, false, loop, noprogress, false, start, stop, temp);
             return new_obj;
         }
 
