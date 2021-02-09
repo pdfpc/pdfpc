@@ -30,12 +30,13 @@
 %
 %  -------------------------------------------------------------------------------------------
 %
-\ProvidesPackage{pdfpc}[2020/12/05 v0.5.1 PDFPC]
+\ProvidesPackage{pdfpc}[2021/02/06 v0.6.0 PDFPC]
 \NeedsTeXFormat{LaTeX2e}
 %
 % Require additional packages needed by \sty{pdfpc}:
 \RequirePackage{kvoptions}
 \RequirePackage{xstring}
+\RequirePackage{iftex}
 \RequirePackage{hyperxmp}
 %
 \SetupKeyvalOptions{
@@ -148,17 +149,36 @@ ______</rdf:Description>^^J%
 \ifPDFPC@hidenotes%
   \newcommand{\pdfpcnote}[1]{}%
 \else%
-  \newcommand{\pdfpcnote}[1]{%
-    {%
-      \edef\\{\string\n}%
-      \pdfannot width 0pt height 0pt depth 0pt {%
-         /Subtype /Text%
-         /Contents (#1)%
-         /F 6%
+  \ifXeTeX%
+    \newcommand{\pdfpcnote}[1]{%
+      {%
+        \edef\\{\string\n}%
+        \special{pdf: ann width 0pt height 0pt depth 0pt%
+           <<%
+             /Subtype /Text%
+             /Contents (#1)%
+             /F 6%
+           >>%
+        }%
       }%
+      \relax%
     }%
-    \relax%
-  }%
+  \else%
+    \ifLuaTeX%
+      \protected\def\pdfannot {\pdfextension annot }%
+    \fi%
+    \newcommand{\pdfpcnote}[1]{%
+      {%
+        \edef\\{\string\n}%
+        \pdfannot width 0pt height 0pt depth 0pt {%
+           /Subtype /Text%
+           /Contents (#1)%
+           /F 6%
+        }%
+      }%
+      \relax%
+    }%
+  \fi%
 \fi%
 %
 \endinput
