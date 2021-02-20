@@ -109,7 +109,7 @@ Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
 .TP
 .BI "\-w, \-\-windowed"=MODE
 Run in the given windowed mode (presenter|presentation|both|none). The default
-mode is "none" (both windows are fullscreen).
+mode is "presenter" (only the presentation window is fullscreen).
 .TP
 .BI "\-X, \-\-external-script"=FILENAME
 Specify a script to be executed with the 'X' (Shift+x) key during the
