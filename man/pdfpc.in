@@ -53,7 +53,9 @@ Disable auto detection of overlay groups. (Default: enabled)
 Show this help
 .TP
 .BI "\-l, \-\-last\-minutes"=N
-Time in minutes, from which on the timer changes its color. (Default: 5 minutes)
+In the old timer mode (see \fBTimer\fR below), defines
+time in minutes before the end of the talk when the timer changes its color.
+(Default: 5 minutes)
 .TP
 .BI "\-L, \-\-list\-actions"
 List actions supported
