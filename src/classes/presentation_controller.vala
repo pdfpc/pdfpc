@@ -927,6 +927,13 @@ namespace pdfpc {
          * them to the presentation controller
          */
         private bool on_motion(Gdk.EventMotion event) {
+            // We need to always update the pointer position, even if it is not
+            // shown. Otherwise, the pointer will appear at the old position
+            // when it is first shown and will jump around at the next mouse
+            // move.
+            this.device_to_normalized(event.x, event.y,
+                out pointer_x, out pointer_y);
+
             if (this.in_pointing_mode()) {
                 return on_move_pointer(event);
             } else if (this.in_drawing_mode()) {
@@ -1055,9 +1062,6 @@ namespace pdfpc {
         }
 
         private bool on_move_pointer(Gdk.EventMotion event) {
-            this.device_to_normalized(event.x, event.y,
-                out pointer_x, out pointer_y);
-
             // restart the pointer timeout timer
             this.restart_pointer_timer();
             this.pointer_hidden = false;
