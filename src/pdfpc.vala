@@ -316,7 +316,7 @@ namespace pdfpc {
                 presentation_windowed = true;
                 break;
             default:
-                GLib.printerr("Unknown windowed mode \"%s\"\n",
+                GLib.printerr("Unknown windowed mode \"%s\". Expected one of \"none\", \"presenter\", \"presentation\" and \"both\".\n",
                     Options.windowed);
                 Process.exit(1);
             }
