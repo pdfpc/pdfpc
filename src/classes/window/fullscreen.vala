@@ -162,17 +162,18 @@ namespace pdfpc.Window {
             this.overlay_layout.add_overlay(this.pen_drawing_surface);
             this.overlay_layout.add_overlay(this.pointer_drawing_surface);
 
+            this.pointer_drawing_surface.no_show_all = true;
+            this.pen_drawing_surface.no_show_all = true;
+
             this.video_surface.realize.connect(() => {
                 this.set_widget_event_pass_through(this.video_surface, true);
             });
             this.pen_drawing_surface.realize.connect(() => {
-                this.enable_pen(false);
                 this.pen_drawing_surface.get_window().set_pass_through(true);
                 this.set_widget_event_pass_through(this.pen_drawing_surface,
                     true);
             });
             this.pointer_drawing_surface.realize.connect(() => {
-                this.enable_pointer(false);
                 this.pointer_drawing_surface.get_window().set_pass_through(true);
                 this.set_widget_event_pass_through(this.pointer_drawing_surface,
                     true);
