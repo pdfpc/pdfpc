@@ -825,6 +825,8 @@ namespace pdfpc {
          * Seek to the time indicated by the mouse position on the progress bar.
          */
         protected int64 mouse_seek(double x, double y) {
+            // shift by the widget offset
+            x -= rect.x;
             double seek_fraction = (x - this.seek_bar_padding) / (rect.width -
                 2 * this.seek_bar_padding);
             if (seek_fraction < 0) {
@@ -874,6 +876,9 @@ namespace pdfpc {
          * Set a flag about whether the mouse is currently in the progress bar.
          */
         private void set_mouse_in(double x, double y) {
+            // shift coordinates by the widget offsets
+            x -= this.rect.x;
+            y -= this.rect.y;
             this.in_seek_bar =
                 x > 0 &&
                 x < this.rect.width &&

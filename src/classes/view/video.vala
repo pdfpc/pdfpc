@@ -37,6 +37,7 @@ namespace pdfpc {
             video.set_size_request(position.width, position.height);
             this.put(video, position.x, position.y);
             this.videos.append(video);
+            video.get_window().set_pass_through(true);
             this.show_all();
         }
 
