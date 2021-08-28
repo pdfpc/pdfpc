@@ -131,6 +131,9 @@ namespace pdfpc.View.Behaviour {
 
             if (link_mapping != this.active_mapping) {
                 if (this.active_mapping != null) {
+                    // Restore the cursor to its default state (the parent
+                    // cursor configuration is used)
+                    event.window.set_cursor(null);
                     this.active_mapping.on_mouse_leave(source, event);
                 }
 

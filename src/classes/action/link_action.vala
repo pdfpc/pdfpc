@@ -63,6 +63,13 @@ namespace pdfpc {
             return new_obj as ActionMapping;
         }
 
+        protected override void on_mouse_enter(Gtk.Widget widget, Gdk.EventMotion event) {
+            // Set the cursor to the X11 theme default link cursor
+            event.window.set_cursor(
+                new Gdk.Cursor.from_name(Gdk.Display.get_default(), "hand2")
+            );
+        }
+
         /**
          * Goto the link's destination on left clicks.
          */
@@ -94,14 +101,6 @@ namespace pdfpc {
             }
 
             return true;
-        }
-
-        protected override bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
-            return false;
-        }
-
-        protected override bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
-            return false;
         }
     }
 }

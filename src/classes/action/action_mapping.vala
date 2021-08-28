@@ -86,28 +86,29 @@ namespace pdfpc {
          * Override this method to get notified of the mouse entering the area.
          */
         public virtual void on_mouse_enter(Gtk.Widget widget, Gdk.EventMotion event) {
-            // Set the cursor to the X11 theme default link cursor
-            event.window.set_cursor(
-                new Gdk.Cursor.from_name(Gdk.Display.get_default(), "hand2")
-            );
+            return;
         }
 
         /**
          * Override this method to get notified of the mouse exiting the area.
          */
         public virtual void on_mouse_leave(Gtk.Widget widget, Gdk.EventMotion event) {
-            // Restore the cursor to its default state (The parent cursor
-            // configuration is used)
-            event.window.set_cursor(null);
+            return;
         }
 
         /**
          * Handle mouse press/release/motion events in the area. Return true to
          * indicate that the event has been handled.
          */
-        public abstract bool on_button_press(Gtk.Widget widget, Gdk.EventButton event);
-        public abstract bool on_button_release(Gtk.Widget widget, Gdk.EventButton event);
-        public abstract bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event);
+        public virtual bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+            return false;
+        }
+        public virtual bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
+            return false;
+        }
+        public virtual bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
+            return false;
+        }
 
         /**
          * Override this method to get notified of the freeze toggle events.
