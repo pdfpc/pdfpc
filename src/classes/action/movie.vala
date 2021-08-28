@@ -70,6 +70,19 @@ namespace pdfpc {
         protected Gee.List<Gtk.Widget> sinks;
 
         /**
+         * A flag indicating that the video widget(s) are shown
+         */
+        protected bool shown = false;
+
+        /**
+         * Cursors for various video states/subwidgets
+         */
+        protected Gdk.Cursor pause_cursor;
+        protected Gdk.Cursor play_cursor;
+        protected Gdk.Cursor drag_cursor;
+        protected Gdk.Cursor blank_cursor;
+
+        /**
          * A flag to indicate when we've reached the End Of Stream, so we
          * know whether to restart on the next click.
          */
@@ -145,10 +158,16 @@ namespace pdfpc {
         /**
          * The position where we switched to pause mode
          */
-        protected int64 paused_at = -1;
+        protected int64 paused_at = 0;
 
         construct {
             this.sinks = new Gee.ArrayList<Gtk.Widget>();
+
+            var display = Gdk.Display.get_default();
+            this.pause_cursor = this.load_cursor(display, "pause_cur.svg");
+            this.play_cursor  = this.load_cursor(display, "play_cur.svg");
+            this.drag_cursor  = new Gdk.Cursor.from_name(display, "hand1");
+            this.blank_cursor = new Gdk.Cursor.from_name(display, "none");
         }
 
         ~ControlledMovie() {
@@ -399,12 +418,30 @@ namespace pdfpc {
         }
 
         /**
-         * Hide all video widegts (but receive events for it)
+         * Hide all video widegts (but receive events for them)
          */
         public void hide() {
             foreach (var sink in this.sinks) {
                 sink.set_opacity(0);
             }
+            this.shown = false;
+        }
+
+        private void update_cursor(Gdk.Window window) {
+            Gdk.Cursor cursor;
+            if (!this.controller.in_drawing_mode()) {
+                if (this.in_seek_bar) {
+                    cursor = this.drag_cursor;
+                } else
+                if (this.paused_at >= 0) {
+                    cursor = this.play_cursor;
+                } else {
+                    cursor = this.pause_cursor;
+                }
+            } else {
+                cursor = this.blank_cursor;
+            }
+            window.set_cursor(cursor);
         }
 
         /**
@@ -416,6 +453,8 @@ namespace pdfpc {
             if (this.pipeline == null) {
                 return false;
             }
+
+            this.update_cursor(event.window);
 
             // don't intercept events in the drawing mode
             if (this.controller.in_drawing_mode()) {
@@ -448,6 +487,8 @@ namespace pdfpc {
          * depending on the previous state.
          */
         protected override bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
+            this.update_cursor(event.window);
+
             // don't intercept events in the drawing mode
             if (this.controller.in_drawing_mode()) {
                 return false;
@@ -466,6 +507,26 @@ namespace pdfpc {
             this.mouse_drag = false;
 
             return true;
+        }
+
+       /**
+         * Load a cursor
+         */
+        protected Gdk.Cursor load_cursor(Gdk.Display display, string filename) {
+            Gdk.Cursor cursor;
+            int size = 24;
+            var surface = Renderer.Image.render(filename, size, size);
+            if (surface != null) {
+                cursor = new Gdk.Cursor.from_surface(display, surface, 0, 0);
+            } else {
+                cursor = new Gdk.Cursor.from_name(display, "default");
+            }
+            return cursor;
+        }
+
+        protected override void on_mouse_leave(Gtk.Widget widget, Gdk.EventMotion event) {
+            this.in_seek_bar = false;
+            this.mouse_drag = false;
         }
 
         protected override void on_freeze(bool frozen) {
@@ -548,6 +609,9 @@ namespace pdfpc {
          */
         protected override bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
             this.set_mouse_in(event.x, event.y);
+
+            this.update_cursor(event.window);
+
             if (this.mouse_drag) {
                 this.mouse_seek(event.x, event.y);
             } else if (this.paused_at >= 0 || this.eos) {
@@ -583,9 +647,14 @@ namespace pdfpc {
                     sink.set_opacity(1);
                 }
             }
+            this.shown = true;
         }
 
         protected void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
+            if (this.controller.in_drawing_mode()) {
+                return;
+            }
+
             double start = (double) this.starttime*Gst.SECOND / this.duration;
             double stop = (double) this.stoptime*Gst.SECOND / this.duration;
 
@@ -880,6 +949,7 @@ namespace pdfpc {
             x -= this.rect.x;
             y -= this.rect.y;
             this.in_seek_bar =
+                this.shown &&
                 x > 0 &&
                 x < this.rect.width &&
                 y > this.rect.height - this.seek_bar_height &&
