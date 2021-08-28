@@ -237,14 +237,8 @@ namespace pdfpc {
          * movies in presentations.  As a bonus, a query string on the video
          * filename can activate the autostart and loop properties.  (E.g., link
          * to movie.avi?autostart&loop to make movie.avi start playing with the
-         * page is entered and loop back to the beginning when it reaches the end.)
-         *
-         * In LaTeX, create such links with
-         *      \usepackage{hyperref}
-         *      \href{run:<movie file>}{<placeholder content>}
-         * Since the video will take the shape of the placeholder content, you
-         * probably want to use a frame from the movie to get the right aspect
-         * ratio.
+         * page is entered and loop back to the beginning when it reaches the
+         * end.)
          */
         protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
@@ -301,24 +295,9 @@ namespace pdfpc {
 
         /**
          * Create a new Movie from an annotation mapping, if the annotation is a
-         * screen annotation with a video file or a movie annotation.  Various
+         * screen annotation with a video file or a movie annotation.  Some
          * options to modify the behavior of the playback are not yet supported,
          * since they're missing from poppler.
-         *
-         * In LaTeX, create screen annotations with
-         *      \usepackage{movie15}
-         *      \includemovie[text=<placeholder content>]{}{}{<movie file>}
-         * The movie size is determined by the size of the placeholder content, so
-         * a frame from the movie is a good choice.  Note that the poster, autoplay,
-         * and repeat options are not yet supported.  (Also note that movie15 is
-         * deprecated, but it works as long as you run ps2pdf with the -dNOSAFER flag.)
-         *
-         * In LaTeX, create movie annotations with
-         *      \usepackage{multimedia}
-         *      \movie[<options>]{<placeholder content>}{<movie file>}
-         * The movie size is determined from the size of the placeholder content or
-         * the width and height options.  Note that the autostart, loop/repeat, and
-         * poster options are not yet supported.
          */
         protected override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
