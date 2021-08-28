@@ -58,6 +58,7 @@ namespace pdfpc.View.Behaviour {
             view.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
 
             view.button_press_event.connect(this.on_button_press);
+            view.button_release_event.connect(this.on_button_release);
             view.motion_notify_event.connect(this.on_mouse_move);
             view.entering_slide.connect(this.on_entering_slide);
             view.leaving_slide.connect(this.on_leaving_slide);
@@ -105,6 +106,21 @@ namespace pdfpc.View.Behaviour {
         }
 
         /**
+         * Similarly, for button release events
+         */
+        protected bool on_button_release(Gtk.Widget source, Gdk.EventButton e) {
+            // In case the coords belong to a link we will get its action. If
+            // they are pointing nowhere we just get null.
+            ActionMapping mapping = this.get_link_mapping_by_coordinates(e.x, e.y);
+
+            if (mapping == null) {
+                return false;
+            }
+
+            return mapping.on_button_release(source, e);
+        }
+
+        /**
          * Called whenever the mouse is moved on the surface of the View.Pdf
          *
          * The signal emitted by this method may for example be used to change
@@ -124,7 +140,11 @@ namespace pdfpc.View.Behaviour {
             }
             this.active_mapping = link_mapping;
 
-            return false;
+            if (link_mapping != null) {
+                return link_mapping.on_mouse_move(source, event);
+            } else {
+                return false;
+            }
         }
 
         /**

@@ -102,11 +102,12 @@ namespace pdfpc {
         }
 
         /**
-         * Handle mouse press events in the area.  Return true to indicate that
-         * the event was handled (and therefore we should not advance to the next
-         * page.
+         * Handle mouse press/release/motion events in the area. Return true to
+         * indicate that the event has been handled.
          */
         public abstract bool on_button_press(Gtk.Widget widget, Gdk.EventButton event);
+        public abstract bool on_button_release(Gtk.Widget widget, Gdk.EventButton event);
+        public abstract bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event);
 
         /**
          * Override this method to get notified of the freeze toggle events.

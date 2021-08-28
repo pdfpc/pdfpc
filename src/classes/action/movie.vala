@@ -227,7 +227,7 @@ namespace pdfpc {
          * probably want to use a frame from the movie to get the right aspect
          * ratio.
          */
-        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
+        protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             if (mapping.action.type != Poppler.ActionType.LAUNCH) {
                 return null;
@@ -301,7 +301,7 @@ namespace pdfpc {
          * the width and height options.  Note that the autostart, loop/repeat, and
          * poster options are not yet supported.
          */
-        public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
+        protected override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             Poppler.Annot annot = mapping.annot;
             string uri, suburi = null;
@@ -384,7 +384,7 @@ namespace pdfpc {
         /**
          * When we leave the page, stop the movie and delete any temporary files.
          */
-        public override void deactivate() {
+        protected override void deactivate() {
             this.stop();
             if (this.temp != "") {
                 if (FileUtils.unlink(this.temp) != 0) {
@@ -412,7 +412,7 @@ namespace pdfpc {
          * Inside the progress bar, pause or stop the timeout, and start the
          * drag state.
          */
-        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+        protected override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
             if (this.pipeline == null) {
                 return false;
             }
@@ -447,7 +447,7 @@ namespace pdfpc {
          * Stop the drag state and restart either playback or the timeout,
          * depending on the previous state.
          */
-        public bool on_button_release(Gdk.EventButton event) {
+        protected override bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
             // don't intercept events in the drawing mode
             if (this.controller.in_drawing_mode()) {
                 return false;
@@ -468,7 +468,7 @@ namespace pdfpc {
             return true;
         }
 
-        public override void on_freeze(bool frozen) {
+        protected override void on_freeze(bool frozen) {
             // if a video was forcefully hidden but we're no longer in the
             // freeze mode, show it and clear the respective flag
             foreach (var sink in this.sinks) {
@@ -546,7 +546,7 @@ namespace pdfpc {
         /**
          * Seek if we're dragging the progress bar.
          */
-        public bool on_motion(Gdk.EventMotion event) {
+        protected override bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
             this.set_mouse_in(event.x, event.y);
             if (this.mouse_drag) {
                 this.mouse_seek(event.x, event.y);
@@ -710,15 +710,6 @@ namespace pdfpc {
                     Gst.Element ad_element = this.add_video_control(queue, bin,
                         conf.rect);
                     ad_element.link(sink);
-
-                    video_area.add_events(
-                          Gdk.EventMask.BUTTON_PRESS_MASK
-                        | Gdk.EventMask.BUTTON_RELEASE_MASK
-                        | Gdk.EventMask.POINTER_MOTION_MASK
-                    );
-                    video_area.motion_notify_event.connect(this.on_motion);
-                    video_area.button_press_event.connect(this.on_button_press);
-                    video_area.button_release_event.connect(this.on_button_release);
                 } else {
                     queue.link(sink);
                 }

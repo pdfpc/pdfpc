@@ -51,7 +51,7 @@ namespace pdfpc {
          * Create from the LinkMapping if the link is an internal link to a named
          * destination inside the PDF file.
          */
-        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
+        protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
             if (   (mapping.action.type != Poppler.ActionType.GOTO_DEST || ((Poppler.ActionGotoDest*)mapping.action).dest.type != Poppler.DestType.NAMED)
                 && mapping.action.type != Poppler.ActionType.URI) {
@@ -66,7 +66,7 @@ namespace pdfpc {
         /**
          * Goto the link's destination on left clicks.
          */
-        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+        protected override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
             if (event.button != 1)
                 return false;
 
@@ -94,6 +94,14 @@ namespace pdfpc {
             }
 
             return true;
+        }
+
+        protected override bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
+            return false;
+        }
+
+        protected override bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
+            return false;
         }
     }
 }
