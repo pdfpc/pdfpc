@@ -417,6 +417,11 @@ namespace pdfpc {
                 return false;
             }
 
+            // don't intercept events in the drawing mode
+            if (this.controller.in_drawing_mode()) {
+                return false;
+            }
+
             Gst.State state;
             Gst.ClockTime time = Gst.Util.get_timestamp();
             this.pipeline.get_state(out state, null, time);
@@ -443,6 +448,11 @@ namespace pdfpc {
          * depending on the previous state.
          */
         public bool on_button_release(Gdk.EventButton event) {
+            // don't intercept events in the drawing mode
+            if (this.controller.in_drawing_mode()) {
+                return false;
+            }
+
             this.set_mouse_in(event.x, event.y);
             if (this.mouse_drag) {
                 var seek_time = this.mouse_seek(event.x, event.y);
@@ -454,7 +464,8 @@ namespace pdfpc {
                 }
             }
             this.mouse_drag = false;
-            return false;
+
+            return true;
         }
 
         public override void on_freeze(bool frozen) {
