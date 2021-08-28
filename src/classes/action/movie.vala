@@ -109,6 +109,11 @@ namespace pdfpc {
         protected bool noaudio = false;
 
         /**
+         * Show the first frame of the movie before playing.
+         */
+        protected bool poster = false;
+
+        /**
          * Time, in second from the start of the movie, at which the playback
          * should start and stop (stop = 0 means 'to the end').
          */
@@ -195,25 +200,26 @@ namespace pdfpc {
             movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
                 movie.starttime * Gst.SECOND);
 
-            movie.hide();
-
             if (movie.autostart) {
                 movie.play();
+            } else if (!movie.poster) {
+                movie.hide();
             }
         }
 
         /**
          * Inits  the movie
          */
-        protected void init_movie(ActionMapping other, Poppler.Rectangle area,
+        protected void init_movie(ControlledMovie movie, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, string? suburi, bool autostart, bool loop, bool noprogress,
+                string uri, string? suburi, bool autostart, bool loop,
+                bool noprogress, bool poster,
                 bool noaudio, int start = 0, int stop = 0, bool temp = false) {
-            other.init(area, controller, document);
-            ControlledMovie movie = (ControlledMovie) other;
+            movie.init(area, controller, document);
             movie.autostart = autostart;
             movie.loop = loop;
             movie.noprogress = noprogress;
+            movie.poster = poster;
             movie.noaudio = noaudio;
             movie.starttime = start;
             movie.stoptime = stop;
@@ -287,9 +293,10 @@ namespace pdfpc {
             }
 
             Type type = Type.from_instance(this);
-            ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
+            ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
             this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, autostart, loop, noprogress, noaudio, start, stop);
+                suburi, autostart, loop, noprogress, false, noaudio,
+                start, stop);
             return new_obj;
         }
 
@@ -307,6 +314,7 @@ namespace pdfpc {
             bool noprogress = false;
             bool loop = false;
             int start = 0, stop = 0;
+            bool poster = false;
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents())) {
@@ -347,9 +355,6 @@ namespace pdfpc {
 
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
-                if (movie.need_poster()) {
-                    GLib.printerr("Movie requests poster. Not yet supported.\n");
-                }
                 string file = movie.get_filename();
                 if (file == null) {
                     GLib.printerr("Movie has no file name\n");
@@ -357,6 +362,7 @@ namespace pdfpc {
                 }
                 uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
+                poster = movie.need_poster();
                 noprogress = !movie.show_controls();
                 #if NEW_POPPLER
                 loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
@@ -373,9 +379,10 @@ namespace pdfpc {
             }
 
             Type type = Type.from_instance(this);
-            ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
+            ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
             this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, false, loop, noprogress, false, start, stop, temp);
+                suburi, false, loop, noprogress, poster, false, start, stop,
+                temp);
             return new_obj;
         }
 
