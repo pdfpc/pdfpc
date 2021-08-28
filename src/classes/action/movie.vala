@@ -42,6 +42,40 @@ namespace pdfpc {
         public Window.Fullscreen window { get; set; }
     }
 
+    protected struct PlaybackOptions {
+        /**
+         * A flag to indicate whether the movie should start automatically.
+         */
+        bool autostart;
+
+        /**
+         * A flag to indicate whether the movie should be played in a loop.
+         */
+        bool loop;
+
+        /**
+         * A flag to indicate whether the progress bar should be supressed.
+         */
+        bool noprogress;
+
+         /**
+         * A flag to indicate whether the audio should be played or not.
+         */
+        bool noaudio;
+
+        /**
+         * Show the first frame of the movie before playing.
+         */
+        bool poster;
+
+        /**
+         * Time, in second from the start of the movie, at which the playback
+         * should start and stop (stop = 0 means 'to the end').
+         */
+        int starttime;
+        int stoptime;
+    }
+
     /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
@@ -89,38 +123,6 @@ namespace pdfpc {
         protected bool eos = false;
 
         /**
-         * A flag to indicate whether the movie should start automatically.
-         */
-        protected bool autostart = false;
-
-        /**
-         * A flag to indicate whether the movie should be played in a loop.
-         */
-        protected bool loop;
-
-        /**
-         * A flag to indicate whether the progress bar should be supressed.
-         */
-        protected bool noprogress = false;
-
-         /**
-         * A flag to indicate whether the audio should be played or not.
-         */
-        protected bool noaudio = false;
-
-        /**
-         * Show the first frame of the movie before playing.
-         */
-        protected bool poster = false;
-
-        /**
-         * Time, in second from the start of the movie, at which the playback
-         * should start and stop (stop = 0 means 'to the end').
-         */
-        protected int starttime;
-        protected int stoptime;
-
-        /**
          * If the movie was attached to the PDF file, we store it in a temporary
          * file, whose name we store here.  If not, this will be the blank string.
          */
@@ -165,6 +167,8 @@ namespace pdfpc {
          */
         protected int64 paused_at = 0;
 
+        protected PlaybackOptions options;
+
         construct {
             this.sinks = new Gee.ArrayList<Gtk.Widget>();
 
@@ -198,11 +202,11 @@ namespace pdfpc {
             // waits until the pipeline is actually in PAUSED mode
             movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
             movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
-                movie.starttime * Gst.SECOND);
+                movie.options.starttime*Gst.SECOND);
 
-            if (movie.autostart) {
+            if (movie.options.autostart) {
                 movie.play();
-            } else if (!movie.poster) {
+            } else if (!movie.options.poster) {
                 movie.hide();
             }
         }
@@ -212,17 +216,12 @@ namespace pdfpc {
          */
         protected void init_movie(ControlledMovie movie, Poppler.Rectangle area,
                 PresentationController controller, Poppler.Document document,
-                string uri, string? suburi, bool autostart, bool loop,
-                bool noprogress, bool poster,
-                bool noaudio, int start = 0, int stop = 0, bool temp = false) {
+                string uri, string? suburi, PlaybackOptions options,
+                bool temp = false) {
             movie.init(area, controller, document);
-            movie.autostart = autostart;
-            movie.loop = loop;
-            movie.noprogress = noprogress;
-            movie.poster = poster;
-            movie.noaudio = noaudio;
-            movie.starttime = start;
-            movie.stoptime = stop;
+
+            movie.options = options;
+
             movie.temp = temp ? uri.substring(7) : "";
 
 #if MOVIE_LOAD_ASYNC
@@ -260,19 +259,22 @@ namespace pdfpc {
                 querystring = splitfile[1];
             }
             string[] queryarray = querystring.split("&");
-            bool autostart = "autostart" in queryarray;
-            bool noaudio = "noaudio" in queryarray;
-            bool loop = "loop" in queryarray;
-            bool noprogress = "noprogress" in queryarray;
-            var start = 0;
-            var stop = 0;
+
+            options.autostart = "autostart" in queryarray;
+            options.loop = "loop" in queryarray;
+            options.noprogress = "noprogress" in queryarray;
+            options.noaudio = "noaudio" in queryarray;
+            options.poster = false;
+            options.starttime = 0;
+            options.stoptime = 0;
+
             string srtfile = null;
             foreach (string param in queryarray) {
                 if (param.has_prefix("start=")) {
-                    start = int.parse(param.split("=")[1]);
+                    options.starttime = int.parse(param.split("=")[1]);
                 }
                 if (param.has_prefix("stop=")) {
-                    stop = int.parse(param.split("=")[1]);
+                    options.stoptime = int.parse(param.split("=")[1]);
                 }
                 if (param.has_prefix("srtfile=")) {
                     srtfile = param.split("=")[1];
@@ -295,8 +297,7 @@ namespace pdfpc {
             Type type = Type.from_instance(this);
             ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
             this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, autostart, loop, noprogress, false, noaudio,
-                start, stop);
+                suburi, options);
             return new_obj;
         }
 
@@ -311,10 +312,15 @@ namespace pdfpc {
             Poppler.Annot annot = mapping.annot;
             string uri, suburi = null;
             bool temp = false;
-            bool noprogress = false;
-            bool loop = false;
-            int start = 0, stop = 0;
-            bool poster = false;
+
+            options.autostart = false;
+            options.loop = false;
+            options.noprogress = false;
+            options.noaudio = false;
+            options.poster = false;
+            options.starttime = 0;
+            options.stoptime = 0;
+
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents())) {
@@ -362,14 +368,14 @@ namespace pdfpc {
                 }
                 uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
-                poster = movie.need_poster();
-                noprogress = !movie.show_controls();
+                options.poster = movie.need_poster();
+                options.noprogress = !movie.show_controls();
                 #if NEW_POPPLER
-                loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
-                start = (int) (movie.get_start()/1000000000L);
+                options.loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
+                options.starttime = (int) (movie.get_start()/1000000000L);
                 int duration = (int) (movie.get_duration()/1000000000L);
                 if (duration > 0) {
-                    stop = start + duration;
+                    options.stoptime = options.starttime + duration;
                 }
                 #endif
                 break;
@@ -381,8 +387,7 @@ namespace pdfpc {
             Type type = Type.from_instance(this);
             ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
             this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, false, loop, noprogress, poster, false, start, stop,
-                temp);
+                suburi, options, temp);
             return new_obj;
         }
 
@@ -542,14 +547,15 @@ namespace pdfpc {
 
             // if a stop time is defined, stop there (but still let
             // the user manually seek *after* this timestamp)
-            if (this.stoptime != 0 &&
-                this.stoptime * Gst.SECOND < timestamp &&
-                timestamp < (this.stoptime + 0.2) * Gst.SECOND) {
-                if (this.loop) {
+            if (this.options.stoptime != 0 &&
+                this.options.stoptime * Gst.SECOND < timestamp &&
+                timestamp < (this.options.stoptime + 0.2) * Gst.SECOND) {
+                if (this.options.loop) {
                     // attempting to seek from this callback fails, so we
                     // must schedule a seek on next idle time.
                     GLib.Idle.add(() => {
-                        this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                        this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                            this.options.starttime*Gst.SECOND);
                         return false;
                     });
                 } else {
@@ -567,9 +573,9 @@ namespace pdfpc {
         public void on_gst_message(Gst.Message message) {
             switch (message.type) {
             case Gst.MessageType.EOS:
-                if (this.loop) {
+                if (this.options.loop) {
                     this.pipeline.seek_simple(Gst.Format.TIME,
-                        Gst.SeekFlags.FLUSH, this.starttime*Gst.SECOND);
+                        Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
                 } else {
                     // Can't seek to beginning w/o updating output,
                     // so mark to seek later
@@ -641,11 +647,11 @@ namespace pdfpc {
                 return;
             }
 
-            double start = (double) this.starttime*Gst.SECOND / this.duration;
-            double stop = (double) this.stoptime*Gst.SECOND / this.duration;
+            double start = (double) options.starttime*Gst.SECOND/this.duration;
+            double stop = (double) options.stoptime*Gst.SECOND/this.duration;
 
             // special case: only starttime is defined
-            if (this.starttime != 0 && this.stoptime == 0) {
+            if (options.starttime != 0 && options.stoptime == 0) {
                 stop = 1.0;
             }
 
@@ -702,7 +708,7 @@ namespace pdfpc {
                 cr.show_text(timestring);
                 cr.restore();
 
-            } else if (this.noprogress == false) {
+            } else if (this.options.noprogress == false) {
                 cr.rectangle(0, 0, rect.width, 4);
                 cr.set_source_rgba(0, 0, 0, 0.8);
                 cr.fill();
@@ -811,7 +817,7 @@ namespace pdfpc {
             this.pipeline.set("subtitle-font-desc", @"Sans, $subsize");
             this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
             this.pipeline.set("video_sink", bin);
-            this.pipeline.set("mute", this.noaudio);
+            this.pipeline.set("mute", this.options.noaudio);
 
             Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
@@ -910,7 +916,8 @@ namespace pdfpc {
 
             if (this.eos) {
                 this.eos = false;
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                this.pipeline.seek_simple(Gst.Format.TIME,
+                    Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
             }
             this.pipeline.set_state(Gst.State.PLAYING);
         }
