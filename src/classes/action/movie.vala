@@ -123,7 +123,6 @@ namespace pdfpc {
          */
         protected double scalex;
         protected double scaley;
-        protected int vheight;
 
         /**
          * The length of the movie, in nanoseconds (!).
@@ -478,7 +477,7 @@ namespace pdfpc {
         public void on_draw(Gst.Element overlay, Cairo.Context cr, uint64 timestamp,
                 uint64 duration) {
             // Transform to work from bottom left, in screen coordinates
-            cr.translate(0, this.vheight);
+            cr.translate(0, this.video_h);
             cr.scale(this.scalex, -this.scaley);
 
             this.draw_seek_bar(cr, timestamp);
@@ -559,7 +558,6 @@ namespace pdfpc {
             this.video_h = info.height;
             this.scalex = (double) this.video_w/rect.width;
             this.scaley = (double) this.video_h/rect.height;
-            this.vheight = this.video_h;
 
             overlay.query_duration(Gst.Format.TIME, out duration);
         }
