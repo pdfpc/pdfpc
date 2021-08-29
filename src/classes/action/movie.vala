@@ -150,9 +150,14 @@ namespace pdfpc {
         protected int64 duration;
 
         /**
-         * Settings for the appearance of the progress bar.
+         * The desired font size (in *video* pixels!)
          */
-        protected double seek_bar_height = 20;
+        protected double seek_bar_fontsize = 16;
+
+        /**
+         * Settings for the appearance of the progress bar (in screen pixels).
+         */
+        protected double seek_bar_height;
         protected double seek_bar_padding = 2;
 
         /**
@@ -625,6 +630,8 @@ namespace pdfpc {
             this.video_h = info.height;
             this.scalex = (double) this.video_w/rect.width;
             this.scaley = (double) this.video_h/rect.height;
+            this.seek_bar_height = (this.seek_bar_fontsize +
+                2*seek_bar_padding)/this.scaley;
 
             overlay.query_duration(Gst.Format.TIME, out duration);
         }
@@ -797,6 +804,8 @@ namespace pdfpc {
                             this.rect = rect;
                             this.scalex = (double) this.video_w/rect.width;
                             this.scaley = (double) this.video_h/rect.height;
+                            this.seek_bar_height = (this.seek_bar_fontsize +
+                                2*seek_bar_padding)/this.scaley;
                         }
                         video_surface.resize_video(video_area, rect);
                     });
