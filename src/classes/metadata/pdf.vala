@@ -856,6 +856,7 @@ namespace pdfpc.Metadata {
                 mapping.deactivate();
             }
             this.action_mapping.clear();
+            this.mapping_page_num = -1;
         }
 
         /**
