@@ -458,7 +458,7 @@ will be reset after leaving and returning to a slide.
 .PP
 Movies may be included in PDF files as "screen annotations". In LaTeX, such
 movies may be added to a presentation with the "multimedia" package. Note that
-the poster and autoplay options are not yet supported.
+the autoplay option is not yet supported.
 
 .PP
 pdfpc will also play back movies linked from a hyperlink of type "launch".
