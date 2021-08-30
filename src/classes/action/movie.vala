@@ -201,11 +201,11 @@ namespace pdfpc {
                 return;
             }
 
-            // initial seek to set the starting point. *Cause the video to
-            // be displayed on the page*.
             movie.pipeline.set_state(Gst.State.PAUSED);
-            // waits until the pipeline is actually in PAUSED mode
+            // wait until the pipeline is actually in PAUSED mode
             movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
+
+            // initial seek to set the starting point
             movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
                 movie.options.starttime*Gst.SECOND);
 
@@ -457,14 +457,6 @@ namespace pdfpc {
                 return false;
             }
 
-            Gst.State state;
-            Gst.ClockTime time = Gst.Util.get_timestamp();
-            this.pipeline.get_state(out state, null, time);
-            if (state == Gst.State.NULL) {
-                this.toggle_play();
-                return true;
-            }
-
             this.set_mouse_in(event.x, event.y);
             if (!this.in_seek_bar) {
                 this.toggle_play();
@@ -611,8 +603,6 @@ namespace pdfpc {
 
             if (this.mouse_drag) {
                 this.mouse_seek(event.x, event.y);
-            } else if (this.paused_at >= 0 || this.eos) {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.paused_at);
             }
 
             return false;
