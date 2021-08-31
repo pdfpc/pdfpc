@@ -43,11 +43,6 @@ namespace pdfpc {
         protected PresentationController controller;
 
         /**
-         * The PDF document in question.
-         */
-        protected Poppler.Document document;
-
-        /**
          * Constructors of ActionMapping classes shouldn't actually do much.  These
          * objects will generally be made with the new_from_... methods, below.
          * Unlike constructors, these have the option of returning null.  Since I
@@ -62,11 +57,10 @@ namespace pdfpc {
         /**
          * Instead of in the constructor, most setup is done in the init method.
          */
-        public virtual void init(Poppler.Rectangle area, PresentationController controller,
-                Poppler.Document document) {
+        public virtual void init(Poppler.Rectangle area,
+            PresentationController controller) {
             this.area = area;
             this.controller = controller;
-            this.document = document;
         }
 
         /**
@@ -76,7 +70,7 @@ namespace pdfpc {
          * to figure out if you're in a subclass.
          */
         public virtual ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             return null;
         }
 
@@ -85,7 +79,7 @@ namespace pdfpc {
          * return null if this class doesn't handle this type of AnnotMapping.
          */
         public virtual ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             return null;
         }
 

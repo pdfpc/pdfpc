@@ -226,10 +226,10 @@ namespace pdfpc {
          * Inits  the movie
          */
         protected void init_movie(ControlledMovie movie, Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document,
+                PresentationController controller,
                 string uri, string? suburi, PlaybackOptions options,
                 bool temp = false) {
-            movie.init(area, controller, document);
+            movie.init(area, controller);
 
             movie.options = options;
 
@@ -257,7 +257,7 @@ namespace pdfpc {
          * end.)
          */
         protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             if (mapping.action.type != Poppler.ActionType.LAUNCH) {
                 return null;
             }
@@ -307,7 +307,7 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
-            this.init_movie(new_obj, mapping.area, controller, document, uri,
+            this.init_movie(new_obj, mapping.area, controller, uri,
                 suburi, options);
             return new_obj;
         }
@@ -319,7 +319,7 @@ namespace pdfpc {
          * since they're missing from poppler.
          */
         protected override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             Poppler.Annot annot = mapping.annot;
             string uri, suburi = null;
             bool temp = false;
@@ -400,7 +400,7 @@ namespace pdfpc {
             ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
             new_obj.filename = file;
 
-            this.init_movie(new_obj, mapping.area, controller, document, uri,
+            this.init_movie(new_obj, mapping.area, controller, uri,
                 suburi, options, temp);
             return new_obj;
         }

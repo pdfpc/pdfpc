@@ -41,9 +41,9 @@ namespace pdfpc {
         /**
          * Initializer.
          */
-        public new void init(Poppler.LinkMapping mapping, PresentationController controller,
-                Poppler.Document document) {
-            base.init(mapping.area, controller, document);
+        public new void init(Poppler.LinkMapping mapping,
+            PresentationController controller) {
+            base.init(mapping.area, controller);
             this.action = mapping.action.copy();
         }
 
@@ -77,13 +77,13 @@ namespace pdfpc {
          * destination inside the PDF file.
          */
         protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             switch (mapping.action.type) {
             case Poppler.ActionType.GOTO_DEST:
                 unowned var goto_action = (Poppler.ActionGotoDest*) mapping.action;
                 if (goto_action.dest.type == Poppler.DestType.NAMED) {
                     var new_obj = new LinkAction();
-                    new_obj.init(mapping, controller, document);
+                    new_obj.init(mapping, controller);
                     return new_obj as ActionMapping;
                 }
                 break;
@@ -92,7 +92,7 @@ namespace pdfpc {
                 var movie = movie_action.movie;
                 if (movie != null) {
                     var new_obj = new LinkAction();
-                    new_obj.init(mapping, controller, document);
+                    new_obj.init(mapping, controller);
                     return new_obj as ActionMapping;
                 }
                 break;
@@ -130,10 +130,10 @@ namespace pdfpc {
                 break;
             case Poppler.ActionType.GOTO_DEST:
                 unowned var action = (Poppler.ActionGotoDest*) this.action;
-                Poppler.Dest destination;
-                destination = this.document.find_dest(action.dest.named_dest);
+                var metadata = this.controller.metadata;
 
-                this.controller.switch_to_slide_number((int)(destination.page_num - 1));
+                int slide_number = metadata.find_dest(action.dest);
+                this.controller.switch_to_slide_number(slide_number);
 
                 break;
             case Poppler.ActionType.MOVIE:
