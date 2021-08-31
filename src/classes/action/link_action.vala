@@ -32,10 +32,10 @@ namespace pdfpc {
         public Poppler.Action action;
 
         /**
-         * Base constructor does nothing.
+         * Base constructor does nothing except assigning the type.
          */
         public LinkAction() {
-            base();
+            this.type = ActionType.LINK;
         }
 
         /**
@@ -48,19 +48,59 @@ namespace pdfpc {
         }
 
         /**
+         * Find movie on the current slide by its filename; there seems to be
+         * no better way with the current Glib Poppler bindings.
+         */
+        protected ControlledMovie? find_controlled_movie(Poppler.Movie movie) {
+            var filename = movie.get_filename();
+            if (filename == null) {
+                return null;
+            }
+
+            var page_num = this.controller.current_slide_number;
+            var metadata = this.controller.metadata;
+            var mappings = metadata.get_action_mapping(page_num);
+            foreach (var mapping in mappings) {
+                if (mapping.type == ActionType.MOVIE) {
+                    var cmovie = (ControlledMovie) mapping;
+                    if (cmovie.filename == filename) {
+                        return cmovie;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /**
          * Create from the LinkMapping if the link is an internal link to a named
          * destination inside the PDF file.
          */
         protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller, Poppler.Document document) {
-            if (   (mapping.action.type != Poppler.ActionType.GOTO_DEST || ((Poppler.ActionGotoDest*)mapping.action).dest.type != Poppler.DestType.NAMED)
-                && mapping.action.type != Poppler.ActionType.URI) {
-                return null;
+            switch (mapping.action.type) {
+            case Poppler.ActionType.GOTO_DEST:
+                unowned var goto_action = (Poppler.ActionGotoDest*) mapping.action;
+                if (goto_action.dest.type == Poppler.DestType.NAMED) {
+                    var new_obj = new LinkAction();
+                    new_obj.init(mapping, controller, document);
+                    return new_obj as ActionMapping;
+                }
+                break;
+            case Poppler.ActionType.MOVIE:
+                unowned var movie_action = (Poppler.ActionMovie*) mapping.action;
+                var movie = movie_action.movie;
+                if (movie != null) {
+                    var new_obj = new LinkAction();
+                    new_obj.init(mapping, controller, document);
+                    return new_obj as ActionMapping;
+                }
+                break;
+            default:
+                break;
             }
 
-            var new_obj = new LinkAction();
-            new_obj.init(mapping, controller, document);
-            return new_obj as ActionMapping;
+            return null;
         }
 
         protected override void on_mouse_enter(Gtk.Widget widget, Gdk.EventMotion event) {
@@ -74,30 +114,55 @@ namespace pdfpc {
          * Goto the link's destination on left clicks.
          */
         protected override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
-            if (event.button != 1)
+            if (event.button != 1) {
                 return false;
+            }
 
             switch (this.action.type) {
-                case Poppler.ActionType.URI:
-                    try {
-                        AppInfo.launch_default_for_uri(this.action.uri.uri, null);
-                    } catch (GLib.Error e) {
-                        GLib.printerr("%s\n", e.message);
-
-                        return false;
-                    }
-
-                    break;
-                case Poppler.ActionType.GOTO_DEST:
-                    unowned Poppler.ActionGotoDest* action = (Poppler.ActionGotoDest*)this.action;
-                    Poppler.Dest destination;
-                    destination = this.document.find_dest(action.dest.named_dest);
-
-                    this.controller.switch_to_slide_number((int)(destination.page_num - 1));
-
-                    break;
-                default:
+            case Poppler.ActionType.URI:
+                try {
+                    AppInfo.launch_default_for_uri(this.action.uri.uri, null);
+                } catch (GLib.Error e) {
+                    GLib.printerr("%s\n", e.message);
                     return false;
+                }
+
+                break;
+            case Poppler.ActionType.GOTO_DEST:
+                unowned var action = (Poppler.ActionGotoDest*) this.action;
+                Poppler.Dest destination;
+                destination = this.document.find_dest(action.dest.named_dest);
+
+                this.controller.switch_to_slide_number((int)(destination.page_num - 1));
+
+                break;
+            case Poppler.ActionType.MOVIE:
+                unowned var action = (Poppler.ActionMovie*) this.action;
+                var movie = action.movie;
+                if (movie != null) {
+                    var controlled_movie = this.find_controlled_movie(movie);
+                    if (controlled_movie != null) {
+                        switch (action.operation) {
+                        case Poppler.ActionMovieOperation.PAUSE:
+                            controlled_movie.pause();
+                            break;
+                        case Poppler.ActionMovieOperation.PLAY:
+                            controlled_movie.rewind();
+                            controlled_movie.play();
+                            break;
+                        case Poppler.ActionMovieOperation.RESUME:
+                            controlled_movie.play();
+                            break;
+                        case Poppler.ActionMovieOperation.STOP:
+                            controlled_movie.pause();
+                            controlled_movie.rewind();
+                            break;
+                        }
+                    }
+                }
+                break;
+            default:
+                return false;
             }
 
             return true;

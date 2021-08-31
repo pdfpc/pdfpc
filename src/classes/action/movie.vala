@@ -108,6 +108,10 @@ namespace pdfpc {
          */
         protected bool shown = false;
 
+        public string filename {
+            get; protected set;
+        }
+
         /**
          * Cursors for various video states/subwidgets
          */
@@ -175,6 +179,8 @@ namespace pdfpc {
         protected PlaybackOptions options;
 
         construct {
+            this.type = ActionType.MOVIE;
+
             this.sinks = new Gee.ArrayList<Gtk.Widget>();
 
             var display = Gdk.Display.get_default();
@@ -317,6 +323,7 @@ namespace pdfpc {
             Poppler.Annot annot = mapping.annot;
             string uri, suburi = null;
             bool temp = false;
+            string file = null;
 
             options.autostart = false;
             options.loop = false;
@@ -354,7 +361,7 @@ namespace pdfpc {
                     uri = "file://" + tmp_fn;
                     temp = true;
                 } else {
-                    string file = movie.get_filename();
+                    file = movie.get_filename();
                     if (file == null) {
                         GLib.printerr("Movie not embedded and has no file name\n");
                         return null;
@@ -366,7 +373,7 @@ namespace pdfpc {
 
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
-                string file = movie.get_filename();
+                file = movie.get_filename();
                 if (file == null) {
                     GLib.printerr("Movie has no file name\n");
                     return null;
@@ -391,6 +398,8 @@ namespace pdfpc {
 
             Type type = Type.from_instance(this);
             ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
+            new_obj.filename = file;
+
             this.init_movie(new_obj, mapping.area, controller, document, uri,
                 suburi, options, temp);
             return new_obj;
@@ -907,7 +916,7 @@ namespace pdfpc {
          * Play the movie, rewinding to the beginning if we had reached the
          * end.
          */
-        protected void play() {
+        public void play() {
             // force showing the widgets
             this.show();
 
@@ -924,13 +933,21 @@ namespace pdfpc {
         /**
          * Pause playback.
          */
-        protected void pause() {
+        public void pause() {
             this.pipeline.set_state(Gst.State.PAUSED);
 
             this.pipeline.query_position(Gst.Format.TIME, out this.paused_at);
             if (this.eos) {
                 this.paused_at -= 1;
             }
+        }
+
+        /**
+         * Pause playback.
+         */
+        public void rewind() {
+            this.pipeline.seek_simple(Gst.Format.TIME,
+                Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
         }
 
         /**

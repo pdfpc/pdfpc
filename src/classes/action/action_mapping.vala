@@ -25,6 +25,13 @@ namespace pdfpc {
      * Base action mapping, encapsulating actions that result from links or annotations.
      */
     public abstract class ActionMapping: GLib.Object {
+        public enum ActionType {
+            LINK,
+            MOVIE
+        }
+
+        public ActionType type;
+
         /**
          * The area on the PDF page associated with the action.
          */
