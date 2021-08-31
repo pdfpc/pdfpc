@@ -88,7 +88,9 @@ namespace pdfpc.Metadata {
         /**
          * Poppler document of the associated PDF file
          */
-        protected Poppler.Document document;
+        public Poppler.Document document {
+            get; protected set;
+        }
 
         /**
          * Number of pages in the PDF document
@@ -1495,13 +1497,6 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Return the Poppler.Document associated with this file
-         */
-        public Poppler.Document get_document() {
-            return this.document;
-        }
-
-        /**
          * Return the PDF title
          */
         public string get_title() {
@@ -1554,7 +1549,7 @@ namespace pdfpc.Metadata {
             if (page_num != this.mapping_page_num) {
                 this.deactivate_mappings();
 
-                var page = this.get_document().get_page(page_num);
+                var page = this.document.get_page(page_num);
 
                 var link_mappings = page.get_link_mapping();
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
