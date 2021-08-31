@@ -118,7 +118,6 @@ namespace pdfpc {
         protected Gdk.Cursor pause_cursor;
         protected Gdk.Cursor play_cursor;
         protected Gdk.Cursor drag_cursor;
-        protected Gdk.Cursor blank_cursor;
 
         /**
          * A flag to indicate when we've reached the End Of Stream, so we
@@ -187,7 +186,6 @@ namespace pdfpc {
             this.pause_cursor = this.load_cursor(display, "pause_cur.svg");
             this.play_cursor  = this.load_cursor(display, "play_cur.svg");
             this.drag_cursor  = new Gdk.Cursor.from_name(display, "hand1");
-            this.blank_cursor = new Gdk.Cursor.from_name(display, "none");
         }
 
         ~ControlledMovie() {
@@ -434,17 +432,13 @@ namespace pdfpc {
 
         private void update_cursor(Gdk.Window window) {
             Gdk.Cursor cursor;
-            if (!this.controller.in_drawing_mode()) {
-                if (this.in_seek_bar) {
-                    cursor = this.drag_cursor;
-                } else
-                if (this.paused_at >= 0) {
-                    cursor = this.play_cursor;
-                } else {
-                    cursor = this.pause_cursor;
-                }
+            if (this.in_seek_bar) {
+                cursor = this.drag_cursor;
+            } else
+            if (this.paused_at >= 0) {
+                cursor = this.play_cursor;
             } else {
-                cursor = this.blank_cursor;
+                cursor = this.pause_cursor;
             }
             window.set_cursor(cursor);
         }
@@ -460,11 +454,6 @@ namespace pdfpc {
             }
 
             this.update_cursor(event.window);
-
-            // don't intercept events in the drawing mode
-            if (this.controller.in_drawing_mode()) {
-                return false;
-            }
 
             this.set_mouse_in(event.x, event.y);
             if (!this.in_seek_bar) {
@@ -485,11 +474,6 @@ namespace pdfpc {
          */
         protected override bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
             this.update_cursor(event.window);
-
-            // don't intercept events in the drawing mode
-            if (this.controller.in_drawing_mode()) {
-                return false;
-            }
 
             this.set_mouse_in(event.x, event.y);
             if (this.mouse_drag) {
@@ -662,10 +646,6 @@ namespace pdfpc {
         }
 
         protected void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
-            if (this.controller.in_drawing_mode()) {
-                return;
-            }
-
             double start = (double) options.starttime*Gst.SECOND/this.duration;
             double stop = (double) options.stoptime*Gst.SECOND/this.duration;
 

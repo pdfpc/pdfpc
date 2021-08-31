@@ -615,6 +615,10 @@ namespace pdfpc {
             return is_pointer_active() || is_spotlight_active();
         }
 
+        public bool in_normal_mode() {
+            return annotation_mode == AnnotationMode.NORMAL;
+        }
+
         public string get_mode_string() {
             switch (this.annotation_mode) {
                 case POINTER:

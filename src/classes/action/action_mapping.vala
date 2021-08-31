@@ -112,6 +112,14 @@ namespace pdfpc {
         }
 
         /**
+         * By default, all mappings are active only in the normal mode.
+         * Override to change this (probably, there will never be a need).
+         */
+        public virtual bool is_sensitive() {
+            return this.controller.in_normal_mode();
+        }
+
+        /**
          * Override this method to get notified of the freeze toggle events.
          */
         public virtual void on_freeze(bool frozen) {

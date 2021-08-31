@@ -98,7 +98,7 @@ namespace pdfpc.View.Behaviour {
             // they are pointing nowhere we just get null.
             ActionMapping mapping = this.get_link_mapping_by_coordinates(e.x, e.y);
 
-            if (mapping == null) {
+            if (mapping == null || !mapping.is_sensitive()) {
                 return false;
             }
 
@@ -113,7 +113,7 @@ namespace pdfpc.View.Behaviour {
             // they are pointing nowhere we just get null.
             ActionMapping mapping = this.get_link_mapping_by_coordinates(e.x, e.y);
 
-            if (mapping == null) {
+            if (mapping == null || !mapping.is_sensitive()) {
                 return false;
             }
 
@@ -137,13 +137,13 @@ namespace pdfpc.View.Behaviour {
                     this.active_mapping.on_mouse_leave(source, event);
                 }
 
-                if (link_mapping != null) {
+                if (link_mapping != null && link_mapping.is_sensitive()) {
                     link_mapping.on_mouse_enter(source, event);
                 }
             }
             this.active_mapping = link_mapping;
 
-            if (link_mapping != null) {
+            if (link_mapping != null && link_mapping.is_sensitive()) {
                 return link_mapping.on_mouse_move(source, event);
             } else {
                 return false;
@@ -155,7 +155,7 @@ namespace pdfpc.View.Behaviour {
          * further requests and checks.
          */
         protected void on_entering_slide(View.Pdf source, int page_number) {
-            // if target is not mapped (ie. the size is not known) post pone
+            // if target is not mapped (ie. the size is not known) postpone
             // the mapping calculatation since the results wouldn't be correct
             if (!target.get_mapped()) {
                 target.realize.connect(() => {
