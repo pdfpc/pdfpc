@@ -1554,11 +1554,13 @@ namespace pdfpc.Metadata {
             if (page_num != this.mapping_page_num) {
                 this.deactivate_mappings();
 
-                GLib.List<Poppler.LinkMapping> link_mappings;
-                link_mappings = this.get_document().get_page(page_num).get_link_mapping();
+                var page = this.get_document().get_page(page_num);
+
+                var link_mappings = page.get_link_mapping();
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
                     foreach (var blank in blanks) {
-                        var action = blank.new_from_link_mapping(mapping, this.controller, this.document);
+                        var action = blank.new_from_link_mapping(mapping,
+                            this.controller, this.document);
                         if (action != null) {
                             this.action_mapping.add(action);
                             break;
@@ -1566,11 +1568,11 @@ namespace pdfpc.Metadata {
                     }
                 }
 
-                GLib.List<Poppler.AnnotMapping> annot_mappings;
-                annot_mappings = this.get_document().get_page(page_num).get_annot_mapping();
+                var annot_mappings = page.get_annot_mapping();
                 foreach (unowned Poppler.AnnotMapping mapping in annot_mappings) {
                     foreach (var blank in blanks) {
-                        var action = blank.new_from_annot_mapping(mapping, this.controller, this.document);
+                        var action = blank.new_from_annot_mapping(mapping,
+                            this.controller, this.document);
                         if (action != null) {
                             this.action_mapping.add(action);
                             break;
