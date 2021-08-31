@@ -31,7 +31,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4"
-     inkscape:cx="62.75"
+     inkscape:cx="21"
      inkscape:cy="63.163233"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -40,8 +40,8 @@
      showgrid="true"
      inkscape:window-width="1204"
      inkscape:window-height="827"
-     inkscape:window-x="717"
-     inkscape:window-y="46"
+     inkscape:window-x="1604"
+     inkscape:window-y="43"
      inkscape:window-maximized="0"
      inkscape:snap-bbox="true">
     <inkscape:grid
@@ -73,7 +73,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:#333333;fill-opacity:0.7254902;stroke:#ffffff;stroke-width:4;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;stroke:#3f3f3f;stroke-width:4;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 28,24 h 26 v 80 H 28 Z"
        id="path2618"
        sodipodi:nodetypes="ccccc"
@@ -82,7 +82,7 @@
        sodipodi:nodetypes="ccccc"
        id="path2195"
        d="m 73,24 h 26 v 80 H 73 Z"
-       style="fill:#333333;fill-opacity:0.72727272;stroke:#fffeff;stroke-width:4;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#ffffff;fill-opacity:1;stroke:#3f3f3f;stroke-width:4;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        inkscape:connector-curvature="0" />
   </g>
 </svg>
