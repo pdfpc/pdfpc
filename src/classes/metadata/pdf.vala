@@ -1560,7 +1560,7 @@ namespace pdfpc.Metadata {
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
                     foreach (var blank in blanks) {
                         var action = blank.new_from_link_mapping(mapping,
-                            this.controller, this.document);
+                            this.controller);
                         if (action != null) {
                             this.action_mapping.add(action);
                             break;
@@ -1572,7 +1572,7 @@ namespace pdfpc.Metadata {
                 foreach (unowned Poppler.AnnotMapping mapping in annot_mappings) {
                     foreach (var blank in blanks) {
                         var action = blank.new_from_annot_mapping(mapping,
-                            this.controller, this.document);
+                            this.controller);
                         if (action != null) {
                             this.action_mapping.add(action);
                             break;
@@ -1583,6 +1583,21 @@ namespace pdfpc.Metadata {
                 this.mapping_page_num = page_num;
             }
             return this.action_mapping;
+        }
+
+        /**
+         * Return slide number corresponding to a named destination
+         */
+        public int find_dest(Poppler.Dest dest) {
+            if (dest.type == Poppler.DestType.NAMED) {
+                var found_dest =
+                    this.document.find_dest(dest.named_dest);
+                if (found_dest != null) {
+                    return found_dest.page_num - 1;
+                }
+            }
+
+            return -1;
         }
 
         public bool has_beamer_notes {
