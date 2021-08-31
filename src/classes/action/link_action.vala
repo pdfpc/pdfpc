@@ -79,6 +79,10 @@ namespace pdfpc {
         protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
                 PresentationController controller) {
             switch (mapping.action.type) {
+            case Poppler.ActionType.URI:
+                var new_obj = new LinkAction();
+                new_obj.init(mapping, controller);
+                return new_obj as ActionMapping;
             case Poppler.ActionType.GOTO_DEST:
                 unowned var goto_action = (Poppler.ActionGotoDest*) mapping.action;
                 if (goto_action.dest.type == Poppler.DestType.NAMED) {
