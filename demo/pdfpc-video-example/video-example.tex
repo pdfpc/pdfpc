@@ -198,6 +198,49 @@
   \singleitem{The poster is obtained from the video when the slide is shown.}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Hyperlink controls}
+
+  \pdfpc understands a special kind of hyperlinks to control a named video on
+  the {\em same} page.
+
+  \begin{itemize}
+    \item Such hyperlinks can be created using the \opt{hyperlinkmovie}
+          command.
+    \item The possible actions are \opt{play}, \opt{stop}, \opt{pause}, and
+          \opt{resume}.
+  \end{itemize}
+
+  \vspace{10pt}
+
+  E.g.,
+  \begin{lstlisting}
+    \movie[label=mymovie]
+        {\includegraphics{poster.png}}{movie.avi}
+    ...
+    \hyperlinkmovie[play]{mymovie}{Click to play!}
+  \end{lstlisting}
+
+  \vfill
+  See a demo on the next page.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example 4}
+  \vspace{10pt}
+  \begin{center}
+    \movie[label=apollo]{\includegraphics[width=0.7\textwidth]{apollo17.jpg}}{apollo17.avi}
+
+    \hyperlinkmovie[play]{apollo}{\fbox{\sc Play}}
+    \hyperlinkmovie[pause]{apollo}{\fbox{\sc Pause}}
+    \hyperlinkmovie[resume]{apollo}{\fbox{\sc Resume}}
+    \hyperlinkmovie[stop]{apollo}{\fbox{\sc Stop}}
+  \end{center}
+
+  \vfill
+  \singleitem{You can control the movie using the ``buttons'' below it.}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Subtitles}
@@ -242,7 +285,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Example 4}
+  \frametitle{Example 5}
 
   An example using the \opt{\textbackslash href\{run:\}} hack. The
   video is set to automatically start playing in the loop a fragment of the
