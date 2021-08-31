@@ -521,9 +521,20 @@ namespace pdfpc {
             return cursor;
         }
 
+        /**
+         * Force refresh when not playing
+         */
+        protected void refresh() {
+            if (this.paused_at >= 0 || this.eos) {
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                    this.paused_at);
+            }
+        }
+
         protected override void on_mouse_leave(Gtk.Widget widget, Gdk.EventMotion event) {
             this.in_seek_bar = false;
             this.mouse_drag = false;
+            this.refresh();
         }
 
         protected override void on_freeze(bool frozen) {
@@ -612,6 +623,8 @@ namespace pdfpc {
 
             if (this.mouse_drag) {
                 this.mouse_seek(event.x, event.y);
+            } else {
+                this.refresh();
             }
 
             return false;
@@ -913,6 +926,21 @@ namespace pdfpc {
         }
 
         /**
+         * Set a flag about whether the mouse is currently in the progress bar.
+         */
+        private void set_mouse_in(double x, double y) {
+            // shift coordinates by the widget offsets
+            x -= this.rect.x;
+            y -= this.rect.y;
+            this.in_seek_bar =
+                this.shown &&
+                x > 0 &&
+                x < this.rect.width &&
+                y > this.rect.height - this.seek_bar_height &&
+                y < this.rect.height;
+        }
+
+        /**
          * Play the movie, rewinding to the beginning if we had reached the
          * end.
          */
@@ -943,26 +971,13 @@ namespace pdfpc {
         }
 
         /**
-         * Pause playback.
+         * Rewind.
          */
         public void rewind() {
+            this.paused_at = this.options.starttime*Gst.SECOND;
+            this.mouse_drag = false;
             this.pipeline.seek_simple(Gst.Format.TIME,
                 Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
-        }
-
-        /**
-         * Set a flag about whether the mouse is currently in the progress bar.
-         */
-        private void set_mouse_in(double x, double y) {
-            // shift coordinates by the widget offsets
-            x -= this.rect.x;
-            y -= this.rect.y;
-            this.in_seek_bar =
-                this.shown &&
-                x > 0 &&
-                x < this.rect.width &&
-                y > this.rect.height - this.seek_bar_height &&
-                y < this.rect.height;
         }
 
         /**
