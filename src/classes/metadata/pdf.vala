@@ -88,7 +88,9 @@ namespace pdfpc.Metadata {
         /**
          * Poppler document of the associated PDF file
          */
-        protected Poppler.Document document;
+        public Poppler.Document document {
+            get; protected set;
+        }
 
         /**
          * Number of pages in the PDF document
@@ -856,6 +858,7 @@ namespace pdfpc.Metadata {
                 mapping.deactivate();
             }
             this.action_mapping.clear();
+            this.mapping_page_num = -1;
         }
 
         /**
@@ -1494,13 +1497,6 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Return the Poppler.Document associated with this file
-         */
-        public Poppler.Document get_document() {
-            return this.document;
-        }
-
-        /**
          * Return the PDF title
          */
         public string get_title() {
@@ -1553,11 +1549,13 @@ namespace pdfpc.Metadata {
             if (page_num != this.mapping_page_num) {
                 this.deactivate_mappings();
 
-                GLib.List<Poppler.LinkMapping> link_mappings;
-                link_mappings = this.get_document().get_page(page_num).get_link_mapping();
+                var page = this.document.get_page(page_num);
+
+                var link_mappings = page.get_link_mapping();
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
                     foreach (var blank in blanks) {
-                        var action = blank.new_from_link_mapping(mapping, this.controller, this.document);
+                        var action = blank.new_from_link_mapping(mapping,
+                            this.controller);
                         if (action != null) {
                             this.action_mapping.add(action);
                             break;
@@ -1565,11 +1563,11 @@ namespace pdfpc.Metadata {
                     }
                 }
 
-                GLib.List<Poppler.AnnotMapping> annot_mappings;
-                annot_mappings = this.get_document().get_page(page_num).get_annot_mapping();
+                var annot_mappings = page.get_annot_mapping();
                 foreach (unowned Poppler.AnnotMapping mapping in annot_mappings) {
                     foreach (var blank in blanks) {
-                        var action = blank.new_from_annot_mapping(mapping, this.controller, this.document);
+                        var action = blank.new_from_annot_mapping(mapping,
+                            this.controller);
                         if (action != null) {
                             this.action_mapping.add(action);
                             break;
@@ -1580,6 +1578,21 @@ namespace pdfpc.Metadata {
                 this.mapping_page_num = page_num;
             }
             return this.action_mapping;
+        }
+
+        /**
+         * Return slide number corresponding to a named destination
+         */
+        public int find_dest(Poppler.Dest dest) {
+            if (dest.type == Poppler.DestType.NAMED) {
+                var found_dest =
+                    this.document.find_dest(dest.named_dest);
+                if (found_dest != null) {
+                    return found_dest.page_num - 1;
+                }
+            }
+
+            return -1;
         }
 
         public bool has_beamer_notes {

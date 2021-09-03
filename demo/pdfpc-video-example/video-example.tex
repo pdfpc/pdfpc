@@ -5,7 +5,9 @@
 
 \usepackage{multimedia}
 
-\usepackage{hyperref}
+\definecolor{links}{HTML}{302080}
+\hypersetup{colorlinks,linkcolor=links,urlcolor=links}
+
 \usepackage[utf8]{inputenc}
 \usepackage{xspace}
 
@@ -130,17 +132,19 @@
     \item \opt{loop} or \opt{repeat} -- play the video in the loop;
     \item \opt{start=<time>s} -- skip the first \opt{<time>} seconds of the
            video;
-    \item \opt{duration=<time>s} -- let the video play for \opt{<time>} seconds.
+    \item \opt{duration=<time>s} -- let the video play for \opt{<time>} seconds;
+    \item \opt{poster} -- show the first frame of the video as the poster\\
+           (\alert{but there are caveats}, \hyperlink{posterPage}{see below}).
   \end{itemize}
     
-  \vspace{20pt}
+  \vfill
 
   E.g., 
   \begin{lstlisting}
     \movie[loop]{\includegraphics{poster}}{movie.avi}
   \end{lstlisting}
 
-  \vspace{10pt}
+  \vfill
   Switch to the next page to see it in action.
 \end{frame}
 
@@ -153,8 +157,90 @@
   \end{center}
 
   \singleitem{Once started, this video will play back in the loop}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The \opt{poster} option}
+  \hypertarget{posterPage}{}
+  There is a partial support for the \opt{poster} option. Note, however, that in
+  this case
+  \begin{itemize}
+    \item you must explicitly specify the \opt{width} and \opt{height}
+          dimensions in the correct aspect ratio of the video;
+    \item the poster will be rendered neither in the ``next slide''
+          preview nor in the ``overview'' mode.
+  \end{itemize}
+
+  \vspace{10pt}
+
+  E.g.,
+  \begin{lstlisting}
+    \movie[width=8cm,height=6cm,poster]{Some text}
+    {movie.avi}
+  \end{lstlisting}
+
+  \vfill
+  The next page is prepared in this manner.
 
 \end{frame}
+
+\begin{frame}
+  \frametitle{Example 3}
+
+  \vspace{10pt}
+  \begin{center}
+    \movie[width=0.68\textwidth,height=0.51\textwidth,poster]
+        {\framebox[0.68\textwidth][c]{A dummy text\rule{0pt}{0.50\textwidth}}}
+        {apollo17.avi}
+  \end{center}
+
+  \vfill
+  \singleitem{The poster is obtained from the video when the slide is shown.}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Hyperlink controls}
+
+  \pdfpc understands a special kind of hyperlinks to control a named video on
+  the {\em same} page.
+
+  \begin{itemize}
+    \item Such hyperlinks can be created using the \opt{hyperlinkmovie}
+          command.
+    \item The possible actions are \opt{play}, \opt{stop}, \opt{pause}, and
+          \opt{resume}.
+  \end{itemize}
+
+  \vspace{10pt}
+
+  E.g.,
+  \begin{lstlisting}
+    \movie[label=mymovie]
+        {\includegraphics{poster.png}}{movie.avi}
+    ...
+    \hyperlinkmovie[play]{mymovie}{Click to play!}
+  \end{lstlisting}
+
+  \vfill
+  See a demo on the next page.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example 4}
+  \vspace{10pt}
+  \begin{center}
+    \movie[label=apollo]{\includegraphics[width=0.7\textwidth]{apollo17.jpg}}{apollo17.avi}
+
+    \hyperlinkmovie[play]{apollo}{\fbox{\sc Play}}
+    \hyperlinkmovie[pause]{apollo}{\fbox{\sc Pause}}
+    \hyperlinkmovie[resume]{apollo}{\fbox{\sc Resume}}
+    \hyperlinkmovie[stop]{apollo}{\fbox{\sc Stop}}
+  \end{center}
+
+  \vfill
+  \singleitem{You can control the movie using the ``buttons'' below it.}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Subtitles}
@@ -168,7 +254,7 @@
   appending ``.srt'' to its path (or URL).
   
   \singleitem{There is also a respective \opt{pdfpcrc} option if you want to
-    make this the default behavior}
+    make this the default behavior.}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -199,7 +285,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Example 3}
+  \frametitle{Example 5}
 
   An example using the \opt{\textbackslash href\{run:\}} hack. The
   video is set to automatically start playing in the loop a fragment of the

@@ -42,6 +42,40 @@ namespace pdfpc {
         public Window.Fullscreen window { get; set; }
     }
 
+    protected struct PlaybackOptions {
+        /**
+         * A flag to indicate whether the movie should start automatically.
+         */
+        bool autostart;
+
+        /**
+         * A flag to indicate whether the movie should be played in a loop.
+         */
+        bool loop;
+
+        /**
+         * A flag to indicate whether the progress bar should be supressed.
+         */
+        bool noprogress;
+
+         /**
+         * A flag to indicate whether the audio should be played or not.
+         */
+        bool noaudio;
+
+        /**
+         * Show the first frame of the movie before playing.
+         */
+        bool poster;
+
+        /**
+         * Time, in second from the start of the movie, at which the playback
+         * should start and stop (stop = 0 means 'to the end').
+         */
+        int starttime;
+        int stoptime;
+    }
+
     /**
      * Make a non-NULL gstreamer element, or raise an error.
      */
@@ -70,37 +104,26 @@ namespace pdfpc {
         protected Gee.List<Gtk.Widget> sinks;
 
         /**
+         * A flag indicating that the video widget(s) are shown
+         */
+        protected bool shown = false;
+
+        public string filename {
+            get; protected set;
+        }
+
+        /**
+         * Cursors for various video states/subwidgets
+         */
+        protected Gdk.Cursor pause_cursor;
+        protected Gdk.Cursor play_cursor;
+        protected Gdk.Cursor drag_cursor;
+
+        /**
          * A flag to indicate when we've reached the End Of Stream, so we
          * know whether to restart on the next click.
          */
         protected bool eos = false;
-
-        /**
-         * A flag to indicate whether the movie should start automatically.
-         */
-        protected bool autostart = false;
-
-        /**
-         * A flag to indicate whether the movie should be played in a loop.
-         */
-        protected bool loop;
-
-        /**
-         * A flag to indicate whether the progress bar should be supressed.
-         */
-        protected bool noprogress = false;
-
-         /**
-         * A flag to indicate whether the audio should be played or not.
-         */
-        protected bool noaudio = false;
-
-        /**
-         * Time, in second from the start of the movie, at which the playback
-         * should start and stop (stop = 0 means 'to the end').
-         */
-        protected int starttime;
-        protected int stoptime;
 
         /**
          * If the movie was attached to the PDF file, we store it in a temporary
@@ -123,7 +146,6 @@ namespace pdfpc {
          */
         protected double scalex;
         protected double scaley;
-        protected int vheight;
 
         /**
          * The length of the movie, in nanoseconds (!).
@@ -131,9 +153,14 @@ namespace pdfpc {
         protected int64 duration;
 
         /**
-         * Settings for the appearance of the progress bar.
+         * The desired font size (in *video* pixels!)
          */
-        protected double seek_bar_height = 20;
+        protected double seek_bar_fontsize = 16;
+
+        /**
+         * Settings for the appearance of the progress bar (in screen pixels).
+         */
+        protected double seek_bar_height;
         protected double seek_bar_padding = 2;
 
         /**
@@ -146,10 +173,19 @@ namespace pdfpc {
         /**
          * The position where we switched to pause mode
          */
-        protected int64 paused_at = -1;
+        protected int64 paused_at = 0;
+
+        protected PlaybackOptions options;
 
         construct {
+            this.type = ActionType.MOVIE;
+
             this.sinks = new Gee.ArrayList<Gtk.Widget>();
+
+            var display = Gdk.Display.get_default();
+            this.pause_cursor = this.load_cursor(display, "pause_cur.svg");
+            this.play_cursor  = this.load_cursor(display, "play_cur.svg");
+            this.drag_cursor  = new Gdk.Cursor.from_name(display, "hand1");
         }
 
         ~ControlledMovie() {
@@ -169,36 +205,32 @@ namespace pdfpc {
                 return;
             }
 
-            // initial seek to set the starting point. *Cause the video to
-            // be displayed on the page*.
             movie.pipeline.set_state(Gst.State.PAUSED);
-            // waits until the pipeline is actually in PAUSED mode
+            // wait until the pipeline is actually in PAUSED mode
             movie.pipeline.get_state(null, null, Gst.CLOCK_TIME_NONE);
+
+            // initial seek to set the starting point
             movie.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
-                movie.starttime * Gst.SECOND);
+                movie.options.starttime*Gst.SECOND);
 
-            movie.hide();
-
-            if (movie.autostart) {
+            if (movie.options.autostart) {
                 movie.play();
+            } else if (!movie.options.poster) {
+                movie.hide();
             }
         }
 
         /**
          * Inits  the movie
          */
-        protected void init_movie(ActionMapping other, Poppler.Rectangle area,
-                PresentationController controller, Poppler.Document document,
-                string uri, string? suburi, bool autostart, bool loop, bool noprogress,
-                bool noaudio, int start = 0, int stop = 0, bool temp = false) {
-            other.init(area, controller, document);
-            ControlledMovie movie = (ControlledMovie) other;
-            movie.autostart = autostart;
-            movie.loop = loop;
-            movie.noprogress = noprogress;
-            movie.noaudio = noaudio;
-            movie.starttime = start;
-            movie.stoptime = stop;
+        protected void init_movie(ControlledMovie movie, Poppler.Rectangle area,
+                PresentationController controller,
+                string uri, string? suburi, PlaybackOptions options,
+                bool temp = false) {
+            movie.init(area, controller);
+
+            movie.options = options;
+
             movie.temp = temp ? uri.substring(7) : "";
 
 #if MOVIE_LOAD_ASYNC
@@ -219,17 +251,11 @@ namespace pdfpc {
          * movies in presentations.  As a bonus, a query string on the video
          * filename can activate the autostart and loop properties.  (E.g., link
          * to movie.avi?autostart&loop to make movie.avi start playing with the
-         * page is entered and loop back to the beginning when it reaches the end.)
-         *
-         * In LaTeX, create such links with
-         *      \usepackage{hyperref}
-         *      \href{run:<movie file>}{<placeholder content>}
-         * Since the video will take the shape of the placeholder content, you
-         * probably want to use a frame from the movie to get the right aspect
-         * ratio.
+         * page is entered and loop back to the beginning when it reaches the
+         * end.)
          */
-        public override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+        protected override ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
+                PresentationController controller) {
             if (mapping.action.type != Poppler.ActionType.LAUNCH) {
                 return null;
             }
@@ -242,19 +268,22 @@ namespace pdfpc {
                 querystring = splitfile[1];
             }
             string[] queryarray = querystring.split("&");
-            bool autostart = "autostart" in queryarray;
-            bool noaudio = "noaudio" in queryarray;
-            bool loop = "loop" in queryarray;
-            bool noprogress = "noprogress" in queryarray;
-            var start = 0;
-            var stop = 0;
+
+            options.autostart = "autostart" in queryarray;
+            options.loop = "loop" in queryarray;
+            options.noprogress = "noprogress" in queryarray;
+            options.noaudio = "noaudio" in queryarray;
+            options.poster = false;
+            options.starttime = 0;
+            options.stoptime = 0;
+
             string srtfile = null;
             foreach (string param in queryarray) {
                 if (param.has_prefix("start=")) {
-                    start = int.parse(param.split("=")[1]);
+                    options.starttime = int.parse(param.split("=")[1]);
                 }
                 if (param.has_prefix("stop=")) {
-                    stop = int.parse(param.split("=")[1]);
+                    options.stoptime = int.parse(param.split("=")[1]);
                 }
                 if (param.has_prefix("srtfile=")) {
                     srtfile = param.split("=")[1];
@@ -275,41 +304,33 @@ namespace pdfpc {
             }
 
             Type type = Type.from_instance(this);
-            ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, autostart, loop, noprogress, noaudio, start, stop);
+            ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
+            this.init_movie(new_obj, mapping.area, controller, uri,
+                suburi, options);
             return new_obj;
         }
 
         /**
          * Create a new Movie from an annotation mapping, if the annotation is a
-         * screen annotation with a video file or a movie annotation.  Various
+         * screen annotation with a video file or a movie annotation.  Some
          * options to modify the behavior of the playback are not yet supported,
          * since they're missing from poppler.
-         *
-         * In LaTeX, create screen annotations with
-         *      \usepackage{movie15}
-         *      \includemovie[text=<placeholder content>]{}{}{<movie file>}
-         * The movie size is determined by the size of the placeholder content, so
-         * a frame from the movie is a good choice.  Note that the poster, autoplay,
-         * and repeat options are not yet supported.  (Also note that movie15 is
-         * deprecated, but it works as long as you run ps2pdf with the -dNOSAFER flag.)
-         *
-         * In LaTeX, create movie annotations with
-         *      \usepackage{multimedia}
-         *      \movie[<options>]{<placeholder content>}{<movie file>}
-         * The movie size is determined from the size of the placeholder content or
-         * the width and height options.  Note that the autostart, loop/repeat, and
-         * poster options are not yet supported.
          */
-        public override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+        protected override ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
+                PresentationController controller) {
             Poppler.Annot annot = mapping.annot;
             string uri, suburi = null;
             bool temp = false;
-            bool noprogress = false;
-            bool loop = false;
-            int start = 0, stop = 0;
+            string file = null;
+
+            options.autostart = false;
+            options.loop = false;
+            options.noprogress = false;
+            options.noaudio = false;
+            options.poster = false;
+            options.starttime = 0;
+            options.stoptime = 0;
+
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
                 if (!("video" in annot.get_contents())) {
@@ -338,7 +359,7 @@ namespace pdfpc {
                     uri = "file://" + tmp_fn;
                     temp = true;
                 } else {
-                    string file = movie.get_filename();
+                    file = movie.get_filename();
                     if (file == null) {
                         GLib.printerr("Movie not embedded and has no file name\n");
                         return null;
@@ -350,23 +371,21 @@ namespace pdfpc {
 
             case Poppler.AnnotType.MOVIE:
                 var movie = ((Poppler.AnnotMovie) annot).get_movie();
-                if (movie.need_poster()) {
-                    GLib.printerr("Movie requests poster. Not yet supported.\n");
-                }
-                string file = movie.get_filename();
+                file = movie.get_filename();
                 if (file == null) {
                     GLib.printerr("Movie has no file name\n");
                     return null;
                 }
                 uri = filename_to_uri(file, controller.get_pdf_fname());
                 temp = false;
-                noprogress = !movie.show_controls();
+                options.poster = movie.need_poster();
+                options.noprogress = !movie.show_controls();
                 #if NEW_POPPLER
-                loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
-                start = (int) (movie.get_start()/1000000000L);
+                options.loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
+                options.starttime = (int) (movie.get_start()/1000000000L);
                 int duration = (int) (movie.get_duration()/1000000000L);
                 if (duration > 0) {
-                    stop = start + duration;
+                    options.stoptime = options.starttime + duration;
                 }
                 #endif
                 break;
@@ -376,16 +395,18 @@ namespace pdfpc {
             }
 
             Type type = Type.from_instance(this);
-            ActionMapping new_obj = (ActionMapping) GLib.Object.new(type);
-            this.init_movie(new_obj, mapping.area, controller, document, uri,
-                suburi, false, loop, noprogress, false, start, stop, temp);
+            ControlledMovie new_obj = (ControlledMovie) GLib.Object.new(type);
+            new_obj.filename = file;
+
+            this.init_movie(new_obj, mapping.area, controller, uri,
+                suburi, options, temp);
             return new_obj;
         }
 
         /**
          * When we leave the page, stop the movie and delete any temporary files.
          */
-        public override void deactivate() {
+        protected override void deactivate() {
             this.stop();
             if (this.temp != "") {
                 if (FileUtils.unlink(this.temp) != 0) {
@@ -400,12 +421,26 @@ namespace pdfpc {
         }
 
         /**
-         * Hide all video widegts (but receive events for it)
+         * Hide all video widegts (but receive events for them)
          */
         public void hide() {
             foreach (var sink in this.sinks) {
                 sink.set_opacity(0);
             }
+            this.shown = false;
+        }
+
+        private void update_cursor(Gdk.Window window) {
+            Gdk.Cursor cursor;
+            if (this.in_seek_bar) {
+                cursor = this.drag_cursor;
+            } else
+            if (this.paused_at >= 0) {
+                cursor = this.play_cursor;
+            } else {
+                cursor = this.pause_cursor;
+            }
+            window.set_cursor(cursor);
         }
 
         /**
@@ -413,18 +448,12 @@ namespace pdfpc {
          * Inside the progress bar, pause or stop the timeout, and start the
          * drag state.
          */
-        public override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+        protected override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
             if (this.pipeline == null) {
                 return false;
             }
 
-            Gst.State state;
-            Gst.ClockTime time = Gst.Util.get_timestamp();
-            this.pipeline.get_state(out state, null, time);
-            if (state == Gst.State.NULL) {
-                this.toggle_play();
-                return true;
-            }
+            this.update_cursor(event.window);
 
             this.set_mouse_in(event.x, event.y);
             if (!this.in_seek_bar) {
@@ -443,7 +472,9 @@ namespace pdfpc {
          * Stop the drag state and restart either playback or the timeout,
          * depending on the previous state.
          */
-        public bool on_button_release(Gdk.EventButton event) {
+        protected override bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
+            this.update_cursor(event.window);
+
             this.set_mouse_in(event.x, event.y);
             if (this.mouse_drag) {
                 var seek_time = this.mouse_seek(event.x, event.y);
@@ -455,10 +486,42 @@ namespace pdfpc {
                 }
             }
             this.mouse_drag = false;
-            return false;
+
+            return true;
         }
 
-        public override void on_freeze(bool frozen) {
+       /**
+         * Load a cursor
+         */
+        protected Gdk.Cursor load_cursor(Gdk.Display display, string filename) {
+            Gdk.Cursor cursor;
+            int size = 24;
+            var surface = Renderer.Image.render(filename, size, size);
+            if (surface != null) {
+                cursor = new Gdk.Cursor.from_surface(display, surface, 0, 0);
+            } else {
+                cursor = new Gdk.Cursor.from_name(display, "default");
+            }
+            return cursor;
+        }
+
+        /**
+         * Force refresh when not playing
+         */
+        protected void refresh() {
+            if (this.paused_at >= 0 || this.eos) {
+                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                    this.paused_at);
+            }
+        }
+
+        protected override void on_mouse_leave(Gtk.Widget widget, Gdk.EventMotion event) {
+            this.in_seek_bar = false;
+            this.mouse_drag = false;
+            this.refresh();
+        }
+
+        protected override void on_freeze(bool frozen) {
             // if a video was forcefully hidden but we're no longer in the
             // freeze mode, show it and clear the respective flag
             foreach (var sink in this.sinks) {
@@ -478,21 +541,22 @@ namespace pdfpc {
         public void on_draw(Gst.Element overlay, Cairo.Context cr, uint64 timestamp,
                 uint64 duration) {
             // Transform to work from bottom left, in screen coordinates
-            cr.translate(0, this.vheight);
+            cr.translate(0, this.video_h);
             cr.scale(this.scalex, -this.scaley);
 
             this.draw_seek_bar(cr, timestamp);
 
             // if a stop time is defined, stop there (but still let
             // the user manually seek *after* this timestamp)
-            if (this.stoptime != 0 &&
-                this.stoptime * Gst.SECOND < timestamp &&
-                timestamp < (this.stoptime + 0.2) * Gst.SECOND) {
-                if (this.loop) {
+            if (this.options.stoptime != 0 &&
+                this.options.stoptime * Gst.SECOND < timestamp &&
+                timestamp < (this.options.stoptime + 0.2) * Gst.SECOND) {
+                if (this.options.loop) {
                     // attempting to seek from this callback fails, so we
                     // must schedule a seek on next idle time.
                     GLib.Idle.add(() => {
-                        this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                        this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                            this.options.starttime*Gst.SECOND);
                         return false;
                     });
                 } else {
@@ -510,9 +574,9 @@ namespace pdfpc {
         public void on_gst_message(Gst.Message message) {
             switch (message.type) {
             case Gst.MessageType.EOS:
-                if (this.loop) {
+                if (this.options.loop) {
                     this.pipeline.seek_simple(Gst.Format.TIME,
-                        Gst.SeekFlags.FLUSH, this.starttime*Gst.SECOND);
+                        Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
                 } else {
                     // Can't seek to beginning w/o updating output,
                     // so mark to seek later
@@ -536,12 +600,15 @@ namespace pdfpc {
         /**
          * Seek if we're dragging the progress bar.
          */
-        public bool on_motion(Gdk.EventMotion event) {
+        protected override bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
             this.set_mouse_in(event.x, event.y);
+
+            this.update_cursor(event.window);
+
             if (this.mouse_drag) {
                 this.mouse_seek(event.x, event.y);
-            } else if (this.paused_at >= 0 || this.eos) {
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.paused_at);
+            } else {
+                this.refresh();
             }
 
             return false;
@@ -559,7 +626,8 @@ namespace pdfpc {
             this.video_h = info.height;
             this.scalex = (double) this.video_w/rect.width;
             this.scaley = (double) this.video_h/rect.height;
-            this.vheight = this.video_h;
+            this.seek_bar_height = (this.seek_bar_fontsize +
+                2*seek_bar_padding)/this.scaley;
 
             overlay.query_duration(Gst.Format.TIME, out duration);
         }
@@ -574,14 +642,15 @@ namespace pdfpc {
                     sink.set_opacity(1);
                 }
             }
+            this.shown = true;
         }
 
         protected void draw_seek_bar(Cairo.Context cr, uint64 timestamp) {
-            double start = (double) this.starttime*Gst.SECOND / this.duration;
-            double stop = (double) this.stoptime*Gst.SECOND / this.duration;
+            double start = (double) options.starttime*Gst.SECOND/this.duration;
+            double stop = (double) options.stoptime*Gst.SECOND/this.duration;
 
             // special case: only starttime is defined
-            if (this.starttime != 0 && this.stoptime == 0) {
+            if (options.starttime != 0 && options.stoptime == 0) {
                 stop = 1.0;
             }
 
@@ -638,7 +707,7 @@ namespace pdfpc {
                 cr.show_text(timestring);
                 cr.restore();
 
-            } else if (this.noprogress == false) {
+            } else if (this.options.noprogress == false) {
                 cr.rectangle(0, 0, rect.width, 4);
                 cr.set_source_rgba(0, 0, 0, 0.8);
                 cr.fill();
@@ -701,15 +770,6 @@ namespace pdfpc {
                     Gst.Element ad_element = this.add_video_control(queue, bin,
                         conf.rect);
                     ad_element.link(sink);
-
-                    video_area.add_events(
-                          Gdk.EventMask.BUTTON_PRESS_MASK
-                        | Gdk.EventMask.BUTTON_RELEASE_MASK
-                        | Gdk.EventMask.POINTER_MOTION_MASK
-                    );
-                    video_area.motion_notify_event.connect(this.on_motion);
-                    video_area.button_press_event.connect(this.on_button_press);
-                    video_area.button_release_event.connect(this.on_button_release);
                 } else {
                     queue.link(sink);
                 }
@@ -736,6 +796,8 @@ namespace pdfpc {
                             this.rect = rect;
                             this.scalex = (double) this.video_w/rect.width;
                             this.scaley = (double) this.video_h/rect.height;
+                            this.seek_bar_height = (this.seek_bar_fontsize +
+                                2*seek_bar_padding)/this.scaley;
                         }
                         video_surface.resize_video(video_area, rect);
                     });
@@ -756,7 +818,7 @@ namespace pdfpc {
             this.pipeline.set("subtitle-font-desc", @"Sans, $subsize");
             this.pipeline.set("force_aspect_ratio", false);  // Else overrides last overlay
             this.pipeline.set("video_sink", bin);
-            this.pipeline.set("mute", this.noaudio);
+            this.pipeline.set("mute", this.options.noaudio);
 
             Gst.Bus bus = this.pipeline.get_bus();
             bus.add_signal_watch();
@@ -825,6 +887,8 @@ namespace pdfpc {
          * Seek to the time indicated by the mouse position on the progress bar.
          */
         protected int64 mouse_seek(double x, double y) {
+            // shift by the widget offset
+            x -= rect.x;
             double seek_fraction = (x - this.seek_bar_padding) / (rect.width -
                 2 * this.seek_bar_padding);
             if (seek_fraction < 0) {
@@ -842,10 +906,25 @@ namespace pdfpc {
         }
 
         /**
+         * Set a flag about whether the mouse is currently in the progress bar.
+         */
+        private void set_mouse_in(double x, double y) {
+            // shift coordinates by the widget offsets
+            x -= this.rect.x;
+            y -= this.rect.y;
+            this.in_seek_bar =
+                this.shown &&
+                x > 0 &&
+                x < this.rect.width &&
+                y > this.rect.height - this.seek_bar_height &&
+                y < this.rect.height;
+        }
+
+        /**
          * Play the movie, rewinding to the beginning if we had reached the
          * end.
          */
-        protected void play() {
+        public void play() {
             // force showing the widgets
             this.show();
 
@@ -853,7 +932,8 @@ namespace pdfpc {
 
             if (this.eos) {
                 this.eos = false;
-                this.pipeline.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, this.starttime * Gst.SECOND);
+                this.pipeline.seek_simple(Gst.Format.TIME,
+                    Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
             }
             this.pipeline.set_state(Gst.State.PLAYING);
         }
@@ -861,7 +941,7 @@ namespace pdfpc {
         /**
          * Pause playback.
          */
-        protected void pause() {
+        public void pause() {
             this.pipeline.set_state(Gst.State.PAUSED);
 
             this.pipeline.query_position(Gst.Format.TIME, out this.paused_at);
@@ -871,14 +951,13 @@ namespace pdfpc {
         }
 
         /**
-         * Set a flag about whether the mouse is currently in the progress bar.
+         * Rewind.
          */
-        private void set_mouse_in(double x, double y) {
-            this.in_seek_bar =
-                x > 0 &&
-                x < this.rect.width &&
-                y > this.rect.height - this.seek_bar_height &&
-                y < this.rect.height;
+        public void rewind() {
+            this.paused_at = this.options.starttime*Gst.SECOND;
+            this.mouse_drag = false;
+            this.pipeline.seek_simple(Gst.Format.TIME,
+                Gst.SeekFlags.FLUSH, this.options.starttime*Gst.SECOND);
         }
 
         /**

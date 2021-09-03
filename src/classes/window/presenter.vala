@@ -921,61 +921,21 @@ namespace pdfpc.Window {
         }
 
        /**
-         * Load an (SVG) icon, replacing a substring in it in special cases
+         * Load an icon (essentially, a quadratic image)
          */
-        protected Gtk.Image load_icon(string filename, int icon_height) {
-            // attempt to load from a local path (if the user hasn't installed)
-            // if that fails, attempt to load from the global path
-            string load_icon_path;
-            if (Options.no_install) {
-                load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons",
-                    filename);
-            } else {
-                load_icon_path = Path.build_filename(Paths.SHARE_PATH, "icons",
-                    filename);
-            }
-            File icon_file = File.new_for_path(load_icon_path);
-
+        protected Gtk.Image load_icon(string filename, int size) {
             Gtk.Image icon;
-            try {
-                int width = icon_height;
-                int height = icon_height;
-
-                if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
-                    width *= this.gdk_scale;
-                    height *= this.gdk_scale;
-                }
-
-                Gdk.Pixbuf pixbuf;
-                if (filename == "highlight.svg") {
-                    uint8[] contents;
-                    string etag_out;
-                    icon_file.load_contents(null, out contents, out etag_out);
-
-                    string buf = (string) contents;
-                    buf = buf.replace("pointer_color", Options.pointer_color);
-
-                    MemoryInputStream stream =
-                        new MemoryInputStream.from_data(buf.data);
-
-                    pixbuf = new Gdk.Pixbuf.from_stream_at_scale(stream,
-                        width, height, true);
-                } else {
-                    pixbuf = new Gdk.Pixbuf.from_file_at_scale(load_icon_path,
-                        width, height, true);
-                }
-
-                Cairo.Surface surface =
-                    Gdk.cairo_surface_create_from_pixbuf(pixbuf, 0, null);
-
+            if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
+                size *= this.gdk_scale;
+            }
+            var surface = Renderer.Image.render(filename, size, size);
+            if (surface != null) {
                 icon = new Gtk.Image.from_surface(surface);
-                icon.no_show_all = true;
-            } catch (Error e) {
-                GLib.printerr("Warning: Could not load icon %s (%s)\n",
-                    load_icon_path, e.message);
+            } else {
                 icon = new Gtk.Image.from_icon_name("image-missing",
                     Gtk.IconSize.LARGE_TOOLBAR);
             }
+            icon.no_show_all = true;
             return icon;
         }
 

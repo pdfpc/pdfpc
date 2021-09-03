@@ -91,7 +91,7 @@ namespace pdfpc {
             Timer timer = new Timer();
 
             // Retrieve the Poppler.Page for the page to render
-            var page = metadata.get_document().get_page(slide_number);
+            var page = metadata.document.get_page(slide_number);
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.

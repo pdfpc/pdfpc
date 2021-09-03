@@ -25,6 +25,13 @@ namespace pdfpc {
      * Base action mapping, encapsulating actions that result from links or annotations.
      */
     public abstract class ActionMapping: GLib.Object {
+        public enum ActionType {
+            LINK,
+            MOVIE
+        }
+
+        public ActionType type;
+
         /**
          * The area on the PDF page associated with the action.
          */
@@ -34,11 +41,6 @@ namespace pdfpc {
          * The presentation controller, which is probably needed to execute actions.
          */
         protected PresentationController controller;
-
-        /**
-         * The PDF document in question.
-         */
-        protected Poppler.Document document;
 
         /**
          * Constructors of ActionMapping classes shouldn't actually do much.  These
@@ -55,11 +57,10 @@ namespace pdfpc {
         /**
          * Instead of in the constructor, most setup is done in the init method.
          */
-        public virtual void init(Poppler.Rectangle area, PresentationController controller,
-                Poppler.Document document) {
+        public virtual void init(Poppler.Rectangle area,
+            PresentationController controller) {
             this.area = area;
             this.controller = controller;
-            this.document = document;
         }
 
         /**
@@ -69,7 +70,7 @@ namespace pdfpc {
          * to figure out if you're in a subclass.
          */
         public virtual ActionMapping? new_from_link_mapping(Poppler.LinkMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             return null;
         }
 
@@ -78,7 +79,7 @@ namespace pdfpc {
          * return null if this class doesn't handle this type of AnnotMapping.
          */
         public virtual ActionMapping? new_from_annot_mapping(Poppler.AnnotMapping mapping,
-                PresentationController controller, Poppler.Document document) {
+                PresentationController controller) {
             return null;
         }
 
@@ -86,27 +87,37 @@ namespace pdfpc {
          * Override this method to get notified of the mouse entering the area.
          */
         public virtual void on_mouse_enter(Gtk.Widget widget, Gdk.EventMotion event) {
-            // Set the cursor to the X11 theme default link cursor
-            event.window.set_cursor(
-                new Gdk.Cursor.from_name(Gdk.Display.get_default(), "hand2")
-            );
+            return;
         }
 
         /**
          * Override this method to get notified of the mouse exiting the area.
          */
         public virtual void on_mouse_leave(Gtk.Widget widget, Gdk.EventMotion event) {
-            // Restore the cursor to its default state (The parent cursor
-            // configuration is used)
-            event.window.set_cursor(null);
+            return;
         }
 
         /**
-         * Handle mouse press events in the area.  Return true to indicate that
-         * the event was handled (and therefore we should not advance to the next
-         * page.
+         * Handle mouse press/release/motion events in the area. Return true to
+         * indicate that the event has been handled.
          */
-        public abstract bool on_button_press(Gtk.Widget widget, Gdk.EventButton event);
+        public virtual bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
+            return false;
+        }
+        public virtual bool on_button_release(Gtk.Widget widget, Gdk.EventButton event) {
+            return false;
+        }
+        public virtual bool on_mouse_move(Gtk.Widget widget, Gdk.EventMotion event) {
+            return false;
+        }
+
+        /**
+         * By default, all mappings are active only in the normal mode.
+         * Override to change this (probably, there will never be a need).
+         */
+        public virtual bool is_sensitive() {
+            return this.controller.in_normal_mode();
+        }
 
         /**
          * Override this method to get notified of the freeze toggle events.
