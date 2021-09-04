@@ -70,6 +70,7 @@ bind C+t                resetTimer
 bind C+n                note
 bind C+o                overlay
 bind C+e                endSlide
+bind C+h                toggleHidden
 
 # Annotation modes
 bind 1                  switchMode normal

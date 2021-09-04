@@ -390,7 +390,11 @@ namespace pdfpc.Window {
             // draw slide number
             var layout = Pango.cairo_create_layout(cr);
             layout.set_font_description(this.font_description);
-            layout.set_text(@"$(slide_id + 1)", -1);
+            if (this.metadata.get_user_slide_hidden(slide_id)) {
+                layout.set_markup(@"<s>$(slide_id + 1)</s>", -1);
+            } else {
+                layout.set_text(@"$(slide_id + 1)", -1);
+            }
             layout.set_width(cell_area.width);
             layout.set_alignment(Pango.Alignment.CENTER);
 
