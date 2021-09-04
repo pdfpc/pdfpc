@@ -69,7 +69,8 @@ namespace pdfpc.Metadata {
 
 
     public errordomain MetaFileError {
-        INVALID_FORMAT
+        INVALID_FORMAT,
+        UNSUPPORTED_VERSION
     }
 
     /**
@@ -124,7 +125,7 @@ namespace pdfpc.Metadata {
         /**
          * Current version of the .pdfpc format
          */
-        protected int format_version = 1;
+        protected int format_version = 2;
 
         /**
          * Flag that the .pdfpc metadata have been modified by user, either
@@ -472,8 +473,8 @@ namespace pdfpc.Metadata {
                     case "pdfpcFormat":
 			int format = (int) item.get_int();
                         // In future, parse depending on the version
-                        if (format != this.format_version) {
-                            throw new MetaFileError.INVALID_FORMAT(
+                        if (format > this.format_version) {
+                            throw new MetaFileError.UNSUPPORTED_VERSION(
                                 "Unsupported pdfpc format version %d", format);
                         }
 			break;
@@ -1045,9 +1046,14 @@ namespace pdfpc.Metadata {
                     parse_pdfpc_file();
                 } catch (GLib.Error e) {
                     GLib.printerr("%s\n", e.message);
-                    // Try old-style format
-                    parse_pdfpc_file_old(out notes_content_old, out skip_line_old);
-                    old_pdfpc = true;
+                    if (e.code == MetaFileError.UNSUPPORTED_VERSION) {
+                        Process.exit(1);
+                    } else {
+                        // Try old-style format
+                        parse_pdfpc_file_old(out notes_content_old,
+                            out skip_line_old);
+                        old_pdfpc = true;
+                    }
                 }
             }
 
