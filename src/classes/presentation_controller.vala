@@ -1183,6 +1183,10 @@ namespace pdfpc {
                 "Jump to the first overlay of the current slide");
             add_action("prevOverlay", this.previous_user_page,
                 "Jump back outside of the current overlay");
+            add_action("nextForced", this.next_page_forced,
+                "Go to the next slide, even if it is hidden");
+            add_action("prevForced", this.previous_page_forced,
+                "Go to the previous slide, even if it is hidden");
 
             add_action("goto", this.controllables_ask_goto_page,
                 "Ask for a page to jump to");
@@ -1655,6 +1659,15 @@ namespace pdfpc {
         }
 
         /**
+         * Go to the next slide, ignoring the "hidden" attribute
+         */
+        public void next_page_forced() {
+            var new_slide_number = this.current_slide_number + 1;
+
+            this.switch_to_slide_number(new_slide_number);
+        }
+
+        /**
          * Go to the next user slide
          */
         public void next_user_page() {
@@ -1702,6 +1715,15 @@ namespace pdfpc {
             var new_slide_number = this.current_slide_number - 1;
 
             new_slide_number = metadata.nearest_nonhidden(new_slide_number, true);
+            this.switch_to_slide_number(new_slide_number);
+        }
+
+        /**
+         * Go to the previous slide, ignoring the "hidden" attribute
+         */
+        public void previous_page_forced() {
+            var new_slide_number = this.current_slide_number - 1;
+
             this.switch_to_slide_number(new_slide_number);
         }
 

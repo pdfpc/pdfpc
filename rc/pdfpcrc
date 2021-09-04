@@ -25,6 +25,10 @@ bind S+Up               firstOverlay
 bind S+Right            next10
 bind S+Left             prev10
 
+# Incremental movement ignoring the "hidden" attribute
+bind S+n                nextForced
+bind S+p                prevForced
+
 # Jumps
 bind Home               gotoFirst
 bind End                gotoLast
