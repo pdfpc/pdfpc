@@ -149,13 +149,14 @@ namespace pdfpc {
             // the pre-render loop
             int* p_slide = null;
 
+            var metadata = this.get_metadata();
+
             int first_page = this.current_slide_number + 1;
+            first_page = metadata.nearest_nonhidden(first_page);
             if (first_page >= this.n_slides) {
                 // nothing to pre-render
                 return GLib.Source.REMOVE;
             }
-
-            var metadata = this.get_metadata();
 
             int last_slide;
             if (this.user_slides) {
@@ -195,6 +196,7 @@ namespace pdfpc {
                 // Increment one slide for each call and stop the loop if we
                 // have reached the last slide
                 *p_slide = *p_slide + 1;
+                *p_slide = metadata.nearest_nonhidden(*p_slide);
                 if (*p_slide > last_slide) {
                     free(p_slide);
                     return GLib.Source.REMOVE;
