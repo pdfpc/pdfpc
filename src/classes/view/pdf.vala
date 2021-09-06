@@ -311,11 +311,15 @@ namespace pdfpc {
                     return;
                 }
 
+                var metadata = this.get_metadata();
                 bool trans_inverse = false;
                 bool sequential_move = false;
-                if (slide_number == this.current_slide_number + 1) {
+                if (slide_number ==
+                    metadata.nearest_nonhidden(this.current_slide_number + 1)) {
                     sequential_move = true;
-                } else if (slide_number + 1 == this.current_slide_number) {
+                } else if (slide_number ==
+                    metadata.nearest_nonhidden(this.current_slide_number - 1,
+                        true)) {
                     sequential_move = true;
                     trans_inverse = true;
                 }
@@ -376,7 +380,6 @@ namespace pdfpc {
 
                 if (!this.disabled && this.transitions_enabled &&
                     sequential_move && previous_slide != null) {
-                    var metadata = this.get_metadata();
                     transman = new View.TransitionManager(metadata,
                         trans_slide_number, previous_slide, this.current_slide,
                         trans_inverse);
