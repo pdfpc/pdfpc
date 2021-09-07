@@ -594,6 +594,8 @@ namespace pdfpc {
                     GLib.printerr("  (debugging info: %s)\n", debug_info);
                 }
                 break;
+            default:
+                break;
             }
         }
 
