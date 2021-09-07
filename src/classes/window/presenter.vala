@@ -1016,20 +1016,24 @@ namespace pdfpc.Window {
                 next_view_user_slide++;
             }
 
-            var next_slide_number =
+            var view_slide_number =
                 this.metadata.user_slide_to_real_slide(next_view_user_slide);
-            this.next_view.disabled = (next_slide_number < 0);
-            this.next_view.display(next_slide_number);
+            view_slide_number = metadata.nearest_nonhidden(view_slide_number);
+            this.next_view.disabled = (view_slide_number < 0);
+            this.next_view.display(view_slide_number);
 
-            next_slide_number =
+            view_slide_number =
                 this.metadata.next_in_overlay(current_slide_number);
-            this.strict_next_view.disabled = (next_slide_number < 0);
-            this.strict_next_view.display(next_slide_number);
+            view_slide_number = metadata.nearest_nonhidden(view_slide_number);
+            this.strict_next_view.disabled = (view_slide_number < 0);
+            this.strict_next_view.display(view_slide_number);
 
-            var prev_slide_number =
+            view_slide_number =
                 this.metadata.prev_in_overlay(current_slide_number);
-            this.strict_prev_view.disabled = (prev_slide_number < 0);
-            this.strict_prev_view.display(prev_slide_number);
+            view_slide_number = metadata.nearest_nonhidden(view_slide_number,
+                true);
+            this.strict_prev_view.disabled = (view_slide_number < 0);
+            this.strict_prev_view.display(view_slide_number);
 
             if (this.metadata.has_beamer_notes) {
                 this.notes_stack.set_visible_child_name("view");

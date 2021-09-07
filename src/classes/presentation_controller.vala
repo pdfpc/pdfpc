@@ -112,6 +112,7 @@ namespace pdfpc {
             }
 
             var next_slide = this.current_slide_number + 1;
+            next_slide = metadata.nearest_nonhidden(next_slide);
             if (duration > 0) {
                 this.autoadvance_timeout_id =
                     GLib.Timeout.add((int) (1000*duration), () => {
@@ -1186,6 +1187,10 @@ namespace pdfpc {
                 "Jump to the first overlay of the current slide");
             add_action("prevOverlay", this.previous_user_page,
                 "Jump back outside of the current overlay");
+            add_action("nextForced", this.next_page_forced,
+                "Go to the next slide, even if it is hidden");
+            add_action("prevForced", this.previous_page_forced,
+                "Go to the previous slide, even if it is hidden");
 
             add_action("goto", this.controllables_ask_goto_page,
                 "Ask for a page to jump to");
@@ -1231,6 +1236,8 @@ namespace pdfpc {
 
             add_action("overlay", this.add_overlay,
                 "Mark the current slide as an overlay slide");
+            add_action("toggleHidden", this.toggle_hidden,
+                "Toggle the hidden flag of the current slide");
             add_action("note", this.controllables_edit_note,
                 "Edit notes for the current slide");
             add_action("endSlide", this.set_end_user_slide,
@@ -1651,6 +1658,16 @@ namespace pdfpc {
         public void next_page() {
             var new_slide_number = this.current_slide_number + 1;
 
+            new_slide_number = metadata.nearest_nonhidden(new_slide_number);
+            this.switch_to_slide_number(new_slide_number);
+        }
+
+        /**
+         * Go to the next slide, ignoring the "hidden" attribute
+         */
+        public void next_page_forced() {
+            var new_slide_number = this.current_slide_number + 1;
+
             this.switch_to_slide_number(new_slide_number);
         }
 
@@ -1665,6 +1682,7 @@ namespace pdfpc {
                 new_slide_number = (int) this.n_slides - 1;
             }
 
+            new_slide_number = metadata.nearest_nonhidden(new_slide_number);
             this.switch_to_slide_number(new_slide_number);
         }
 
@@ -1700,6 +1718,16 @@ namespace pdfpc {
         public void previous_page() {
             var new_slide_number = this.current_slide_number - 1;
 
+            new_slide_number = metadata.nearest_nonhidden(new_slide_number, true);
+            this.switch_to_slide_number(new_slide_number);
+        }
+
+        /**
+         * Go to the previous slide, ignoring the "hidden" attribute
+         */
+        public void previous_page_forced() {
+            var new_slide_number = this.current_slide_number - 1;
+
             this.switch_to_slide_number(new_slide_number);
         }
 
@@ -1709,6 +1737,7 @@ namespace pdfpc {
         public void previous_user_page() {
             var new_slide_number = this.metadata.user_slide_to_real_slide(this.current_user_slide_number - 1);
 
+            new_slide_number = metadata.nearest_nonhidden(new_slide_number, true);
             this.switch_to_slide_number(new_slide_number);
         }
 
@@ -1771,6 +1800,7 @@ namespace pdfpc {
             var new_user_slide_number = int.min(this.current_user_slide_number + 10, this.user_n_slides - 1);
             var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
+            new_slide_number = metadata.nearest_nonhidden(new_slide_number);
             this.switch_to_slide_number(new_slide_number);
         }
 
@@ -1781,6 +1811,7 @@ namespace pdfpc {
             var new_user_slide_number = int.max(this.current_user_slide_number - 10, 0);
             var new_slide_number = this.metadata.user_slide_to_real_slide(new_user_slide_number);
 
+            new_slide_number = metadata.nearest_nonhidden(new_slide_number, true);
             this.switch_to_slide_number(new_slide_number);
         }
 
@@ -1933,6 +1964,19 @@ namespace pdfpc {
                 } else {
                     this.overview.set_n_slides(this.user_n_slides);
                 }
+                this.controllables_update();
+            }
+        }
+
+        /**
+         * Toggle the hidden flag of the current slide
+         */
+        protected void toggle_hidden() {
+            bool hidden = this.metadata.get_slide_hidden(current_slide_number);
+            int offset = this.metadata.set_slide_hidden(current_slide_number,
+                !hidden);
+            if (offset != 0) {
+                this.switch_to_slide_number(current_slide_number + offset);
                 this.controllables_update();
             }
         }

@@ -381,16 +381,28 @@ namespace pdfpc.Window {
                 cr.scale(1.0/scale_factor, 1.0/scale_factor);
             }
 
+            bool hidden = this.metadata.get_user_slide_hidden(slide_id);
+
             if ((flags & Gtk.CellRendererState.SELECTED) == 0) {
                 cr.rectangle(cell_area.x, cell_area.y, cell_area.width, cell_area.height);
-                cr.set_source_rgba(0, 0, 0, 0.4);
+                double alpha;
+                if (hidden) {
+                    alpha = 0.7;
+                } else {
+                    alpha = 0.4;
+                }
+                cr.set_source_rgba(0, 0, 0, alpha);
                 cr.fill();
             }
 
             // draw slide number
             var layout = Pango.cairo_create_layout(cr);
             layout.set_font_description(this.font_description);
-            layout.set_text(@"$(slide_id + 1)", -1);
+            if (hidden) {
+                layout.set_markup(@"<s>$(slide_id + 1)</s>", -1);
+            } else {
+                layout.set_text(@"$(slide_id + 1)", -1);
+            }
             layout.set_width(cell_area.width);
             layout.set_alignment(Pango.Alignment.CENTER);
 
@@ -398,11 +410,7 @@ namespace pdfpc.Window {
             layout.get_pixel_extents(null, out logical_extent);
             cr.move_to(cell_area.x + (cell_area.width / 2), cell_area.y + (cell_area.height / 2) - (logical_extent.height / 2));
 
-            if ((flags & Gtk.CellRendererState.SELECTED) == 0) {
-                cr.set_source_rgba(0.7, 0.7, 0.7, 0.7);
-            } else {
-                cr.set_source_rgba(0.7, 0.7, 0.7, 0.2);
-            }
+            cr.set_source_rgba(0.7, 0.7, 0.7, 0.7);
 
             Pango.cairo_show_layout(cr, layout);
         }

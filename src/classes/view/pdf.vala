@@ -149,13 +149,14 @@ namespace pdfpc {
             // the pre-render loop
             int* p_slide = null;
 
+            var metadata = this.get_metadata();
+
             int first_page = this.current_slide_number + 1;
+            first_page = metadata.nearest_nonhidden(first_page);
             if (first_page >= this.n_slides) {
                 // nothing to pre-render
                 return GLib.Source.REMOVE;
             }
-
-            var metadata = this.get_metadata();
 
             int last_slide;
             if (this.user_slides) {
@@ -195,6 +196,7 @@ namespace pdfpc {
                 // Increment one slide for each call and stop the loop if we
                 // have reached the last slide
                 *p_slide = *p_slide + 1;
+                *p_slide = metadata.nearest_nonhidden(*p_slide);
                 if (*p_slide > last_slide) {
                     free(p_slide);
                     return GLib.Source.REMOVE;
@@ -309,11 +311,15 @@ namespace pdfpc {
                     return;
                 }
 
+                var metadata = this.get_metadata();
                 bool trans_inverse = false;
                 bool sequential_move = false;
-                if (slide_number == this.current_slide_number + 1) {
+                if (slide_number ==
+                    metadata.nearest_nonhidden(this.current_slide_number + 1)) {
                     sequential_move = true;
-                } else if (slide_number + 1 == this.current_slide_number) {
+                } else if (slide_number ==
+                    metadata.nearest_nonhidden(this.current_slide_number - 1,
+                        true)) {
                     sequential_move = true;
                     trans_inverse = true;
                 }
@@ -374,7 +380,6 @@ namespace pdfpc {
 
                 if (!this.disabled && this.transitions_enabled &&
                     sequential_move && previous_slide != null) {
-                    var metadata = this.get_metadata();
                     transman = new View.TransitionManager(metadata,
                         trans_slide_number, previous_slide, this.current_slide,
                         trans_inverse);

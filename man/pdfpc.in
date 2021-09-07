@@ -160,6 +160,12 @@ Go forward 10 slides
 .B Shift + Left cursor key / 3rd mouse button / Mouse wheel up
 Go back 10 slides
 .TP
+.B Shift + n
+Go forward 1 slide irrespectively of its "hidden" attribute
+.TP
+.B Shift + p
+Go backward 1 slide irrespectively of its "hidden" attribute
+.TP
 .B Home
 Go to the first slide
 .TP
@@ -244,7 +250,11 @@ Pause timer
 Reset timer
 .TP
 .B Ctrl + o
-Toggle the overlay flag for one particular slide (see Overlays
+Toggle the overlay flag for one particular slide (see \fBOverlays\fR
+below)
+.TP
+.B Ctrl + h
+Toggle the hidden attribute for the current slide (see \fBHidden slides\fR
 below)
 .TP
 .B Ctrl + e
@@ -424,6 +434,16 @@ with pdflatex).  If your preferred slide-producing method does not work
 correctly with this detection, you can supply this information using the \[aq]Ctrl + o\[aq] key
 for each slide that is part of an overlay (except the first one!).  The page
 numbering is also adapted.  This information is automatically stored.
+
+.SS Hidden slides
+.PP
+When preparing presentation from an existing set of slides, it is sometimes
+helpful to mark certain slides to be skipped during the talk. The \[aq]Ctrl +
+h\[aq] combination toggles the "hidden" attribute of the current slide, making
+it essentially invisible. It is still possible to navigate to a hidden slide
+either in the \fBOverview\fR mode, using the Goto action (\[aq]g\[aq]), or
+by hitting \[aq]Shift + n\[aq] or \[aq]Shift + p\[aq] to switch to the
+next/previous slide, respectively, ignoring the "hidden" attribute.
 
 .SS End slide
 .PP
