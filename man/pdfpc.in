@@ -634,10 +634,9 @@ Bugs can be reported at
 
 .SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by
-.URL https://github.com/davvil/pdfpc "davvil" .
-
-pdfpc is a fork of Pdf Presenter Console, available
-.URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "online" .
+.URL https://github.com/davvil/pdfpc "David Vilar" ,
+which in turn was a fork of Jakob Westhoff's PDF Presenter Console
+.URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "" .
 
 .SH SEE ALSO
 .PP
