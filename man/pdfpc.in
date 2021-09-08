@@ -632,11 +632,6 @@ $ texdoc pdfpc
 Bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "our issue tracker" .
 
-.PP
-The LaTeX package "hyperref" produces buggy results when using with
-beamer notes. It is recommended to use the "multimedia" package
-instead.
-
 .SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by
 .URL https://github.com/davvil/pdfpc "davvil" .
