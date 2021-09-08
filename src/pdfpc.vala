@@ -431,23 +431,21 @@ namespace pdfpc {
                     new Window.Presenter(this.controller,
                         presenter_monitor, presenter_windowed);
 
+                this.controller.presenter.show.connect(() => {
+                    this.controller.presenter.update();
+                });
+                this.controller.presenter.show_all();
             }
             if (!single_screen_mode || Options.display_switch) {
                 this.controller.presentation =
                     new Window.Presentation(this.controller,
                         presentation_monitor, presentation_windowed,
                         width, height);
-            }
 
-            // The windows are always displayed at last to be sure all caches
-            // have been created at this point.
-            if (this.controller.presentation != null) {
+                this.controller.presentation.show.connect(() => {
+                    this.controller.presentation.update();
+                });
                 this.controller.presentation.show_all();
-                this.controller.presentation.update();
-            }
-            if (this.controller.presenter != null) {
-                this.controller.presenter.show_all();
-                this.controller.presenter.update();
             }
 
             if (Options.page_hnum >= 1 &&
@@ -484,8 +482,10 @@ namespace pdfpc {
                                     new Window.Presentation(controller,
                                         i, presentation_windowed,
                                         width, height);
+                                controller.presentation.show.connect(() => {
+                                    controller.presentation.update();
+                                });
                                 controller.presentation.show_all();
-                                controller.presentation.update();
                                 break;
                             }
                         }
