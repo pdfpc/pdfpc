@@ -291,10 +291,16 @@ namespace pdfpc {
                     Options.prerender_slides = int.parse(fields[2]);
                     break;
                 case "presentation-screen":
-                    Options.presentation_screen = fields[2];
+                    // Don't override command-line setting
+                    if (Options.presentation_screen == null) {
+                        Options.presentation_screen = fields[2];
+                    }
                     break;
                 case "presenter-screen":
-                    Options.presenter_screen = fields[2];
+                    // Don't override command-line setting
+                    if (Options.presenter_screen == null) {
+                        Options.presenter_screen = fields[2];
+                    }
                     break;
 #if REST
                 case "rest-https":
