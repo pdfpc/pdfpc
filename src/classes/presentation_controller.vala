@@ -1543,20 +1543,24 @@ namespace pdfpc {
         public bool scroll(Gdk.EventScroll scroll) {
             if (!this.ignore_mouse_events && !Options.disable_scrolling) {
                 switch (scroll.direction) {
-                    case Gdk.ScrollDirection.UP:
-                    case Gdk.ScrollDirection.LEFT:
-                        if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0)
-                            this.back10();
-                        else
-                            this.previous_page();
+                case Gdk.ScrollDirection.UP:
+                case Gdk.ScrollDirection.LEFT:
+                    if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                        this.back10();
+                    } else {
+                        this.previous_page();
+                    }
                     break;
 
-                    case Gdk.ScrollDirection.DOWN:
-                    case Gdk.ScrollDirection.RIGHT:
-                        if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0)
-                            this.jump10();
-                        else
-                            this.next_page();
+                case Gdk.ScrollDirection.DOWN:
+                case Gdk.ScrollDirection.RIGHT:
+                    if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                        this.jump10();
+                    } else {
+                        this.next_page();
+                    }
+                    break;
+                default:
                     break;
                 }
                 return true;

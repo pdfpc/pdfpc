@@ -109,6 +109,8 @@ namespace pdfpc {
                     case Poppler.PageTransitionType.UNCOVER:
                         this.transition.type = Poppler.PageTransitionType.COVER;
                         break;
+                    default:
+                        break;
                     }
 
                     this.transition.angle = (180 + this.transition.angle)%360;

@@ -50,7 +50,6 @@ namespace pdfpc.View {
             }
 
             var mdsettings = this.get_settings();
-            mdsettings.enable_plugins = false;
             mdsettings.enable_javascript = false;
         }
 

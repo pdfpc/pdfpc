@@ -905,20 +905,22 @@ namespace pdfpc.Metadata {
                 foreach(unowned Poppler.AnnotMapping am in anns) {
                     var a = am.annot;
                     switch (a.get_annot_type()) {
-                        case Poppler.AnnotType.TEXT:
-                        case Poppler.AnnotType.FREE_TEXT:
-                        case Poppler.AnnotType.HIGHLIGHT:
-                        case Poppler.AnnotType.UNDERLINE:
-                        case Poppler.AnnotType.SQUIGGLY:
-                            if (note_text.length > 0) {
-                                note_text += "\n";
-                            }
-                            note_text += a.get_contents();
+                    case Poppler.AnnotType.TEXT:
+                    case Poppler.AnnotType.FREE_TEXT:
+                    case Poppler.AnnotType.HIGHLIGHT:
+                    case Poppler.AnnotType.UNDERLINE:
+                    case Poppler.AnnotType.SQUIGGLY:
+                        if (note_text.length > 0) {
+                            note_text += "\n";
+                        }
+                        note_text += a.get_contents();
 
-                            // Remove the annotation to avoid its rendering
-                            page.remove_annot(a);
+                        // Remove the annotation to avoid its rendering
+                        page.remove_annot(a);
 
-                            break;
+                        break;
+                    default:
+                        break;
                     }
                 }
                 if (note_text != "") {
