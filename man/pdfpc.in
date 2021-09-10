@@ -80,11 +80,13 @@ Go to a specific page directly after startup. In case of overlays, the first sli
 .TP
 .BI "\-r, \-\-page\-transition"=TRANSITION
 Set default page transition. The TRANSITION specification is of the form
-type:duration:angle:alignment:direction. See the \fBPage transitions\fR section
-for the list of supported types. \fBduration\fR is in seconds. The three last
-settings are optional (and indeed meaningless for some of the transition types).
-The accepted values for \fBangle\fR are 0/90/180/270; \fBalignment\fR can be
-h[orizontal] of v[ertical] and \fBdirection\fR i[nward] or o[utward].
+type[:duration[:angle[:alignment[:direction]]]]. See the \fBPage transitions\fR
+section for the list of supported types. \fBduration\fR is in seconds and set to
+1 by default. The accepted values for \fBangle\fR are 0/90/180/270;
+\fBalignment\fR can be h[orizontal] of v[ertical] and \fBdirection\fR i[nward]
+or o[utward]. The last three optional settings are meaningless for some of the
+transition types and can be left empty. Examples: "push", "dissolve:1.5",
+"wipe:1:90", "split:1::vertical:outward".
 .TP
 .BI "\-R, \-\-pdfpc\-location"=LOCATION
 Use custom pdfpc file.
@@ -367,17 +369,23 @@ be made using many PDF editors and even viewers;  when using LaTeX, the
 notes cannot be edited in pdfpc.
 .PP
 In addition, while in the presentation mode, pressing \[aq]Ctrl + n\[aq] will
-allow you to take or edit notes for the current user slide.  To exit the note
-editing mode, press the Escape key.  These notes are stored in the .pdfpc file.
-They take precedence over the native PDF annotations, i.e., if a user-provided
-note exists for a given slide, any PDF annotations on that page will be silently
-ignored. While editing a note, the normal keybindings are disabled, e.g., you
-are not able to change slides.
+allow you to take or edit notes for the current slide.  These notes are stored
+in the .pdfpc file. The native PDF annotations take precedence over these notes,
+i.e., if a note exists for a given slide in the .pdfpc file, any PDF annotation
+on that page will silently override it. While editing a note, the normal
+keybindings are disabled, e.g., you are not able to change slides. To exit the
+note editing mode, press the Escape key.
 .PP
-Although mixing the
-two types of notes is possible, for a given presentation one will likely want to
-have either only the "native" notes (produced by the same PDF authoring software
-used for making the slides), or only the "pdfpc" ones.
+Although mixing the two types of notes is possible, for a given presentation one
+will likely want to have either only the "native" notes (produced by the same
+PDF authoring software used for making the slides), or only the "pdfpc" ones.
+Note that if the PDF presentation changes, the notes stored in the
+respective .pdfpc file may get out of sync.
+.PP
+pdfpc also supports old-style beamer notes (see the \-n option), which are
+typeset on a half of the "virtual" slide twice as large as the real one. Note
+that due to a bug in beamer, the auto-grouping feature does not work with such
+presentations.
 
 .SS Overview mode
 
@@ -541,7 +549,7 @@ full setup at the computer in advance.
 
 .SS pdfpc files
 .PP
-Notes, user-defined overlays, and some additional information is stored in a
+Notes, user-defined overlays, and some additional information are stored in a
 file with extension "pdfpc".  When pdfpc is invoked with a PDF file, it
 automatically checks for and loads the associated .pdfpc file, if it exists.
 This means that you normally do not have to deal with this kind of files
@@ -626,17 +634,11 @@ $ texdoc pdfpc
 Bugs can be reported at
 .URL https://github.com/pdfpc/pdfpc/issues "our issue tracker" .
 
-.PP
-The LaTeX package "hyperref" produces buggy results when using with
-beamer notes. It is recommended to use the "multimedia" package
-instead.
-
 .SH ACKNOWLEDGEMENTS
 pdfpc was previously developed by
-.URL https://github.com/davvil/pdfpc "davvil" .
-
-pdfpc is a fork of Pdf Presenter Console, available
-.URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "online" .
+.URL https://github.com/davvil/pdfpc "David Vilar" ,
+which in turn was a fork of Jakob Westhoff's PDF Presenter Console
+.URL https://github.com/jakobwesthoff/Pdf-Presenter-Console "" .
 
 .SH SEE ALSO
 .PP
