@@ -69,7 +69,7 @@ namespace pdfpc {
             if (this.fps > 0 &&
                 slide_number >= 0 &&
                 slide_number < metadata.get_slide_count()) {
-                var page = metadata.document.get_page(slide_number);
+                var page = metadata.get_slide_page(slide_number);
 
                 var trans = page.get_transition();
                 // If undefined or is the simple replace transition, assume the

@@ -94,9 +94,7 @@ namespace pdfpc.Metadata {
         /**
          * Poppler document of the associated PDF file
          */
-        public Poppler.Document document {
-            get; protected set;
-        }
+        protected Poppler.Document document;
 
         /**
          * Number of pages in the PDF document
@@ -860,12 +858,30 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Return PDF page corresponding to a given slide, either slide proper
+         * or the respective notes page
+         */
+        public Poppler.Page get_slide_page(int slide_number,
+            bool notes = false) {
+            int ipage;
+            if (this.notes_position == NotesPosition.NEXT) {
+                ipage = 2*slide_number;
+                if (notes) {
+                    ipage++;
+                }
+            } else {
+                ipage = slide_number;
+            }
+            return this.document.get_page(ipage);
+        }
+
+        /**
          * Return slide duration
          */
         public double get_slide_duration(int slide_number) {
             if (slide_number >= 0 && slide_number < this.get_slide_count()) {
 
-                var page = this.document.get_page(slide_number);
+                var page = this.get_slide_page(slide_number);
                 return page.get_duration();
             } else {
                 return -1;
@@ -898,7 +914,7 @@ namespace pdfpc.Metadata {
          */
         private void notes_from_document() {
             for (int i = 0; i < this.page_count; i++) {
-                var page = this.document.get_page(i);
+                var page = this.get_slide_page(i);
                 string note_text = "";
 
                 List<Poppler.AnnotMapping> anns = page.get_annot_mapping();
@@ -1020,19 +1036,32 @@ namespace pdfpc.Metadata {
             fill_path_info(fname, fpcname);
 
             this.document = this.open_pdf_document(this.pdf_fname);
+
+            // NB: this is a temporary & incomplete hack. We need to know
+            // which pages are real at this moment in the very beginning,
+            // before .pdfpc (and XMP) are normally processed
+            if (Options.notes_position != null) {
+                var new_notes_position =
+                    NotesPosition.from_string(Options.notes_position);
+                this.set_notes_position(new_notes_position);
+            }
             this.page_count = this.document.get_n_pages();
+            if (this.notes_position == NotesPosition.NEXT) {
+                this.page_count /= 2;
+            }
+
             this.pages = new Gee.ArrayList<PageMeta>();
             for (int i = 0; i < this.page_count; i++) {
                 var page = new PageMeta();
                 page.user_slide = i;
-                page.label = this.document.get_page(i).label;
+                page.label = this.get_slide_page(i).label;
                 this.pages.add(page);
             }
 
             // Get maximal page dimensions
             for (int i = 0; i < this.page_count; i++) {
                 double width1, height1;
-                this.document.get_page(i).get_size(out width1, out height1);
+                this.get_slide_page(i).get_size(out width1, out height1);
                 if (this.original_page_width < width1) {
                     this.original_page_width = width1;
                 }
@@ -1121,7 +1150,8 @@ namespace pdfpc.Metadata {
             bool disable_auto_grouping = Options.disable_auto_grouping;
             // Force it if there are beamer notes or custom overlays defined
             if (!disable_auto_grouping &&
-                (this.notes_position != NotesPosition.NONE ||
+                ((this.notes_position != NotesPosition.NONE &&
+                  this.notes_position != NotesPosition.NEXT) ||
                  skip_line_old != null)) {
                 disable_auto_grouping = true;
                 GLib.printerr("Notes position set, auto grouping disabled.\n");
@@ -1663,7 +1693,7 @@ namespace pdfpc.Metadata {
             if (page_num != this.mapping_page_num) {
                 this.deactivate_mappings();
 
-                var page = this.document.get_page(page_num);
+                var page = this.get_slide_page(page_num);
 
                 var link_mappings = page.get_link_mapping();
                 foreach (unowned Poppler.LinkMapping mapping in link_mappings) {
@@ -1724,7 +1754,8 @@ namespace pdfpc.Metadata {
         TOP,
         BOTTOM,
         RIGHT,
-        LEFT;
+        LEFT,
+        NEXT;
 
         public static NotesPosition from_string(string? position) {
             if (position == null) {
@@ -1740,6 +1771,8 @@ namespace pdfpc.Metadata {
                     return TOP;
                 case "bottom":
                     return BOTTOM;
+                case "next":
+                    return NEXT;
                 default:
                     return NONE;
             }
@@ -1757,6 +1790,8 @@ namespace pdfpc.Metadata {
                     return "RIGHT";
                 case LEFT:
                     return "LEFT";
+                case NEXT:
+                    return "NEXT";
                 default:
                     assert_not_reached();
             }
