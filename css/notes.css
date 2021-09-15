@@ -5,6 +5,16 @@ body {
     color: white;
 }
 
+body::-webkit-scrollbar {
+    background-color: black;
+    width: 3%;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: gray;
+    border-radius: 3px;
+}
+
 a {
     color: #4682b4;
     text-decoration: none;
