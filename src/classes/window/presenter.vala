@@ -606,6 +606,7 @@ namespace pdfpc.Window {
             notes_sw.add(this.notes_editor);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 
+            // The PDF rendering widget for beamer notes
             this.notes_view = new View.Pdf.from_fullscreen(this,
                 true, false);
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
@@ -1158,6 +1159,9 @@ namespace pdfpc.Window {
         protected void update_note() {
             string this_note = this.metadata.get_note(
                 this.controller.current_slide_number);
+            if (this_note == null) {
+                this_note = "";
+            }
             this.notes_editor.buffer.text = this_note;
 
             // render the note
