@@ -87,11 +87,14 @@ namespace pdfpc {
                 }
             }
 
-            // Measure the time to render the page
-            Timer timer = new Timer();
-
             // Retrieve the Poppler.Page for the page to render
             var page = metadata.get_slide_page(slide_number, notes_area);
+            if (page == null) {
+                return this.fade_to_black(width, height);
+            }
+
+            // Measure the time to render the page
+            Timer timer = new Timer();
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.

@@ -42,6 +42,11 @@ namespace pdfpc.Metadata {
 
     protected class PageMeta {
         /**
+         * PDF page index
+         */
+        public uint pdf_idx;
+
+        /**
          * PDF page label
          */
         public string label;
@@ -60,6 +65,11 @@ namespace pdfpc.Metadata {
          * Slide to be skipped in the normal flow
          */
         public bool hidden;
+
+        /**
+         * Next page contains beamer notes of this slide
+         */
+        public bool next_is_notes = false;
 
         /**
          * Note
@@ -95,11 +105,6 @@ namespace pdfpc.Metadata {
          * Poppler document of the associated PDF file
          */
         protected Poppler.Document document;
-
-        /**
-         * Number of pages in the PDF document
-         */
-        protected uint page_count;
 
         /**
          * PDF page dimensions
@@ -415,7 +420,7 @@ namespace pdfpc.Metadata {
                     slide_get_overlay(idx) == overlay) {
                     slide_number = idx;
                 } else {
-                    for (int i = 0; i < this.page_count; i++) {
+                    for (int i = 0; i < this.pages.size; i++) {
                         page = this.get_page_meta(i);
                         if (page.label == page_label) {
                             slide_number = i + overlay;
@@ -649,7 +654,7 @@ namespace pdfpc.Metadata {
                     int slide_number =
                         user_slide_to_real_slide(user_slide, false);
                     // Assign to all slides from the same user slide
-                    for (int i = slide_number; i < this.page_count; i++) {
+                    for (int i = slide_number; i < this.pages.size; i++) {
                         var page = this.get_page_meta(i);
                         if (page.user_slide == user_slide) {
                             set_note(notes_unescaped, i, false);
@@ -861,18 +866,31 @@ namespace pdfpc.Metadata {
          * Return PDF page corresponding to a given slide, either slide proper
          * or the respective notes page
          */
-        public Poppler.Page get_slide_page(int slide_number,
+        public Poppler.Page? get_slide_page(int slide_number,
             bool notes = false) {
-            int ipage;
-            if (this.notes_position == NotesPosition.NEXT) {
-                ipage = 2*slide_number;
-                if (notes) {
-                    ipage++;
+            var page_meta = this.get_page_meta(slide_number);
+            int ipage = (int) page_meta.pdf_idx;
+            if (notes) {
+                switch (this.notes_position) {
+                case NotesPosition.NEXT:
+                    if (page_meta.next_is_notes) {
+                        ipage++;
+                    } else {
+                        ipage = -1;
+                    }
+                    break;
+                case NotesPosition.NONE:
+                    ipage = -1;
+                    break;
+                default:
+                    break;
                 }
-            } else {
-                ipage = slide_number;
             }
-            return this.document.get_page(ipage);
+            if (ipage >= 0) {
+                return this.document.get_page(ipage);
+            } else {
+                return null;
+            }
         }
 
         /**
@@ -913,7 +931,7 @@ namespace pdfpc.Metadata {
          * Fill the slide notes from pdf text annotations.
          */
         private void notes_from_document() {
-            for (int i = 0; i < this.page_count; i++) {
+            for (int i = 0; i < this.pages.size; i++) {
                 var page = this.get_slide_page(i);
                 string note_text = "";
 
@@ -1040,26 +1058,37 @@ namespace pdfpc.Metadata {
             // NB: this is a temporary & incomplete hack. We need to know
             // which pages are real at this moment in the very beginning,
             // before .pdfpc (and XMP) are normally processed
+            // Also, the prefix ("note") should be configurable, likely through
+            // the XMP mechanism
             if (Options.notes_position != null) {
                 var new_notes_position =
                     NotesPosition.from_string(Options.notes_position);
                 this.set_notes_position(new_notes_position);
             }
-            this.page_count = this.document.get_n_pages();
-            if (this.notes_position == NotesPosition.NEXT) {
-                this.page_count /= 2;
-            }
 
             this.pages = new Gee.ArrayList<PageMeta>();
-            for (int i = 0; i < this.page_count; i++) {
-                var page = new PageMeta();
-                page.user_slide = i;
-                page.label = this.get_slide_page(i).label;
-                this.pages.add(page);
+            var npages = this.document.get_n_pages();
+            for (int i = 0, j = 0; i < npages; i++) {
+                var label = this.document.get_page(i).label;
+                if (this.notes_position == NotesPosition.NEXT &&
+                    label.has_prefix("note")) {
+                    // get the previous, real slide
+                    var slide_page = this.get_page_meta(j - 1);
+                    if (slide_page != null) {
+                        slide_page.next_is_notes = true;
+                    }
+                } else {
+                    var page = new PageMeta();
+                    page.pdf_idx = i;
+                    page.user_slide = j;
+                    page.label = label;
+                    this.pages.add(page);
+                    j++;
+                }
             }
 
             // Get maximal page dimensions
-            for (int i = 0; i < this.page_count; i++) {
+            for (int i = 0; i < this.pages.size; i++) {
                 double width1, height1;
                 this.get_slide_page(i).get_size(out width1, out height1);
                 if (this.original_page_width < width1) {
@@ -1122,12 +1151,6 @@ namespace pdfpc.Metadata {
                 this.set_last_minutes(Options.last_minutes);
             }
 
-            if (Options.notes_position != null) {
-                var new_notes_position =
-                    NotesPosition.from_string(Options.notes_position);
-                this.set_notes_position(new_notes_position);
-            }
-
             if (Options.default_transition != null) {
                 this.set_default_transition_from_string(Options.default_transition);
             }
@@ -1142,6 +1165,9 @@ namespace pdfpc.Metadata {
                         Options.notes_format);
                     Process.exit(1);
                 }
+            }
+
+            if (Options.notes_position != null) {
                 var new_notes_position =
                     NotesPosition.from_string(Options.notes_position);
                 this.set_notes_position(new_notes_position);
@@ -1160,7 +1186,7 @@ namespace pdfpc.Metadata {
             if (!disable_auto_grouping) {
                 string previous_label = null;
                 int user_slide = -1;
-                for (int i = 0; i < this.page_count; ++i) {
+                for (int i = 0; i < this.pages.size; ++i) {
                     var page = this.get_page_meta(i);
                     // Auto-detect which pages to skip, but respect overlays
                     // forcefully set by the user
@@ -1185,18 +1211,18 @@ namespace pdfpc.Metadata {
         }
 
         /**
-         * Return the number of pages in the pdf document
+         * Return the number of *real* slides (not counting notes!)
          */
         public uint get_slide_count() {
-            return this.page_count;
+            return this.pages.size;
         }
 
         /**
          * Return the number of user slides
          */
         public int get_user_slide_count() {
-            if (this.page_count > 0) {
-                var page = this.get_page_meta((int) this.page_count - 1);
+            if (this.pages.size > 0) {
+                var page = this.get_page_meta((int) this.pages.size - 1);
                 return page.user_slide + 1;
             } else {
                 return 0;
@@ -1335,7 +1361,7 @@ namespace pdfpc.Metadata {
             }
             page.forced_overlay = true;
 
-            for (int i = slide_number; i < this.page_count; i++) {
+            for (int i = slide_number; i < this.pages.size; i++) {
                 page = this.get_page_meta(i);
                 page.user_slide--;
             }
@@ -1376,7 +1402,7 @@ namespace pdfpc.Metadata {
             this.dirty_state = true;
 
             if (onoff) {
-                for (int i = slide_number; i < this.page_count; i++) {
+                for (int i = slide_number; i < this.pages.size; i++) {
                     page = this.get_page_meta(i);
                     if (page != null && !page.hidden) {
                         return i - slide_number;
@@ -1408,7 +1434,7 @@ namespace pdfpc.Metadata {
                     return true;
                 }
                 slide_number++;
-            } while (slide_number < this.page_count &&
+            } while (slide_number < this.pages.size &&
                      real_slide_to_user_slide(slide_number) == user_slide);
 
             return false;
@@ -1441,14 +1467,14 @@ namespace pdfpc.Metadata {
                 return 0;
             } else {
                 if (lastSlide) {
-                    for (int i = (int)this.page_count - 1; i >= 0; i--) {
+                    for (int i = (int) this.pages.size - 1; i >= 0; i--) {
                         var page = this.get_page_meta(i);
                         if (page.user_slide == number) {
                             return i;
                         }
                     }
                 } else {
-                    for (int i = 0; i < this.page_count; i++) {
+                    for (int i = 0; i < this.pages.size; i++) {
                         var page = this.get_page_meta(i);
                         if (page.user_slide == number) {
                             return i;
@@ -1466,9 +1492,9 @@ namespace pdfpc.Metadata {
          * last user slide.
          */
         public int real_slide_to_user_slide(int number) {
-            if (this.page_count == 0 || number < 0) {
+            if (this.pages.size == 0 || number < 0) {
                 return -1;
-            } else if (number >= this.page_count) {
+            } else if (number >= this.pages.size) {
                 return this.get_user_slide_count() - 1;
             } else {
                 var page = this.get_page_meta(number);
