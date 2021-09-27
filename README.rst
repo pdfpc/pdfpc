@@ -37,7 +37,8 @@ Installation
 
 - On FreeBSD::
 
-    It is available under graphics/pdfpc. A pre-built binary is also available.
+    sudo pkg install pdfpc
+    # It is also available under graphics/pdfpc in the ports tree.
 
 - On macOS with Homebrew::
 
