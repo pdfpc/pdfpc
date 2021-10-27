@@ -948,7 +948,8 @@ namespace pdfpc.Metadata {
                             this.duration = int.parse(entry.value);
                             break;
                         case "EndUserSlide":
-                            this.end_user_slide = int.parse(entry.value);
+                            // all slide numbering is 0-based internally
+                            this.end_user_slide = int.parse(entry.value) - 1;
                             break;
                         case "StartTime":
                             this.start_time = entry.value;
