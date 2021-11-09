@@ -272,6 +272,9 @@ namespace pdfpc {
                 case "next-height":
                     Options.next_height = int.parse(fields[2]);
                     break;
+                case "next-slide-first-overlay":
+                    Options.next_slide_first_overlay = bool.parse(fields[2]);
+                    break;
                 case "overview-min-size":
                     Options.min_overview_width = int.parse(fields[2]);
                     break;

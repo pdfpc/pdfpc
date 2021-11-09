@@ -1017,7 +1017,7 @@ namespace pdfpc.Window {
             }
 
             var view_slide_number =
-                this.metadata.user_slide_to_real_slide(next_view_user_slide);
+                this.metadata.user_slide_to_real_slide(next_view_user_slide, Options.final_slide_overlay || !Options.next_slide_first_overlay);
             view_slide_number = metadata.nearest_nonhidden(view_slide_number);
             this.next_view.disabled = (view_slide_number < 0);
             this.next_view.display(view_slide_number);

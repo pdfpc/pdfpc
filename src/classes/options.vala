@@ -311,6 +311,12 @@ namespace pdfpc {
          * instead of the next slide.
          */
         public static bool final_slide_overlay = false;
+
+        /**
+         * If the next slide is an overlay group, show the first slide of
+         * that group in "next slide" view instead of the last slide.
+         */
+        public static bool next_slide_first_overlay = false;
 #if REST
         /**
          * Run REST server
