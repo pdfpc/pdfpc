@@ -126,7 +126,6 @@ Percentage of the height of the presenter screen to be used for the next slide (
 .B next-slide-first-overlay
 If the next slide is an overlay group, show the first slide of that group in the
 next slide view instead of the last slide of that group (bool, Default is false).
-This option is ignored if "final-slide" is enabled.
 .TP
 .B overview-min-size
 Minimum width for the overview miniatures, in pixels (int, Default is 150).

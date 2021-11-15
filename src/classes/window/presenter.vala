@@ -1011,13 +1011,13 @@ namespace pdfpc.Window {
             this.current_view.display(current_slide_number);
 
             var next_view_user_slide = current_user_slide_number;
-            if (!Options.final_slide_overlay ||
-                this.metadata.is_user_slide(current_slide_number)) {
+            bool show_final_slide_of_current_overlay = Options.final_slide_overlay && !this.metadata.is_user_slide(current_slide_number);
+            if (!show_final_slide_of_current_overlay) {
                 next_view_user_slide++;
             }
 
             var view_slide_number =
-                this.metadata.user_slide_to_real_slide(next_view_user_slide, Options.final_slide_overlay || !Options.next_slide_first_overlay);
+                this.metadata.user_slide_to_real_slide(next_view_user_slide, show_final_slide_of_current_overlay || !Options.next_slide_first_overlay);
             view_slide_number = metadata.nearest_nonhidden(view_slide_number);
             this.next_view.disabled = (view_slide_number < 0);
             this.next_view.display(view_slide_number);
