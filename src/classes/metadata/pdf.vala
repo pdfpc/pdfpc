@@ -500,16 +500,16 @@ namespace pdfpc.Metadata {
 			this.notes_position =
                             NotesPosition.from_string(item.get_string());
 			break;
-                     case "defaultTransition":
+                    case "defaultTransition":
 			this.set_default_transition_from_string(item.get_string());
 			break;
-                   case "disableMarkdown":
+                    case "disableMarkdown":
 			this.disable_markdown = item.get_boolean();
 			break;
-                   case "noteFontSize":
+                    case "noteFontSize":
 			this.font_size = (int) item.get_int();
 			break;
-                   case "pages":
+                    case "pages":
 			this.parse_pdfpc_pages(item);
 			break;
 		    default:
