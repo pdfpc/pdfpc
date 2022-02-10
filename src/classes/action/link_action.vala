@@ -155,7 +155,7 @@ namespace pdfpc {
                     this.launch_for_uri(this.action.uri.uri);
                 } catch (GLib.Error e) {
                     GLib.printerr("%s\n", e.message);
-                    return false;
+                    return true;
                 }
 
                 break;
