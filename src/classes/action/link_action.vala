@@ -115,6 +115,33 @@ namespace pdfpc {
         }
 
         /**
+         * Launch an application, trying to cover all corner cases.
+         */
+        private void launch_for_uri(string uri) throws GLib.Error {
+            if (Uri.parse_scheme(uri) != null) {
+                AppInfo.launch_default_for_uri(uri, null);
+            } else {
+                // Guess a MIME type and launch its default handler
+                bool uncertain;
+                var ctype = ContentType.guess(uri, null, out uncertain);
+                var appinfo = AppInfo.get_default_for_type(ctype, false);
+                string path;
+                if (Path.is_absolute(uri)) {
+                    path = uri;
+                } else {
+                    // If the path is not absolute, translate it relative
+                    // to the PDF document location
+                    var pdf_fname = controller.get_pdf_fname();
+                    var dirname = Path.get_dirname(pdf_fname);
+                    path = Posix.realpath(Path.build_filename(dirname, uri));
+                }
+                var list = new List<File>();
+                list.append(File.new_for_path(path));
+                appinfo.launch(list, null);
+            }
+        }
+
+        /**
          * Goto the link's destination on left clicks.
          */
         protected override bool on_button_press(Gtk.Widget widget, Gdk.EventButton event) {
@@ -125,10 +152,10 @@ namespace pdfpc {
             switch (this.action.type) {
             case Poppler.ActionType.URI:
                 try {
-                    AppInfo.launch_default_for_uri(this.action.uri.uri, null);
+                    this.launch_for_uri(this.action.uri.uri);
                 } catch (GLib.Error e) {
                     GLib.printerr("%s\n", e.message);
-                    return false;
+                    return true;
                 }
 
                 break;
