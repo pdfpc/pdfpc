@@ -133,7 +133,7 @@ namespace pdfpc {
                     // to the PDF document location
                     var pdf_fname = controller.get_pdf_fname();
                     var dirname = Path.get_dirname(pdf_fname);
-                    path = Posix.realpath(Path.build_filename(dirname, uri));
+                    path = Path.build_filename(dirname, uri);
                 }
                 var list = new List<File>();
                 list.append(File.new_for_path(path));
