@@ -834,28 +834,21 @@ namespace pdfpc {
          * is not an absolute path, use the PDF file location as a base
          * directory.
          */
-        protected string? filename_to_uri(string file, string pdf_fname) {
-            Regex uriRE = null;
-            try {
-                uriRE = new Regex("^[a-z]*://");
-            } catch (Error error) {
-                // Won't happen
-                return null;
-            }
-            if (uriRE.match(file)) {
-                return file;
-            }
-            if (GLib.Path.is_absolute(file)) {
-                return "file://" + file;
+        protected string filename_to_uri(string location, string pdf_fname) {
+            if (Uri.parse_scheme(location) != null) {
+                return location;
             }
 
-            string dirname = GLib.Path.get_dirname(pdf_fname);
-            string rp = Posix.realpath(GLib.Path.build_filename(dirname, file));
-            if (rp != null) {
-                return "file://" + rp;
+            string fullpath;
+            if (GLib.Path.is_absolute(location)) {
+                fullpath = location;
             } else {
-                return null;
+                var dirname = GLib.Path.get_dirname(pdf_fname);
+                fullpath = GLib.Path.build_filename(dirname, location);
             }
+
+            var fp = File.new_for_path(fullpath);
+            return fp.get_uri();
         }
 
         /**
