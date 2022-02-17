@@ -36,6 +36,11 @@ if (REST)
     set(REST_PACKAGES
         libsoup-2.4
     )
+
+    if (${CMAKE_HOST_WIN32})
+        # Needed for Posix.gethostname()
+        set(WSOCK32_LIB wsock32)
+    endif ()
 endif ()
 
 if ("${POPPLER_VERSION}" VERSION_GREATER_EQUAL 0.80 AND "${VALA_VERSION}" VERSION_GREATER 0.48.0)
@@ -155,6 +160,7 @@ add_executable(pdfpc
 # explicitly add libraries (needed e.g. for Fedora 13+)
 target_link_libraries(pdfpc
     m
+    ${WSOCK32_LIB}
     ${GOBJECT_LIBRARIES}
     ${GIO_LIBRARIES}
     ${GEE_LIBRARIES}
