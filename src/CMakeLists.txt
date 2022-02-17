@@ -33,6 +33,9 @@ endif ()
 if (REST)
     pkg_check_modules(SOUP REQUIRED libsoup-2.4)
     pkg_check_modules(QRENCODE REQUIRED libqrencode)
+    set(REST_PACKAGES
+        libsoup-2.4
+    )
 endif ()
 
 if ("${POPPLER_VERSION}" VERSION_GREATER_EQUAL 0.80 AND "${VALA_VERSION}" VERSION_GREATER 0.48.0)
@@ -133,6 +136,7 @@ PACKAGES
     pangocairo
     posix
     ${MOVIE_PACKAGES}
+    ${REST_PACKAGES}
 OPTIONS
     --enable-experimental
     ${EXTRA_VALA_OPTIONS}
@@ -158,6 +162,7 @@ target_link_libraries(pdfpc
     ${MARKDOWN_LIBRARIES}
     ${WEBKIT_LIBRARIES}
     ${JSON_LIBRARIES}
+    ${SOUP_LIBRARIES}
     ${QRENCODE_LIBRARIES}
     ${GTK_LIBRARIES}
     ${GTHREAD_LIBRARIES}
