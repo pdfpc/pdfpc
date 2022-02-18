@@ -33,6 +33,14 @@ endif ()
 if (REST)
     pkg_check_modules(SOUP REQUIRED libsoup-2.4)
     pkg_check_modules(QRENCODE REQUIRED libqrencode)
+    set(REST_PACKAGES
+        libsoup-2.4
+    )
+
+    if (${CMAKE_HOST_WIN32})
+        # Needed for Posix.gethostname()
+        set(WSOCK32_LIB wsock32)
+    endif ()
 endif ()
 
 if ("${POPPLER_VERSION}" VERSION_GREATER_EQUAL 0.80 AND "${VALA_VERSION}" VERSION_GREATER 0.48.0)
@@ -133,6 +141,7 @@ PACKAGES
     pangocairo
     posix
     ${MOVIE_PACKAGES}
+    ${REST_PACKAGES}
 OPTIONS
     --enable-experimental
     ${EXTRA_VALA_OPTIONS}
@@ -151,6 +160,7 @@ add_executable(pdfpc
 # explicitly add libraries (needed e.g. for Fedora 13+)
 target_link_libraries(pdfpc
     m
+    ${WSOCK32_LIB}
     ${GOBJECT_LIBRARIES}
     ${GIO_LIBRARIES}
     ${GEE_LIBRARIES}
@@ -158,6 +168,7 @@ target_link_libraries(pdfpc
     ${MARKDOWN_LIBRARIES}
     ${WEBKIT_LIBRARIES}
     ${JSON_LIBRARIES}
+    ${SOUP_LIBRARIES}
     ${QRENCODE_LIBRARIES}
     ${GTK_LIBRARIES}
     ${GTHREAD_LIBRARIES}
