@@ -88,7 +88,7 @@ namespace pdfpc {
             }
 
             // Measure the time to render the page
-            Timer timer = new Timer();
+            GLib.Timer timer = new GLib.Timer();
 
             // Retrieve the Poppler.Page for the page to render
             var page = metadata.document.get_page(slide_number);

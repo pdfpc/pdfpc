@@ -1085,10 +1085,6 @@ namespace pdfpc.Metadata {
             if (Options.end_time != null) {
                 this.set_end_time(Options.end_time);
             }
-            // If end_time is set, reset duration to 0
-            if (this.end_time != null) {
-                this.set_duration(0);
-            }
 
             if (Options.last_minutes != 0) {
                 this.set_last_minutes(Options.last_minutes);

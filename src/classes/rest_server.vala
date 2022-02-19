@@ -113,7 +113,7 @@ namespace pdfpc {
 
             string statestr;
             builder.set_member_name("state");
-            if (controller.running) {
+            if (controller.is_running()) {
                 statestr = "running";
             } else if (controller.is_paused()) {
                 statestr = "paused";

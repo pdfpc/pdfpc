@@ -77,7 +77,7 @@ namespace pdfpc.Window {
         /**
          * Timer for the presenation
          */
-        protected TimerLabel? timer;
+        protected Gtk.Label timer_label;
 
         /**
          * Slide progress label ( eg. "23/42" )
@@ -467,7 +467,7 @@ namespace pdfpc.Window {
          * Update (hide/show) status icons
          **/
         private void update_status_icons() {
-            if (this.timer.is_paused()) {
+            if (this.controller.is_paused()) {
                 this.pause_icon.show();
             } else {
                 this.pause_icon.hide();
@@ -625,11 +625,43 @@ namespace pdfpc.Window {
             this.apply_font_size(meta_font_size);
 
             // The countdown timer is centered in the 90% bottom part of the screen
-            this.timer = this.controller.getTimer();
-            this.timer.name = "timer";
-            this.timer.get_style_context().add_class("bottomText");
-            this.timer.set_justify(Gtk.Justification.CENTER);
+            this.timer_label = new Gtk.Label("");
+            this.timer_label.name = "timer";
+            this.timer_label.get_style_context().add_class("bottomText");
+            this.timer_label.set_justify(Gtk.Justification.CENTER);
+            this.controller.timer_change.connect((status, str) => {
+                    var context = this.get_style_context();
 
+                    // Clear any previously assigned class
+                    context.remove_class("pretalk");
+                    context.remove_class("too-fast");
+                    context.remove_class("too-slow");
+                    context.remove_class("last-minutes");
+                    context.remove_class("overtime");
+
+                    switch (status) {
+                    case PresentationController.ProgressStatus.PreTalk:
+                        context.add_class("pretalk");
+                        break;
+                    case PresentationController.ProgressStatus.Fast:
+                        context.add_class("too-fast");
+                        break;
+                    case PresentationController.ProgressStatus.Slow:
+                        context.add_class("too-slow");
+                        break;
+                    case PresentationController.ProgressStatus.LastMinutes:
+                        context.add_class("last-minutes");
+                        break;
+                    case PresentationController.ProgressStatus.Overtime:
+                        context.add_class("overtime");
+                        break;
+                    default:
+                        break;
+                    }
+
+                    this.timer_label.set_label(str);
+                });
+            this.controller.reset_timer();
 
             // The slide counter is centered in the 90% bottom part of the screen
             this.slide_progress = new Gtk.Entry();
@@ -744,11 +776,11 @@ namespace pdfpc.Window {
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             bottom_row.homogeneous = true;
 
-            this.timer.halign = Gtk.Align.CENTER;
-            this.timer.valign = Gtk.Align.END;
+            this.timer_label.halign = Gtk.Align.CENTER;
+            this.timer_label.valign = Gtk.Align.END;
 
             bottom_row.pack_start(this.status);
-            bottom_row.pack_start(this.timer);
+            bottom_row.pack_start(this.timer_label);
             bottom_row.pack_end(this.slide_progress, false);
 
             Gtk.Grid full_layout = new Gtk.Grid();
