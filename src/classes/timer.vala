@@ -77,7 +77,7 @@ namespace pdfpc {
         /**
          * Display mode
          */
-        public Mode mode = Mode.CountUp;
+        protected Mode mode = Mode.CountUp;
 
         /**
          * Current time, updated every second
@@ -149,6 +149,50 @@ namespace pdfpc {
 
             // Start the clock
             GLib.Timeout.add(1000, this.on_timeout);
+        }
+
+        /**
+         * Get mode
+         */
+        public Mode get_mode() {
+            return this.mode;
+        }
+
+        /**
+         * Set mode, returning true/false on success/failure.
+         * If the mode changes, update the view.
+         */
+        public bool set_mode(Mode new_mode) {
+            if (new_mode == Mode.CountDown && this.duration == 0) {
+                // This combination makes no sense
+                return false;
+            }
+
+            if (this.mode != new_mode) {
+                this.mode = new_mode;
+                this.update();
+            }
+
+            return true;
+        }
+
+        /**
+         * Cycle the mode (count up/count down/current time)
+         */
+        public void cycle_mode() {
+            switch (this.mode) {
+            case Mode.Clock:
+                this.set_mode(Mode.CountUp);
+                break;
+            case Mode.CountUp:
+                if (this.set_mode(Mode.CountDown) != true) {
+                    this.set_mode(Mode.Clock);
+                }
+                break;
+            case Mode.CountDown:
+                this.set_mode(Mode.Clock);
+                break;
+            }
         }
 
         /**

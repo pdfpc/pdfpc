@@ -400,7 +400,7 @@ namespace pdfpc {
                     this.timer = new Timer((int) (60*metadata.get_duration()),
                         metadata.get_start_time(), metadata.get_end_time());
                     if (Options.use_time_of_day) {
-                        this.timer.mode = Timer.Mode.Clock;
+                        this.timer.set_mode(Timer.Mode.Clock);
                     }
                     this.timer.change.connect(on_timer_change);
 
@@ -1277,6 +1277,8 @@ namespace pdfpc {
                 "Pause the timer");
             add_action("resetTimer", this.reset_timer,
                 "Reset the timer");
+            add_action("cycleTimerMode", this.cycle_timer,
+                "Cycle the timer view");
 
             add_action("windowed", this.toggle_windowed,
                 "Toggle the windowed state");
@@ -2062,6 +2064,13 @@ namespace pdfpc {
          */
         public void reset_timer() {
             this.timer.reset();
+        }
+
+        /**
+         * Cycle the timer view (count up/count down/current time)
+         */
+        public void cycle_timer() {
+            this.timer.cycle_mode();
         }
 
         /**

@@ -246,7 +246,11 @@ Edit notes for the current slide (press Escape to exit this mode)
 Start timer
 .TP
 .B p
-Pause timer
+Pause/continue timer
+.TP
+.B Shift + t
+Cycle between the timer view modes (count up/count down/current time), when
+applicable
 .TP
 .B Ctrl + t
 Reset timer
