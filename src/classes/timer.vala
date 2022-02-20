@@ -23,12 +23,24 @@
 namespace pdfpc {
     /**
      * Auxiliary function to parse time string, returning Unix time
-     * TODO: should be rewriten without POSIX strptime() for OS neutrality
      */
     time_t parse_time(string t) {
-        var tm = Time.local(time_t());
-        tm.strptime(t + ":00", "%H:%M:%S");
-        return tm.mktime();
+        int hours = 0, minutes = 0;
+        t.scanf("%d:%d", &hours, &minutes);
+
+        var dt_now = new DateTime.now();
+        var hours_now = dt_now.get_hour();
+        var minutes_now = dt_now.get_minute();
+
+        var diff_minutes = 60*(hours - hours_now) + (minutes - minutes_now);
+        if (diff_minutes < 0) {
+            // Assume it's about tomorrow
+            diff_minutes += 60*24;
+        }
+
+        var dt = dt_now.add_minutes(diff_minutes);
+
+        return (time_t) dt.to_unix();
     }
 
     /**
@@ -114,17 +126,9 @@ namespace pdfpc {
 
             if (start_time_str != null) {
                 this.intended_start_time = parse_time(start_time_str);
-                if (this.intended_start_time < this.now) {
-                    // Assume it's about tomorrow
-                    this.intended_start_time += 24*3600;
-                }
             }
             if (end_time_str != null) {
                 intended_end_time = parse_time(end_time_str);
-                if (intended_end_time < this.now) {
-                    // Assume it's about tomorrow
-                    intended_end_time += 24*3600;
-                }
             }
 
             if (this.intended_start_time > 0 && intended_end_time > 0) {
