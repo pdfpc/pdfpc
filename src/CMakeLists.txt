@@ -4,7 +4,6 @@ pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(GEE REQUIRED gee-0.8)
 pkg_check_modules(POPPLER REQUIRED poppler-glib>=0.22)
 pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.22)
-pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
 pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 pkg_check_modules(JSON REQUIRED json-glib-1.0)
 list (FIND GTK_STATIC_LIBRARIES "X11" _index)
@@ -28,6 +27,11 @@ if (MOVIES)
         gstreamer-audio-1.0
         gstreamer-video-1.0
     )
+endif ()
+
+if (MDVIEW)
+    pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
+    set(MDVIEW_PACKAGES webkit2gtk-4.0)
 endif ()
 
 if (REST)
@@ -141,6 +145,7 @@ PACKAGES
     pangocairo
     posix
     ${MOVIE_PACKAGES}
+    ${MDVIEW_PACKAGES}
     ${REST_PACKAGES}
 OPTIONS
     --enable-experimental
