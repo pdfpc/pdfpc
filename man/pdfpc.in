@@ -496,9 +496,6 @@ See
 .URL http://pdfpc.github.io/demo/pdfpc-video-example.zip "our website"
 for a detailed explanation with examples.
 
-.PP
-See the bugs section for further information.
-
 .SS Pointer mode
 .PP
 If needed, it is possible to turn on a pointer which draws a red (by default)
