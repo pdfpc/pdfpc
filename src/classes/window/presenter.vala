@@ -68,8 +68,9 @@ namespace pdfpc.Window {
         protected Gtk.Stack notes_stack;
         protected Gtk.TextView notes_editor;
         protected View.Pdf notes_view;
+#if MDVIEW
         protected View.MarkdownView mdview;
-
+#endif
         protected Gtk.Paned slide_views;
         protected Gtk.Paned current_view_and_stricts;
         protected Gtk.Paned next_view_and_notes;
@@ -611,14 +612,15 @@ namespace pdfpc.Window {
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(this.notes_view);
 
-            // The Markdown rendering widget
-            this.mdview = new View.MarkdownView();
-
             // The full notes stack
             this.notes_stack = new Gtk.Stack();
             this.notes_stack.add_named(notes_sw, "editor");
             this.notes_stack.add_named(frame, "view");
+#if MDVIEW
+            // The Markdown rendering widget
+            this.mdview = new View.MarkdownView();
             this.notes_stack.add_named(this.mdview, "mdview");
+#endif
             this.notes_stack.homogeneous = true;
 
             var meta_font_size = this.metadata.get_font_size();
@@ -1043,7 +1045,9 @@ namespace pdfpc.Window {
                 this.notes_stack.set_visible_child_name("view");
                 this.notes_view.display(current_slide_number);
             } else {
+#if MDVIEW
                 this.notes_stack.set_visible_child_name("mdview");
+#endif
                 this.update_note();
             }
 
@@ -1147,9 +1151,11 @@ namespace pdfpc.Window {
                 this.metadata.set_note(this_note,
                     this.controller.current_slide_number);
                 this.controller.set_ignore_input_events(false);
+#if MDVIEW
                 this.mdview.render(this_note,
                     this.metadata.get_disable_markdown());
                 this.notes_stack.set_visible_child_name("mdview");
+#endif
                 return true;
             } else {
                 return false;
@@ -1163,9 +1169,10 @@ namespace pdfpc.Window {
             string this_note = this.metadata.get_note(
                 this.controller.current_slide_number);
             this.notes_editor.buffer.text = this_note;
-
+#if MDVIEW
             // render the note
             this.mdview.render(this_note, this.metadata.get_disable_markdown());
+#endif
         }
 
         public void show_overview() {
@@ -1219,10 +1226,11 @@ namespace pdfpc.Window {
             } catch (Error e) {
                 GLib.printerr("Warning: failed to set CSS for notes.\n");
             }
-
+#if MDVIEW
             // 20pt is set in notes.css
             var mdview_zoom = size/20.0;
             this.mdview.apply_zoom(mdview_zoom);
+#endif
         }
 
         private void on_zoom(PresentationController.ScaledRectangle? rect) {

@@ -21,6 +21,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#if MDVIEW
 namespace pdfpc.View {
     public class MarkdownView : WebKit.WebView {
         WebKit.UserContentManager ucm;
@@ -75,3 +76,4 @@ namespace pdfpc.View {
         }
     }
 }
+#endif

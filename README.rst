@@ -192,6 +192,9 @@ can be removed by compiling without support for movie playback by passing
 To disable support for the built-in REST Web server, pass *-DREST=OFF* to cmake.
 In this case, libsoup and libqrencode are not needed.
 
+To disable support for viewing notes in the Markdown format, pass *-DMDVIEW=OFF*
+to cmake. In this case, webkit2gtk is not needed.
+
 Compilation troubleshooting
 ---------------------------
 
