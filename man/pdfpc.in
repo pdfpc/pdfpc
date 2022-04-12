@@ -208,9 +208,12 @@ Switch the pen drawing mode on
 .B 4 / KP_4
 Switch the eraser drawing mode on
 .TP
+.B 5 / KP_5
+Switch the spotlight mode on
+.TP
 .B Plus / KP_Add / Equal
 Depending on the current mode, increase font size of notes or pointer size or
-the size of pen or eraser
+the size of pen or eraser or spotlight
 .TP
 .B Minus / KP_Subtract
 Depending on the current mode, decrease font size of notes or pointer size or
