@@ -32,6 +32,7 @@ endif ()
 if (MDVIEW)
     pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
     set(MDVIEW_PACKAGES webkit2gtk-4.0)
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D MDVIEW)
 endif ()
 
 if (REST)
