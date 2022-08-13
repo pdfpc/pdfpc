@@ -629,7 +629,7 @@ namespace pdfpc.Window {
             this.timer_label.name = "timer";
             this.timer_label.get_style_context().add_class("bottomText");
             this.timer_label.set_justify(Gtk.Justification.CENTER);
-            this.controller.timer_change.connect((status, str) => {
+            this.controller.timer_change.connect((str) => {
                     var context = this.get_style_context();
 
                     // Clear any previously assigned class
@@ -639,7 +639,7 @@ namespace pdfpc.Window {
                     context.remove_class("last-minutes");
                     context.remove_class("overtime");
 
-                    switch (status) {
+                    switch (this.controller.progress_status) {
                     case PresentationController.ProgressStatus.PreTalk:
                         context.add_class("pretalk");
                         break;

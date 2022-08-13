@@ -94,6 +94,20 @@ namespace pdfpc {
             this.controllables_update();
         }
 
+        /**
+         * Progress status of the talk
+         */
+        public enum ProgressStatus {
+            PreTalk,
+            Normal,
+            Slow,
+            Fast,
+            LastMinutes,
+            Overtime;
+        }
+
+        public ProgressStatus progress_status { get; protected set; }
+
         public void start_autoadvance_timer(int slide_number) {
             double duration = this.metadata.get_slide_duration(slide_number);
             if (duration < 0) {
@@ -322,7 +336,7 @@ namespace pdfpc {
         /**
          * Signal: Fired when the timer label changes
          */
-        public signal void timer_change(ProgressStatus status, string label);
+        public signal void timer_change(string label);
 
         /**
          * Controllables which are registered with this presentation controller.
@@ -336,25 +350,16 @@ namespace pdfpc {
         public RestServer rest_server { get; protected set; }
 #endif
 
-        public enum ProgressStatus {
-            PreTalk,
-            Normal,
-            Slow,
-            Fast,
-            LastMinutes,
-            Overtime;
-        }
-
         protected void on_timer_change(int talk_time, Timer.State state,
             string label) {
             int duration = this.timer.duration;
-            ProgressStatus status = ProgressStatus.Normal;
+            this.progress_status = ProgressStatus.Normal;
 
             if (state == Timer.State.PreTalk) {
-                status = ProgressStatus.PreTalk;
+                this.progress_status = ProgressStatus.PreTalk;
             } else if (duration > 0) {
                 if (talk_time >= duration) {
-                    status = ProgressStatus.Overtime;
+                    this.progress_status = ProgressStatus.Overtime;
                 } else if (Options.timer_pace_color) {
                     // Indication of too slow/fast pace independently
                     // of the time left.
@@ -366,22 +371,22 @@ namespace pdfpc {
                     int expected_time = (int) (duration*expected_progress);
 
                     if (talk_time > expected_time + 60) {
-                        status = ProgressStatus.Slow;
+                        this.progress_status = ProgressStatus.Slow;
                     } else if (talk_time < expected_time - 60) {
-                        status = ProgressStatus.Fast;
+                        this.progress_status = ProgressStatus.Fast;
                     } else {
-                        status = ProgressStatus.Normal;
+                        this.progress_status = ProgressStatus.Normal;
                     }
                 } else {
                     // Old "last-minutes" warning
                     int time_left = duration - talk_time;
                     if (time_left < 60*this.metadata.get_last_minutes()) {
-                        status = ProgressStatus.LastMinutes;
+                        this.progress_status = ProgressStatus.LastMinutes;
                     }
                 }
             }
 
-            this.timer_change(status, label);
+            this.timer_change(label);
         }
 
         /**
