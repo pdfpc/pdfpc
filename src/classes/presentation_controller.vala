@@ -386,7 +386,20 @@ namespace pdfpc {
                 }
             }
 
-            this.timer_change(label);
+            string sym;
+            switch (timer.get_mode()) {
+            case Timer.Mode.CountUp:
+                sym = " \u2b08";
+                break;
+            case Timer.Mode.CountDown:
+                sym = " \u2b0a";
+                break;
+            default:
+                sym = "";
+                break;
+            }
+
+            this.timer_change(label + sym);
         }
 
         /**
