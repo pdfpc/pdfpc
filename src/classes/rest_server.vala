@@ -122,6 +122,30 @@ namespace pdfpc {
             }
             builder.add_string_value(statestr);
 
+            builder.set_member_name("progress_status");
+            string progress_status_str;
+            switch (controller.progress_status) {
+            case PresentationController.ProgressStatus.PreTalk:
+                progress_status_str = "pretalk";
+                break;
+            case PresentationController.ProgressStatus.Fast:
+                progress_status_str = "too-fast";
+                break;
+            case PresentationController.ProgressStatus.Slow:
+                progress_status_str = "too-slow";
+                break;
+            case PresentationController.ProgressStatus.LastMinutes:
+                progress_status_str = "last-minutes";
+                break;
+            case PresentationController.ProgressStatus.Overtime:
+                progress_status_str = "overtime";
+                break;
+            default:
+                progress_status_str = "normal";
+                break;
+            }
+            builder.add_string_value(progress_status_str);
+
             builder.set_member_name("mode");
             builder.add_string_value(controller.get_mode_string());
 
