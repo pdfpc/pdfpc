@@ -31,6 +31,7 @@ namespace pdfpc {
         var dt_now = new DateTime.now();
         var hours_now = dt_now.get_hour();
         var minutes_now = dt_now.get_minute();
+        var seconds_now = dt_now.get_second();
 
         var diff_minutes = 60*(hours - hours_now) + (minutes - minutes_now);
         if (diff_minutes < 0) {
@@ -39,6 +40,9 @@ namespace pdfpc {
         }
 
         var dt = dt_now.add_minutes(diff_minutes);
+
+        // Round down to full minutes
+        dt = dt.add_seconds(-seconds_now);
 
         return (time_t) dt.to_unix();
     }
