@@ -44,6 +44,10 @@ bind S+space            histFwd
 bind S+End              nextUnseen
 bind S+Home             prevSeen
 
+# Undo and redo
+bind C+z                undo
+bind C+y                redo
+
 # The overview mode
 bind Tab                overview
 
