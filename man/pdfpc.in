@@ -245,6 +245,12 @@ Exit any "special" state (pause, freeze, blank)
 .B Ctrl + n
 Edit notes for the current slide (press Escape to exit this mode)
 .TP
+.B Ctrl + z
+In drawing and eraser mode, undo the last added stroke or erase curve.
+.TP
+.B Ctrl + y
+In drawing and eraser mode, redo the last undone stroke or erase curve.
+.TP
 .B s
 Start timer
 .TP
