@@ -1374,6 +1374,10 @@ namespace pdfpc {
                 "Reload the presentation");
             add_action("quit", this.quit,
                 "Exit pdfpc");
+            add_action("undo", this.undo,
+                "Undo the last paint action");
+            add_action("redo", this.redo,
+                "Redo the last paint action");
         }
 
         protected void add_action(string name, callback func,
@@ -1926,6 +1930,26 @@ namespace pdfpc {
             var new_slide_number = this.history_fwd.poll_head();
             this.history_bck.offer_head(this.current_slide_number);
             this.switch_to_slide_number(new_slide_number, true);
+        }
+
+        /**
+         * Undo the drawing
+         */
+        public void undo() {
+            if (in_drawing_mode()) {
+                this.pen_drawing.undo();
+                this.queue_pen_surface_draws();
+            }
+        }
+
+        /**
+         * Undo the drawing
+         */
+        public void redo() {
+            if (in_drawing_mode()) {
+                this.pen_drawing.redo();
+                this.queue_pen_surface_draws();
+            }
         }
 
         /**

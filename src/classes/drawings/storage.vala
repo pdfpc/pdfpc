@@ -42,14 +42,14 @@ namespace pdfpc.Drawings.Storage {
         /**
          * Store an overlay drawing with the given index as an identifier.
          */
-        public abstract void store(uint index, Cairo.ImageSurface surface);
-
+        public abstract void store(uint index,
+                                   DrawingCommandList drawing_commands);
         /**
          * Retrieve an overlay drawing from storage, or null if none was made.
          *
          * The returned reference can be modified without modifying the storage.
          */
-        public abstract Cairo.ImageSurface? retrieve(uint index);
+        public abstract pdfpc.DrawingCommandList? retrieve(uint index);
 
         /**
          * Clear the storage
@@ -61,31 +61,32 @@ namespace pdfpc.Drawings.Storage {
         /**
          * Actual overlay images.
          */
-        protected Cairo.ImageSurface[] storage = null;
+        protected DrawingCommandList[] drawing_commands_storage = null;
 
         /**
          * Initialize the storage
          */
         public MemoryUncompressed( Metadata.Pdf metadata ) {
             base(metadata);
-            // This is more slots than we might need, but prevents us from being out
-            // of bounds if the number of user slides is changed due to overlay marking
-            // changing.
-            storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
+            clear();
         }
 
-        public override void store(uint index, Cairo.ImageSurface surface) {
-            storage[index] = surface;
+        public override void store(uint index,
+                                   DrawingCommandList drawing_commands) {
+            drawing_commands_storage[index] = drawing_commands;
         }
 
-        public override Cairo.ImageSurface? retrieve(uint index) {
-            Cairo.ImageSurface? result = storage[index];
-            storage[index] = null;
+        public override pdfpc.DrawingCommandList? retrieve(uint index) {
+            var result = drawing_commands_storage[index];
+            drawing_commands_storage[index] = null;
             return result;
         }
 
         public override void clear() {
-            storage = new Cairo.ImageSurface[this.metadata.get_slide_count()];
+            // This is more slots than we might need, but prevents us from being out
+            // of bounds if the number of user slides is changed due to overlay marking
+            // changing.
+            drawing_commands_storage = new pdfpc.DrawingCommandList[this.metadata.get_slide_count()];
         }
     }
 

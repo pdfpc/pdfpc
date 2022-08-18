@@ -91,6 +91,8 @@ namespace pdfpc.Drawings {
         private int current_slide {get; set;}
         private Drawings.Storage.Base storage {get; protected set;}
 
+        private DrawingCommandList drawing_command_list;
+
         protected void set_surface(Cairo.ImageSurface surface) {
             this.surface = surface;
             this.context = new Cairo.Context(this.surface);
@@ -115,6 +117,8 @@ namespace pdfpc.Drawings {
             this.current_slide == -1;
 
             this.set_new_surface();
+
+            this.drawing_command_list = new DrawingCommandList();
         }
 
         public Cairo.ImageSurface? render_to_surface() {
@@ -130,6 +134,23 @@ namespace pdfpc.Drawings {
                 x1 * this.width, y1 * this.height,
                 x2 * this.width, y2 * this.height
             );
+
+            // Copy the calculation from tool_add line. This calculation
+            // should be shared.
+            double lwidth = tool.width / this.width;
+            if (tool.pressure >= 0.0) {
+                // TODO: perhaps make this normalization adjustable
+                // and/or implement a smarter mapping
+                lwidth *= tool.pressure/0.5;
+            }
+
+
+            // Add to the drawing command list
+            this.drawing_command_list.add_line(
+                tool.is_eraser,
+                x1, y1, x2, y2,
+                lwidth,
+                tool.red, tool.green, tool.blue, tool.alpha);
         }
 
         /*
@@ -139,6 +160,23 @@ namespace pdfpc.Drawings {
             this.context.set_operator(Cairo.Operator.CLEAR);
             this.context.paint();
             this.context.set_operator(Cairo.Operator.OVER);
+            this.drawing_command_list.clear();
+        }
+
+        /*
+         * Undo the last commands
+         */
+        public void undo() {
+            this.drawing_command_list.undo();
+            this.drawing_command_list.paint_in_surface(this.surface);
+        }
+
+        /*
+         * Undo the last commands
+         */
+        public void redo() {
+            this.drawing_command_list.redo();
+            this.drawing_command_list.paint_in_surface(this.surface);
         }
 
         /*
@@ -148,15 +186,15 @@ namespace pdfpc.Drawings {
         public void switch_to_slide(int slide_number) {
             if (slide_number != this.current_slide) {
                 if (this.surface != null) {
-                    storage.store(this.current_slide, this.surface);
+                    storage.store(this.current_slide, this.drawing_command_list);
                 }
 
-                Cairo.ImageSurface? from_storage = storage.retrieve(slide_number);
-                if (from_storage == null) {
-                    set_new_surface();
-                } else {
-                    set_surface(from_storage);
+                this.drawing_command_list = storage.retrieve(slide_number);
+                if (this.drawing_command_list == null) {
+                    this.drawing_command_list = new DrawingCommandList();
                 }
+                set_new_surface();
+                this.drawing_command_list.paint_in_surface(this.surface);
                 this.current_slide = slide_number;
             }
         }
