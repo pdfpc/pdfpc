@@ -81,8 +81,7 @@ namespace pdfpc {
 
             // start the timer unless it's the initial positioning
             if (!this.history_bck.is_empty) {
-                this.running = true;
-                this.timer.start();
+                this.timer.run();
             }
 
             // clear the highlighted selection when switching to a new page
@@ -95,6 +94,20 @@ namespace pdfpc {
             this.controllables_update();
         }
 
+        /**
+         * Progress status of the talk
+         */
+        public enum ProgressStatus {
+            PreTalk,
+            Normal,
+            Slow,
+            Fast,
+            LastMinutes,
+            Overtime;
+        }
+
+        public ProgressStatus progress_status { get; protected set; }
+
         public void start_autoadvance_timer(int slide_number) {
             double duration = this.metadata.get_slide_duration(slide_number);
             if (duration < 0) {
@@ -102,7 +115,7 @@ namespace pdfpc {
             }
 
             // no autoadvance if paused/not started yet
-            if (!this.running) {
+            if (!this.is_running()) {
                 return;
             }
 
@@ -118,7 +131,7 @@ namespace pdfpc {
                     GLib.Timeout.add((int) (1000*duration), () => {
                         // check again - the paused state might be enabled
                         // meantime
-                        if (this.running) {
+                        if (this.is_running()) {
                             this.switch_to_slide_number(next_slide);
                         }
                         this.autoadvance_timeout_id = 0;
@@ -133,8 +146,13 @@ namespace pdfpc {
         /**
          * Started & not paused
          */
-        public bool running { get; protected set; default = false; }
+        public bool is_running() {
+            return this.timer.is_running();
+        }
 
+        /**
+         * Paused
+         */
         public bool is_paused() {
             return this.timer.is_paused();
         }
@@ -316,6 +334,11 @@ namespace pdfpc {
         public signal void zoom_request(ScaledRectangle? rect);
 
         /**
+         * Signal: Fired when the timer label changes
+         */
+        public signal void timer_change(string label);
+
+        /**
          * Controllables which are registered with this presentation controller.
          */
         protected Gee.List<Controllable> controllables;
@@ -326,6 +349,59 @@ namespace pdfpc {
          */
         public RestServer rest_server { get; protected set; }
 #endif
+
+        protected void on_timer_change(int talk_time, Timer.State state,
+            string label) {
+            int duration = this.timer.duration;
+            this.progress_status = ProgressStatus.Normal;
+
+            if (state == Timer.State.PreTalk) {
+                this.progress_status = ProgressStatus.PreTalk;
+            } else if (duration > 0) {
+                if (talk_time >= duration) {
+                    this.progress_status = ProgressStatus.Overtime;
+                } else if (Options.timer_pace_color) {
+                    // Indication of too slow/fast pace independently
+                    // of the time left.
+
+                    // Assuming we're in the middle of the current slide
+                    double expected_progress =
+                        (this.current_user_slide_number + 0.5)/this.user_n_slides;
+
+                    int expected_time = (int) (duration*expected_progress);
+
+                    if (talk_time > expected_time + 60) {
+                        this.progress_status = ProgressStatus.Slow;
+                    } else if (talk_time < expected_time - 60) {
+                        this.progress_status = ProgressStatus.Fast;
+                    } else {
+                        this.progress_status = ProgressStatus.Normal;
+                    }
+                } else {
+                    // Old "last-minutes" warning
+                    int time_left = duration - talk_time;
+                    if (time_left < 60*this.metadata.get_last_minutes()) {
+                        this.progress_status = ProgressStatus.LastMinutes;
+                    }
+                }
+            }
+
+            string sym;
+            switch (timer.get_mode()) {
+            case Timer.Mode.CountUp:
+                sym = " \u2b08";
+                break;
+            case Timer.Mode.CountDown:
+                sym = " \u2b0a";
+                break;
+            default:
+                sym = "";
+                break;
+            }
+
+            this.timer_change(label + sym);
+        }
+
         /**
          * The metadata of the presentation
          */
@@ -339,10 +415,12 @@ namespace pdfpc {
                 if (value != null) {
                     this.metadata.controller = this;
 
-                    this.timer = getTimerLabel(this,
-                        (int) metadata.get_duration() * 60,
+                    this.timer = new Timer((int) (60*metadata.get_duration()),
                         metadata.get_start_time(), metadata.get_end_time());
-                    this.timer.reset();
+                    if (Options.use_time_of_day) {
+                        this.timer.set_mode(Timer.Mode.Clock);
+                    }
+                    this.timer.change.connect(on_timer_change);
 
                     this.current_slide_number = 0;
 
@@ -388,10 +466,9 @@ namespace pdfpc {
         private Gee.ArrayQueue<int> history_fwd;
 
         /**
-         * Timer for the presentation. It should only be displayed on one view.
-         * We hope the controllables behave accordingly.
+         * Timer for the presentation
          */
-        protected TimerLabel timer;
+        protected Timer timer;
 
         protected delegate void callback();
         protected delegate void callback_with_parameter(GLib.Variant? parameter);
@@ -1218,6 +1295,8 @@ namespace pdfpc {
                 "Pause the timer");
             add_action("resetTimer", this.reset_timer,
                 "Reset the timer");
+            add_action("cycleTimerMode", this.cycle_timer,
+                "Cycle the timer view");
 
             add_action("windowed", this.toggle_windowed,
                 "Toggle the windowed state");
@@ -1600,13 +1679,6 @@ namespace pdfpc {
             this.ignore_mouse_events = v;
         }
 
-        /**
-         * Get the timer
-         */
-        public TimerLabel getTimer() {
-            return this.timer;
-        }
-
         private void readKeyBindings() {
             foreach (var bt in Options.key_bindings) {
                 if (bt.type == "bind") {
@@ -1785,8 +1857,7 @@ namespace pdfpc {
          * Go to the named slide
          */
         public void goto_string(Variant? page) {
-            this.running = true;
-            this.timer.start();
+            this.timer.run();
 
             int destination = int.parse(page.get_string()) - 1;
             this.goto_user_page(destination);
@@ -1989,7 +2060,6 @@ namespace pdfpc {
          * Start the presentation (-> timer)
          */
         protected void start() {
-            this.running = true;
             this.timer.start();
             // start the autoadvancing on the initial page, if needed
             this.start_autoadvance_timer(this.current_slide_number);
@@ -2000,9 +2070,8 @@ namespace pdfpc {
          * Pause the timer
          */
         public void toggle_pause() {
-            this.running = !this.running;
-            this.timer.pause();
-            if (this.running) {
+            this.timer.toggle_pause();
+            if (this.is_running()) {
                 this.start_autoadvance_timer(this.current_slide_number);
             }
             this.controllables_update();
@@ -2011,8 +2080,15 @@ namespace pdfpc {
         /**
          * Reset the timer
          */
-        protected void reset_timer() {
+        public void reset_timer() {
             this.timer.reset();
+        }
+
+        /**
+         * Cycle the timer view (count up/count down/current time)
+         */
+        public void cycle_timer() {
+            this.timer.cycle_mode();
         }
 
         /**

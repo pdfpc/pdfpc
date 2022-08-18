@@ -69,6 +69,7 @@ bind Escape             exitState
 bind s                  start
 bind p                  pause
 bind C+t                resetTimer
+bind S+t                cycleTimerMode
 
 # Presentation editing
 bind C+n                note
