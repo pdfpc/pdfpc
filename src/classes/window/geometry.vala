@@ -27,6 +27,10 @@ namespace pdfpc.Window {
         public int x_offset = int.MIN;
         public int y_offset = int.MIN;
 
+        public bool default_positions() {
+            return x_offset == int.MIN && y_offset == int.MIN;
+        }
+
         private bool parse_legacy_geometry(string description, int colonIndex) {
             width = int.parse(description.substring(0, colonIndex));
             height = int.parse(description.substring(colonIndex + 1));
@@ -117,12 +121,13 @@ namespace pdfpc.Window {
         }
 
         private int? parse_single_offset(string desc, int pos, out int num) {
-            if (desc[pos] != '+' && desc[pos] != '-') {
+            char sign = desc[pos];
+            if (sign != '+' && sign != '-') {
                 return null;
             }
             int res;
             pos = parse_prefix(desc, pos+1, out res);
-            num = (desc[0] == '-') ? -res : res;
+            num = (sign == '-') ? -res : res;
             return pos;
         }
 

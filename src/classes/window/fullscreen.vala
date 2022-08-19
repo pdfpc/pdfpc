@@ -205,6 +205,18 @@ namespace pdfpc.Window {
                 if (geometry != null) {
                     this.window_w = geometry.width;
                     this.window_h = geometry.height;
+
+                    if (!geometry.default_positions()) {
+                        if (Options.move_on_mapped) {
+                            this.map_event.connect(() => {
+                                this.move(geometry.x_offset, geometry.y_offset);
+                                return true;
+                            });
+                        } else {
+                        GLib.printerr("%d, %d\n", geometry.x_offset, geometry.y_offset);
+                            this.move(geometry.x_offset, geometry.y_offset);
+                        }
+                    }
                 } else {
                     this.window_w /= 2;
                     this.window_h /= 2;
