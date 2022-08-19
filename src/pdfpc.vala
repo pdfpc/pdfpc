@@ -283,26 +283,10 @@ namespace pdfpc {
             // parse size option
             // should be in the width:height format
 
-            int width = -1, height = -1;
+            Window.Geometry presentation_geometry = new Window.Geometry(
+                Options.presentation_size
+            );
             if (Options.presentation_size != null) {
-                int colonIndex = Options.presentation_size.index_of(":");
-
-                string w_string;
-                string h_string;
-                w_string = Options.presentation_size.substring(0, colonIndex);
-                h_string = Options.presentation_size.substring(colonIndex + 1);
-                width = int.parse(w_string);
-                height = int.parse(h_string);
-
-                if (width < 1 || height < 1) {
-                    GLib.printerr(
-                        "Failed to parse --size=%s\n",
-                        Options.presentation_size
-                    );
-                    Process.exit(1);
-
-                }
-
                 Options.windowed = "both";
             }
 
@@ -447,7 +431,8 @@ namespace pdfpc {
                 this.controller.presentation =
                     new Window.Presentation(this.controller,
                         presentation_monitor, presentation_windowed,
-                        width, height);
+                        presentation_geometry.width,
+                        presentation_geometry.height);
 
                 this.controller.presentation.show.connect(() => {
                     this.controller.presentation.update();
@@ -488,7 +473,8 @@ namespace pdfpc {
                                 controller.presentation =
                                     new Window.Presentation(controller,
                                         i, presentation_windowed,
-                                        width, height);
+                                        presentation_geometry.width,
+                                        presentation_geometry.height);
                                 controller.presentation.show.connect(() => {
                                     controller.presentation.update();
                                 });
