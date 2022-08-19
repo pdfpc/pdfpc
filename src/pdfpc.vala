@@ -283,13 +283,21 @@ namespace pdfpc {
 #if MOVIES
             Gst.init(ref args);
 #endif
-            // parse size option
+            // parse size options
             // should be in the width:height format
 
             Window.Geometry presentation_geometry = null;
             if (Options.presentation_size != null) {
                 presentation_geometry = new Window.Geometry(
                     Options.presentation_size
+                );
+                Options.windowed = "both";
+            }
+
+            Window.Geometry presenter_geometry = null;
+            if (Options.presenter_size != null) {
+                presenter_geometry = new Window.Geometry(
+                    Options.presenter_size
                 );
                 Options.windowed = "both";
             }
@@ -424,7 +432,8 @@ namespace pdfpc {
             if (!single_screen_mode || !Options.display_switch) {
                 this.controller.presenter =
                     new Window.Presenter(this.controller,
-                        presenter_monitor, presenter_windowed);
+                        presenter_monitor, presenter_windowed,
+                        presenter_geometry);
 
                 this.controller.presenter.show.connect(() => {
                     this.controller.presenter.update();
