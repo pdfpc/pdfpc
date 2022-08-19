@@ -246,6 +246,11 @@ namespace pdfpc {
         public static string? presentation_size = null;
 
         /**
+         * Size of the presenter window
+         */
+        public static string? presenter_size = null;
+
+        /**
          * Pointer color
          */
         public static string pointer_color = "red";
