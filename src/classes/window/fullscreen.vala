@@ -120,7 +120,7 @@ namespace pdfpc.Window {
         protected virtual void resize_gui() {}
 
         public Fullscreen(PresentationController controller, bool is_presenter,
-            int monitor_num, bool windowed, int width = -1, int height = -1) {
+            int monitor_num, bool windowed, Geometry? geometry = null) {
             this.controller = controller;
             this.is_presenter = is_presenter;
             this.windowed = windowed;
@@ -202,9 +202,9 @@ namespace pdfpc.Window {
                     this.do_fullscreen();
                 }
             } else {
-                if (width > 0 && height > 0) {
-                    this.window_w = width;
-                    this.window_h = height;
+                if (geometry != null) {
+                    this.window_w = geometry.width;
+                    this.window_h = geometry.height;
                 } else {
                     this.window_w /= 2;
                     this.window_h /= 2;

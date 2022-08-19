@@ -283,10 +283,11 @@ namespace pdfpc {
             // parse size option
             // should be in the width:height format
 
-            Window.Geometry presentation_geometry = new Window.Geometry(
-                Options.presentation_size
-            );
+            Window.Geometry presentation_geometry = null;
             if (Options.presentation_size != null) {
+                presentation_geometry = new Window.Geometry(
+                    Options.presentation_size
+                );
                 Options.windowed = "both";
             }
 
@@ -431,8 +432,7 @@ namespace pdfpc {
                 this.controller.presentation =
                     new Window.Presentation(this.controller,
                         presentation_monitor, presentation_windowed,
-                        presentation_geometry.width,
-                        presentation_geometry.height);
+                        presentation_geometry);
 
                 this.controller.presentation.show.connect(() => {
                     this.controller.presentation.update();
@@ -473,8 +473,7 @@ namespace pdfpc {
                                 controller.presentation =
                                     new Window.Presentation(controller,
                                         i, presentation_windowed,
-                                        presentation_geometry.width,
-                                        presentation_geometry.height);
+                                        presentation_geometry);
                                 controller.presentation.show.connect(() => {
                                     controller.presentation.update();
                                 });

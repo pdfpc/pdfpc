@@ -24,34 +24,27 @@ namespace pdfpc.Window {
     public class Geometry {
         public int width;
         public int height;
-        public int x_offset;
-        public int y_offset;
+        public int x_offset = int.MIN;
+        public int y_offset = int.MIN;
 
         public Geometry(string description) {
-            if (description == null) {
-                width = -1;
-                height = -1;
-                x_offset = int.MIN;
-                y_offset = int.MIN;
-            } else {
-                int colonIndex = description.index_of(":");
-                if (colonIndex >= 0) {
-                    width = int.parse(description.substring(0, colonIndex));
-                    height = int.parse(description.substring(colonIndex + 1));
-                    if (width < 1 || height < 1) {
-                        GLib.printerr(
-                            "Failed to parse %s as a window geometry\n",
-                            description
-                        );
-                        Process.exit(1);
-                    }
-                } else {
+            int colonIndex = description.index_of(":");
+            if (colonIndex >= 0) {
+                width = int.parse(description.substring(0, colonIndex));
+                height = int.parse(description.substring(colonIndex + 1));
+                if (width < 1 || height < 1) {
                     GLib.printerr(
                         "Failed to parse %s as a window geometry\n",
                         description
                     );
                     Process.exit(1);
                 }
+            } else {
+                GLib.printerr(
+                    "Failed to parse %s as a window geometry\n",
+                    description
+                );
+                Process.exit(1);
             }
         }
     }
