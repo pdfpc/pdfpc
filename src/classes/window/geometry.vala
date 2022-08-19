@@ -32,9 +32,24 @@ namespace pdfpc.Window {
             if (colonIndex >= 0) {
                 width = int.parse(description.substring(0, colonIndex));
                 height = int.parse(description.substring(colonIndex + 1));
-                if (width < 1 || height < 1) {
+                if (width < 1) {
                     GLib.printerr(
-                        "Failed to parse %s as a window geometry\n",
+                        "The string %s does not specify a positive width\n",
+                        description.substring(0, colonIndex)
+                    );
+                    GLib.printerr(
+                        "Failed to parse %s as a W:H window geometry\n",
+                        description
+                    );
+                    Process.exit(1);
+                }
+                if (height < 1) {
+                    GLib.printerr(
+                        "The string %s does not specify a positive height\n",
+                        description.substring(colonIndex + 1)
+                    );
+                    GLib.printerr(
+                        "Failed to parse %s as a W:H window geometry\n",
                         description
                     );
                     Process.exit(1);
