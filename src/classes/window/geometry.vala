@@ -27,27 +27,109 @@ namespace pdfpc.Window {
         public int x_offset = int.MIN;
         public int y_offset = int.MIN;
 
+        private bool parse_legacy_geometry(string description, int colonIndex) {
+            width = int.parse(description.substring(0, colonIndex));
+            height = int.parse(description.substring(colonIndex + 1));
+            if (width < 1) {
+                GLib.printerr(
+                    "The string %s does not specify a positive width\n",
+                    description.substring(0, colonIndex)
+                );
+                return false;
+            }
+            if (height < 1) {
+                GLib.printerr(
+                    "The string %s does not specify a positive height\n",
+                    description.substring(colonIndex + 1)
+                );
+                return false;
+            }
+            return true;
+        }
+
+        private bool is_digit(char d) {
+            switch (d) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private int parse_prefix(string desc, int pos, out int num) {
+            num = 0;
+            while (pos < desc.len() && is_digit(desc[pos])) {
+                num *= 10;
+                num += desc[pos] - 48;
+                pos += 1;
+            }
+            return pos;
+        }
+
+        private bool parse_xish_geometry(string desc) {
+            int pos = 0;
+            if (desc[0] == '=') {
+                pos = 1;
+            }
+            pos = parse_prefix(desc, pos, out width);
+            if (width < 1) {
+                GLib.printerr("Width must be positive\n");
+                return false;
+            }
+            if (pos == desc.len() || (desc[pos] | 32) != 'x') {
+                GLib.printerr("Expected x or X after width\n");
+                return false;
+            }
+            pos += 1;
+            pos = parse_prefix(desc, pos, out height);
+            if (height < 1) {
+                GLib.printerr("Height must be positive\n");
+                return false;
+            }
+            if (pos != desc.len()) {
+                int? p = parse_single_offset(desc, pos, out x_offset);
+                if (p == null) {
+                    GLib.printerr("No valid x offset after height\n");
+                    return false;
+                }
+                pos = p;
+                p = parse_single_offset(desc, pos, out y_offset);
+                if (p == null) {
+                    GLib.printerr("No valid y offset after x offset\n");
+                    return false;
+                }
+                pos = p;
+            }
+            if (pos != desc.len()) {
+                GLib.printerr("More characters after y offset\n");
+                return false;
+            }
+            return true;
+        }
+
+        private int? parse_single_offset(string desc, int pos, out int num) {
+            if (desc[pos] != '+' && desc[pos] != '-') {
+                return null;
+            }
+            int res;
+            pos = parse_prefix(desc, pos+1, out res);
+            num = (desc[0] == '-') ? -res : res;
+            return pos;
+        }
+
         public Geometry(string description) {
             int colonIndex = description.index_of(":");
             if (colonIndex >= 0) {
-                width = int.parse(description.substring(0, colonIndex));
-                height = int.parse(description.substring(colonIndex + 1));
-                if (width < 1) {
-                    GLib.printerr(
-                        "The string %s does not specify a positive width\n",
-                        description.substring(0, colonIndex)
-                    );
-                    GLib.printerr(
-                        "Failed to parse %s as a W:H window geometry\n",
-                        description
-                    );
-                    Process.exit(1);
-                }
-                if (height < 1) {
-                    GLib.printerr(
-                        "The string %s does not specify a positive height\n",
-                        description.substring(colonIndex + 1)
-                    );
+                if (!parse_legacy_geometry(description, colonIndex)) {
                     GLib.printerr(
                         "Failed to parse %s as a W:H window geometry\n",
                         description
@@ -55,70 +137,11 @@ namespace pdfpc.Window {
                     Process.exit(1);
                 }
             } else {
-                unowned string desc_xhpxpy;
-                string desc_hpxpy;
-                unowned string desc_pxpy;
-                string desc_xpy;
-                unowned string desc_py;
-                string desc_y;
-                if (
-                    int.try_parse(description, out width, out desc_xhpxpy)
-                    ||
-                    width < 1
-                ) {
-                    GLib.printerr(
-                        "A Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                        description
-                    );
-                    Process.exit(1);
-                }
-                if (desc_xhpxpy.index_of("x") != 0) {
-                    GLib.printerr(
-                        "B Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                        description
-                    );
-                    Process.exit(1);
-                }
-                desc_hpxpy = desc_xhpxpy.substring(1);
-                if (int.try_parse(desc_hpxpy, out height, out desc_pxpy)) {
-                    if (height < 1) {
-                        GLib.printerr(
-                            "C Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                            description
-                        );
-                        Process.exit(1);
-                    }
-                } else {
-                    if (desc_pxpy.index_of("+") != 0) {
-                        GLib.printerr(
-                            "D Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                            description
-                        );
-                        Process.exit(1);
-                    }
-                    desc_xpy = desc_pxpy.substring(1);
-                    if (int.try_parse(desc_xpy, out x_offset, out desc_py)) {
-                        GLib.printerr(
-                            "E Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                            description
-                        );
-                        Process.exit(1);
-                    }
-                    if (desc_py.index_of("+") != 0) {
-                        GLib.printerr(
-                            "F Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                            description
-                        );
-                        Process.exit(1);
-                    }
-                    desc_y = desc_py.substring(1);
-                    if (!int.try_parse(desc_y, out y_offset)) {
-                        GLib.printerr(
-                            "G Failed to parse %s as a WxH[+X+Y] window geometry\n",
-                            description
-                        );
-                        Process.exit(1);
-                    }
+                if (!parse_xish_geometry(description)) {
+                   GLib.printerr(
+                       "Failed to parse %s as a WxH[+X+Y] geometry\n",
+                       description
+                   );
                 }
             }
         }
