@@ -122,8 +122,8 @@ namespace pdfpc {
                 ref Options.external_script,
                 "Enable execution of an external script", "file"},
             {"size", 'Z', 0, OptionArg.STRING,
-                ref Options.size,
-                "Size of the presentation window (implies \"-w\")", "W:H"},
+                ref Options.presentation_size,
+                "Size of the presentation window (implies \"-w both\")", "W:H"},
             {"presenter-screen", '1', 0, OptionArg.STRING,
                 ref Options.presenter_screen,
                 "Monitor to be used for the presenter", "M"},
@@ -284,14 +284,21 @@ namespace pdfpc {
             // should be in the width:height format
 
             int width = -1, height = -1;
-            if (Options.size != null) {
-                int colonIndex = Options.size.index_of(":");
+            if (Options.presentation_size != null) {
+                int colonIndex = Options.presentation_size.index_of(":");
 
-                width = int.parse(Options.size.substring(0, colonIndex));
-                height = int.parse(Options.size.substring(colonIndex + 1));
+                string w_string;
+                string h_string;
+                w_string = Options.presentation_size.substring(0, colonIndex);
+                h_string = Options.presentation_size.substring(colonIndex + 1);
+                width = int.parse(w_string);
+                height = int.parse(h_string);
 
                 if (width < 1 || height < 1) {
-                    GLib.printerr("Failed to parse --size=%s\n", Options.size);
+                    GLib.printerr(
+                        "Failed to parse --size=%s\n",
+                        Options.presentation_size
+                    );
                     Process.exit(1);
 
                 }
