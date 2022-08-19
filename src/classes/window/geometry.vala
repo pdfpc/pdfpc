@@ -55,11 +55,71 @@ namespace pdfpc.Window {
                     Process.exit(1);
                 }
             } else {
-                GLib.printerr(
-                    "Failed to parse %s as a window geometry\n",
-                    description
-                );
-                Process.exit(1);
+                unowned string desc_xhpxpy;
+                string desc_hpxpy;
+                unowned string desc_pxpy;
+                string desc_xpy;
+                unowned string desc_py;
+                string desc_y;
+                if (
+                    int.try_parse(description, out width, out desc_xhpxpy)
+                    ||
+                    width < 1
+                ) {
+                    GLib.printerr(
+                        "A Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                        description
+                    );
+                    Process.exit(1);
+                }
+                if (desc_xhpxpy.index_of("x") != 0) {
+                    GLib.printerr(
+                        "B Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                        description
+                    );
+                    Process.exit(1);
+                }
+                desc_hpxpy = desc_xhpxpy.substring(1);
+                if (int.try_parse(desc_hpxpy, out height, out desc_pxpy)) {
+                    if (height < 1) {
+                        GLib.printerr(
+                            "C Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                            description
+                        );
+                        Process.exit(1);
+                    }
+                } else {
+                    if (desc_pxpy.index_of("+") != 0) {
+                        GLib.printerr(
+                            "D Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                            description
+                        );
+                        Process.exit(1);
+                    }
+                    desc_xpy = desc_pxpy.substring(1);
+                    if (int.try_parse(desc_xpy, out x_offset, out desc_py)) {
+                        GLib.printerr(
+                            "E Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                            description
+                        );
+                        Process.exit(1);
+                    }
+                    if (desc_py.index_of("+") != 0) {
+                        GLib.printerr(
+                            "F Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                            description
+                        );
+                        Process.exit(1);
+                    }
+                    desc_y = desc_py.substring(1);
+                    if (!int.try_parse(desc_y, out y_offset)) {
+                        GLib.printerr(
+                            "G Failed to parse %s as a WxH[+X+Y] window geometry\n",
+                            description
+                        );
+                        Process.exit(1);
+                    }
+                }
             }
         }
     }
