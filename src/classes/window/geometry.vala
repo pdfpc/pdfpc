@@ -134,6 +134,11 @@ namespace pdfpc.Window {
         public Geometry(string description) {
             int colonIndex = description.index_of(":");
             if (colonIndex >= 0) {
+                GLib.printerr("Legacy window geometry \"%s\"\n", description);
+                GLib.printerr(
+                    "Support for the W:H format " +
+                    "will be removed in a future version\n"
+                );
                 if (!parse_legacy_geometry(description, colonIndex)) {
                     GLib.printerr(
                         "Failed to parse %s as a W:H window geometry\n",

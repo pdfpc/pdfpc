@@ -123,10 +123,12 @@ namespace pdfpc {
                 "Enable execution of an external script", "file"},
             {"size", 'Z', 0, OptionArg.STRING,
                 ref Options.presentation_size,
-                "Size of the presentation window (implies \"-w both\")", "W:H"},
+                "Size of the presentation window",
+                "WxH[+X+Y]"},
             {"pc-size", 'A', 0, OptionArg.STRING,
                 ref Options.presenter_size,
-                "Size of the presenter window (implies \"-w both\")", "W:H"},
+                "Size of the presenter window",
+                "WxH[+X+Y]"},
             {"presenter-screen", '1', 0, OptionArg.STRING,
                 ref Options.presenter_screen,
                 "Monitor to be used for the presenter", "M"},
@@ -284,7 +286,7 @@ namespace pdfpc {
             Gst.init(ref args);
 #endif
             // parse size options
-            // should be in the width:height format
+            // should be in the WxH[+X+Y] or the legay W:H format
 
             Window.Geometry presentation_geometry = null;
             if (Options.presentation_size != null) {
