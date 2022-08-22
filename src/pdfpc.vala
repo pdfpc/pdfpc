@@ -291,7 +291,6 @@ namespace pdfpc {
                 presentation_geometry = new Window.Geometry(
                     Options.presentation_size
                 );
-                Options.windowed = "both";
             }
 
             Window.Geometry presenter_geometry = null;
@@ -299,23 +298,25 @@ namespace pdfpc {
                 presenter_geometry = new Window.Geometry(
                     Options.presenter_size
                 );
-                Options.windowed = "both";
             }
 
-            bool presenter_windowed = false;
-            bool presentation_windowed = false;
+            bool presenter_windowed = true;
+            bool presentation_windowed = presentation_geometry != null;
             switch (Options.windowed) {
+            case null:
+                break;
             case "none":
+                presenter_windowed = false;
+                presentation_windowed = false;
                 break;
             case "presenter":
-            case null:
-                presenter_windowed = true;
+                presentation_windowed = false;
                 break;
             case "presentation":
+                presenter_windowed = false;
                 presentation_windowed = true;
                 break;
             case "both":
-                presenter_windowed = true;
                 presentation_windowed = true;
                 break;
             default:
