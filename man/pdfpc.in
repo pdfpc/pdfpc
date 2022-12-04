@@ -232,6 +232,10 @@ fully active)
 .B w
 Toggle between the fullscreen and windowed mode of the presenter screen
 .TP
+.B Shift + a
+Maximize/unmaximize the current slide view (e.g., to increase accuracy while
+drawing)
+.TP
 .B b
 Turn off the presentation view (i.e.  fill it with a black color)
 .TP
