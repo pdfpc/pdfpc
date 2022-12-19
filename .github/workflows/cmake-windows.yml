@@ -35,12 +35,12 @@ jobs:
           mingw-w64-x86_64-vala       
           mingw-w64-x86_64-libgee
           mingw-w64-x86_64-poppler
-          mingw-w64-x86_64-libgtk-3
-          mingw-w64-x86_64-libgstreamer1.0
-          mingw-w64-x86_64-libgstreamer-plugins-base1.0
-          mingw-w64-x86_64-libjson-glib
+          mingw-w64-x86_64-gtk3
+          mingw-w64-x86_64-gstreamer
+          mingw-w64-x86_64-gst-plugins-base
+          mingw-w64-x86_64-json-glib
           mingw-w64-x86_64-libsoup
-          mingw-w64-x86_64-libqrencode
+          mingw-w64-x86_64-qrencode
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
