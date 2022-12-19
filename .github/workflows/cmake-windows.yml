@@ -41,6 +41,7 @@ jobs:
           mingw-w64-x86_64-json-glib
           mingw-w64-x86_64-libsoup
           mingw-w64-x86_64-qrencode
+          mingw-w64-x86_64-discount
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MAKE_PROGRAM=ninja -DMDVIEW=OFF
