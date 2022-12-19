@@ -135,21 +135,11 @@ On macOS with MacPorts, you can install all dependencies using the `port` comman
     # install dependencies
     sudo port -v install cmake vala pkgconfig gtk3 +x11 poppler libgee librsvg gstreamer1-gst-plugins-good +gtk3 +x11
 
-On Windows, a Cygwin installation with the following dependencies is needed:
+On Windows with MSYS2/MinGW-w64, the dependencies are installed with::
 
-- cmake
-- automake
-- make
-- gcc
-- gcc-c++
-- libstdc++-4.8-dev
-- x11
-- vala
-- gtk
-- gee
-- libpoppler
-- gstreamer
-- libgstinterfaces1.0-devel
+    pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-gcc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-vala mingw-w64-x86_64-libgee mingw-w64-x86_64-poppler mingw-w64-x86_64-gtk3 mingw-w64-x86_64-gstreamer mingw-w64-x86_64-gst-plugins-base mingw-w64-x86_64-json-glib mingw-w64-x86_64-libsoup mingw-w64-x86_64-qrencode mingw-w64-x86_64-discount
+
+(change `x86_64` to `i686` if you want to compile the 32-bit variant).
 
 Downloading and compilation
 ---------------------------
@@ -193,7 +183,11 @@ To disable support for the built-in REST Web server, pass *-DREST=OFF* to cmake.
 In this case, libsoup and libqrencode are not needed.
 
 To disable support for viewing notes in the Markdown format, pass *-DMDVIEW=OFF*
-to cmake. In this case, webkit2gtk is not needed.
+to cmake. In this case, webkit2gtk is not needed. If webkit2gtk is not available
+for your OS (i.e., macOS or Windows), you *must* pass this option for the build to succeed.
+
+On Windows, the compilation has been tested with the Ninja backend, so pass *-DCMAKE_MAKE_PROGRAM=ninja* to the cmake command and use *ninja* instead of *make*.
+
 
 Compilation troubleshooting
 ---------------------------
