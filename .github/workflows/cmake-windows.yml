@@ -43,7 +43,7 @@ jobs:
           mingw-w64-x86_64-qrencode
 
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MAKE_PROGRAM=ninja -DMDVIEW=OFF
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MAKE_PROGRAM=ninja -DMDVIEW=OFF
 
     - name: Build
-      run: ninja
+      run: cd build && ninja
