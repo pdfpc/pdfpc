@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pdfpc.github.io/schema/pdfpc/2",
+  "description": "Metadata about a presentation used by pdfpc",
+  "title": "pdfpc",
+  "type": "object",
+  "properties": {
+    "pdfpcFormat": {
+      "description": "Version number of this format, currently 2",
+      "type": "integer",
+      "const": 2
+    },
+    "duration": {
+      "description": "Duration of the presentation, in minutes",
+      "type": "integer",
+      "minimum": 1
+    },
+    "startTime": {
+      "description": "Intended start time, in the HH:MM format",
+      "type": "string",
+      "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+    },
+    "endTime": {
+      "description": "Intended end time, in the HH:MM format",
+      "type": "string",
+      "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+    },
+    "endSlide": {
+      "description": "User-defined last slide, 0-based",
+      "type": "integer",
+      "minimum": 0
+    },
+    "savedSlide": {
+      "description": "Bookmarked slide, 0-based",
+      "type": "integer",
+      "minimum": 0
+    },
+    "lastMinutes": {
+      "description": "Number of last minutes when the timer color changes",
+      "type": "integer",
+      "minimum": 1,
+      "default": 5
+    },
+    "disableMarkdown": {
+      "description": "Interpret notes as plain text",
+      "type": "boolean",
+      "default": false
+    },
+    "noteFontSize": {
+      "description": "Font size used to display slide notes",
+      "type": "integer",
+      "minimum": 1,
+      "default": 20
+    },
+    "defaultTransition": {
+      "description": "Default slide transition",
+      "type": "string",
+      "$comment": "A proper regex pattern would be kilometer long...",
+      "default": "replace",
+      "examples": [
+        "push",
+        "dissolve:1.5",
+        "wipe:1:90",
+        "split:1:0:vertical:outward"
+      ]
+    },
+    "beamerNotePosition": {
+      "description": "Position of Beamer notes",
+      "type": "string",
+      "enum": [
+        "none",
+        "top",
+        "bottom",
+        "right",
+        "left"
+      ],
+      "default": "none"
+    },
+    "pages": {
+      "description": "Array of pages; only user-modified ones need to be listed",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/page"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "pdfpcFormat"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "page": {
+      "description": "Page metadata",
+      "type": "object",
+      "properties": {
+        "idx": {
+          "description": "0-based PDF page index",
+          "type": "integer",
+          "minimum": 0
+        },
+        "label": {
+          "description": "PDF page label",
+          "type": "string"
+        },
+        "overlay": {
+          "description": "Overlay index having the same label, 0-based",
+          "type": "integer",
+          "minimum": 0
+        },
+        "forcedOverlay": {
+          "description": "Override overlay autodetection",
+          "type": "boolean",
+          "default": false
+        },
+        "hidden": {
+          "description": "Flag indicating the page should normally be skipped",
+          "type": "boolean",
+          "default": false
+        },
+        "note": {
+          "description": "User notes, either in plain text or Markdown",
+          "oneOf": [
+            {
+              "type": "string",
+              "contentMediaType": "text/plain"
+            },
+            {
+              "type": "string",
+              "contentMediaType": "text/markdown"
+            }
+          ],
+          "$comment": "The interpretation depends on disableMarkdown 1 level up"
+        }
+      },
+      "required": [
+        "idx",
+        "label",
+        "overlay"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
