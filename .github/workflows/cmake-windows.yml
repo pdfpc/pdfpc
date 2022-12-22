@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "**" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -32,7 +32,7 @@ jobs:
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-pkg-config
-          mingw-w64-x86_64-vala       
+          mingw-w64-x86_64-vala
           mingw-w64-x86_64-libgee
           mingw-w64-x86_64-poppler
           mingw-w64-x86_64-gtk3
