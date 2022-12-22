@@ -2,6 +2,17 @@
 pdfpc Changelog
 ===============
 
+Version 4.6.0
+=============
+
+*Released: December 2022*
+
+- Support hidden slides
+- Poster images for videos
+- Undo/Redo for slide drawings
+- JSON-schema for .pdfpc file
+- Simple REST-server for remote control
+
 Version 4.5.0
 =============
 
