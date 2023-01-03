@@ -29,23 +29,15 @@ if (MOVIES)
     )
 endif ()
 
-if (MDVIEW)
-    pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
-    set(MDVIEW_PACKAGES webkit2gtk-4.0)
-    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D MDVIEW)
-endif ()
-
 if (REST)
     pkg_check_modules(SOUP libsoup-2.4)
     if (SOUP_FOUND)
-        set(REST_PACKAGES
-            libsoup-2.4
-        )
+        set(LIBSOUP_API 2.4)
+        set(REST_PACKAGES libsoup-2.4)
     else ()
+        set(LIBSOUP_API 3.0)
         pkg_check_modules(SOUP REQUIRED libsoup-3.0)
-        set(REST_PACKAGES
-            libsoup-3.0
-        )
+        set(REST_PACKAGES libsoup-3.0)
     endif ()
 
     pkg_check_modules(QRENCODE REQUIRED libqrencode)
@@ -54,6 +46,16 @@ if (REST)
         # Needed for Posix.gethostname()
         set(WSOCK32_LIB wsock32)
     endif ()
+endif ()
+
+if (MDVIEW)
+    if (${LIBSOUP_API} EQUAL 3.0)
+        set(MDVIEW_PACKAGES webkit2gtk-4.1)
+    else ()
+        set(MDVIEW_PACKAGES webkit2gtk-4.0)
+    endif ()
+    pkg_check_modules(WEBKIT REQUIRED ${MDVIEW_PACKAGES})
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D MDVIEW)
 endif ()
 
 if ("${POPPLER_VERSION}" VERSION_GREATER_EQUAL 0.80 AND "${VALA_VERSION}" VERSION_GREATER 0.48.0)
