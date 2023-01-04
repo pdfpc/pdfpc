@@ -36,19 +36,11 @@ if (MDVIEW)
 endif ()
 
 if (REST)
-    pkg_check_modules(SOUP libsoup-2.4)
-    if (SOUP_FOUND)
-        set(REST_PACKAGES
-            libsoup-2.4
-        )
-    else ()
-        pkg_check_modules(SOUP REQUIRED libsoup-3.0)
-        set(REST_PACKAGES
-            libsoup-3.0
-        )
-    endif ()
-
+    pkg_check_modules(SOUP REQUIRED libsoup-2.4)
     pkg_check_modules(QRENCODE REQUIRED libqrencode)
+    set(REST_PACKAGES
+        libsoup-2.4
+    )
 
     if (${CMAKE_HOST_WIN32})
         # Needed for Posix.gethostname()
