@@ -2,6 +2,11 @@
 pdfpc
 =====
 
+|ubuntubuild| |windowsbuild|
+
+.. |ubuntubuild| image:: https://github.com/pdfpc/pdfpc/actions/workflows/cmake-ubuntu.yml/badge.svg?branch=master 
+.. |windowsbuild| image:: https://github.com/pdfpc/pdfpc/actions/workflows/cmake-windows.yml/badge.svg?branch=master
+
 About
 =====
 
