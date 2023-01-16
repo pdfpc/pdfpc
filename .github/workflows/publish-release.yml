@@ -3,14 +3,14 @@ name: Publish release
 on:
     push:
         branches:
-            - release-ci
+            - master
         paths:
             - 'src/pdfpc.version'
 
 jobs:
     create-release:
         runs-on: ubuntu-latest
-        
+
         permissions:
             contents: write
 
@@ -18,28 +18,27 @@ jobs:
 
         steps:
         - uses: actions/checkout@v3
-        
+
         - uses: actions/download-artifact@v3
           with:
               name: pdfpc-demo.pdf
 
         - uses: actions/download-artifact@v3
           with:
-              name: video-example.zip
-              
+              name: pdfpc-video-example.zip
+
         - name: Extract release name
           run: |
               PDFPC_VERSION=$( head -n 1 src/pdfpc.version )
               echo "PDFPC_VERSION=$PDFPC_VERSION" >> $GITHUB_ENV
-              
+
         - name: Release
           uses: softprops/action-gh-release@v1
           with:
               body: "Release of ${{ env.PDFPC_VERSION }}"
               files: |
                   pdfpc-demo.pdf
-                  video-example.zip
-              draft: true
+                  pdfpc-video-example.zip
               tag_name: ${{ env.PDFPC_VERSION }}
 
     build-demo-assets:
@@ -82,5 +81,5 @@ jobs:
         - name: Save video examples
           uses: actions/upload-artifact@v3
           with:
-            name: video-example.zip
+            name: pdfpc-video-example.zip
             path: demo/pdfpc-video-example/video-example.zip
