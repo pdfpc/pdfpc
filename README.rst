@@ -98,10 +98,10 @@ Requirements
 In order to compile and run pdfpc, the following requirements need to be met:
 
 - cmake >= 3.0
-- vala  >= 0.34
+- vala  >= 0.48
 - gtk+  >= 3.22
 - gee   >= 0.8
-- poppler with glib bindings
+- poppler >= 0.8 with glib bindings
 - pangocairo
 - gstreamer >= 1.0 with gst-plugins-good
 - discount (aka markdown2)
@@ -110,7 +110,7 @@ In order to compile and run pdfpc, the following requirements need to be met:
 - libsoup
 - libqrencode
 
-E.g., on Ubuntu 18.04 onward, you can install these dependencies with::
+E.g., on Ubuntu 20.04 onward, you can install these dependencies with::
 
     sudo apt-get install cmake valac libgee-0.8-dev libpoppler-glib-dev
     libgtk-3-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
@@ -151,13 +151,13 @@ Downloading and compilation
 
 You can download the latest stable release of pdfpc in the release section of
 github (https://github.com/pdfpc/pdfpc/releases). Uncompress the tarball (we
-use v4.2.1 as an example here)::
+use v4.6.0 as an example here)::
 
-    tar xvf pdfpc-4.2.1.tar.gz
+    tar xvf pdfpc-4.6.0.tar.gz
 
 Change to the extracted directory::
 
-    cd pdfpc-4.2.1
+    cd pdfpc-4.6.0
 
 Compile and install::
 

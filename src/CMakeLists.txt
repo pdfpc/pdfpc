@@ -2,7 +2,7 @@ find_package(PkgConfig)
 pkg_check_modules(GOBJECT REQUIRED gobject-2.0)
 pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(GEE REQUIRED gee-0.8)
-pkg_check_modules(POPPLER REQUIRED poppler-glib>=0.22)
+pkg_check_modules(POPPLER REQUIRED poppler-glib>=0.80)
 pkg_check_modules(GTK REQUIRED gtk+-3.0>=3.22)
 pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 pkg_check_modules(JSON REQUIRED json-glib-1.0)
@@ -47,10 +47,6 @@ if (REST)
         set(WSOCK32_LIB wsock32)
     endif ()
 endif ()
-
-if ("${POPPLER_VERSION}" VERSION_GREATER_EQUAL 0.80 AND "${VALA_VERSION}" VERSION_GREATER 0.48.0)
-    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D NEW_POPPLER)
-endif()
 
 include_directories(
     ${GOBJECT_INCLUDE_DIRS}
