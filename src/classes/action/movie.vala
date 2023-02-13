@@ -381,13 +381,11 @@ namespace pdfpc {
                 options.poster = movie.need_poster();
                 options.noprogress = !movie.show_controls();
                 options.loop = movie.get_play_mode() == Poppler.MoviePlayMode.REPEAT;
-                #if NEW_POPPLER
                 options.starttime = (int) (movie.get_start()/1000000000L);
                 int duration = (int) (movie.get_duration()/1000000000L);
                 if (duration > 0) {
                     options.stoptime = options.starttime + duration;
                 }
-                #endif
                 break;
 
             default:
