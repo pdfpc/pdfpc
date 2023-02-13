@@ -47,6 +47,7 @@ namespace pdfpc {
             this.action = mapping.action.copy();
         }
 
+#if MOVIES
         /**
          * Find movie on the current slide by its filename; there seems to be
          * no better way with the current Glib Poppler bindings.
@@ -71,6 +72,7 @@ namespace pdfpc {
 
             return null;
         }
+#endif
 
         /**
          * Create from the LinkMapping if the link is an internal link to a named
@@ -91,6 +93,7 @@ namespace pdfpc {
                     return new_obj as ActionMapping;
                 }
                 break;
+#if MOVIES
             case Poppler.ActionType.MOVIE:
                 unowned var movie_action = (Poppler.ActionMovie*) mapping.action;
                 var movie = movie_action.movie;
@@ -100,6 +103,7 @@ namespace pdfpc {
                     return new_obj as ActionMapping;
                 }
                 break;
+#endif
             default:
                 break;
             }
@@ -167,6 +171,7 @@ namespace pdfpc {
                 this.controller.switch_to_slide_number(slide_number);
 
                 break;
+#if MOVIES
             case Poppler.ActionType.MOVIE:
                 unowned var action = (Poppler.ActionMovie*) this.action;
                 var movie = action.movie;
@@ -192,6 +197,7 @@ namespace pdfpc {
                     }
                 }
                 break;
+#endif
             default:
                 return false;
             }
