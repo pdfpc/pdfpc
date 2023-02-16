@@ -22,6 +22,7 @@ jobs:
             build_movies: [movies_on, movies_off]
             build_mdview: [mdview_on, mdview_off]
             build_rest: [rest_on, rest_off]
+
             include:
                 - movies_packages:
                 - movies_build_flag: off
@@ -34,7 +35,7 @@ jobs:
                 - mdview_packages:
                 - mdview_build_flag: off
 
-                - mdview_packages: libwebkit2gtk-4.0-dev
+                - mdview_packages: libwebkit2gtk-4.0-dev libmarkdown2-dev
                   build_mdview: mdview_on
                 - mdview_build_flag: on
                   build_mdview: mdview_on
@@ -42,7 +43,7 @@ jobs:
                 - rest_packages:
                 - rest_build_flag: off
 
-                - rest_packages: libsoup2.4-dev libqrencode-dev
+                - rest_packages: libsoup2.4-dev libqrencode-dev libmarkdown2-dev
                   build_rest: rest_on
                 - rest_build_flag: on
                   build_rest: rest_on
@@ -53,7 +54,7 @@ jobs:
     - name: requirements
       run: |
         sudo apt update
-        sudo apt -y install cmake valac libunwind-dev libgee-0.8-dev libpoppler-glib-dev libgtk-3-dev libjson-glib-dev libmarkdown2-dev ${{ matrix.movies_packages }} ${{ matrix.mdview_packages }} ${{ matrix.rest_packages }}
+        sudo apt -y install cmake valac libunwind-dev libgee-0.8-dev libpoppler-glib-dev libgtk-3-dev libjson-glib-dev ${{ matrix.movies_packages }} ${{ matrix.mdview_packages }} ${{ matrix.rest_packages }}
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
