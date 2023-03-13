@@ -14,6 +14,6 @@ about: Create a report to help us improve
 2. ...
 
 pdfpc version:
-Used Distribution (GTK version, vala version):
-Display Server (X/Wayland):
+Used Distribution (GTK version, Vala version):
+Display Server (X11/Wayland):
 HiDPI Setting (yes/no):
