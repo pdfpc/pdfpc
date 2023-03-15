@@ -346,6 +346,12 @@ namespace pdfpc {
                     bool timer_pace_color = bool.parse(fields[2]);
                     Options.timer_pace_color = timer_pace_color;
                     break;
+                case "count-down-symbol":
+                    Options.count_down_symbol = " " + fields[2];
+                    break;
+                case "count-up-symbol":
+                    Options.count_up_symbol = " " + fields[2];
+                    break;
                 case "toolbox":
                     Options.toolbox_shown = bool.parse(fields[2]);
                     break;

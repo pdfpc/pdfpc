@@ -389,10 +389,10 @@ namespace pdfpc {
             string sym;
             switch (timer.get_mode()) {
             case Timer.Mode.CountUp:
-                sym = " \u2b08";
+                sym = Options.count_up_symbol;
                 break;
             case Timer.Mode.CountDown:
-                sym = " \u2b0a";
+                sym = Options.count_down_symbol;
                 break;
             default:
                 sym = "";

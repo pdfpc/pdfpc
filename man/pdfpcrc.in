@@ -189,6 +189,12 @@ presentation is progressing according to the expected pace (bool, Default is tru
 See the timer operation description in
 .B \fBpdfpc\fR(1).
 .TP
+.B count-down-symbol
+Set the symbol shown after the timer when counting down
+.TP
+.B count-up-symbol
+Set the symbol shown after the timer when counting up
+.TP
 .B toolbox
 Show the toolbox on startup (bool, Default is false).
 .TP

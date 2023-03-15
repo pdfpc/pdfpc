@@ -201,6 +201,16 @@ namespace pdfpc {
         public static string? end_time = null;
 
         /**
+         * Symbol to show when counting down
+         */
+        public static string count_down_symbol = " \u2b0a";
+
+        /**
+         * Symbol to show when counting up
+         */
+        public static string count_up_symbol = " \u2b08";
+
+        /**
          * Add a black slide at the end of the presentation
          */
         public static bool black_on_end = false;
