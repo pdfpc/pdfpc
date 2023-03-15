@@ -122,8 +122,13 @@ namespace pdfpc {
                 ref Options.external_script,
                 "Enable execution of an external script", "file"},
             {"size", 'Z', 0, OptionArg.STRING,
-                ref Options.size,
-                "Size of the presentation window (implies \"-w\")", "W:H"},
+                ref Options.presentation_size,
+                "Size of the presentation window",
+                "WxH[+X+Y]"},
+            {"pc-size", 'A', 0, OptionArg.STRING,
+                ref Options.presenter_size,
+                "Size of the presenter window",
+                "WxH[+X+Y]"},
             {"presenter-screen", '1', 0, OptionArg.STRING,
                 ref Options.presenter_screen,
                 "Monitor to be used for the presenter", "M"},
@@ -276,39 +281,40 @@ namespace pdfpc {
 #if MOVIES
             Gst.init(ref args);
 #endif
-            // parse size option
-            // should be in the width:height format
+            // parse size options
+            // should be in the WxH[+X+Y] or the legay W:H format
 
-            int width = -1, height = -1;
-            if (Options.size != null) {
-                int colonIndex = Options.size.index_of(":");
-
-                width = int.parse(Options.size.substring(0, colonIndex));
-                height = int.parse(Options.size.substring(colonIndex + 1));
-
-                if (width < 1 || height < 1) {
-                    GLib.printerr("Failed to parse --size=%s\n", Options.size);
-                    Process.exit(1);
-
-                }
-
-                Options.windowed = "both";
+            Window.Geometry presentation_geometry = null;
+            if (Options.presentation_size != null) {
+                presentation_geometry = new Window.Geometry(
+                    Options.presentation_size
+                );
             }
 
-            bool presenter_windowed = false;
-            bool presentation_windowed = false;
+            Window.Geometry presenter_geometry = null;
+            if (Options.presenter_size != null) {
+                presenter_geometry = new Window.Geometry(
+                    Options.presenter_size
+                );
+            }
+
+            bool presenter_windowed = true;
+            bool presentation_windowed = presentation_geometry != null;
             switch (Options.windowed) {
+            case null:
+                break;
             case "none":
+                presenter_windowed = false;
+                presentation_windowed = false;
                 break;
             case "presenter":
-            case null:
-                presenter_windowed = true;
+                presentation_windowed = false;
                 break;
             case "presentation":
+                presenter_windowed = false;
                 presentation_windowed = true;
                 break;
             case "both":
-                presenter_windowed = true;
                 presentation_windowed = true;
                 break;
             default:
@@ -425,7 +431,8 @@ namespace pdfpc {
             if (!single_screen_mode || !Options.display_switch) {
                 this.controller.presenter =
                     new Window.Presenter(this.controller,
-                        presenter_monitor, presenter_windowed);
+                        presenter_monitor, presenter_windowed,
+                        presenter_geometry);
 
                 this.controller.presenter.show.connect(() => {
                     this.controller.presenter.update();
@@ -436,7 +443,7 @@ namespace pdfpc {
                 this.controller.presentation =
                     new Window.Presentation(this.controller,
                         presentation_monitor, presentation_windowed,
-                        width, height);
+                        presentation_geometry);
 
                 this.controller.presentation.show.connect(() => {
                     this.controller.presentation.update();
@@ -477,7 +484,7 @@ namespace pdfpc {
                                 controller.presentation =
                                     new Window.Presentation(controller,
                                         i, presentation_windowed,
-                                        width, height);
+                                        presentation_geometry);
                                 controller.presentation.show.connect(() => {
                                     controller.presentation.update();
                                 });

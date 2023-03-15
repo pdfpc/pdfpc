@@ -112,8 +112,10 @@ Enable REST server for remote control of pdfpc.
 Enable Wayland-specific workaround. This might fix HiDPI scaling problems.
 .TP
 .BI "\-w, \-\-windowed"=MODE
-Run in the given windowed mode (presenter|presentation|both|none). The default
-mode is "presenter" (only the presentation window is fullscreen).
+Run in the given windowed mode (presenter|presentation|both|none).
+If this option is not specified, the presenter window will be windowed
+and the presentation will be fullscreen unless the `-Z` option is specified,
+corresponding to defaults of "presenter" or "both".
 .TP
 .BI "\-X, \-\-external-script"=FILENAME
 Specify a script to be executed with the 'X' (Shift+x) key during the
@@ -133,7 +135,16 @@ If the script exits with a non-zero return value, whatever the script
 wrote to stdout is printed in the console. Otherwise nothing is printed.
 .TP
 .BI "\-Z, \-\-size"
-Size of the presentation window in width:height format (forces windowed mode)
+Size (and position) of the presentation window.
+The size should be given as [=]W{xX}H[{+-}X{+-}Y]
+with W serving as the width and H as the height of the window
+and {+-}X and {+-}Y as the position of the upper left corner if specified,
+similar to the common format implemented by XParseGeometry.
+For backwards compatibility, a W:H format is also accepted.
+.TP
+.BI "\-?, \-\-???"
+Size (and position) of the presenter window.
+See -Z option for format description.
 .TP
 .BI "\-1, \-\-presenter\-screen"=MONITOR
 Monitor to be used for the presenter screen (see the \-M option).

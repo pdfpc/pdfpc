@@ -120,7 +120,7 @@ namespace pdfpc.Window {
         protected virtual void resize_gui() {}
 
         public Fullscreen(PresentationController controller, bool is_presenter,
-            int monitor_num, bool windowed, int width = -1, int height = -1) {
+            int monitor_num, bool windowed, Geometry? geometry = null) {
             this.controller = controller;
             this.is_presenter = is_presenter;
             this.windowed = windowed;
@@ -202,9 +202,21 @@ namespace pdfpc.Window {
                     this.do_fullscreen();
                 }
             } else {
-                if (width > 0 && height > 0) {
-                    this.window_w = width;
-                    this.window_h = height;
+                if (geometry != null) {
+                    this.window_w = geometry.width;
+                    this.window_h = geometry.height;
+
+                    if (!geometry.default_positions()) {
+                        if (Options.move_on_mapped) {
+                            this.map_event.connect(() => {
+                                this.move(geometry.x_offset, geometry.y_offset);
+                                return true;
+                            });
+                        } else {
+                        GLib.printerr("%d, %d\n", geometry.x_offset, geometry.y_offset);
+                            this.move(geometry.x_offset, geometry.y_offset);
+                        }
+                    }
                 } else {
                     this.window_w /= 2;
                     this.window_h /= 2;
