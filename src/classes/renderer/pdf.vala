@@ -87,11 +87,14 @@ namespace pdfpc {
                 }
             }
 
+            // Retrieve the Poppler.Page for the page to render
+            var page = metadata.get_slide_page(slide_number, notes_area);
+            if (page == null) {
+                return this.fade_to_black(width, height);
+            }
+
             // Measure the time to render the page
             GLib.Timer timer = new GLib.Timer();
-
-            // Retrieve the Poppler.Page for the page to render
-            var page = metadata.document.get_page(slide_number);
 
             // A lot of Pdfs have transparent backgrounds defined. We render
             // every page before a white background because of this.
