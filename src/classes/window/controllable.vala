@@ -133,6 +133,10 @@ namespace pdfpc.Window {
             this.button_press_event.connect(this.controller.button_press);
             this.scroll_event.connect(this.controller.scroll);
 
+            this.controller.zoom_request.connect(this.on_zoom);
+
+            this.controller.reload_request.connect(this.on_reload);
+
             // Start the 5 seconds timeout after which the mouse cursor is
             // hidden
             this.restart_hide_cursor_timer();
@@ -302,6 +306,19 @@ namespace pdfpc.Window {
                 // another five seconds.
                 return true;
             }
+        }
+
+        /**
+         * Called on document reload.
+         * TODO: in principle the document geometry may change!
+         */
+        private void on_reload() {
+            this.main_view.invalidate();
+        }
+
+        private void on_zoom(PresentationController.ScaledRectangle? rect) {
+            this.main_view.display(this.controller.current_slide_number,
+                true, rect);
         }
     }
 }

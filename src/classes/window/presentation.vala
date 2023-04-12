@@ -51,9 +51,7 @@ namespace pdfpc.Window {
             int screen_num, bool windowed, int width = -1, int height = -1) {
             base(controller, false, screen_num, windowed, width, height);
 
-            this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);
-            this.controller.zoom_request.connect(this.on_zoom);
 
             this.view = new View.Pdf.from_controllable_window(this, false, true);
             this.view.transitions_enabled = true;
@@ -70,21 +68,14 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Called on document reload.
-         * TODO: in principle the document geometry may change!
-         */
-        public void on_reload() {
-            this.view.invalidate();
-        }
-
-        /**
          * Update the display
          */
         public void update() {
             this.visible = !this.controller.hidden;
 
-            if (this.controller.frozen)
+            if (this.controller.frozen) {
                 return;
+            }
 
             bool old_disabled = this.view.disabled;
             if (this.controller.faded_to_black) {
@@ -95,11 +86,6 @@ namespace pdfpc.Window {
 
             bool force = old_disabled != this.view.disabled;
             this.view.display(this.controller.current_slide_number, force);
-        }
-
-        private void on_zoom(PresentationController.ScaledRectangle? rect) {
-            this.main_view.display(this.controller.current_slide_number,
-                true, rect);
         }
 
         private void on_entering_slide(int slide_number) {
