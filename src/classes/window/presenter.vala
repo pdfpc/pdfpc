@@ -35,11 +35,11 @@ namespace pdfpc.Window {
      * Other useful information like time slide count, ... can be displayed here as
      * well.
      */
-    public class Presenter : Fullscreen, Controllable {
+    public class Presenter : ControllableWindow {
         /**
          * Only handle links and annotations on the current_view
          */
-        public View.Pdf main_view {
+        public override View.Pdf main_view {
             get {
                 return this.current_view;
             }
@@ -573,15 +573,15 @@ namespace pdfpc.Window {
             // count.
             int current_allocated_width = (int) Math.floor(
                 this.window_w*Options.current_size/100.0);
-            this.current_view = new View.Pdf.from_fullscreen(this,
+            this.current_view = new View.Pdf.from_controllable_window(this,
                 false, true);
 
-            this.next_view = new View.Pdf.from_fullscreen(this,
+            this.next_view = new View.Pdf.from_controllable_window(this,
                 false, false, true);
 
-            this.strict_next_view = new View.Pdf.from_fullscreen(this,
+            this.strict_next_view = new View.Pdf.from_controllable_window(this,
                 false, false);
-            this.strict_prev_view = new View.Pdf.from_fullscreen(this,
+            this.strict_prev_view = new View.Pdf.from_controllable_window(this,
                 false, false);
 
             this.css_provider = new Gtk.CssProvider();
@@ -607,7 +607,7 @@ namespace pdfpc.Window {
             notes_sw.add(this.notes_editor);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 
-            this.notes_view = new View.Pdf.from_fullscreen(this,
+            this.notes_view = new View.Pdf.from_controllable_window(this,
                 true, false);
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(this.notes_view);

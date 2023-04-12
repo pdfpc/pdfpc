@@ -29,11 +29,11 @@ namespace pdfpc.Window {
     /**
      * Window showing the currently active slide to be presented on a beamer
      */
-    public class Presentation : Fullscreen, Controllable {
+    public class Presentation : ControllableWindow {
         /**
          * The only view is the main view.
          */
-        public View.Pdf main_view {
+        public override View.Pdf main_view {
             get {
                 return this.view;
             }
@@ -55,7 +55,7 @@ namespace pdfpc.Window {
             this.controller.update_request.connect(this.update);
             this.controller.zoom_request.connect(this.on_zoom);
 
-            this.view = new View.Pdf.from_fullscreen(this, false, true);
+            this.view = new View.Pdf.from_controllable_window(this, false, true);
             this.view.transitions_enabled = true;
             this.view.entering_slide.connect(this.on_entering_slide);
 

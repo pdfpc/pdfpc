@@ -2326,16 +2326,18 @@ namespace pdfpc {
          * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
          * controllable's main view.
          */
-        public void overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect, out Window.Fullscreen window) {
+        public void overlay_pos(int n, Poppler.Rectangle area,
+            out Gdk.Rectangle rect, out Window.ControllableWindow window) {
             window = null;
 
-            Controllable c = (n < this.controllables.size) ? this.controllables.get(n) : null;
+            Controllable c = (n < this.controllables.size) ?
+                this.controllables.get(n) : null;
             // default scale, and make the compiler happy
             if (c == null) {
                 rect = Gdk.Rectangle();
                 return;
             }
-            window = c as Window.Fullscreen;
+            window = c as Window.ControllableWindow;
             if (c.main_view == null) {
                 rect = Gdk.Rectangle();
                 return;

@@ -231,12 +231,12 @@ namespace pdfpc {
         }
 
         /**
-         * Create a new Pdf view from a Fullscreen window instance
+         * Create a new Pdf view from a ControllableWindow instance
          *
          * This is a convenience constructor which automatically creates a full
          * metadata and rendering chain to be used with the pdf view.
          */
-        public Pdf.from_fullscreen(Window.Fullscreen window,
+        public Pdf.from_controllable_window(Window.ControllableWindow window,
             bool notes_area, bool clickable_links, bool user_slides=false) {
             var controller = window.controller;
             var metadata = controller.metadata;

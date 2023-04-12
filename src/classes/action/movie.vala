@@ -39,7 +39,7 @@ namespace pdfpc {
     public class VideoConf : Object {
         public int display_num { get; set; }
         public Gdk.Rectangle rect { get; set; }
-        public Window.Fullscreen window { get; set; }
+        public Window.ControllableWindow window { get; set; }
     }
 
     protected struct PlaybackOptions {
@@ -735,7 +735,7 @@ namespace pdfpc {
             Gee.List<VideoConf> video_confs = new Gee.ArrayList<VideoConf>();
             while (true) {
                 Gdk.Rectangle rect;
-                Window.Fullscreen window;
+                Window.ControllableWindow window;
                 this.controller.overlay_pos(n, this.area, out rect, out window);
                 if (window == null) {
                     break;
@@ -785,7 +785,7 @@ namespace pdfpc {
                 video_surface.add_video(video_area, conf.rect);
                 video_surface.size_allocate.connect((a) => {
                         Gdk.Rectangle rect;
-                        Window.Fullscreen window;
+                        Window.ControllableWindow window;
 
                         this.controller.overlay_pos(conf.display_num,
                             this.area, out rect, out window);
