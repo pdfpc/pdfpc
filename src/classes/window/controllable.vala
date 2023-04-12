@@ -128,7 +128,7 @@ namespace pdfpc.Window {
             });
 
             this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
-            this.motion_notify_event.connect(this.on_mouse_move);
+            this.main_view.motion_notify_event.connect(this.on_mouse_move);
 
             this.pointer_drawing_surface.draw.connect(this.draw_pointer);
             this.pen_drawing_surface.draw.connect(this.draw_pen);
@@ -270,7 +270,7 @@ namespace pdfpc.Window {
          */
         public bool on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
             // Restore the mouse cursor to its default value
-            this.get_window().set_cursor(null);
+            event.window.set_cursor(null);
 
             this.restart_hide_cursor_timer();
 
@@ -294,13 +294,14 @@ namespace pdfpc.Window {
          */
         protected bool on_hide_cursor_timeout() {
             this.hide_cursor_timeout = 0;
+            var w = this.main_view.get_window();
 
             // Window might be null in case it has not been mapped
-            if (this.get_window() != null) {
+            if (w != null) {
                 var cursor =
                     new Gdk.Cursor.for_display(Gdk.Display.get_default(),
                         Gdk.CursorType.BLANK_CURSOR);
-                this.get_window().set_cursor(cursor);
+                w.set_cursor(cursor);
 
                 // After the timeout disabled the cursor do not run it again
                 return false;
