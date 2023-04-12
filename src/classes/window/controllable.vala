@@ -1,5 +1,5 @@
 /**
- * Fullscreen Window
+ * Controllable Fullscreen-capable Window
  *
  * This file is part of pdfpc.
  *

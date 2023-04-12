@@ -1,5 +1,5 @@
 /**
- * Presentater window
+ * Presenter window
  *
  * This file is part of pdfpc.
  *
