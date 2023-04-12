@@ -31,20 +31,6 @@ namespace pdfpc.Window {
      */
     public class Presentation : ControllableWindow {
         /**
-         * The only view is the main view.
-         */
-        public override View.Pdf main_view {
-            get {
-                return this.view;
-            }
-        }
-
-        /**
-         * View containing the slide to show
-         */
-        protected View.Pdf view;
-
-        /**
          * Base constructor instantiating a new presentation window
          */
         public Presentation(PresentationController controller,
@@ -53,11 +39,8 @@ namespace pdfpc.Window {
 
             this.controller.update_request.connect(this.update);
 
-            this.view = new View.Pdf.from_controllable_window(this, false, true);
-            this.view.transitions_enabled = true;
-            this.view.entering_slide.connect(this.on_entering_slide);
-
-            this.overlay_layout.add(this.view);
+            this.main_view.transitions_enabled = true;
+            this.main_view.entering_slide.connect(this.on_entering_slide);
 
             // TODO: update the ratio on document reload
             double ratio = metadata.get_page_width()/metadata.get_page_height();
@@ -77,15 +60,15 @@ namespace pdfpc.Window {
                 return;
             }
 
-            bool old_disabled = this.view.disabled;
+            bool old_disabled = this.main_view.disabled;
             if (this.controller.faded_to_black) {
-                this.view.disabled = true;
+                this.main_view.disabled = true;
             } else {
-                this.view.disabled = false;
+                this.main_view.disabled = false;
             }
 
-            bool force = old_disabled != this.view.disabled;
-            this.view.display(this.controller.current_slide_number, force);
+            bool force = old_disabled != this.main_view.disabled;
+            this.main_view.display(this.controller.current_slide_number, force);
         }
 
         private void on_entering_slide(int slide_number) {

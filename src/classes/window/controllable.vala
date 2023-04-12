@@ -44,7 +44,7 @@ namespace pdfpc.Window {
             }
         }
 
-        public virtual View.Pdf main_view { get; }
+        public View.Pdf main_view { get; protected set; }
 
         /**
          * Whether the instance is presenter
@@ -75,8 +75,8 @@ namespace pdfpc.Window {
         public View.Video video_surface { get; protected set; }
 
         /**
-         * Timer id which monitors mouse motion to hide the cursor after 5
-         * seconds of inactivity
+         * Timer id monitoring mouse motion to hide the cursor on main_view
+         * after a few seconds of inactivity
          */
         protected uint hide_cursor_timeout = 0;
 
@@ -98,10 +98,14 @@ namespace pdfpc.Window {
 
             this.overlay_layout = new Gtk.Overlay();
 
+            this.main_view = new View.Pdf.from_controllable_window(this,
+                false, true);
+
             this.pointer_drawing_surface = new Gtk.DrawingArea();
             this.pen_drawing_surface = new Gtk.DrawingArea();
             this.video_surface = new View.Video();
 
+            this.overlay_layout.add(this.main_view);
             this.overlay_layout.add_overlay(this.video_surface);
             this.overlay_layout.add_overlay(this.pen_drawing_surface);
             this.overlay_layout.add_overlay(this.pointer_drawing_surface);

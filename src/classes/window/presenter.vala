@@ -37,20 +37,6 @@ namespace pdfpc.Window {
      */
     public class Presenter : ControllableWindow {
         /**
-         * Only handle links and annotations on the current_view
-         */
-        public override View.Pdf main_view {
-            get {
-                return this.current_view;
-            }
-        }
-
-        /**
-         * View showing the current slide
-         */
-        protected View.Pdf current_view;
-
-        /**
          * View showing a preview of the next slide
          */
         protected View.Pdf next_view;
@@ -572,8 +558,6 @@ namespace pdfpc.Window {
             // count.
             int current_allocated_width = (int) Math.floor(
                 this.window_w*Options.current_size/100.0);
-            this.current_view = new View.Pdf.from_controllable_window(this,
-                false, true);
 
             this.next_view = new View.Pdf.from_controllable_window(this,
                 false, false, true);
@@ -705,8 +689,6 @@ namespace pdfpc.Window {
             frame = new Gtk.AspectFrame(null, 1.0f, 0.0f, page_ratio, false);
             frame.add(this.strict_next_view);
             strict_views.attach(frame, 1, 0);
-
-            this.overlay_layout.add(this.current_view);
 
             this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK   |
                                           Gdk.EventMask.BUTTON_RELEASE_MASK |
@@ -1040,7 +1022,7 @@ namespace pdfpc.Window {
             int current_user_slide_number =
                 this.controller.current_user_slide_number;
 
-            this.current_view.display(current_slide_number);
+            this.main_view.display(current_slide_number);
 
             var next_view_user_slide = current_user_slide_number;
             bool show_final_slide_of_current_overlay =
