@@ -108,6 +108,11 @@ namespace pdfpc {
         public static int prerender_slides = 2;
 
         /**
+         * Time to wait before hiding cursor on the main slide view [s]
+         */
+        public static int cursor_timeout = 2;
+
+        /**
          * Config option to enable a workaround for fullscreen window placement
          * (needed for some WM's, e.g., fvwm)
          */

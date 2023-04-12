@@ -141,8 +141,7 @@ namespace pdfpc.Window {
 
             this.controller.reload_request.connect(this.on_reload);
 
-            // Start the 5 seconds timeout after which the mouse cursor is
-            // hidden
+            // Start the timeout after which the mouse cursor gets hidden
             this.restart_hide_cursor_timer();
 
             this.destroy.connect((source) => controller.quit());
@@ -277,20 +276,21 @@ namespace pdfpc.Window {
             return false;
         }
         /**
-         * Restart the 5 seconds timeout before hiding the mouse cursor
+         * Restart the timeout before hiding the mouse cursor
          */
         protected void restart_hide_cursor_timer(){
             if (this.hide_cursor_timeout != 0) {
                 Source.remove(this.hide_cursor_timeout);
             }
 
-            this.hide_cursor_timeout = Timeout.add_seconds(5,
+            this.hide_cursor_timeout =
+                Timeout.add_seconds(Options.cursor_timeout,
                 this.on_hide_cursor_timeout);
         }
 
         /**
-         * Timeout method called if the mouse pointer has not been moved for 5
-         * seconds
+         * Timeout method called if the mouse pointer has not been moved for
+         * a while
          */
         protected bool on_hide_cursor_timeout() {
             this.hide_cursor_timeout = 0;

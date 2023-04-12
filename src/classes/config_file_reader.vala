@@ -245,6 +245,9 @@ namespace pdfpc {
                 case "current-size":
                     Options.current_size = int.parse(fields[2]);
                     break;
+                case "cursor-timeout":
+                    Options.cursor_timeout = int.parse(fields[2]);
+                    break;
                 case "disable-input-autodetection":
                     Options.disable_input_autodetection = bool.parse(fields[2]);
                     break;

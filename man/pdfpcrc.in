@@ -91,6 +91,10 @@ Percentage of the height of the presenter screen to be used for the current slid
 .B current-size
 Percentage of the presenter screen to be used for the current slide (int, Default is 60).
 .TP
+.B cursor-timeout
+Mouse inactivity timeout (in units of s) after which the cursor gets hidden
+(int, Default is 2).
+.TP
 .BI disable-input-autodetection
 Do not automatically detect type (pen or eraser) of tablet input devices (bool,
 Default is false).

@@ -1098,7 +1098,8 @@ namespace pdfpc {
                 Source.remove(this.pointer_timeout_id);
             }
 
-            this.pointer_timeout_id = Timeout.add_seconds(2, () => {
+            this.pointer_timeout_id =
+                Timeout.add_seconds(Options.cursor_timeout, () => {
                     this.pointer_timeout_id = 0;
                     this.pointer_hidden = true;
                     this.queue_pointer_surface_draws();
