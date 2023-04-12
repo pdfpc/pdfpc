@@ -33,8 +33,8 @@ namespace pdfpc.Window {
         /**
          * The geometry of this window
          */
-        protected int window_w;
-        protected int window_h;
+        public int window_w { get; protected set; }
+        public int window_h { get; protected set; }
 
         /**
          * Currently selected windowed (!=fullscreen) mode
