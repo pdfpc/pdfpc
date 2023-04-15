@@ -48,9 +48,9 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Whether the instance is presenter
+         * Whether the user directly interacts with this window
          */
-        public bool is_presenter { get; protected set; }
+        public bool interactive { get; protected set; }
 
         /**
          * Drawing area for pointer mode
@@ -95,17 +95,13 @@ namespace pdfpc.Window {
          * Base constructor instantiating a new controllable window
          */
         public ControllableWindow(PresentationController controller,
-            bool is_presenter, int monitor_num, bool windowed,
+            bool interactive, int monitor_num, bool windowed,
             int width = -1, int height = -1) {
 
             base(monitor_num, windowed, width, height);
             this.controller = controller;
 
-            this.title = "pdfpc - %s (%s)".printf(
-                is_presenter ? "presenter" : "presentation",
-                controller.metadata.get_title());
-
-            this.is_presenter = is_presenter;
+            this.interactive = interactive;
 
             this.overlay_layout = new Gtk.Overlay();
 
@@ -138,7 +134,7 @@ namespace pdfpc.Window {
                     true);
             });
 
-            if (this.is_presenter) {
+            if (this.interactive) {
                 this.register_presenter_handlers();
             }
 
@@ -267,7 +263,7 @@ namespace pdfpc.Window {
                 context.set_source_surface(drawing_surface, 0, 0);
                 context.paint();
                 context.set_matrix(old_xform);
-                if (this.is_presenter && c.in_drawing_mode() &&
+                if (this.interactive && c.in_drawing_mode() &&
                     !c.pointer_hidden) {
                     double width_adjustment = (double) a.width / base_width;
                     context.set_operator(Cairo.Operator.OVER);

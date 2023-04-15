@@ -264,8 +264,6 @@ namespace pdfpc {
                 _presenter = value;
                 if (value != null) {
                     this.register_controllable(value);
-
-                    this.init_pen_and_pointer();
                 }
             }
         }
@@ -614,6 +612,8 @@ namespace pdfpc {
             this.pointer   = new PointerTool(false);
             this.spotlight = new PointerTool(true);
             this.current_pointer = null;
+
+            this.init_pen_and_pointer();
 
             this.history_bck = new Gee.ArrayQueue<int>();
             this.history_fwd = new Gee.ArrayQueue<int>();

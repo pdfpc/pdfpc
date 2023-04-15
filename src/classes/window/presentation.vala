@@ -35,7 +35,14 @@ namespace pdfpc.Window {
          */
         public Presentation(PresentationController controller,
             int screen_num, bool windowed, int width = -1, int height = -1) {
-            base(controller, false, screen_num, windowed, width, height);
+            bool interactive = false;
+            if (Options.single_screen) {
+                interactive = true;
+            }
+            base(controller, interactive, screen_num, windowed, width, height);
+
+            this.title = "pdfpc - presentation (%s)".
+                printf(controller.metadata.get_title());
 
             this.controller.update_request.connect(this.update);
 
