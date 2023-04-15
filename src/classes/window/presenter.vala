@@ -559,17 +559,13 @@ namespace pdfpc.Window {
             this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
             this.load_icons();
 
-            this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
-            this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
-            this.add_events(Gdk.EventMask.SCROLL_MASK);
-
             this.resize_bottom_texts();
 
             this.overview = new Overview(this.controller);
             this.overview.vexpand = true;
             this.overview.hexpand = true;
             this.overview.set_n_slides(this.controller.user_n_slides);
-            this.controller.set_overview(this.overview);
+            this.controller.overview = this.overview;
 
             this.slide_views = create_paned(Gtk.Orientation.HORIZONTAL);
             this.slide_views.position = current_allocated_width;
@@ -584,11 +580,6 @@ namespace pdfpc.Window {
             frame = new Gtk.AspectFrame(null, 1.0f, 0.0f, page_ratio, false);
             frame.add(this.strict_next_view);
             strict_views.attach(frame, 1, 0);
-
-            this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK   |
-                                          Gdk.EventMask.BUTTON_RELEASE_MASK |
-                                          Gdk.EventMask.POINTER_MOTION_MASK);
-
 
             this.current_view_and_stricts =
                 create_paned(Gtk.Orientation.VERTICAL);
@@ -896,7 +887,7 @@ namespace pdfpc.Window {
 #endif
         }
 
-        public void show_overview() {
+        protected void show_overview() {
             // Ignore events coming from the presentation view
             if (!this.is_active) {
                 return;
@@ -904,11 +895,12 @@ namespace pdfpc.Window {
 
             this.overview.current_slide = this.controller.current_user_slide_number;
             this.slide_stack.set_visible_child_name("overview");
-            this.overview.ensure_focus();
+            this.controller.set_ignore_input_events(true);
         }
 
-        public void hide_overview() {
+        protected void hide_overview() {
             this.slide_stack.set_visible_child_name("slides");
+            this.controller.set_ignore_input_events(false);
         }
 
         public bool is_overview_shown() {

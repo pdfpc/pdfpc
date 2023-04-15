@@ -31,9 +31,12 @@ namespace pdfpc.Window {
         /**
          * The registered PresentationController
          */
-        public PresentationController controller {
-            get; protected set;
-        }
+        public PresentationController controller { get; protected set; }
+
+        /**
+         * The main view widget
+         */
+        public View.Pdf main_view { get; protected set; }
 
         /**
          * Metadata of the slides
@@ -44,20 +47,10 @@ namespace pdfpc.Window {
             }
         }
 
-        public View.Pdf main_view { get; protected set; }
-
         /**
          * Whether the instance is presenter
          */
-        public bool is_presenter {
-            get; protected set;
-        }
-
-        /**
-         * Overlay layout. Holds all drawing layers (main_view,
-         * pointer & pen drawing areas, and the video surface)
-         */
-        protected Gtk.Overlay overlay_layout;
+        public bool is_presenter { get; protected set; }
 
         /**
          * Drawing area for pointer mode
@@ -75,10 +68,28 @@ namespace pdfpc.Window {
         public View.Video video_surface { get; protected set; }
 
         /**
+         * Overlay layout. Holds all drawing layers (main_view,
+         * pointer & pen drawing areas, and the video surface)
+         */
+        protected Gtk.Overlay overlay_layout;
+
+        /**
          * Timer id monitoring mouse motion to hide the cursor on main_view
          * after a few seconds of inactivity
          */
         protected uint hide_cursor_timeout = 0;
+
+        /**
+         * Key modifiers that we support
+         */
+        protected uint accepted_key_mods = Gdk.ModifierType.SHIFT_MASK   |
+                                           Gdk.ModifierType.CONTROL_MASK |
+                                           Gdk.ModifierType.META_MASK;
+
+        /**
+         * Timestamp of the last key event
+         */
+        protected uint last_key_ev_time = 0;
 
        /**
          * Base constructor instantiating a new controllable window
@@ -92,7 +103,7 @@ namespace pdfpc.Window {
 
             this.title = "pdfpc - %s (%s)".printf(
                 is_presenter ? "presenter" : "presentation",
-                metadata.get_title());
+                controller.metadata.get_title());
 
             this.is_presenter = is_presenter;
 
@@ -127,24 +138,56 @@ namespace pdfpc.Window {
                     true);
             });
 
-            this.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
-            this.main_view.motion_notify_event.connect(this.on_mouse_move);
+            if (this.is_presenter) {
+                this.register_presenter_handlers();
+            }
 
+            // Soft cursor drawing events
             this.pointer_drawing_surface.draw.connect(this.draw_pointer);
             this.pen_drawing_surface.draw.connect(this.draw_pen);
 
-            this.key_press_event.connect(this.controller.key_press);
-            this.button_press_event.connect(this.controller.button_press);
-            this.scroll_event.connect(this.controller.scroll);
-
-            this.controller.zoom_request.connect(this.on_zoom);
-
-            this.controller.reload_request.connect(this.on_reload);
+            // Special events coming from the controller
+            this.controller.zoom_request.connect(this.c_on_zoom);
+            this.controller.reload_request.connect(this.c_on_reload);
 
             // Start the timeout after which the mouse cursor gets hidden
             this.restart_hide_cursor_timer();
 
             this.destroy.connect((source) => controller.quit());
+        }
+
+        public void enable_pointer(bool onoff) {
+            if (onoff) {
+                this.pointer_drawing_surface.show();
+            } else {
+                this.pointer_drawing_surface.hide();
+            }
+        }
+
+        public void enable_pen(bool onoff) {
+            if (onoff) {
+                this.pen_drawing_surface.show();
+            } else {
+                this.pen_drawing_surface.hide();
+            }
+        }
+
+        protected void register_presenter_handlers() {
+            // Main view events
+            var view = this.main_view;
+            view.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK |
+                            Gdk.EventMask.LEAVE_NOTIFY_MASK);
+
+            view.motion_notify_event.connect(this.v_on_mouse_move);
+            view.enter_notify_event.connect(this.v_on_enter_notify);
+            view.leave_notify_event.connect(this.v_on_leave_notify);
+            view.button_press_event.connect(this.v_on_button_press);
+            view.button_release_event.connect(this.v_on_button_release);
+
+            // General controlling events acting on the whole window
+            this.key_press_event.connect(this.w_on_key_press);
+            this.button_press_event.connect(this.w_on_button_press);
+            this.scroll_event.connect(this.w_on_scroll);
         }
 
         /**
@@ -204,14 +247,6 @@ namespace pdfpc.Window {
             return true;
         }
 
-        public void enable_pointer(bool onoff) {
-            if (onoff) {
-                this.pointer_drawing_surface.show();
-            } else {
-                this.pointer_drawing_surface.hide();
-            }
-        }
-
         protected bool draw_pen(Cairo.Context context) {
             Gtk.Allocation a;
             this.pen_drawing_surface.get_allocation(out a);
@@ -256,25 +291,163 @@ namespace pdfpc.Window {
             return true;
         }
 
-        public void enable_pen(bool onoff) {
-            if (onoff) {
-                this.pen_drawing_surface.show();
+        /**
+         * Handle keypresses
+         */
+        protected bool w_on_key_press(Gdk.EventKey key) {
+            if (key.time != last_key_ev_time) {
+                last_key_ev_time = key.time;
+
+                // Punctuation characters are usually generated by keyboards
+                // with the Shift mod pressed; we ignore it in this case.
+                if (((char) key.keyval).ispunct()) {
+                    key.state &= ~Gdk.ModifierType.SHIFT_MASK;
+                }
+                var keydef = new KeyDef(key.keyval,
+                    key.state & this.accepted_key_mods);
+
+                return controller.on_key_press(keydef);
             } else {
-                this.pen_drawing_surface.hide();
+                return false;
             }
         }
 
         /**
-         * Called every time the mouse cursor is moved
+         * Handle mouse clicks
          */
-        public bool on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
-            // Restore the mouse cursor to its default value
-            event.window.set_cursor(null);
+        protected bool w_on_button_press(Gdk.EventButton button) {
+            if (button.type == Gdk.EventType.BUTTON_PRESS) {
+                var keydef = new KeyDef(button.button,
+                    button.state & this.accepted_key_mods);
+                return controller.on_button_press(keydef);
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Handle mouse scrolling
+         */
+        protected bool w_on_scroll(Gdk.EventScroll scroll) {
+            bool up   = false;
+            bool down = false;
+            switch (scroll.direction) {
+            case Gdk.ScrollDirection.UP:
+            case Gdk.ScrollDirection.LEFT:
+                up = true;
+                break;
+            case Gdk.ScrollDirection.DOWN:
+            case Gdk.ScrollDirection.RIGHT:
+                down = true;
+                break;
+            default:
+                break;
+            }
+
+            if (up) {
+                return controller.on_scroll(true, scroll.state);
+            } else if (down) {
+                return controller.on_scroll(false, scroll.state);
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Called every time the mouse is moved
+         */
+        protected bool v_on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
+            // If the cursor is blanked, restore it to its default value
+            var cursor = event.window.get_cursor();
+            if (cursor != null &&
+                cursor.cursor_type == Gdk.CursorType.BLANK_CURSOR) {
+                event.window.set_cursor(null);
+            }
 
             this.restart_hide_cursor_timer();
 
-            return false;
+            // We always update the soft pointer position, even if hidden.
+            // Otherwise, the pointer will appear at the old position
+            // when it is first shown and jump at the next mouse move.
+            this.device_to_normalized(event.x, event.y,
+                out controller.pointer_x, out controller.pointer_y);
+
+            if (controller.in_pointing_mode()) {
+                return controller.on_move_pointer();
+            } else if (controller.in_drawing_mode()) {
+                var dev = event.get_source_device();
+                if (!Options.disable_input_autodetection) {
+                    Gdk.InputSource source_type = dev.get_source();
+                    if (source_type == Gdk.InputSource.ERASER) {
+                        var mode = PresentationController.AnnotationMode.ERASER;
+                        controller.set_mode(mode);
+                    } else if (source_type == Gdk.InputSource.PEN) {
+                        var mode = PresentationController.AnnotationMode.PEN;
+                        controller.set_mode(mode);
+                    }
+                }
+
+                if (!Options.disable_input_pressure &&
+                    controller.pen_is_pressed) {
+                    double pressure;
+                    if (dev.get_axis(event.axes, Gdk.AxisUse.PRESSURE,
+                        out pressure) != true) {
+                        pressure = -1.0;
+                    }
+                    controller.set_pen_pressure(pressure);
+                }
+
+                return controller.on_move_pen();
+            } else {
+                return false;
+            }
         }
+
+        protected bool v_on_enter_notify() {
+            return controller.on_enter_notify();
+        }
+
+        protected bool v_on_leave_notify() {
+            return controller.on_leave_notify();
+        }
+
+        protected bool v_on_button_press(Gdk.EventButton event) {
+            if (controller.is_pointer_active()) {
+                this.device_to_normalized(event.x, event.y,
+                    out controller.drag_x, out controller.drag_y);
+                controller.highlight.width = 0;
+                controller.highlight.height = 0;
+                return true;
+            } else if (controller.in_drawing_mode()) {
+                double x, y;
+                this.device_to_normalized(event.x, event.y, out x, out y);
+                controller.move_pen(x, y);
+                controller.pen_is_pressed = true;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        protected bool v_on_button_release(Gdk.EventButton event) {
+            if (controller.is_pointer_active()) {
+                double x, y;
+                this.device_to_normalized(event.x, event.y, out x, out y);
+                controller.update_highlight(x, y);
+                controller.drag_x = -1;
+                controller.drag_y = -1;
+                return true;
+            } else if (controller.in_drawing_mode()) {
+                double x, y;
+                this.device_to_normalized(event.x, event.y, out x, out y);
+                controller.move_pen(x, y);
+                controller.pen_is_pressed = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         /**
          * Restart the timeout before hiding the mouse cursor
          */
@@ -317,13 +490,25 @@ namespace pdfpc.Window {
          * Called on document reload.
          * TODO: in principle the document geometry may change!
          */
-        private void on_reload() {
+        protected void c_on_reload() {
             this.main_view.invalidate();
         }
 
-        private void on_zoom(PresentationController.ScaledRectangle? rect) {
+        protected void c_on_zoom(PresentationController.ScaledRectangle? rect) {
             this.main_view.display(this.controller.current_slide_number,
                 true, rect);
+        }
+
+        /**
+         * Convert device coordinates to normalized ones
+         */
+        protected void device_to_normalized(double dev_x, double dev_y,
+            out double x, out double y) {
+            Gtk.Allocation a;
+            this.main_view.get_allocation(out a);
+
+            x = dev_x/a.width;
+            y = dev_y/a.height;
         }
     }
 }
