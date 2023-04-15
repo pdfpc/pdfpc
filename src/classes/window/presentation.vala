@@ -36,7 +36,7 @@ namespace pdfpc.Window {
         public Presentation(PresentationController controller,
             int screen_num, bool windowed, int width = -1, int height = -1) {
             bool interactive = false;
-            if (Options.single_screen) {
+            if (Options.single_screen || Options.presentation_interactive) {
                 interactive = true;
             }
             base(controller, interactive, screen_num, windowed, width, height);

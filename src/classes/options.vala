@@ -236,6 +236,11 @@ namespace pdfpc {
         public static string? notes_position = null;
 
         /**
+         * Whether the presentation window is always interactive
+         */
+        public static bool presentation_interactive = false;
+
+        /**
          * Screen to be used for the presentation (output name)
          */
         public static string? presentation_screen = null;

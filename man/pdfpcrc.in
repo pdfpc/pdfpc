@@ -153,6 +153,12 @@ Number of slides ahead of the current one to pre-render (int, default is 2). Set
 to 0 to disable the pre-rendering; set to a negative number to pre-render all at
 once.
 .TP
+.B presentation-interactive
+Let the presentation window react to user actions, similar to the presenter
+(bool, default is false). Note that if the presentation window is the only pdfpc
+GUI (i.e., if run with \fB\-sS\fR), it will be interactive irrespective of this
+flag.
+.TP
 .B presentation-screen
 Screen to be used for the presentation (output name, see e.g. "xrandr --listmonitors").
 .TP

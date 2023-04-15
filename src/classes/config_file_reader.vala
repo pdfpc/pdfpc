@@ -296,6 +296,9 @@ namespace pdfpc {
                 case "prerender-slides":
                     Options.prerender_slides = int.parse(fields[2]);
                     break;
+                case "presentation-interactive":
+                    Options.presentation_interactive = bool.parse(fields[2]);
+                    break;
                 case "presentation-screen":
                     // Don't override command-line setting
                     if (Options.presentation_screen == null) {
