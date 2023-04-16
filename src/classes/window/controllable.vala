@@ -80,6 +80,11 @@ namespace pdfpc.Window {
         protected uint hide_cursor_timeout = 0;
 
         /**
+         * Cursor state kept internally
+         */
+        protected bool cursor_blanked = false;
+
+        /**
          * Key modifiers that we support
          */
         protected uint accepted_key_mods = Gdk.ModifierType.SHIFT_MASK   |
@@ -354,10 +359,9 @@ namespace pdfpc.Window {
          */
         protected bool v_on_mouse_move(Gtk.Widget source, Gdk.EventMotion event) {
             // If the cursor is blanked, restore it to its default value
-            var cursor = event.window.get_cursor();
-            if (cursor != null &&
-                cursor.cursor_type == Gdk.CursorType.BLANK_CURSOR) {
+            if (this.cursor_blanked) {
                 event.window.set_cursor(null);
+                this.cursor_blanked = false;
             }
 
             this.restart_hide_cursor_timer();
@@ -471,6 +475,7 @@ namespace pdfpc.Window {
                     new Gdk.Cursor.for_display(Gdk.Display.get_default(),
                         Gdk.CursorType.BLANK_CURSOR);
                 w.set_cursor(cursor);
+                this.cursor_blanked = true;
 
                 // After the timeout disabled the cursor do not run it again
                 return false;
