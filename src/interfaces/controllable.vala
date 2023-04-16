@@ -37,7 +37,7 @@ namespace pdfpc {
         /**
          * The view on which links and annotations should be handled.
          */
-        public abstract View.Pdf main_view { get; }
+        public abstract View.Pdf main_view { get; protected set; }
     }
 }
 

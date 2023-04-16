@@ -92,7 +92,7 @@ namespace pdfpc.Window {
          * When the section changes, we need to update the current slide number.
          * Also, make sure we don't end up with no selection.
          */
-        public void on_selection_changed() {
+        protected void on_selection_changed() {
             var ltp = this.slides_view.get_selected_items();
             if (ltp != null) {
                 var tp = ltp.data;
@@ -136,24 +136,12 @@ namespace pdfpc.Window {
             this.slides_view.button_release_event.connect(this.on_mouse_release);
             this.slides_view.key_press_event.connect(this.on_key_press);
             this.slides_view.selection_changed.connect(this.on_selection_changed);
-            this.key_press_event.connect((event) => this.slides_view.key_press_event(event));
         }
 
         public void set_available_space(int width, int height) {
             this.max_width = width;
             this.max_height = height;
             this.prepare_layout();
-        }
-
-        /**
-         * Get keyboard focus.  This requires that the window has focus.
-         */
-        public void ensure_focus() {
-            Gtk.Window top = this.get_toplevel() as Gtk.Window;
-            if (top != null && !top.has_toplevel_focus) {
-                top.present();
-            }
-            this.slides_view.grab_focus();
         }
 
         /**
@@ -271,30 +259,29 @@ namespace pdfpc.Window {
          * PresentationController.
          */
         public bool on_key_press(Gtk.Widget source, Gdk.EventKey key) {
-            bool handled = false;
+            bool handled = true;
             switch (key.keyval) {
                 case Gdk.Key.Left:
                 case Gdk.Key.Page_Up:
                     if (this.current_slide > 0) {
                         this.current_slide -= 1;
                     }
-                    handled = true;
                     break;
                 case Gdk.Key.Right:
                 case Gdk.Key.Page_Down:
                     if (this.current_slide < this.n_slides - 1) {
                         this.current_slide += 1;
                     }
-                    handled = true;
                     break;
                 case Gdk.Key.Return:
                     bool gotoFirst = (key.state & Gdk.ModifierType.SHIFT_MASK) != 0;
                     this.controller.goto_user_page(this.current_slide, !gotoFirst);
-                    handled = true;
                     break;
                 case Gdk.Key.Escape:
                     this.controller.controllables_hide_overview();
-                    handled = true;
+                    break;
+                default:
+                    handled = false;
                     break;
             }
 

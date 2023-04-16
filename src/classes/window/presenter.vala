@@ -1,5 +1,5 @@
 /**
- * Presentater window
+ * Presenter window
  *
  * This file is part of pdfpc.
  *
@@ -29,27 +29,30 @@
  */
 
 namespace pdfpc.Window {
+
+   /**
+     * An auxiliary function to load an icon (essentially, a square image)
+     */
+    public Gtk.Image load_icon(string filename, int size) {
+        Gtk.Image icon;
+        var surface = Renderer.Image.render(filename, size, size);
+        if (surface != null) {
+            icon = new Gtk.Image.from_surface(surface);
+        } else {
+            icon = new Gtk.Image.from_icon_name("image-missing",
+                Gtk.IconSize.LARGE_TOOLBAR);
+        }
+        icon.no_show_all = true;
+        return icon;
+    }
+
     /**
      * Window showing the currently active and next slide.
      *
      * Other useful information like time slide count, ... can be displayed here as
      * well.
      */
-    public class Presenter : Fullscreen, Controllable {
-        /**
-         * Only handle links and annotations on the current_view
-         */
-        public View.Pdf main_view {
-            get {
-                return this.current_view;
-            }
-        }
-
-        /**
-         * View showing the current slide
-         */
-        protected View.Pdf current_view;
-
+    public class Presenter : ControllableWindow {
         /**
          * View showing a preview of the next slide
          */
@@ -171,136 +174,10 @@ namespace pdfpc.Window {
         protected Gtk.Stack slide_stack;
 
         /**
-         * Fixed layout - container of the toolbox.
-         */
-        protected Gtk.Fixed toolbox_container;
-
-        /**
          * The toolbox with action buttons
          */
-        protected Gtk.Box toolbox;
+        protected ToolBox toolbox;
 
-        /**
-         * Drawing color selector button of the toolbox
-         */
-        protected Gtk.ColorButton color_button;
-
-        /**
-         * Drawing scale selector button of the toolbox
-         */
-        protected Gtk.ScaleButton scale_button;
-
-        /**
-         * Coordinates of the click event at the beginning of toolbox dragging
-         **/
-        private int toolbox_x0;
-        private int toolbox_y0;
-
-        /**
-         * Size of the toolbox button icons
-         **/
-        private int toolbox_icon_height;
-
-        protected bool on_button_press(Gtk.Widget pbut, Gdk.EventButton event) {
-            if (event.button == 1 ) {
-                var w = this.get_window();
-
-                w.get_position(out this.toolbox_x0, out this.toolbox_y0);
-
-                this.toolbox_x0 += (int) event.x;
-                this.toolbox_y0 += (int) event.y;
-            }
-
-            return true;
-        }
-
-        protected bool on_move_pointer(Gtk.Widget pbut, Gdk.EventMotion event) {
-            int x = (int) event.x_root - this.toolbox_x0;
-            int y = (int) event.y_root - this.toolbox_y0;
-
-            if (true) {
-                int dest_x, dest_y;
-                toolbox.translate_coordinates(pbut, x, y,
-                    out dest_x, out dest_y);
-                this.toolbox_container.move(toolbox, dest_x, dest_y);
-            }
-
-            return true;
-        }
-
-        protected Gtk.Button add_toolbox_button(Gtk.Box panel,
-            bool tbox_inverse, string icon_fname, string? tooltip = null) {
-            var bimage = this.load_icon(icon_fname, toolbox_icon_height);
-            bimage.show();
-            var button = new Gtk.Button();
-            button.add(bimage);
-            button.can_focus = false;
-            button.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
-            if (!Options.disable_tooltips) {
-                button.set_tooltip_text(tooltip);
-            }
-            if (tbox_inverse) {
-                panel.pack_end(button);
-            } else {
-                panel.pack_start(button);
-            }
-
-            return button;
-        }
-
-        protected Gtk.ColorButton add_toolbox_cbutton(Gtk.Box panel,
-            bool tbox_inverse, string? tooltip = null) {
-            var button = new Gtk.ColorButton();
-            button.can_focus = false;
-            button.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
-            if (!Options.disable_tooltips) {
-                button.set_tooltip_text(tooltip);
-            }
-            if (tbox_inverse) {
-                panel.pack_end(button);
-            } else {
-                panel.pack_start(button);
-            }
-
-            return button;
-        }
-
-        protected Gtk.ScaleButton add_toolbox_sbutton(Gtk.Box panel,
-            bool tbox_inverse, string icon_fname, string? tooltip = null) {
-
-            var button = new Gtk.ScaleButton(Gtk.IconSize.DIALOG,
-                0, 50, 2, null);
-
-            var bimage = this.load_icon(icon_fname, toolbox_icon_height);
-            bimage.show();
-            button.set_image(bimage);
-
-            button.set_relief(Gtk.ReliefStyle.NORMAL);
-            button.get_adjustment().set_page_increment(4);
-
-            button.add_events(Gdk.EventMask.POINTER_MOTION_MASK);
-            if (!Options.disable_tooltips) {
-                button.set_tooltip_text(tooltip);
-            }
-
-            if (tbox_inverse) {
-                panel.pack_end(button);
-            } else {
-                panel.pack_start(button);
-            }
-
-            // ignore input events on the main window while the scale popup
-            // is active
-            var popup = button.get_popup();
-            popup.show.connect(() => {
-                this.controller.set_ignore_input_events(true);
-            });
-            popup.hide.connect(() => {
-                this.controller.set_ignore_input_events(false);
-            });
-
-            return button;
-        }
 
         protected Gtk.ScrolledWindow create_help_window() {
             var help_sw = new Gtk.ScrolledWindow(null, null);
@@ -431,6 +308,10 @@ namespace pdfpc.Window {
             double bottom_height = (double) this.window_h/this.bottom_frac_inv;
             int icon_height = (int) (0.9*bottom_height);
 
+            if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
+                icon_height *= this.gdk_scale;
+            }
+
             // Remove all existing icons
             var icons = this.status.get_children();
             foreach (Gtk.Widget icon in icons) {
@@ -438,18 +319,18 @@ namespace pdfpc.Window {
                 icon.destroy();
             }
 
-            this.blank_icon = this.load_icon("blank.svg", icon_height);
-            this.hidden_icon = this.load_icon("hidden.svg", icon_height);
-            this.frozen_icon = this.load_icon("snow.svg", icon_height);
-            this.pause_icon = this.load_icon("pause.svg", icon_height);
-            this.saved_icon = this.load_icon("saved.svg", icon_height);
-            this.loaded_icon = this.load_icon("loaded.svg", icon_height);
-            this.locked_icon = this.load_icon("locked.svg", icon_height);
+            this.blank_icon = load_icon("blank.svg", icon_height);
+            this.hidden_icon = load_icon("hidden.svg", icon_height);
+            this.frozen_icon = load_icon("snow.svg", icon_height);
+            this.pause_icon = load_icon("pause.svg", icon_height);
+            this.saved_icon = load_icon("saved.svg", icon_height);
+            this.loaded_icon = load_icon("loaded.svg", icon_height);
+            this.locked_icon = load_icon("locked.svg", icon_height);
 
-            this.highlight_icon = this.load_icon("highlight.svg", icon_height);
-            this.pen_icon = this.load_icon("pen.svg", icon_height);
-            this.eraser_icon = this.load_icon("eraser.svg", icon_height);
-            this.spotlight_icon = this.load_icon("spotlight.svg", icon_height);
+            this.highlight_icon = load_icon("highlight.svg", icon_height);
+            this.pen_icon = load_icon("pen.svg", icon_height);
+            this.eraser_icon = load_icon("eraser.svg", icon_height);
+            this.spotlight_icon = load_icon("spotlight.svg", icon_height);
 
             this.status.pack_start(this.blank_icon, false, false);
             this.status.pack_start(this.hidden_icon, false, false);
@@ -552,6 +433,9 @@ namespace pdfpc.Window {
             int screen_num, bool windowed) {
             base(controller, true, screen_num, windowed);
 
+            this.title = "pdfpc - presenter (%s)".
+                printf(controller.metadata.get_title());
+
             this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);
             this.controller.edit_note_request.connect(this.edit_note);
@@ -560,7 +444,6 @@ namespace pdfpc.Window {
             this.controller.hide_overview_request.connect(this.hide_overview);
             this.controller.increase_font_size_request.connect(this.increase_font_size);
             this.controller.decrease_font_size_request.connect(this.decrease_font_size);
-            this.controller.zoom_request.connect(this.on_zoom);
 
             // TODO: update the page aspect ratio on document reload
             float page_ratio = (float)
@@ -573,15 +456,13 @@ namespace pdfpc.Window {
             // count.
             int current_allocated_width = (int) Math.floor(
                 this.window_w*Options.current_size/100.0);
-            this.current_view = new View.Pdf.from_fullscreen(this,
-                false, true);
 
-            this.next_view = new View.Pdf.from_fullscreen(this,
+            this.next_view = new View.Pdf.from_controllable_window(this,
                 false, false, true);
 
-            this.strict_next_view = new View.Pdf.from_fullscreen(this,
+            this.strict_next_view = new View.Pdf.from_controllable_window(this,
                 false, false);
-            this.strict_prev_view = new View.Pdf.from_fullscreen(this,
+            this.strict_prev_view = new View.Pdf.from_controllable_window(this,
                 false, false);
 
             this.css_provider = new Gtk.CssProvider();
@@ -607,7 +488,7 @@ namespace pdfpc.Window {
             notes_sw.add(this.notes_editor);
             notes_sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
 
-            this.notes_view = new View.Pdf.from_fullscreen(this,
+            this.notes_view = new View.Pdf.from_controllable_window(this,
                 true, false);
             frame = new Gtk.AspectFrame(null, 0.5f, 0.0f, page_ratio, false);
             frame.add(this.notes_view);
@@ -681,17 +562,13 @@ namespace pdfpc.Window {
             this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
             this.load_icons();
 
-            this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
-            this.add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
-            this.add_events(Gdk.EventMask.SCROLL_MASK);
-
             this.resize_bottom_texts();
 
             this.overview = new Overview(this.controller);
             this.overview.vexpand = true;
             this.overview.hexpand = true;
             this.overview.set_n_slides(this.controller.user_n_slides);
-            this.controller.set_overview(this.overview);
+            this.controller.overview = this.overview;
 
             this.slide_views = create_paned(Gtk.Orientation.HORIZONTAL);
             this.slide_views.position = current_allocated_width;
@@ -706,13 +583,6 @@ namespace pdfpc.Window {
             frame = new Gtk.AspectFrame(null, 1.0f, 0.0f, page_ratio, false);
             frame.add(this.strict_next_view);
             strict_views.attach(frame, 1, 0);
-
-            this.overlay_layout.add(this.current_view);
-
-            this.video_surface.set_events(Gdk.EventMask.BUTTON_PRESS_MASK   |
-                                          Gdk.EventMask.BUTTON_RELEASE_MASK |
-                                          Gdk.EventMask.POINTER_MOTION_MASK);
-
 
             this.current_view_and_stricts =
                 create_paned(Gtk.Orientation.VERTICAL);
@@ -794,157 +664,14 @@ namespace pdfpc.Window {
             full_overlay.add(full_layout);
 
             // maybe should be calculated based on screen dimensions?
-            this.toolbox_icon_height = 36;
-
-            Gtk.Orientation toolbox_orientation = Gtk.Orientation.HORIZONTAL;
-            bool tbox_inverse = false;
-            int tb_offset = (int) (0.02*this.window_h);
-
-            int tbox_x = 0, tbox_y = 0;
-            switch (Options.toolbox_direction) {
-                case Options.ToolboxDirection.LtoR:
-                    toolbox_orientation = Gtk.Orientation.HORIZONTAL;
-                    tbox_inverse = false;
-                    tbox_x = (int) (0.15*this.window_w) + tb_offset;
-                    tbox_y = (int) (0.70*this.window_h) + tb_offset;
-                    break;
-                case Options.ToolboxDirection.RtoL:
-                    toolbox_orientation = Gtk.Orientation.HORIZONTAL;
-                    tbox_inverse = true;
-                    tbox_x = (int) (0.15*this.window_w) - tb_offset;
-                    tbox_y = (int) (0.70*this.window_h) + tb_offset;
-                    break;
-                case Options.ToolboxDirection.TtoB:
-                    toolbox_orientation = Gtk.Orientation.VERTICAL;
-                    tbox_inverse = false;
-                    tbox_x = 0*this.window_w + tb_offset;
-                    tbox_y = 0*this.window_h + tb_offset;
-                    break;
-                case Options.ToolboxDirection.BtoT:
-                    toolbox_orientation = Gtk.Orientation.VERTICAL;
-                    tbox_inverse = true;
-                    tbox_x = 0*this.window_w + tb_offset;
-                    tbox_y = 0*this.window_h + tb_offset;
-                    break;
+            int toolbox_icon_height = 36;
+            if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
+                toolbox_icon_height *= this.gdk_scale;
             }
-            toolbox = new Gtk.Box(toolbox_orientation, 0);
-            toolbox.get_style_context().add_class("toolbox");
-            toolbox.halign = Gtk.Align.START;
-            toolbox.valign = Gtk.Align.START;
+            this.toolbox = new Window.ToolBox(this, toolbox_icon_height);
 
-            /* Toolbox handle consisting of an image + eventbox */
-            var himage = this.load_icon("move.svg", 30);
-            himage.show();
-
-            var heventbox = new Gtk.EventBox();
-            heventbox.button_press_event.connect(on_button_press);
-            heventbox.motion_notify_event.connect(on_move_pointer);
-            heventbox.add(himage);
-            heventbox.set_events(
-                  Gdk.EventMask.BUTTON_PRESS_MASK |
-                  Gdk.EventMask.BUTTON1_MOTION_MASK
-            );
-            if (tbox_inverse) {
-                this.toolbox.pack_end(heventbox);
-            } else {
-                this.toolbox.pack_start(heventbox);
-            }
-
-            Gtk.Button tb;
-            tb = add_toolbox_button(this.toolbox, tbox_inverse, "settings.svg",
-                "Toggle toolbox panel");
-
-            /* Toolbox panel that contains the buttons */
-            var button_panel = new Gtk.Box(toolbox_orientation, 0);
-            button_panel.set_spacing(0);
-            button_panel.set_homogeneous(true);
-
-            if (Options.toolbox_minimized) {
-                button_panel.hide();
-            }
-            if (tbox_inverse) {
-                this.toolbox.pack_end(button_panel);
-            } else {
-                this.toolbox.pack_start(button_panel);
-            }
-
-            tb.clicked.connect(() => {
-                    var state = button_panel.visible;
-                    if (state) {
-                        button_panel.hide();
-                    } else {
-                        button_panel.show();
-                    }
-                });
-
-            tb = add_toolbox_button(button_panel, tbox_inverse, "empty.svg",
-                "Normal mode");
-            tb.clicked.connect(() => {
-                    this.controller.set_normal_mode();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "highlight.svg",
-                "Pointer mode");
-            tb.clicked.connect(() => {
-                    this.controller.set_pointer_mode();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "pen.svg",
-                "Pen mode");
-            tb.clicked.connect(() => {
-                    this.controller.set_pen_mode();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "eraser.svg",
-                "Eraser mode");
-            tb.clicked.connect(() => {
-                    this.controller.set_eraser_mode();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "spotlight.svg",
-                "Spotlight mode");
-            tb.clicked.connect(() => {
-                    this.controller.set_spotlight_mode();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "snow.svg",
-                "Freeze presentation window");
-            tb.clicked.connect(() => {
-                    this.controller.toggle_freeze();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "blank.svg",
-                "Black presentation window");
-            tb.clicked.connect(() => {
-                    this.controller.fade_to_black();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "hidden.svg",
-                "Hide presentation window");
-            tb.clicked.connect(() => {
-                    this.controller.hide_presentation();
-                });
-            tb = add_toolbox_button(button_panel, tbox_inverse, "pause.svg",
-                "Pause/resume timer");
-            tb.clicked.connect(() => {
-                    this.controller.toggle_pause();
-                });
-
-            scale_button = add_toolbox_sbutton(button_panel, tbox_inverse,
-                "linewidth.svg", "Drawing tool size");
-            scale_button.hide();
-            scale_button.value_changed.connect((val) => {
-                this.controller.set_pen_size(val);
-            });
-
-            color_button = add_toolbox_cbutton(button_panel, tbox_inverse,
-                "Pen color");
-            color_button.hide();
-            color_button.color_set.connect(() => {
-                    var rgba = color_button.rgba;
-                    this.controller.pen_drawing.pen.set_rgba(rgba);
-                    this.controller.queue_pen_surface_draws();
-                });
-
-            this.toolbox_container = new Gtk.Fixed();
-
-            this.toolbox_container.put(toolbox, tbox_x, tbox_y);
-
-            full_overlay.add_overlay(this.toolbox_container);
-            full_overlay.set_overlay_pass_through(this.toolbox_container, true);
+            full_overlay.add_overlay(this.toolbox);
+            full_overlay.set_overlay_pass_through(this.toolbox, true);
 
             this.add(full_overlay);
         }
@@ -952,25 +679,6 @@ namespace pdfpc.Window {
         public override void show() {
             base.show();
             this.resize_overview();
-        }
-
-       /**
-         * Load an icon (essentially, a quadratic image)
-         */
-        protected Gtk.Image load_icon(string filename, int size) {
-            Gtk.Image icon;
-            if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
-                size *= this.gdk_scale;
-            }
-            var surface = Renderer.Image.render(filename, size, size);
-            if (surface != null) {
-                icon = new Gtk.Image.from_surface(surface);
-            } else {
-                icon = new Gtk.Image.from_icon_name("image-missing",
-                    Gtk.IconSize.LARGE_TOOLBAR);
-            }
-            icon.no_show_all = true;
-            return icon;
         }
 
         public void session_saved() {
@@ -995,37 +703,12 @@ namespace pdfpc.Window {
             this.slide_progress.set_text("%d/%u".printf(current, total));
         }
 
-        protected void update_toolbox() {
-            if (Options.toolbox_shown) {
-                toolbox_container.show();
-            } else {
-                toolbox_container.hide();
-            }
-
-            var controller = this.controller;
-
-            var rgba = controller.pen_drawing.pen.get_rgba();
-            color_button.set_rgba(rgba);
-            if (controller.is_pen_active()) {
-                color_button.show();
-            } else {
-                color_button.hide();
-            }
-
-            scale_button.set_value(controller.get_pen_size());
-            if (controller.is_pen_active() || controller.is_eraser_active()) {
-                scale_button.show();
-            } else {
-                scale_button.hide();
-            }
-        }
 
         /**
          * Called on document reload.
          * TODO: in principle the document geometry may change!
          */
         public void on_reload() {
-            this.current_view.invalidate();
             this.next_view.invalidate();
             this.strict_next_view.invalidate();
             this.strict_prev_view.invalidate();
@@ -1042,7 +725,7 @@ namespace pdfpc.Window {
             int current_user_slide_number =
                 this.controller.current_user_slide_number;
 
-            this.current_view.display(current_slide_number);
+            this.main_view.display(current_slide_number);
 
             var next_view_user_slide = current_user_slide_number;
             bool show_final_slide_of_current_overlay =
@@ -1096,7 +779,7 @@ namespace pdfpc.Window {
             this.loaded_icon.hide();
             this.locked_icon.hide();
 
-            this.update_toolbox();
+            this.toolbox.update();
         }
 
         /**
@@ -1207,7 +890,7 @@ namespace pdfpc.Window {
 #endif
         }
 
-        public void show_overview() {
+        protected void show_overview() {
             // Ignore events coming from the presentation view
             if (!this.is_active) {
                 return;
@@ -1215,11 +898,12 @@ namespace pdfpc.Window {
 
             this.overview.current_slide = this.controller.current_user_slide_number;
             this.slide_stack.set_visible_child_name("overview");
-            this.overview.ensure_focus();
+            this.controller.set_ignore_input_events(true);
         }
 
-        public void hide_overview() {
+        protected void hide_overview() {
             this.slide_stack.set_visible_child_name("slides");
+            this.controller.set_ignore_input_events(false);
         }
 
         public bool is_overview_shown() {
@@ -1263,11 +947,6 @@ namespace pdfpc.Window {
             var mdview_zoom = size/20.0;
             this.mdview.apply_zoom(mdview_zoom);
 #endif
-        }
-
-        private void on_zoom(PresentationController.ScaledRectangle? rect) {
-            this.main_view.display(this.controller.current_slide_number,
-                true, rect);
         }
 
         public void show_help_window(bool onoff) {

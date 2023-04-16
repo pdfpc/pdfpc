@@ -91,6 +91,10 @@ Percentage of the height of the presenter screen to be used for the current slid
 .B current-size
 Percentage of the presenter screen to be used for the current slide (int, Default is 60).
 .TP
+.B cursor-timeout
+Mouse inactivity timeout (in units of s) after which the cursor gets hidden
+(int, Default is 2).
+.TP
 .BI disable-input-autodetection
 Do not automatically detect type (pen or eraser) of tablet input devices (bool,
 Default is false).
@@ -148,6 +152,12 @@ Delay (in seconds) to launch the pre-rendering process after a slide change
 Number of slides ahead of the current one to pre-render (int, default is 2). Set
 to 0 to disable the pre-rendering; set to a negative number to pre-render all at
 once.
+.TP
+.B presentation-interactive
+Let the presentation window react to user actions, similar to the presenter
+(bool, default is false). Note that if the presentation window is the only pdfpc
+GUI (i.e., if run with \fB\-sS\fR), it will be interactive irrespective of this
+flag.
 .TP
 .B presentation-screen
 Screen to be used for the presentation (output name, see e.g. "xrandr --listmonitors").

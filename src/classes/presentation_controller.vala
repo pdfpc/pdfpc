@@ -36,6 +36,27 @@ public interface ScreenSaver : Object {
 }
 
 namespace pdfpc {
+    protected class KeyDef : GLib.Object, Gee.Hashable<KeyDef> {
+        public uint keycode { get; set; }
+        public uint modMask { get; set; }
+
+        public KeyDef(uint k, uint m) {
+            this.keycode = k;
+            this.modMask = m;
+        }
+
+        public uint hash() {
+            // see gdk/gdkkeysyms.h modMask is usally in the form of
+            // 0xFF??. Keycodes are usally 0x??. We shift modMask by 8 bits
+            // to combine both codes.
+            return (this.modMask << 8) | this.keycode;
+        }
+
+        public bool equal_to(KeyDef other) {
+            return this.keycode == other.keycode && this.modMask == other.modMask;
+        }
+    }
+
     /**
      * Controller handling all the triggered events/signals
      */
@@ -243,9 +264,6 @@ namespace pdfpc {
                 _presenter = value;
                 if (value != null) {
                     this.register_controllable(value);
-
-                    this.init_pen_and_pointer();
-                    this.register_mouse_handlers();
                 }
             }
         }
@@ -276,11 +294,6 @@ namespace pdfpc {
                         !this._presentation.is_monitor_connected());
             }
         }
-
-        /**
-         * Key modifiers that we support
-         */
-        public uint accepted_key_mods = Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.META_MASK;
 
         /**
          * Ignore input events. Useful e.g. for editing notes.
@@ -443,8 +456,8 @@ namespace pdfpc {
          * The presenters overview. We need to communicate with it for toggling
          * skips
          */
-        protected Window.Overview overview;
-        protected bool overview_shown {
+        public Window.Overview overview { get; set; }
+        public bool overview_shown {
             get {
                 if (presenter == null) {
                     return false;
@@ -453,11 +466,6 @@ namespace pdfpc {
                 }
             }
         }
-
-        /**
-         * Timestamp of the last key event
-         */
-        protected uint last_key_ev_time = 0;
 
         /**
          * Store the backward/forward "history" of the slides
@@ -490,27 +498,6 @@ namespace pdfpc {
 
         protected Gee.ArrayList<ActionDescription> action_descriptions =
             new Gee.ArrayList<ActionDescription>();
-
-        protected class KeyDef : GLib.Object, Gee.Hashable<KeyDef> {
-            public uint keycode { get; set; }
-            public uint modMask { get; set; }
-
-            public KeyDef(uint k, uint m) {
-                this.keycode = k;
-                this.modMask = m;
-            }
-
-            public uint hash() {
-                // see gdk/gdkkeysyms.h modMask is usally in the form of
-                // 0xFF??. Keycodes are usally 0x??. We shift modMask by 8 bits
-                // to combine both codes.
-                return (this.modMask << 8) | this.keycode;
-            }
-
-            public bool equal_to(KeyDef other) {
-                return this.keycode == other.keycode && this.modMask == other.modMask;
-            }
-        }
 
         protected class ActionAndParameter : GLib.Object {
             public GLib.Action action { get; set; }
@@ -614,7 +601,7 @@ namespace pdfpc {
 
         protected PointerTool pointer;
         protected PointerTool spotlight;
-        public PointerTool? current_pointer { get; protected set; }
+        public PointerTool current_pointer { get; protected set; }
 
         /**
          * Instantiate a new controller
@@ -622,9 +609,7 @@ namespace pdfpc {
         public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
 
-            this.pointer   = new PointerTool(false);
-            this.spotlight = new PointerTool(true);
-            this.current_pointer = null;
+            this.init_pen_and_pointer();
 
             this.history_bck = new Gee.ArrayQueue<int>();
             this.history_fwd = new Gee.ArrayQueue<int>();
@@ -667,7 +652,7 @@ namespace pdfpc {
         private uint pen_step = 2;
         public double pen_last_x;
         public double pen_last_y;
-        private bool pen_is_pressed = false;
+        public bool pen_is_pressed = false;
 
         public bool is_pointer_active() {
             return this.annotation_mode == AnnotationMode.POINTER;
@@ -712,9 +697,10 @@ namespace pdfpc {
             }
         }
 
-        private void move_pen(double x, double y) {
+        public void move_pen(double x, double y) {
             if (this.pen_is_pressed) {
-                pen_drawing.add_line(this.current_pen_drawing_tool, this.pen_last_x, this.pen_last_y, x, y);
+                pen_drawing.add_line(this.current_pen_drawing_tool,
+                this.pen_last_x, this.pen_last_y, x, y);
             }
             this.pen_last_x = x;
             this.pen_last_y = y;
@@ -749,7 +735,7 @@ namespace pdfpc {
             return current_pen_drawing_tool.width;
         }
 
-        private void set_pen_pressure(double pressure) {
+        public void set_pen_pressure(double pressure) {
             current_pen_drawing_tool.pressure = pressure;
         }
 
@@ -898,6 +884,10 @@ namespace pdfpc {
         }
 
         private void init_pen_and_pointer() {
+            this.pointer   = new PointerTool(false);
+            this.spotlight = new PointerTool(true);
+            this.current_pointer = this.pointer;
+
             this.pointer.size = Options.pointer_size;
             if (this.pointer.size > 500) {
                 this.pointer.size = 500;
@@ -950,21 +940,13 @@ namespace pdfpc {
 
         public double drag_x = -1;
         public double drag_y = -1;
-        public double pointer_x;
-        public double pointer_y;
 
         /**
-         * Convert device coordinates to normalized ones
+         * Coordinates of the "soft" pointer, continuously updated
+         * irrespective of the mode
          */
-        private void device_to_normalized(double dev_x, double dev_y,
-            out double x, out double y) {
-            var view = this.presenter.main_view;
-            Gtk.Allocation a;
-            view.get_allocation(out a);
-
-            x = dev_x/a.width;
-            y = dev_y/a.height;
-        }
+        public double pointer_x;
+        public double pointer_y;
 
         private void queue_pointer_surface_draws() {
             if (presenter != null) {
@@ -975,122 +957,95 @@ namespace pdfpc {
             }
         }
 
-        protected void register_mouse_handlers() {
-            var view = presenter.main_view;
-            view.set_events(
-                  Gdk.EventMask.BUTTON_PRESS_MASK
-                | Gdk.EventMask.BUTTON_RELEASE_MASK
-                | Gdk.EventMask.POINTER_MOTION_MASK
-                | Gdk.EventMask.ENTER_NOTIFY_MASK
-                | Gdk.EventMask.LEAVE_NOTIFY_MASK
-            );
-
-            view.motion_notify_event.connect(on_motion);
-            view.button_press_event.connect(on_button_press);
-            view.button_release_event.connect(on_button_release);
-            view.enter_notify_event.connect(() => {
-                    this.pointer_hidden = false;
-                    return true;
-                });
-            view.leave_notify_event.connect(() => {
-                    this.pointer_hidden = true;
-                    // make sure the pointer is cleared
-                    if (this.in_pointing_mode()) {
-                        this.queue_pointer_surface_draws();
-                    } else if (this.in_drawing_mode()) {
-                        this.queue_pen_surface_draws();
-                    }
-                    return true;
-                });
-        }
-
         /**
-         * Handle mouse events on the window and, if necessary send
-         * them to the presentation controller
+         * Handle mouse motion events from controllables' main views
          */
-        private bool on_motion(Gdk.EventMotion event) {
-            // We need to always update the pointer position, even if it is not
-            // shown. Otherwise, the pointer will appear at the old position
-            // when it is first shown and will jump around at the next mouse
-            // move.
-            this.device_to_normalized(event.x, event.y,
-                out pointer_x, out pointer_y);
-
-            if (this.in_pointing_mode()) {
-                return on_move_pointer(event);
-            } else if (this.in_drawing_mode()) {
-                return on_move_pen(event);
-            } else {
-                return false;
-            }
-        }
-
-        private bool on_button_press(Gdk.EventButton event) {
-            if (this.annotation_mode == AnnotationMode.POINTER) {
-                this.device_to_normalized(event.x, event.y,
-                    out drag_x, out drag_y);
-                this.highlight.width = 0;
-                this.highlight.height = 0;
-                return true;
-            } else if (this.in_drawing_mode()) {
-                double x, y;
-                this.device_to_normalized(event.x, event.y, out x, out y);
-                move_pen(x, y);
-                pen_is_pressed = true;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        private bool on_button_release(Gdk.EventButton event) {
-            if (this.annotation_mode == AnnotationMode.POINTER) {
-                double x, y;
-                this.device_to_normalized(event.x, event.y, out x, out y);
-                update_highlight(x, y);
-                drag_x = -1;
-                drag_y = -1;
-                return true;
-            } else if (this.in_drawing_mode()) {
-                double x, y;
-                this.device_to_normalized(event.x, event.y, out x, out y);
-                move_pen(x, y);
-                pen_is_pressed = false;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        private bool on_move_pen(Gdk.EventMotion event) {
-            var dev = event.get_source_device();
-            if (!Options.disable_input_autodetection) {
-                Gdk.InputSource source_type = dev.get_source();
-                if (source_type == Gdk.InputSource.ERASER) {
-                    this.set_mode(AnnotationMode.ERASER);
-                } else if (source_type == Gdk.InputSource.PEN) {
-                    this.set_mode(AnnotationMode.PEN);
-                }
-            }
-
-            if (!Options.disable_input_pressure && pen_is_pressed) {
-                double pressure;
-                if (dev.get_axis(event.axes, Gdk.AxisUse.PRESSURE,
-                    out pressure) != true) {
-                    pressure = -1.0;
-                }
-                set_pen_pressure(pressure);
-            }
-
+        public bool on_move_pen() {
             // restart the pointer timeout timer
             this.restart_pointer_timer();
             this.pointer_hidden = false;
 
-            double x, y;
-            this.device_to_normalized(event.x, event.y, out x, out y);
-            move_pen(x, y);
+            move_pen(pointer_x, pointer_y);
 
             return true;
+        }
+
+        public bool on_enter_notify() {
+            this.pointer_hidden = false;
+            return true;
+        }
+
+        public bool on_leave_notify() {
+            this.pointer_hidden = true;
+            // make sure the pointer is cleared
+            if (this.in_pointing_mode()) {
+                this.queue_pointer_surface_draws();
+            } else if (this.in_drawing_mode()) {
+                this.queue_pen_surface_draws();
+            }
+            return true;
+        }
+
+        /**
+         * Handle key presses from controllables
+         */
+        public bool on_key_press(KeyDef keydef) {
+            if (!ignore_keyboard_events) {
+                var action_with_parameter = this.keyBindings.get(keydef);
+
+                if (action_with_parameter != null) {
+                    var param = action_with_parameter.parameter;
+                    action_with_parameter.action.activate(param);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Handle mouse clicks from controllables
+         */
+        public bool on_button_press(KeyDef keydef) {
+            if (!ignore_mouse_events) {
+                var action_with_parameter = this.mouseBindings.get(keydef);
+                if (action_with_parameter != null) {
+                    var param = action_with_parameter.parameter;
+                    action_with_parameter.action.activate(param);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Handle mouse scrolls from controllables
+         */
+        public bool on_scroll(bool up, uint state) {
+            if (!this.ignore_mouse_events && !Options.disable_scrolling) {
+                if (up) {
+                    if ((state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                        this.back10();
+                    } else {
+                        this.previous_page();
+                    }
+                } else {
+                    if ((state & Gdk.ModifierType.SHIFT_MASK) != 0) {
+                        this.jump10();
+                    } else {
+                        this.next_page();
+                    }
+                }
+
+                return true;
+            } else {
+                return false;
+            }
         }
 
         protected void restart_pointer_timer() {
@@ -1098,7 +1053,8 @@ namespace pdfpc {
                 Source.remove(this.pointer_timeout_id);
             }
 
-            this.pointer_timeout_id = Timeout.add_seconds(2, () => {
+            this.pointer_timeout_id =
+                Timeout.add_seconds(Options.cursor_timeout, () => {
                     this.pointer_timeout_id = 0;
                     this.pointer_hidden = true;
                     this.queue_pointer_surface_draws();
@@ -1143,7 +1099,7 @@ namespace pdfpc {
             this.update_highlight(pointer_x, pointer_y);
         }
 
-        private bool on_move_pointer(Gdk.EventMotion event) {
+        public bool on_move_pointer() {
             // restart the pointer timeout timer
             this.restart_pointer_timer();
             this.pointer_hidden = false;
@@ -1154,7 +1110,7 @@ namespace pdfpc {
             return true;
         }
 
-        private void update_highlight(double x, double y) {
+        public void update_highlight(double x, double y) {
             if (drag_x!=-1) {
                 this.highlight.width=Math.fabs(drag_x-x);
                 this.highlight.height=Math.fabs(drag_y-y);
@@ -1163,7 +1119,6 @@ namespace pdfpc {
                 queue_pointer_surface_draws();
             }
         }
-
 
         public void increase_pointer_size() {
             if (this.current_pointer.size < 500) {
@@ -1228,10 +1183,6 @@ namespace pdfpc {
                 }
             }
             Gtk.main_quit();
-        }
-
-        public void set_overview(Window.Overview o) {
-            this.overview = o;
         }
 
         public void set_pen_color_to_string(Variant? color_variant) {
@@ -1572,83 +1523,6 @@ namespace pdfpc {
          */
         public void unbindAllMouse() {
             this.mouseBindings.clear();
-        }
-
-        /**
-         * Handle keypresses to each of the controllables
-         *
-         * This separate handling is needed because keypresses from any of the
-         * window have implications on the behaviour of both of them. Therefore
-         * this controller is needed to take care of the needed actions.
-         */
-        public bool key_press(Gdk.EventKey key) {
-            if (key.time != last_key_ev_time && !ignore_keyboard_events ) {
-                last_key_ev_time = key.time;
-                if (this.overview_shown) {
-                    this.overview.key_press_event(key);
-                    return true;
-                }
-
-                // Punctuation characters are usually generated by keyboards
-                // with the Shift mod pressed; we ignore it in this case.
-                if (((char) key.keyval).ispunct()) {
-                    key.state &= ~Gdk.ModifierType.SHIFT_MASK;
-                }
-                var action_with_parameter = this.keyBindings.get(new KeyDef(key.keyval,
-                    key.state & this.accepted_key_mods));
-
-                if (action_with_parameter != null)
-                    action_with_parameter.action.activate(action_with_parameter.parameter);
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        /**
-         * Handle mouse clicks to each of the controllables
-         */
-        public bool button_press(Gdk.EventButton button) {
-            if (!ignore_mouse_events && button.type == Gdk.EventType.BUTTON_PRESS ) {
-                var action_with_parameter = this.mouseBindings.get(new KeyDef(button.button,
-                    button.state & this.accepted_key_mods));
-                if (action_with_parameter != null)
-                    action_with_parameter.action.activate(action_with_parameter.parameter);
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        /**
-         * Notify each of the controllables of mouse scrolling
-         */
-        public bool scroll(Gdk.EventScroll scroll) {
-            if (!this.ignore_mouse_events && !Options.disable_scrolling) {
-                switch (scroll.direction) {
-                case Gdk.ScrollDirection.UP:
-                case Gdk.ScrollDirection.LEFT:
-                    if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
-                        this.back10();
-                    } else {
-                        this.previous_page();
-                    }
-                    break;
-
-                case Gdk.ScrollDirection.DOWN:
-                case Gdk.ScrollDirection.RIGHT:
-                    if ((scroll.state & Gdk.ModifierType.SHIFT_MASK) != 0) {
-                        this.jump10();
-                    } else {
-                        this.next_page();
-                    }
-                    break;
-                default:
-                    break;
-                }
-                return true;
-            }
-            return false;
         }
 
         /**
@@ -2320,22 +2194,23 @@ namespace pdfpc {
             }
         }
 
-
 #if MOVIES
         /**
          * Give the Gdk.Rectangle corresponding to the Poppler.Rectangle for the nth
          * controllable's main view.
          */
-        public void overlay_pos(int n, Poppler.Rectangle area, out Gdk.Rectangle rect, out Window.Fullscreen window) {
+        public void overlay_pos(int n, Poppler.Rectangle area,
+            out Gdk.Rectangle rect, out Window.ControllableWindow window) {
             window = null;
 
-            Controllable c = (n < this.controllables.size) ? this.controllables.get(n) : null;
+            Controllable c = (n < this.controllables.size) ?
+                this.controllables.get(n) : null;
             // default scale, and make the compiler happy
             if (c == null) {
                 rect = Gdk.Rectangle();
                 return;
             }
-            window = c as Window.Fullscreen;
+            window = c as Window.ControllableWindow;
             if (c.main_view == null) {
                 rect = Gdk.Rectangle();
                 return;

@@ -108,6 +108,11 @@ namespace pdfpc {
         public static int prerender_slides = 2;
 
         /**
+         * Time to wait before hiding cursor on the main slide view [s]
+         */
+        public static int cursor_timeout = 2;
+
+        /**
          * Config option to enable a workaround for fullscreen window placement
          * (needed for some WM's, e.g., fvwm)
          */
@@ -229,6 +234,11 @@ namespace pdfpc {
          * Position of notes on slides
          */
         public static string? notes_position = null;
+
+        /**
+         * Whether the presentation window is always interactive
+         */
+        public static bool presentation_interactive = false;
 
         /**
          * Screen to be used for the presentation (output name)
