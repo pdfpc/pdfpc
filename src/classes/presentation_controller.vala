@@ -601,17 +601,13 @@ namespace pdfpc {
 
         protected PointerTool pointer;
         protected PointerTool spotlight;
-        public PointerTool? current_pointer { get; protected set; }
+        public PointerTool current_pointer { get; protected set; }
 
         /**
          * Instantiate a new controller
          */
         public PresentationController() {
             this.controllables = new Gee.ArrayList<Controllable>();
-
-            this.pointer   = new PointerTool(false);
-            this.spotlight = new PointerTool(true);
-            this.current_pointer = null;
 
             this.init_pen_and_pointer();
 
@@ -888,6 +884,10 @@ namespace pdfpc {
         }
 
         private void init_pen_and_pointer() {
+            this.pointer   = new PointerTool(false);
+            this.spotlight = new PointerTool(true);
+            this.current_pointer = this.pointer;
+
             this.pointer.size = Options.pointer_size;
             if (this.pointer.size > 500) {
                 this.pointer.size = 500;
