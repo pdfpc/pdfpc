@@ -8,13 +8,33 @@ on:
             - 'src/pdfpc.version'
 
 jobs:
+    extract-version:
+        runs-on: ubuntu-latest
+
+        outputs:
+            PDFPC_VERSION: ${{ steps.version-extract.outputs.PDFPC_VERSION }}
+
+        steps:
+        - uses: actions/checkout@v3
+
+        - id: version-extract
+          name: Extract release name
+          run: |
+              PDFPC_VERSION=$( head -n 1 src/pdfpc.version )
+              echo "PDFPC_VERSION=$PDFPC_VERSION" >> $GITHUB_OUTPUT
+
     create-release:
         runs-on: ubuntu-latest
 
         permissions:
             contents: write
 
-        needs: [build-demo-assets]
+        needs: [extract-version, build-demo-assets]
+
+        if: ${{ !endsWith(needs.extract-version.outputs.PDFPC_VERSION, 'pre') }}
+        
+        env:
+          PDFPC_VERSION: ${{ needs.extract-version.outputs.PDFPC_VERSION }}
 
         steps:
         - uses: actions/checkout@v3
@@ -26,11 +46,6 @@ jobs:
         - uses: actions/download-artifact@v3
           with:
               name: pdfpc-video-example.zip
-
-        - name: Extract release name
-          run: |
-              PDFPC_VERSION=$( head -n 1 src/pdfpc.version )
-              echo "PDFPC_VERSION=$PDFPC_VERSION" >> $GITHUB_ENV
 
         - name: Release
           uses: softprops/action-gh-release@v1
