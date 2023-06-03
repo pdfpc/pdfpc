@@ -86,10 +86,12 @@ Maximal size (in units of kB) of a slide image to store it uncompressed in the
 cache (int, Default is 256).
 .TP
 .B current-height
-Percentage of the height of the presenter screen to be used for the current slide (int, Default is 80).
+Percentage of the height of the "main" presenter area to be used for the current
+slide (int, Default is 80).
 .TP
 .B current-size
-Percentage of the presenter screen to be used for the current slide (int, Default is 60).
+Percentage of the width of the presenter screen to be used for the current slide
+(int, Default is 60).
 .TP
 .B cursor-timeout
 Mouse inactivity timeout (in units of s) after which the cursor gets hidden
@@ -125,7 +127,8 @@ managers (e.g., FVWM) ignore the placement if made before the window is
 shown. This option enables a workaround (bool, Default is false).
 .TP
 .B next-height
-Percentage of the height of the presenter screen to be used for the next slide (int, Default is 70).
+Percentage of the height of the "main" presenter area to be used for the next
+slide (int, Default is 70).
 .TP
 .B next-slide-first-overlay
 If the next slide is an overlay group, show the first slide of that group in the
@@ -186,6 +189,11 @@ Set opacity of the area outside of the spotlight, in percent (int, default is
 .TP
 .B spotlight-size
 Set the initial spotlight size, in pixels (int, default is 100).
+.TP
+.B status-height
+Percentage of the height of the presenter screen left for the status area
+(timer, progress, icons), leaving (100 - status_height)% for the "main" area
+(int, Default is 10).
 .TP
 .B switch-screens
 Switch the presentation and the presenter screen (bool, Default is false).
