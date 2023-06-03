@@ -77,6 +77,7 @@ namespace pdfpc.Window {
         protected Gtk.Paned slide_views;
         protected Gtk.Paned current_view_and_stricts;
         protected Gtk.Paned next_view_and_notes;
+        protected Gtk.Paned full_layout;
 
         /**
          * Timer for the presenation
@@ -87,11 +88,6 @@ namespace pdfpc.Window {
          * Slide progress label ( eg. "23/42" )
          */
         protected Gtk.Entry slide_progress;
-
-        /**
-         * The bottom row is 10% of the window height, fixed
-         */
-        private int bottom_frac_inv = 10;
 
         /**
          * Container for the status icons
@@ -268,6 +264,7 @@ namespace pdfpc.Window {
             enable_paned_handle(this.slide_views, onoff);
             enable_paned_handle(this.current_view_and_stricts, onoff);
             enable_paned_handle(this.next_view_and_notes, onoff);
+            enable_paned_handle(this.full_layout, onoff);
         }
 
         public bool current_view_maximized {
@@ -301,15 +298,23 @@ namespace pdfpc.Window {
             this.current_view_maximized = onoff;
         }
 
-        /**
-         * (Re)load icons
-         **/
-        private void load_icons() {
-            double bottom_height = (double) this.window_h/this.bottom_frac_inv;
-            int icon_height = (int) (0.9*bottom_height);
+        public void show_status_icons(bool onoff) {
+            if (onoff) {
+                this.update_status_icons();
+            } else {
+                var icons = this.status.get_children();
+                foreach (Gtk.Widget icon in icons) {
+                    icon.hide();
+                }
+            }
+        }
 
+        /**
+         * (Re)load status icons
+         **/
+        private void reload_status_icons(int height) {
             if (!Pdfpc.is_Wayland_backend() && !Pdfpc.is_Quartz_backend()) {
-                icon_height *= this.gdk_scale;
+                height *= this.gdk_scale;
             }
 
             // Remove all existing icons
@@ -319,30 +324,30 @@ namespace pdfpc.Window {
                 icon.destroy();
             }
 
-            this.blank_icon = load_icon("blank.svg", icon_height);
-            this.hidden_icon = load_icon("hidden.svg", icon_height);
-            this.frozen_icon = load_icon("snow.svg", icon_height);
-            this.pause_icon = load_icon("pause.svg", icon_height);
-            this.saved_icon = load_icon("saved.svg", icon_height);
-            this.loaded_icon = load_icon("loaded.svg", icon_height);
-            this.locked_icon = load_icon("locked.svg", icon_height);
+            this.blank_icon = load_icon("blank.svg", height);
+            this.hidden_icon = load_icon("hidden.svg", height);
+            this.frozen_icon = load_icon("snow.svg", height);
+            this.pause_icon = load_icon("pause.svg", height);
+            this.saved_icon = load_icon("saved.svg", height);
+            this.loaded_icon = load_icon("loaded.svg", height);
+            this.locked_icon = load_icon("locked.svg", height);
 
-            this.highlight_icon = load_icon("highlight.svg", icon_height);
-            this.pen_icon = load_icon("pen.svg", icon_height);
-            this.eraser_icon = load_icon("eraser.svg", icon_height);
-            this.spotlight_icon = load_icon("spotlight.svg", icon_height);
+            this.highlight_icon = load_icon("highlight.svg", height);
+            this.pen_icon = load_icon("pen.svg", height);
+            this.eraser_icon = load_icon("eraser.svg", height);
+            this.spotlight_icon = load_icon("spotlight.svg", height);
 
-            this.status.pack_start(this.blank_icon, false, false);
-            this.status.pack_start(this.hidden_icon, false, false);
-            this.status.pack_start(this.frozen_icon, false, false);
-            this.status.pack_start(this.pause_icon, false, false);
-            this.status.pack_start(this.saved_icon, false, false);
-            this.status.pack_start(this.loaded_icon, false, false);
-            this.status.pack_start(this.locked_icon, false, false);
-            this.status.pack_start(this.highlight_icon, false, false);
-            this.status.pack_start(this.pen_icon, false, false);
-            this.status.pack_start(this.eraser_icon, false, false);
-            this.status.pack_start(this.spotlight_icon, false, false);
+            this.status.pack_start(this.blank_icon, false, true);
+            this.status.pack_start(this.hidden_icon, false, true);
+            this.status.pack_start(this.frozen_icon, false, true);
+            this.status.pack_start(this.pause_icon, false, true);
+            this.status.pack_start(this.saved_icon, false, true);
+            this.status.pack_start(this.loaded_icon, false, true);
+            this.status.pack_start(this.locked_icon, false, true);
+            this.status.pack_start(this.highlight_icon, false, true);
+            this.status.pack_start(this.pen_icon, false, true);
+            this.status.pack_start(this.eraser_icon, false, true);
+            this.status.pack_start(this.spotlight_icon, false, true);
         }
 
         /**
@@ -394,10 +399,10 @@ namespace pdfpc.Window {
         /**
          * Set font size for the timer & slide progress widgets
          **/
-        private void resize_bottom_texts() {
+        private void resize_bottom_texts(int height) {
             const string css_template = ".bottomText { font-size: %dpx; }";
-            var target_size_height = (int) (12.0*this.window_h/400.0);
-            var bottom_css = css_template.printf(target_size_height);
+            int font_size = (int) (0.7*height);
+            var bottom_css = css_template.printf(font_size);
 
             try {
                 this.bottom_text_css_provider.load_from_data(bottom_css, -1);
@@ -406,27 +411,39 @@ namespace pdfpc.Window {
             }
         }
 
-        /**
-         * Resize the overview
-         **/
-        private void resize_overview() {
-            this.overview.set_available_space(this.window_w,
-                (int) Math.floor(this.window_h*(1.0 - 1.0/bottom_frac_inv)));
+        // Explicitly defined via CSS
+        private int handle_thickness = 5;
+
+        private int bottom_height = 0;
+
+        private void on_bottom_resize(Gtk.Allocation a) {
+            int height = a.height;
+
+            // If any of the status icons is visible, there is a problem:
+            // unfortunately, Gtk.Icon is not shrinkable, so we try to detect
+            // an attempt to decrease the bottom pane height by checking
+            // whether the total height exceeds the vertical dimension of the
+            // window.
+            int jutting = this.slide_stack.get_allocated_height() +
+                height + handle_thickness - this.window_h;
+            if (jutting > 0) {
+                height -= jutting;
+            }
+
+            if (this.bottom_height != height) {
+                this.bottom_height = height;
+
+                this.reload_status_icons(height);
+                this.update_status_icons();
+
+                this.resize_bottom_texts(height);
+
+                this.overview.set_available_space(this.window_w,
+                    this.window_h - height);
+            }
         }
 
         /**
-         * Resize parts of the GUI that cannot do it themselves (icons, text)
-         **/
-        protected override void resize_gui() {
-            this.load_icons();
-            this.update_status_icons();
-
-            this.resize_bottom_texts();
-
-            this.resize_overview();
-        }
-
-       /**
          * Base constructor instantiating a new presenter window
          */
         public Presenter(PresentationController controller,
@@ -451,11 +468,9 @@ namespace pdfpc.Window {
 
             // In most scenarios the current slide is displayed bigger than the
             // next one. The option current_size represents the width this view
-            // should use as a percentage value. The maximal height is 90% of
-            // the screen, as we need a place to display the timer and slide
-            // count.
-            int current_allocated_width = (int) Math.floor(
-                this.window_w*Options.current_size/100.0);
+            // should use as a percentage value.
+            int current_allocated_width = (int)
+                (this.window_w*Options.current_size/100.0);
 
             this.next_view = new View.Pdf.from_controllable_window(this,
                 false, false, true);
@@ -507,11 +522,15 @@ namespace pdfpc.Window {
             var meta_font_size = this.metadata.get_font_size();
             this.apply_font_size(meta_font_size);
 
-            // The countdown timer is centered in the 90% bottom part of the screen
+            // The countdown timer is centered in the bottom part of the screen
             this.timer_label = new Gtk.Label("");
             this.timer_label.name = "timer";
             this.timer_label.get_style_context().add_class("bottomText");
             this.timer_label.set_justify(Gtk.Justification.CENTER);
+            this.timer_label.halign = Gtk.Align.CENTER;
+            this.timer_label.valign = Gtk.Align.CENTER;
+            this.timer_label.margin = 0;
+
             this.controller.timer_change.connect((str) => {
                     var context = this.get_style_context();
 
@@ -546,7 +565,7 @@ namespace pdfpc.Window {
                 });
             this.controller.reset_timer();
 
-            // The slide counter is centered in the 90% bottom part of the screen
+            // The slide counter
             this.slide_progress = new Gtk.Entry();
             this.slide_progress.name = "slideProgress";
             this.slide_progress.get_style_context().add_class("bottomText");
@@ -554,15 +573,12 @@ namespace pdfpc.Window {
             this.slide_progress.sensitive = false;
             this.slide_progress.has_frame = false;
             this.slide_progress.key_press_event.connect(this.on_key_press_slide_progress);
-            this.slide_progress.valign = Gtk.Align.END;
-            // reduce the width of Gtk.Entry. we reserve a width for
-            // 7 chars (i.e. maximal 999/999 for displaying)
+            this.slide_progress.valign = Gtk.Align.CENTER;
+            // Reduce the width of Gtk.Entry, reserving room for 7 characters
+            // (i.e., up to 999/999).
             this.slide_progress.width_chars = 7;
 
-            this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 2);
-            this.load_icons();
-
-            this.resize_bottom_texts();
+            this.status = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 
             this.overview = new Overview(this.controller);
             this.overview.vexpand = true;
@@ -587,11 +603,11 @@ namespace pdfpc.Window {
             this.current_view_and_stricts =
                 create_paned(Gtk.Orientation.VERTICAL);
 
-            // Height of the window minus the bottom part (icons, timer, etc)
-            var usable_height = (1.0 - 1.0/this.bottom_frac_inv)*this.window_h;
+            // Height of the window minus the status area and the Paned handle
+            var main_height = (1.0 - Options.status_height/100.0)*this.window_h;
 
             double wheight1, wheight2;
-            wheight1 = Options.current_height/100.0*usable_height;
+            wheight1 = Options.current_height/100.0*main_height;
             wheight2 = current_allocated_width/page_ratio;
             this.current_view_and_stricts.position =
                 (int) double.min(wheight1, wheight2);
@@ -605,10 +621,10 @@ namespace pdfpc.Window {
 
             this.next_view_and_notes = create_paned(Gtk.Orientation.VERTICAL);
 
-            // To be exact, the width of Paned handle should be subtracted...
-            var next_allocated_width = this.window_w - current_allocated_width;
+            var next_allocated_width = this.window_w - current_allocated_width
+                - this.handle_thickness;
 
-            wheight1 = Options.next_height/100.0*usable_height;
+            wheight1 = Options.next_height/100.0*main_height;
             wheight2 = next_allocated_width/page_ratio;
             this.next_view_and_notes.position =
                 (int) double.min(wheight1, wheight2);
@@ -648,20 +664,18 @@ namespace pdfpc.Window {
             var bottom_row = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
             bottom_row.homogeneous = true;
 
-            this.timer_label.halign = Gtk.Align.CENTER;
-            this.timer_label.valign = Gtk.Align.END;
-
             bottom_row.pack_start(this.status);
             bottom_row.pack_start(this.timer_label);
-            bottom_row.pack_end(this.slide_progress, false);
+            bottom_row.pack_start(this.slide_progress);
+            bottom_row.size_allocate.connect(this.on_bottom_resize);
 
-            Gtk.Grid full_layout = new Gtk.Grid();
-            full_layout.row_homogeneous = true;
-            full_layout.attach(this.slide_stack, 0, 0, 1, this.bottom_frac_inv - 1);
-            full_layout.attach(bottom_row, 0, this.bottom_frac_inv - 1, 1, 1);
+            this.full_layout = create_paned(Gtk.Orientation.VERTICAL);
+            this.full_layout.position = (int) main_height;
+            this.full_layout.pack1(this.slide_stack, true, true);
+            this.full_layout.pack2(bottom_row, true, true);
 
-            Gtk.Overlay full_overlay = new Gtk.Overlay();
-            full_overlay.add(full_layout);
+            var full_overlay = new Gtk.Overlay();
+            full_overlay.add(this.full_layout);
 
             // maybe should be calculated based on screen dimensions?
             int toolbox_icon_height = 36;
@@ -674,11 +688,6 @@ namespace pdfpc.Window {
             full_overlay.set_overlay_pass_through(this.toolbox, true);
 
             this.add(full_overlay);
-        }
-
-        public override void show() {
-            base.show();
-            this.resize_overview();
         }
 
         public void session_saved() {
