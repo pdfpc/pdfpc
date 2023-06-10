@@ -156,20 +156,24 @@ namespace pdfpc {
         public static uint last_minutes = 0;
 
         /**
-         * Commandline option providing the size of the current slide in
-         * the presenter window
+         * Height of the status area (timer, progress, icons) in the presenter
+         * (% of the window height), leaving (100 - status_height)% for the
+         * "main" area
+         */
+        public static uint status_height = 10;
+
+        /**
+         * Width of the current slide in the presenter (% of the window width)
          */
         public static uint current_size = 60;
 
         /**
-         * Commandline option providing the height of the current slide in
-         * the presenter window
+         * Height of the current slide in the presenter (% of the "main")
          **/
         public static uint current_height = 80;
 
         /**
-         * Commandline option providing the maximum height of the next slide
-         * in the presenter window
+         * Height of the next slide in the presenter (% of the "main")
          **/
         public static uint next_height = 70;
 

@@ -334,6 +334,9 @@ namespace pdfpc {
                 case "spotlight-size":
                     Options.spotlight_size = int.parse(fields[2]);
                     break;
+                case "status-height":
+                    Options.status_height = int.parse(fields[2]);
+                    break;
                 case "switch-screens":
                     bool switch_screens = bool.parse(fields[2]);
                     if (switch_screens) {

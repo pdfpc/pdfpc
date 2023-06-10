@@ -28,6 +28,8 @@ entry {
 paned separator {
     background-image: none;
     background-color: black;
+    min-width: 5px;
+    min-height: 5px;
 }
 
 .customization separator {
