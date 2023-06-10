@@ -215,19 +215,9 @@ namespace pdfpc {
         public static bool black_on_end = false;
 
         /**
-         * Show the actions supported in the config file(s)
-         */
-        public static bool list_actions = false;
-
-        /**
          * Show the defined action bindings
          */
         public static bool list_bindings = false;
-
-        /**
-         * Show the available monitors(s)
-         */
-        public static bool list_monitors = false;
 
         /**
          * Commandline option to choose which format to parse notes in
@@ -290,26 +280,9 @@ namespace pdfpc {
         public static bool auto_srt = false;
 
         /**
-         * Page number which should be displayed after startup;
-         * "h" stands for human (numerated from 1, not 0)
-         */
-        public static int page_hnum = 1;
-
-        /**
-         * Flag if the version string should be printed on startup
-         */
-        public static bool version = false;
-
-        /**
          * Location of a non-default, user-chosen .pdfpc file
          */
         public static string? pdfpc_location = null;
-
-        /**
-         * pdfpcrc statement(s) passed on the command line
-         */
-        [CCode (array_length = false, array_null_terminated = true)]
-        public static string[]? pdfpcrc_statements = null;
 
         /**
          * Test pdfpc without installation

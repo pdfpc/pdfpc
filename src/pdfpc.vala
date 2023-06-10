@@ -42,6 +42,33 @@ namespace pdfpc {
         private PresentationController controller;
 
         /**
+         * Show the actions supported in the config file(s)
+         */
+        private static bool list_actions = false;
+
+        /**
+         * Show the available monitors(s)
+         */
+        private static bool list_monitors = false;
+
+        /**
+         * pdfpcrc statement(s) passed on the command line
+         */
+        [CCode (array_length = false, array_null_terminated = true)]
+        private static string[]? pdfpcrc_statements = null;
+
+        /**
+         * Page number which should be displayed after startup;
+         * "h" stands for human (counted from 1, not 0)
+         */
+        private static int page_hnum = 1;
+
+        /**
+         * Flag if the version string should be printed on startup
+         */
+        private static bool version = false;
+
+        /**
          * Commandline option parser entry definitions
          */
         const OptionEntry[] options = {
@@ -49,7 +76,7 @@ namespace pdfpc {
                 ref Options.list_bindings,
                 "List action bindings defined", null},
             {"cfg-statement", 'c', 0, OptionArg.STRING_ARRAY,
-                ref Options.pdfpcrc_statements,
+                ref pdfpcrc_statements,
                 "Interpret the string as a pdfpcrc statement", "STRING"},
             {"time-of-day", 'C', 0, 0,
                 ref Options.use_time_of_day,
@@ -70,10 +97,10 @@ namespace pdfpc {
                 ref Options.last_minutes,
                 "Change the timer color during last N mins [5]", "N"},
             {"list-actions", 'L', 0, 0,
-                ref Options.list_actions,
+                ref list_actions,
                 "List actions supported in the config file(s)", null},
             {"list-monitors", 'M', 0, 0,
-                ref Options.list_monitors,
+                ref list_monitors,
                 "List available monitors", null},
             {"notes", 'n', 0, OptionArg.STRING,
                 ref Options.notes_position,
@@ -87,7 +114,7 @@ namespace pdfpc {
                 "REST port number [8088]", null},
 #endif
             {"page", 'P', 0, OptionArg.INT,
-                ref Options.page_hnum,
+                ref page_hnum,
                 "Go to page number N directly after startup", "N"},
             {"page-transition", 'r', 0, OptionArg.STRING,
                 ref Options.default_transition,
@@ -108,7 +135,7 @@ namespace pdfpc {
                 ref Options.auto_srt,
                 "Load video subtitle files automatically", null},
             {"version", 'v', 0, 0,
-                ref Options.version,
+                ref version,
                 "Output version information and exit", null},
 #if REST
             {"enable-rest-server", 'V', 0, 0,
@@ -224,12 +251,12 @@ namespace pdfpc {
 
             string pdfFilename = this.parse_command_line_options(ref args);
 
-            if (Options.version) {
+            if (version) {
                 print_version();
                 Process.exit(0);
             }
 
-            if (Options.list_monitors) {
+            if (list_monitors) {
                 int n_monitors = display.get_n_monitors();
                 GLib.print("Monitors: %d\n", n_monitors);
                 for (int i = 0; i < n_monitors; i++) {
@@ -283,7 +310,7 @@ namespace pdfpc {
             }
             configFileReader.readConfig(userConfig);
 
-            foreach (string statement in Options.pdfpcrc_statements) {
+            foreach (string statement in pdfpcrc_statements) {
                 configFileReader.parseStatement(statement);
             }
 
@@ -339,7 +366,7 @@ namespace pdfpc {
             // Initialize the master controller
             this.controller = new PresentationController();
 
-            if (Options.list_actions) {
+            if (list_actions) {
                 GLib.print("Actions supported by pdfpc:\n");
                 var actions = this.controller.get_action_descriptions();
                 for (int i = 0; i < actions.length; i += 2) {
@@ -463,9 +490,9 @@ namespace pdfpc {
                 this.controller.presentation.show_all();
             }
 
-            if (Options.page_hnum >= 1 &&
-                Options.page_hnum <= metadata.get_end_user_slide() + 1) {
-                int u = metadata.user_slide_to_real_slide(Options.page_hnum - 1,
+            if (page_hnum >= 1 &&
+                page_hnum <= metadata.get_end_user_slide() + 1) {
+                int u = metadata.user_slide_to_real_slide(page_hnum - 1,
                     false);
                 this.controller.switch_to_slide_number(u, true);
             } else {
