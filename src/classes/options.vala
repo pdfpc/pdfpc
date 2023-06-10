@@ -37,7 +37,7 @@ namespace pdfpc {
         }
 
         /**
-         * Commandline option enabeling the execution of external
+         * Commandline option enabling the execution of external
          * scripts. Only the scripts explicitly given on the
          * commandline can be executed.
          */
@@ -301,9 +301,14 @@ namespace pdfpc {
         public static bool version = false;
 
         /**
-         * Location of specific, user-chosen pdfpcrc file
+         * Location of a non-default, user-chosen .pdfpc file
          */
         public static string? pdfpc_location = null;
+
+        /**
+         * semicolon-separated pdfpcrc statement(s) passed on the command line
+         */
+        public static string? pdfpcrc_statements = null;
 
         /**
          * Test pdfpc without installation

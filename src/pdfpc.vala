@@ -48,6 +48,9 @@ namespace pdfpc {
             {"list-bindings", 'B', 0, 0,
                 ref Options.list_bindings,
                 "List action bindings defined", null},
+            {"cfg-statement", 'c', 0, OptionArg.STRING,
+                ref Options.pdfpcrc_statements,
+                "Interpret the string as pdfpcrc statement(s)", "STRING"},
             {"time-of-day", 'C', 0, 0,
                 ref Options.use_time_of_day,
                 "Use the current time for the timer", null},
@@ -252,20 +255,39 @@ namespace pdfpc {
             }
 
             ConfigFileReader configFileReader = new ConfigFileReader();
+
+            string systemConfig;
             if (Options.no_install) {
-                configFileReader.readConfig(Path.build_filename(Paths.SOURCE_PATH, "rc/pdfpcrc"));
+                systemConfig = Path.build_filename(Paths.SOURCE_PATH,
+                    "rc/pdfpcrc");
             } else {
-                configFileReader.readConfig(Path.build_filename(Paths.CONF_PATH, "pdfpcrc"));
+                systemConfig = Path.build_filename(Paths.CONF_PATH,
+                    "pdfpcrc");
             }
-            var legacyUserConfig = Path.build_filename(Environment.get_home_dir(), ".pdfpcrc");
-            var userConfig = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpcrc");
-            if (GLib.FileUtils.test(userConfig, (GLib.FileTest.IS_REGULAR))) {
-                // first, use the xdg config directory
-                configFileReader.readConfig(userConfig);
-            } else if (GLib.FileUtils.test(legacyUserConfig, (GLib.FileTest.IS_REGULAR))) {
-                // if not found, use the legacy location
-                configFileReader.readConfig(legacyUserConfig);
-                GLib.printerr("Loaded pdfpcrc from legacy location. Please move your config file to %s\n", userConfig);
+            configFileReader.readConfig(systemConfig);
+
+            // First, try the XDG config directory
+            var userConfig =
+                Path.build_filename(GLib.Environment.get_user_config_dir(),
+                    "pdfpc", "pdfpcrc");
+            if (!GLib.FileUtils.test(userConfig, GLib.FileTest.IS_REGULAR)) {
+                // If not found, try the legacy location
+                var legacyUserConfig =
+                    Path.build_filename(Environment.get_home_dir(), ".pdfpcrc");
+                if (GLib.FileUtils.test(legacyUserConfig,
+                    GLib.FileTest.IS_REGULAR)) {
+                    GLib.printerr("Please move your config file from %s to %s\n",
+                        legacyUserConfig, userConfig);
+                    userConfig = legacyUserConfig;
+                }
+            }
+            configFileReader.readConfig(userConfig);
+
+            if (Options.pdfpcrc_statements != null) {
+                string[] statements = Options.pdfpcrc_statements.split(";");
+                for (int i = 0; i < statements.length; i++) {
+                    configFileReader.parseStatement(statements[i]);
+                }
             }
 
             // with prerendering enabled, it makes no sense not to cache a slide
