@@ -312,24 +312,17 @@ note though, that only in the normal mode the mouse bindings are configurable.
 .SS Caching / Pre-rendering
 
 .PP
-To allow fast changes between the presentation slides, the PDF
-pages are pre-rendered to memory.  The progress bar on the bottom of the
-presenter screen indicates how many percent of the slides have been
-pre-rendered already.  During the initial rendering phase this will slow down
-slide changes, as most CPU power is used for the rendering process in the
-background.  After the cache is fully primed, however, the changing of slides
-should be much faster, as with normal PDF viewers.
-
-.PP
+To allow fast changes between the presentation slides, a few consecutive PDF
+pages (the number is configurable) are pre-rendered and kept in memory.
 To avoid excessive memory consumption, cached are only slides that took a
 significant time to render; this threshold is configurable. In order to further
 reduce memory consumption, the pre-rendered and cached slides are selectively
-compressed in memory. The compression factor is typically 10\-30, however, it
+compressed. The compression factor is typically 10\-30, however, it
 takes some CPU time to compress and uncompress, so there is a trade-off. Small
 images below a certain (configurable) threshold will not be compressed.
 
 .PP
-Please refer to the \fBpdfpcrc\fR(5) man page for options to fine tune the
+Please refer to the \fBpdfpcrc\fR(5) man page for options to fine-tune the
 caching algorithm.
 
 .SS Timer
