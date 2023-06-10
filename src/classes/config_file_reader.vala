@@ -180,16 +180,15 @@ namespace pdfpc {
         }
 
         public void parseStatement(string line) {
-            string[] fields;
-            string uncommentedLine;
-            try {
-                var splitRegex = new Regex("\\s\\s*");
-                var commentRegex = new Regex("^\\s*#.*$");
-                uncommentedLine = commentRegex.replace(line, -1, 0, "");
-                fields = splitRegex.split(uncommentedLine);
-            } catch (Error e) {
+            // Strip white spaces
+            string statement = line.strip();
+
+            // Ignore comments
+            if (statement[0] == '#') {
                 return;
             }
+
+            string[] fields = GLib.Regex.split_simple("[ \t]+", statement);
 
             if (fields.length == 0) {
                 return;
@@ -197,29 +196,29 @@ namespace pdfpc {
 
             switch(fields[0]) {
             case "bind":
-                this.bindKey(uncommentedLine, fields);
+                this.bindKey(statement, fields);
                 break;
             case "unbind":
-                this.unbindKey(uncommentedLine, fields);
+                this.unbindKey(statement, fields);
                 break;
             case "unbind_all":
                 this.unbindKeyAll();
                 break;
             case "mouse":
-                this.bindMouse(uncommentedLine, fields);
+                this.bindMouse(statement, fields);
                 break;
             case "unmouse":
-                this.unbindMouse(uncommentedLine, fields);
+                this.unbindMouse(statement, fields);
                 break;
             case "unmouse_all":
                 this.unbindMouseAll();
                 break;
             case "option":
-                this.readOption(uncommentedLine, fields);
+                this.readOption(statement, fields);
                 break;
             default:
                 GLib.printerr("Warning: Invalid configuration statement \"%s\"\n",
-                    uncommentedLine);
+                    statement);
                 break;
             }
         }
