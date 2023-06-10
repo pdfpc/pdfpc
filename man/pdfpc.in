@@ -34,7 +34,7 @@ List action bindings defined
 .TP
 .BI "\-c, \-\-cfg\-statement"=STRING
 Interpret the string as a pdfpcrc(5) statement. Multiple statements can be
-given, separated by semicolons.
+given.
 .TP
 .BI "\-C, \-\-time\-of\-day
 Display the time of the day

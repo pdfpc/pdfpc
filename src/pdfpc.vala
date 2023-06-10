@@ -48,9 +48,9 @@ namespace pdfpc {
             {"list-bindings", 'B', 0, 0,
                 ref Options.list_bindings,
                 "List action bindings defined", null},
-            {"cfg-statement", 'c', 0, OptionArg.STRING,
+            {"cfg-statement", 'c', 0, OptionArg.STRING_ARRAY,
                 ref Options.pdfpcrc_statements,
-                "Interpret the string as pdfpcrc statement(s)", "STRING"},
+                "Interpret the string as a pdfpcrc statement", "STRING"},
             {"time-of-day", 'C', 0, 0,
                 ref Options.use_time_of_day,
                 "Use the current time for the timer", null},
@@ -283,11 +283,8 @@ namespace pdfpc {
             }
             configFileReader.readConfig(userConfig);
 
-            if (Options.pdfpcrc_statements != null) {
-                string[] statements = Options.pdfpcrc_statements.split(";");
-                for (int i = 0; i < statements.length; i++) {
-                    configFileReader.parseStatement(statements[i]);
-                }
+            foreach (string statement in Options.pdfpcrc_statements) {
+                configFileReader.parseStatement(statement);
             }
 
             // with prerendering enabled, it makes no sense not to cache a slide

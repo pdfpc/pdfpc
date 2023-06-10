@@ -306,9 +306,10 @@ namespace pdfpc {
         public static string? pdfpc_location = null;
 
         /**
-         * semicolon-separated pdfpcrc statement(s) passed on the command line
+         * pdfpcrc statement(s) passed on the command line
          */
-        public static string? pdfpcrc_statements = null;
+        [CCode (array_length = false, array_null_terminated = true)]
+        public static string[]? pdfpcrc_statements = null;
 
         /**
          * Test pdfpc without installation
