@@ -168,46 +168,59 @@ namespace pdfpc {
 
         public void readConfig(string fname) {
             var file = File.new_for_path(fname);
-            uint8[] raw_datau8;
+            try {
+                uint8[] raw_datau8;
+                file.load_contents(null, out raw_datau8, null);
+                string[] lines = ((string) raw_datau8).split("\n");
+                for (int i = 0; i < lines.length; ++i) {
+                    this.parseStatement(lines[i]);
+                }
+            } catch (Error e) {
+            }
+        }
+
+        public void parseStatement(string line) {
+            string[] fields;
+            string uncommentedLine;
             try {
                 var splitRegex = new Regex("\\s\\s*");
                 var commentRegex = new Regex("^\\s*#.*$");
-                file.load_contents(null, out raw_datau8, null);
-                string[] lines = ((string) raw_datau8).split("\n");
-                for (int i=0; i<lines.length; ++i) {
-                    string uncommentedLine = commentRegex.replace(lines[i], -1, 0, "");
-                    string[] fields = splitRegex.split(uncommentedLine);
-                    if (fields.length == 0)
-                        continue;
-                    switch(fields[0]) {
-                        case "bind":
-                            this.bindKey(uncommentedLine, fields);
-                            break;
-                        case "unbind":
-                            this.unbindKey(uncommentedLine, fields);
-                            break;
-                        case "unbind_all":
-                            this.unbindKeyAll();
-                            break;
-                        case "mouse":
-                            this.bindMouse(uncommentedLine, fields);
-                            break;
-                        case "unmouse":
-                            this.unbindMouse(uncommentedLine, fields);
-                            break;
-                        case "unmouse_all":
-                            this.unbindMouseAll();
-                            break;
-                        case "option":
-                            this.readOption(uncommentedLine, fields);
-                            break;
-                        default:
-                            GLib.printerr("Warning: Invalid configuration statement \"%s\"\n",
-                                uncommentedLine);
-                            break;
-                    }
-                }
+                uncommentedLine = commentRegex.replace(line, -1, 0, "");
+                fields = splitRegex.split(uncommentedLine);
             } catch (Error e) {
+                return;
+            }
+
+            if (fields.length == 0) {
+                return;
+            }
+
+            switch(fields[0]) {
+            case "bind":
+                this.bindKey(uncommentedLine, fields);
+                break;
+            case "unbind":
+                this.unbindKey(uncommentedLine, fields);
+                break;
+            case "unbind_all":
+                this.unbindKeyAll();
+                break;
+            case "mouse":
+                this.bindMouse(uncommentedLine, fields);
+                break;
+            case "unmouse":
+                this.unbindMouse(uncommentedLine, fields);
+                break;
+            case "unmouse_all":
+                this.unbindMouseAll();
+                break;
+            case "option":
+                this.readOption(uncommentedLine, fields);
+                break;
+            default:
+                GLib.printerr("Warning: Invalid configuration statement \"%s\"\n",
+                    uncommentedLine);
+                break;
             }
         }
 
