@@ -222,7 +222,7 @@ namespace pdfpc.Window {
             button_panel.set_homogeneous(true);
 
             if (Options.toolbox_minimized) {
-                button_panel.hide();
+                button_panel.set_child_visible(false);
             }
             if (tbox_inverse) {
                 this.toolbox.pack_end(button_panel);
@@ -231,12 +231,8 @@ namespace pdfpc.Window {
             }
 
             tb.clicked.connect(() => {
-                    var state = button_panel.visible;
-                    if (state) {
-                        button_panel.hide();
-                    } else {
-                        button_panel.show();
-                    }
+                    var state = button_panel.get_child_visible();
+                    button_panel.set_child_visible(!state);
                 });
 
             tb = add_button(button_panel, tbox_inverse, "empty.svg",
