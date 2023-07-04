@@ -160,33 +160,23 @@ namespace pdfpc.Window {
 
             Gtk.Orientation orientation = Gtk.Orientation.HORIZONTAL;
             bool tbox_inverse = false;
-            int tb_offset = (int) (0.02*presenter.window_h);
 
-            int tbox_x = 0, tbox_y = 0;
             switch (Options.toolbox_direction) {
                 case Options.ToolboxDirection.LtoR:
                     orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = false;
-                    tbox_x = (int) (0.15*presenter.window_w) + tb_offset;
-                    tbox_y = (int) (0.70*presenter.window_h) + tb_offset;
                     break;
                 case Options.ToolboxDirection.RtoL:
                     orientation = Gtk.Orientation.HORIZONTAL;
                     tbox_inverse = true;
-                    tbox_x = (int) (0.15*presenter.window_w) - tb_offset;
-                    tbox_y = (int) (0.70*presenter.window_h) + tb_offset;
                     break;
                 case Options.ToolboxDirection.TtoB:
                     orientation = Gtk.Orientation.VERTICAL;
                     tbox_inverse = false;
-                    tbox_x = 0*presenter.window_w + tb_offset;
-                    tbox_y = 0*presenter.window_h + tb_offset;
                     break;
                 case Options.ToolboxDirection.BtoT:
                     orientation = Gtk.Orientation.VERTICAL;
                     tbox_inverse = true;
-                    tbox_x = 0*presenter.window_w + tb_offset;
-                    tbox_y = 0*presenter.window_h + tb_offset;
                     break;
             }
             toolbox = new Gtk.Box(orientation, 0);
@@ -222,7 +212,7 @@ namespace pdfpc.Window {
             button_panel.set_homogeneous(true);
 
             if (Options.toolbox_minimized) {
-                button_panel.hide();
+                button_panel.set_child_visible(false);
             }
             if (tbox_inverse) {
                 this.toolbox.pack_end(button_panel);
@@ -231,12 +221,8 @@ namespace pdfpc.Window {
             }
 
             tb.clicked.connect(() => {
-                    var state = button_panel.visible;
-                    if (state) {
-                        button_panel.hide();
-                    } else {
-                        button_panel.show();
-                    }
+                    var state = button_panel.get_child_visible();
+                    button_panel.set_child_visible(!state);
                 });
 
             tb = add_button(button_panel, tbox_inverse, "empty.svg",
@@ -301,6 +287,9 @@ namespace pdfpc.Window {
                     this.controller.queue_pen_surface_draws();
                 });
 
+            int tbox_x, tbox_y;
+            calculate_position(presenter.window_w, presenter.window_h,
+                out tbox_x, out tbox_y);
             this.put(this.toolbox, tbox_x, tbox_y);
         }
 
@@ -327,6 +316,40 @@ namespace pdfpc.Window {
             } else {
                 scale_button.hide();
             }
+        }
+
+        protected void calculate_position(int w, int h, out int x, out int y) {
+            double fx = 0.0, fy = 0.0;
+            double offset = 0.02*h;
+
+            switch (Options.toolbox_direction) {
+                case Options.ToolboxDirection.LtoR:
+                    fx = 0.15*w + offset;
+                    fy = 0.70*h + offset;
+                    break;
+                case Options.ToolboxDirection.RtoL:
+                    fx = 0.15*w - offset;
+                    fy = 0.70*h + offset;
+                    break;
+                case Options.ToolboxDirection.TtoB:
+                    fx = 0*w + offset;
+                    fy = 0*h + offset;
+                    break;
+                case Options.ToolboxDirection.BtoT:
+                    fx = 0*w + offset;
+                    fy = 0*h + offset;
+                    break;
+            }
+
+            x = (int) fx;
+            y = (int) fy;
+        }
+
+        public void on_window_resize(int w, int h) {
+            int x, y;
+            calculate_position(w, h, out x, out y);
+
+            this.move(this.toolbox, x, y);
         }
     }
 }

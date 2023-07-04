@@ -791,6 +791,10 @@ namespace pdfpc.Window {
             this.toolbox.update();
         }
 
+        protected override void resize_gui() {
+            this.toolbox.on_window_resize(this.window_w, this.window_h);
+        }
+
         /**
          * Ask for the page to jump to
          */
