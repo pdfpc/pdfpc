@@ -339,8 +339,8 @@ namespace pdfpc.Window {
          * Handle mouse scrolling
          */
         protected bool w_on_scroll(Gdk.EventScroll scroll) {
-            bool up   = false;
-            bool down = false;
+            bool up = false, down = false;
+
             switch (scroll.direction) {
             case Gdk.ScrollDirection.UP:
             case Gdk.ScrollDirection.LEFT:
@@ -349,6 +349,15 @@ namespace pdfpc.Window {
             case Gdk.ScrollDirection.DOWN:
             case Gdk.ScrollDirection.RIGHT:
                 down = true;
+                break;
+            case Gdk.ScrollDirection.SMOOTH:
+                double dx, dy;
+                scroll.get_scroll_deltas(out dx, out dy);
+                if (dx > 0 || dy > 0) {
+                    down = true;
+                } else if (dx < 0 || dy < 0) {
+                    up = true;
+                }
                 break;
             default:
                 break;
