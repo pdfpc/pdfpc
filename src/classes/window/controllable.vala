@@ -190,6 +190,8 @@ namespace pdfpc.Window {
 
             // General controlling events acting on the whole window
             this.key_press_event.connect(this.w_on_key_press);
+
+            this.add_events(Gdk.EventMask.SCROLL_MASK);
             this.scroll_event.connect(this.w_on_scroll);
 
             // Wayland treats the window decorations as part of the window.
