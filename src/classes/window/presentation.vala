@@ -54,7 +54,8 @@ namespace pdfpc.Window {
             var frame = new Gtk.AspectFrame(null, 0.5f, 0.5f,
                 (float) ratio, false);
             frame.add(overlay_layout);
-            this.add(frame);
+
+            this.add_top_container(frame);
         }
 
         /**
