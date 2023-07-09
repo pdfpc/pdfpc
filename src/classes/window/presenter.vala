@@ -687,7 +687,7 @@ namespace pdfpc.Window {
             full_overlay.add_overlay(this.toolbox);
             full_overlay.set_overlay_pass_through(this.toolbox, true);
 
-            this.add(full_overlay);
+            this.add_top_container(full_overlay);
         }
 
         public void session_saved() {

@@ -139,10 +139,6 @@ namespace pdfpc.Window {
                     true);
             });
 
-            if (this.interactive) {
-                this.register_presenter_handlers();
-            }
-
             // Soft cursor drawing events
             this.pointer_drawing_surface.draw.connect(this.draw_pointer);
             this.pen_drawing_surface.draw.connect(this.draw_pen);
@@ -155,6 +151,13 @@ namespace pdfpc.Window {
             this.restart_hide_cursor_timer();
 
             this.destroy.connect((source) => controller.quit());
+        }
+
+        protected void add_top_container(Gtk.Widget top) {
+            this.add(top);
+            if (this.interactive) {
+                this.register_presenter_handlers(top);
+            }
         }
 
         public void enable_pointer(bool onoff) {
@@ -173,7 +176,7 @@ namespace pdfpc.Window {
             }
         }
 
-        protected void register_presenter_handlers() {
+        protected void register_presenter_handlers(Gtk.Widget top) {
             // Main view events
             var view = this.main_view;
             view.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK |
@@ -187,8 +190,14 @@ namespace pdfpc.Window {
 
             // General controlling events acting on the whole window
             this.key_press_event.connect(this.w_on_key_press);
-            this.button_press_event.connect(this.w_on_button_press);
+
+            this.add_events(Gdk.EventMask.SCROLL_MASK);
             this.scroll_event.connect(this.w_on_scroll);
+
+            // Wayland treats the window decorations as part of the window.
+            // Thus, we assign the mouse handler to the top widget instead,
+            // so the WM actions like resize & drag continue working.
+            top.button_press_event.connect(this.w_on_button_press);
         }
 
         /**
@@ -330,8 +339,8 @@ namespace pdfpc.Window {
          * Handle mouse scrolling
          */
         protected bool w_on_scroll(Gdk.EventScroll scroll) {
-            bool up   = false;
-            bool down = false;
+            bool up = false, down = false;
+
             switch (scroll.direction) {
             case Gdk.ScrollDirection.UP:
             case Gdk.ScrollDirection.LEFT:
@@ -340,6 +349,15 @@ namespace pdfpc.Window {
             case Gdk.ScrollDirection.DOWN:
             case Gdk.ScrollDirection.RIGHT:
                 down = true;
+                break;
+            case Gdk.ScrollDirection.SMOOTH:
+                double dx, dy;
+                scroll.get_scroll_deltas(out dx, out dy);
+                if (dx > 0 || dy > 0) {
+                    down = true;
+                } else if (dx < 0 || dy < 0) {
+                    up = true;
+                }
                 break;
             default:
                 break;
