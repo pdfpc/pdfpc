@@ -125,8 +125,25 @@ namespace pdfpc.Window {
 
             this.set_default_size(this.window_w, this.window_h);
 
-            // Watch for window geometry changes; keep the local copy updated
+            // Watch for changes of the window geometry or monitor switched;
+            // keep the local copies updated
             this.configure_event.connect((ev) => {
+                    if (this.windowed) {
+                        var new_monitor =
+                            display.get_monitor_at_window(ev.window);
+
+                        if (new_monitor != this.monitor) {
+                            this.monitor = new_monitor;
+
+                            int n_monitors = display.get_n_monitors();
+                            for (int i = 0; i < n_monitors; i++) {
+                                if (display.get_monitor(i) == new_monitor) {
+                                    this.monitor_num_to_use = i;
+                                }
+                            }
+                        }
+                    }
+
                     if (ev.width != this.window_w ||
                         ev.height != this.window_h) {
                         this.window_w = ev.width;
