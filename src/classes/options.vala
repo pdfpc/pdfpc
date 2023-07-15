@@ -232,7 +232,7 @@ namespace pdfpc {
         /**
          * Whether the presentation window is always interactive
          */
-        public static bool presentation_interactive = false;
+        public static bool presentation_interactive = true;
 
         /**
          * Screen to be used for the presentation (output name)
