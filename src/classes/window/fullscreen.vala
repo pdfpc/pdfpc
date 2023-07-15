@@ -121,6 +121,17 @@ namespace pdfpc.Window {
                     this.window_w /= 2;
                     this.window_h /= 2;
                 }
+
+                if (Options.move_on_mapped) {
+                    // Some WM's ignore move requests made prior to
+                    // mapping the window
+                    this.map_event.connect(() => {
+                            this.move(monitor_geometry.x, monitor_geometry.y);
+                            return true;
+                        });
+                } else {
+                    this.move(monitor_geometry.x, monitor_geometry.y);
+                }
             }
 
             this.set_default_size(this.window_w, this.window_h);
