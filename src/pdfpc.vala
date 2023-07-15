@@ -263,9 +263,10 @@ namespace pdfpc {
                     var monitor = display.get_monitor(i);
                     int sf = monitor.get_scale_factor();
                     var geo = monitor.get_geometry();
+                    var model = monitor.get_model();
                     GLib.print(" %d: %c %s \t[%dx%d+%d+%d@%dHz \tscale=%d%%]\n",
                         i, monitor.is_primary() ? '*':' ',
-                        monitor.get_model(),
+                        model == null ? "-":model,
                         geo.width*sf, geo.height*sf,
                         geo.x*sf, geo.y*sf,
                         (monitor.get_refresh_rate() + 500)/1000,
