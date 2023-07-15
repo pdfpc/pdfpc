@@ -140,10 +140,12 @@ wrote to stdout is printed in the console. Otherwise nothing is printed.
 Size of the presentation window in width:height format (forces windowed mode)
 .TP
 .BI "\-1, \-\-presenter\-screen"=MONITOR
-Monitor to be used for the presenter screen (see the \-M option).
+Monitor to be used for the presenter screen (see the \-M option). Either the
+model name or the index can be used.
 .TP
 .BI "\-2, \-\-presentation\-screen"=MONITOR
-Monitor to be used for the presentation screen (see the \-M option).
+Monitor to be used for the presentation screen (see the \-M option). Either the
+model name or the index can be used.
 
 .SH KEYBINDINGS
 These are the default keybindings for pdfpc:

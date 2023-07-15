@@ -412,6 +412,17 @@ namespace pdfpc {
 
             int primary_monitor_num = 0, secondary_monitor_num = 0;
             int presenter_monitor = -1, presentation_monitor = -1;
+
+            // Check if the screen(s) are given by their index instead of model
+            if (Options.presenter_screen != null &&
+                Options.presenter_screen.length == 1) {
+                presenter_monitor = int.parse(Options.presenter_screen);
+            }
+            if (Options.presentation_screen != null &&
+                Options.presentation_screen.length == 1) {
+                presentation_monitor = int.parse(Options.presentation_screen);
+            }
+
             int n_monitors = display.get_n_monitors();
             for (int i = 0; i < n_monitors; i++) {
                 // First, try to satisfy user's preferences
@@ -439,13 +450,13 @@ namespace pdfpc {
 
             // Bail out if an explicitly requested monitor is not found
             if (Options.presenter_screen != null &&
-                presenter_monitor == -1) {
+                (presenter_monitor < 0 || presenter_monitor >= n_monitors)) {
                 GLib.printerr("Monitor \"%s\" not found\n",
                     Options.presenter_screen);
                 Process.exit(1);
             }
             if (Options.presentation_screen != null &&
-                presentation_monitor == -1) {
+                (presentation_monitor < 0 || presentation_monitor >= n_monitors)) {
                 GLib.printerr("Monitor \"%s\" not found\n",
                     Options.presentation_screen);
                 Process.exit(1);
