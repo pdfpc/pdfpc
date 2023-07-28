@@ -246,6 +246,9 @@ namespace pdfpc {
          * initializes the Gtk system.
          */
         public void run(string[] args) {
+#if WIN
+            Console.attachConsole();
+#endif
 #if X11
             X.init_threads();
 #endif

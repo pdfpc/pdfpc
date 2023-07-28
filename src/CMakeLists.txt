@@ -172,6 +172,7 @@ CUSTOM_VAPIS
     ${CMAKE_CURRENT_SOURCE_DIR}/libmarkdown.vapi
     ${CMAKE_CURRENT_SOURCE_DIR}/libqrencode.vapi
     ${CMAKE_CURRENT_SOURCE_DIR}/procinfo.vapi
+    ${CMAKE_CURRENT_SOURCE_DIR}/console.vapi
 )
 
 add_executable(pdfpc
