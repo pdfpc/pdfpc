@@ -122,6 +122,11 @@ endif ()
 if (NOT MARKDOWN_FOUND)
     LIST(REMOVE_ITEM VALA_SRC classes/renderer/markdown.vala)
 endif ()
+if (${CMAKE_HOST_WIN32})
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D WIN)
+else ()
+    LIST(REMOVE_ITEM VALA_SRC classes/resource.vala)
+endif ()
 
 # Check for some compiler flags to suppress excessive Vala-triggered warnings
 # Since gcc >= 4.4 can silently ignore unrecognized -W-no* flags, we test
@@ -166,6 +171,7 @@ CUSTOM_VAPIS
     ${CMAKE_CURRENT_SOURCE_DIR}/custom_binding.vapi
     ${CMAKE_CURRENT_SOURCE_DIR}/libmarkdown.vapi
     ${CMAKE_CURRENT_SOURCE_DIR}/libqrencode.vapi
+    ${CMAKE_CURRENT_SOURCE_DIR}/procinfo.vapi
 )
 
 add_executable(pdfpc

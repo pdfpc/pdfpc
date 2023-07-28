@@ -30,6 +30,9 @@ namespace pdfpc.Renderer {
             // attempt to load from a local path (if the user hasn't installed)
             // if that fails, attempt to load from the global path
             string load_icon_path;
+#if WIN
+            load_icon_path = ResourceLocator.getResourcePath(Path.build_filename("icons", filename));
+#else
             if (Options.no_install) {
                 load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons",
                     filename);
@@ -37,6 +40,7 @@ namespace pdfpc.Renderer {
                 load_icon_path = Path.build_filename(Paths.SHARE_PATH, "icons",
                     filename);
             }
+#endif
             File icon_file = File.new_for_path(load_icon_path);
 
             try {
