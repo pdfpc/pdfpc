@@ -2,6 +2,8 @@
  * Taken from: https://github.com/xournalpp/xournalpp/blob/700308a27457116ae804429631d5f31a525ff9b7/src/exe/win32/console.cpp
  */
 
+#ifdef _WIN32
+
 #include "console.h"
 
 #include <windows.h>
@@ -79,3 +81,5 @@ void attachConsole() {
         ShowWindow(GetConsoleWindow(), SW_HIDE);
     }
 }
+
+#endif

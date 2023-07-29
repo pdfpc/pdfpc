@@ -20,7 +20,7 @@ mkdir "$setup_dir"/lib
 mkdir -p ../build
 
 echo "copy installed files"
-(cd ../build && cmake .. -DMDVIEW=OFF -DCMAKE_MAKE_PROGRAM=ninja -DMOVIES=ON -DCMAKE_INSTALL_PREFIX= && DESTDIR=../windows-setup/"$setup_dir" cmake --build . --target install)
+(cd ../build && cmake .. -DMDVIEW=OFF -DCMAKE_MAKE_PROGRAM=ninja -DCMAKE_BUILD_TYPE=Release -DMOVIES=ON -DCMAKE_INSTALL_PREFIX= && DESTDIR=../windows-setup/"$setup_dir" cmake --build . --target install)
 
 echo $(pwd)
 echo "copy libraries"
@@ -50,7 +50,6 @@ cp /mingw64/bin/gdbus.exe "$setup_dir"/bin
 
 echo "create installer"
 bash make_version_nsh.sh
-exit
 "/c/Program Files (x86)/NSIS/Bin/makensis.exe" pdfpc.nsi
 
 echo "finished"
