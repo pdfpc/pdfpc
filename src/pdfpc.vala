@@ -293,7 +293,9 @@ namespace pdfpc {
             string systemConfig;
 #if WIN
             if ((systemConfig = ResourceLocator.getResourcePath("etc/pdfpcrc")) == null){
-                systemConfig = ResourceLocator.getResourcePath("rc/pdfpcrc");
+                if ((systemConfig = ResourceLocator.getResourcePath("rc/pdfpcrc")) == null) {
+                    GLib.printerr("system pdfpcrc could not be found");
+                }
             }
 #else
             if (Options.no_install) {
@@ -304,7 +306,9 @@ namespace pdfpc {
                     "pdfpcrc");
             }
 #endif
-            configFileReader.readConfig(systemConfig);
+            if (systemConfig != null) {
+                configFileReader.readConfig(systemConfig);
+            }
 
             // First, try the XDG config directory
             var userConfig =

@@ -32,6 +32,10 @@ namespace pdfpc.Renderer {
             string load_icon_path;
 #if WIN
             load_icon_path = ResourceLocator.getResourcePath(Path.build_filename("icons", filename));
+            if (load_icon_path == null) {
+                GLib.printerr("Warning: Could not load image %s (File not found)\n",
+                    filename);
+            }
 #else
             if (Options.no_install) {
                 load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons",
