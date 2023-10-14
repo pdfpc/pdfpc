@@ -230,6 +230,9 @@ namespace pdfpc {
             }
 
             switch (fields[1]) {
+                case "auto-hide":
+                    Options.auto_hide = bool.parse(fields[2]);
+                    break;
                 case "black-on-end":
                     Options.black_on_end = bool.parse(fields[2]);
                     break;

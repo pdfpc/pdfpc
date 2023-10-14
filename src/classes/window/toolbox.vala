@@ -263,7 +263,7 @@ namespace pdfpc.Window {
             tb = add_button(button_panel, tbox_inverse, "hidden.svg",
                 "Hide presentation window");
             tb.clicked.connect(() => {
-                    this.controller.hide_presentation();
+                    this.controller.toggle_hide_presentation();
                 });
             tb = add_button(button_panel, tbox_inverse, "pause.svg",
                 "Pause/resume timer");
