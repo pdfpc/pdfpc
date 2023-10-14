@@ -1258,7 +1258,7 @@ namespace pdfpc {
 
             add_action("blank", this.fade_to_black,
                 "Blank the presentation screen");
-            add_action("hide", this.hide_presentation,
+            add_action("hide", this.toggle_hide_presentation,
                 "Hide the presentation screen");
             add_action("freeze", this.toggle_freeze,
                 "Toggle freeze the presentation screen");
@@ -1891,15 +1891,22 @@ namespace pdfpc {
         }
 
         /**
-         * Hide the presentation window
+         * Set presentation window hiding
          */
-        public void hide_presentation() {
+        public void hide_presentation(bool hide) {
             if (this.single_screen_mode) {
                 return;
             }
 
-            this.hidden = !this.hidden;
+            this.hidden = hide;
             this.controllables_update();
+        }
+
+        /**
+         * Toggle presentation window hiding
+         */
+        public void toggle_hide_presentation() {
+            this.hide_presentation(!this.hidden);
         }
 
         /**

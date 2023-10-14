@@ -535,9 +535,7 @@ namespace pdfpc {
                     } else if (!presentation.is_monitor_connected()) {
                         presentation.connect_monitor(m);
                         // Make sure it is not hidden
-                        if (controller.hidden) {
-                            controller.hide_presentation();
-                        }
+                        controller.hide_presentation(false);
                     } else {
                         // Everything is connected already; is this a 3rd+
                         // monitor? Do nothing for now.
@@ -554,9 +552,7 @@ namespace pdfpc {
                     var presentation = controller.presentation;
                     if (presentation != null && presentation.monitor == m) {
                         // Make sure it is hidden
-                        if (!controller.hidden) {
-                            controller.hide_presentation();
-                        }
+                        controller.hide_presentation(true);
                         presentation.connect_monitor(null);
                     }
                 });
