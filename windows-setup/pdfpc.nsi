@@ -109,8 +109,6 @@ SectionEnd
 	WriteRegStr HKLM "Software\Classes\${PROGID}\DefaultIcon" "" '"${CMD}",0'
 	WriteRegStr HKLM "Software\Classes\${PROGID}\shell" "" "open"
 	WriteRegStr HKLM "Software\Classes\${PROGID}\shell\open\command" "" '"${CMD}" "%1"'
-	WriteRegStr HKLM "Software\Classes\${PROGID}\shell\edit" "" "Edit with pdfpc"
-	WriteRegStr HKLM "Software\Classes\${PROGID}\shell\edit\command" "" '"${CMD}" "%1"'
 !macroend
 
 !macro DeleteProgId PROGID
