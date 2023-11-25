@@ -126,6 +126,7 @@ if (${CMAKE_HOST_WIN32})
     set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D WIN)
 else ()
     LIST(REMOVE_ITEM VALA_SRC classes/resource.vala)
+    LIST(REMOVE_ITEM C_SRC console.c)
 endif ()
 
 # Check for some compiler flags to suppress excessive Vala-triggered warnings

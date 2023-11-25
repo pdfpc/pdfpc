@@ -1,85 +1,62 @@
-/**
- * Taken from: https://github.com/xournalpp/xournalpp/blob/700308a27457116ae804429631d5f31a525ff9b7/src/exe/win32/console.cpp
- */
-
 #ifdef _WIN32
 
 #include "console.h"
 
 #include <windows.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <Psapi.h>
+#include <tlhelp32.h>
 
-void attachConsole() {
-    if (GetConsoleWindow() != NULL) {
-        // Console is already attached.
-        ShowWindow(GetConsoleWindow(), SW_HIDE);
-        return;
-    }
-
-    // Make sure the console starts hidden.
-    STARTUPINFOW startupInfo = {0};
-    startupInfo.dwFlags = STARTF_USESHOWWINDOW;
-    startupInfo.wShowWindow = SW_HIDE;
-    startupInfo.cb = sizeof(startupInfo);
-
-    PROCESS_INFORMATION processInformation = {0};
-
-    bool consoleAttached = false;
-
-    if (CreateProcessW(L"C:\\Windows\\System32\\cmd.exe", NULL, NULL, NULL, FALSE, 0, NULL, NULL, &startupInfo,
-                       &processInformation)) {
-
-        HANDLE job = CreateJobObject(NULL, NULL);
-
-        if (job != NULL) {
-            // Terminate the console process automatically when Xournal++ exits.
-            JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobInformation = {0};
-            jobInformation.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-
-            if (!SetInformationJobObject(job, JobObjectExtendedLimitInformation, &jobInformation,
-                                         sizeof(jobInformation)) ||
-                !AssignProcessToJobObject(job, processInformation.hProcess)) {
-                TerminateProcess(processInformation.hProcess, 0);
-                CloseHandle(processInformation.hProcess);
-                CloseHandle(processInformation.hThread);
-                CloseHandle(job);
-                processInformation.hProcess = processInformation.hThread = job = NULL;
-            } else {
-                // It takes a short time before the console becomes ready to be attached, unfortunately
-                // there is no API that would let us wait for it.
-                for (unsigned short i = 0; i < 20; i++) {
-                    if (AttachConsole(processInformation.dwProcessId)) {
-                        consoleAttached = true;
-                        break;
-                    }
-                    Sleep(50);
-                }
+DWORD getParentPID(DWORD pid)
+{
+    HANDLE handle = NULL;
+    PROCESSENTRY32 entry = { 0 };
+    DWORD parent_pid = 0;
+    entry.dwSize = sizeof(PROCESSENTRY32);
+    handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (Process32First(handle, &entry)) {
+        do {
+            if (entry.th32ProcessID == pid) {
+                parent_pid = entry.th32ParentProcessID;
+                break;
             }
-        } else {
-            TerminateProcess(processInformation.hProcess, 0);
-            CloseHandle(processInformation.hProcess);
-            CloseHandle(processInformation.hThread);
-            processInformation.hProcess = processInformation.hThread = NULL;
-        }
-
-        if (processInformation.hProcess != NULL) {
-            if (!consoleAttached) {
-                TerminateProcess(processInformation.hProcess, 0);
-                CloseHandle(job);
-            }
-
-            CloseHandle(processInformation.hProcess);
-            CloseHandle(processInformation.hThread);
-        }
+        } while (Process32Next(handle, &entry));
     }
+    CloseHandle(handle);
+    return (parent_pid);
+}
 
-    if (!consoleAttached) {
-        // Could not attach to the manually created console process, request one from the system instead.
-        // This will make the console window flash briefly before we hide it.
-        AllocConsole();
+int getProcessName(DWORD pid, char* fname, DWORD size)
+{
+    HANDLE handle = NULL;
+    handle = OpenProcess(
+        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+        FALSE,
+        pid
+    );
+    if (handle) {
+        GetModuleBaseNameA(handle, NULL, fname, size);
+        CloseHandle(handle);
+    }
+}
+
+int getCurrentProcessName(char* fname, DWORD size) {
+    DWORD pid, parent_pid;
+    pid = GetCurrentProcessId();
+    parent_pid = getParentPID(pid);
+    return getProcessName(parent_pid, fname, size);
+}
+
+void hideConsoleIfNotNeeded() {
+    char fname[MAX_PATH] = { 0 };
+    getCurrentProcessName(fname, MAX_PATH);
+    
+    if (strncasecmp(fname, "cmd.exe", MAX_PATH) && strncasecmp(fname, "powershell.exe", MAX_PATH)) {
+        // We are not launched from cmd or powershell, going to hide console window...
         ShowWindow(GetConsoleWindow(), SW_HIDE);
     }
+
+    return;
 }
 
 #endif

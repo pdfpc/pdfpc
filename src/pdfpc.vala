@@ -247,7 +247,7 @@ namespace pdfpc {
          */
         public void run(string[] args) {
 #if WIN
-            Console.attachConsole();
+            Console.hideConsoleIfNotNeeded();
 #endif
 #if X11
             X.init_threads();
