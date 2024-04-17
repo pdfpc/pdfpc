@@ -23,7 +23,12 @@
 namespace pdfpc.Renderer {
     public class MD {
         public static string render(string? text = "", bool plain_text = false) {
+#if MARKDOWN3
+            var flags = new Markdown.DocumentFlags();
+            flags.set(Markdown.DocumentFlag.NO_EXT);
+#else
             Markdown.DocumentFlags flags = Markdown.DocumentFlags.NO_EXT;
+#endif
 
             string html;
             if (text != "" && plain_text) {

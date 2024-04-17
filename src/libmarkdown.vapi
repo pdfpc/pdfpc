@@ -95,9 +95,23 @@ namespace Markdown
 		public void ref_prefix (string prefix);
 	}
 
+#if MARKDOWN3
+	[Compact]
+	[CCode (cname = "mkd_flag_t", free_function = "mkd_free_flags")]
+	public class DocumentFlags {
+		[CCode (cname = "mkd_flags")]
+        public DocumentFlags();
+		[CCode (cname = "mkd_set_flag_num")]
+		public void set (DocumentFlag flag);
+    }
+
+	[CCode (cprefix = "MKD_")]
+	public enum DocumentFlag
+#else
 	[Flags]
 	[CCode (cname = "mkd_flag_t", cprefix = "MKD_")]
 	public enum DocumentFlags
+#endif
 	{
 		NOLINKS,
 		NOIMAGE,
