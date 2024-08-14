@@ -21,6 +21,10 @@ textview * selection {
   color: black;
 }
 
+textview * {
+   caret-color: white;
+}
+
 entry {
     background-image: none;
 }
