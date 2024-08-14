@@ -44,7 +44,7 @@ If you are using i3-wm add this to your config file::
 
     for_window [ title="^pdfpc - present" ] border none floating enable
 
-No presenter view showing (Mac only workaround)
+No presenter view showing (Mac workaround)
 ===========================================
 
 Current for Sonoma 14.5, updated 8/14/24.
