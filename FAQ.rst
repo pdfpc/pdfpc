@@ -63,7 +63,7 @@ Change this system setting to "never" on Mac to restore the expected behavior fr
     "system settings > desktop and dock > prefer tabs when opening documents" set to never
 
 An alternative to this, and potentially other window tiling managers, is to launch
-pdfpc in a dimensioned window such as:
+pdfpc in a dimensioned window such as::
 
     pdfpc -Z 1000:1000 presentation.pdf
 
