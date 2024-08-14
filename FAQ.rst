@@ -56,7 +56,7 @@ set to "always":
     "system settings > desktop and dock > prefer tabs when opening documents" set to always
 
 This option forces pdfpc to open the presentation view as a second tab, the window is then
-maximized and it is longer visible. 
+maximized and the tabs are no longer visible. 
 
 Change this system setting to "never" on Mac to restore the expected behavior from pdfpc.
 
