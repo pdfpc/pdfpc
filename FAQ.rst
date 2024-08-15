@@ -44,3 +44,28 @@ If you are using i3-wm add this to your config file::
 
     for_window [ title="^pdfpc - present" ] border none floating enable
 
+No presenter view showing (Mac workaround)
+===========================================
+
+Current for Sonoma 14.5, updated 8/14/24.
+
+If no presenter view is showing, or if the presenter view flashes briefly then
+disappears, you likely have the Mac option "prefer tabs when opening documents"
+set to "always":
+
+    "system settings > desktop and dock > prefer tabs when opening documents" set to always
+
+This option forces pdfpc to open the presentation view as a second tab, the window is then
+maximized and the tabs are no longer visible. 
+
+Change this system setting to "never" on Mac to restore the expected behavior from pdfpc.
+
+    "system settings > desktop and dock > prefer tabs when opening documents" set to never
+
+An alternative to this, and potentially other window tiling managers, is to launch
+pdfpc in a dimensioned window such as::
+
+    pdfpc -Z 1000:1000 presentation.pdf
+
+In this way we can see the tabs for presentation and presenter views, and manually drag them
+to the screens we desire.
