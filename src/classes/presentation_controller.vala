@@ -1312,10 +1312,10 @@ namespace pdfpc {
             add_action_with_parameter("movePointer", GLib.VariantType.STRING,
                 this.move_pointer,
                 "Move pointer by vector", "(x,y)");
-#if REST
+
             add_action("showQRcode", this.show_qrcode,
                 "Show QR code");
-#endif
+
             add_action("showHelp", this.show_help,
                 "Show a help screen");
 
@@ -2173,6 +2173,10 @@ namespace pdfpc {
             if (this.presenter != null && this.rest_server != null) {
                 this.presenter.show_qrcode_window(false);
             }
+        }
+#else
+        public void show_qrcode() {
+            GLib.printerr("No REST support, QR disabled.\n");
         }
 #endif
         protected void exit_state() {
