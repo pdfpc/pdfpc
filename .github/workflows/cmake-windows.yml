@@ -31,7 +31,6 @@ jobs:
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-pkg-config
           mingw-w64-x86_64-vala       
           mingw-w64-x86_64-libgee
           mingw-w64-x86_64-poppler
@@ -42,9 +41,13 @@ jobs:
           mingw-w64-x86_64-libsoup
           mingw-w64-x86_64-qrencode
           mingw-w64-x86_64-discount
-
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MAKE_PROGRAM=ninja -DMDVIEW=OFF
+          mingw-w64-x86_64-nsis
 
     - name: Build
-      run: cd build && ninja
+      run: cd windows-setup && ./package.sh
+
+    - name: Upload installer artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: pdfpc-setup
+        path: windows-setup/pdfpc-setup.exe

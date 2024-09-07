@@ -500,9 +500,16 @@ namespace pdfpc {
             this.port_num = port_num;
 
             // If defined as an absolute path, use it as is
-            if (Options.rest_static_root.has_prefix("/")) {
+            if (Options.rest_static_root.has_prefix("/") || Regex.match_simple("[a-zA-Z]:\\.*", Options.rest_static_root)) {
                 this.static_root = Options.rest_static_root;
             } else {
+#if WIN
+                this.static_root = ResourceLocator.getResourcePath(Options.rest_static_root);
+                if (this.static_root == null) {
+                    GLib.printerr("rest-static-root-path not found!");
+                    this.static_root = ".";
+                }
+#else
                 if (Options.no_install) {
                     this.static_root = Path.build_filename(Paths.SOURCE_PATH,
                         Options.rest_static_root);
@@ -510,6 +517,7 @@ namespace pdfpc {
                     this.static_root = Path.build_filename(Paths.SHARE_PATH,
                         Options.rest_static_root);
                 }
+#endif
             }
 
             this.add_handler("/api", api_handler);
