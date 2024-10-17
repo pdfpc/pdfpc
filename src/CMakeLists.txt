@@ -33,15 +33,15 @@ if (MDVIEW OR REST)
 endif ()
 
 if (MDVIEW)
-    pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.0)
-    set(MDVIEW_PACKAGES webkit2gtk-4.0)
+    pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.1)
+    set(MDVIEW_PACKAGES webkit2gtk-4.1)
 endif ()
 
 if (REST)
-    pkg_check_modules(SOUP REQUIRED libsoup-2.4)
+    pkg_check_modules(SOUP REQUIRED libsoup-3.0)
     pkg_check_modules(QRENCODE REQUIRED libqrencode)
     set(REST_PACKAGES
-        libsoup-2.4
+        libsoup-3.0
     )
 
     if (${CMAKE_HOST_WIN32})
