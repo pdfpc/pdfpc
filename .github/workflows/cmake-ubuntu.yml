@@ -43,7 +43,7 @@ jobs:
                 - rest_packages:
                 - rest_build_flag: off
 
-                - rest_packages: libsoup3.0-dev libqrencode-dev libmarkdown2-dev
+                - rest_packages: libsoup-3.0-dev libqrencode-dev libmarkdown2-dev
                   build_rest: rest_on
                 - rest_build_flag: on
                   build_rest: rest_on
