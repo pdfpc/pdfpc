@@ -35,7 +35,7 @@ jobs:
                 - mdview_packages:
                 - mdview_build_flag: off
 
-                - mdview_packages: libwebkit2gtk-4.0-dev libmarkdown2-dev
+                - mdview_packages: libwebkit2gtk-4.1-dev libmarkdown2-dev
                   build_mdview: mdview_on
                 - mdview_build_flag: on
                   build_mdview: mdview_on
@@ -43,7 +43,7 @@ jobs:
                 - rest_packages:
                 - rest_build_flag: off
 
-                - rest_packages: libsoup2.4-dev libqrencode-dev libmarkdown2-dev
+                - rest_packages: libsoup-3.0-dev libqrencode-dev libmarkdown2-dev
                   build_rest: rest_on
                 - rest_build_flag: on
                   build_rest: rest_on

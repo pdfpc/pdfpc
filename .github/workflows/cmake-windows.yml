@@ -39,7 +39,7 @@ jobs:
           mingw-w64-x86_64-gstreamer
           mingw-w64-x86_64-gst-plugins-base
           mingw-w64-x86_64-json-glib
-          mingw-w64-x86_64-libsoup
+          mingw-w64-x86_64-libsoup3
           mingw-w64-x86_64-qrencode
           mingw-w64-x86_64-discount
 

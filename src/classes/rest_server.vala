@@ -3,7 +3,7 @@
  *
  * This file is part of pdfpc.
  *
- * Copyright (C) 2020 Evgeny Stambulchik
+ * Copyright (C) 2020,2024 Evgeny Stambulchik
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -242,10 +242,10 @@ namespace pdfpc {
             }
         }
 
-        private void static_handler(Soup.Server server, Soup.Message msg,
-            string path, GLib.HashTable? query, Soup.ClientContext client) {
+        private void static_handler(Soup.Server server, Soup.ServerMessage msg,
+            string path, GLib.HashTable? query) {
 
-	    var fname = this.static_root + msg.uri.get_path();
+	    var fname = this.static_root + path;
             if (fname.has_suffix("/")) {
                 fname += "index.html";
             }
@@ -261,33 +261,32 @@ namespace pdfpc {
                     out result_uncertain);
                 msg.set_response(mime, Soup.MemoryUse.COPY, raw_datau8);
 
-                msg.status_code = 200;
+                msg.set_status(200, null);
             } catch (Error e) {
                 GLib.printerr("Failed opening file %s: %s\n", fname, e.message);
-                msg.status_code = 404;
+                msg.set_status(404, null);
             }
 	}
 
-        private void api_handler(Soup.Server server, Soup.Message msg,
-            string path, GLib.HashTable<string, string>? query,
-            Soup.ClientContext client) {
+        private void api_handler(Soup.Server server, Soup.ServerMessage msg,
+            string path, GLib.HashTable<string, string>? query) {
 
             // Once locked, serve only the single client
-            if (this.locked && this.client_host != client.get_host()) {
-                msg.status_code = 403;
+            if (this.locked && this.client_host != msg.get_remote_host()) {
+                msg.set_status(403, null);
                 GLib.printerr("Refused to serve client %s\n",
-                    client.get_host());
+                    msg.get_remote_host());
                 return;
             }
 
-            var headers = msg.response_headers;
+            var headers = msg.get_response_headers();
             headers.append("Access-Control-Allow-Origin", "*");
             headers.append("Access-Control-Allow-Methods", "GET,PUT");
             headers.append("Access-Control-Allow-Headers",
                 "authorization,content-type");
 
-            if (msg.method == "OPTIONS") {
-                msg.status_code = 204;
+            if (msg.get_method() == "OPTIONS") {
+                msg.set_status(204, null);
                 return;
             }
 
@@ -295,17 +294,17 @@ namespace pdfpc {
             if (path == "/api/helo") {
                 if (!this.locked) {
                     this.locked = true;
-                    this.client_host = client.get_host();
+                    this.client_host = msg.get_remote_host();
                     // At this point the QR code may be withdrawn
                     this.metadata.controller.hide_qrcode();
                 }
             } else if (!this.locked) {
                 // Anything else is forbidden until "lock-in" is in effect
-                msg.status_code = 412;
+                msg.set_status(412, null);
                 return;
             }
 
-            msg.status_code = 200;
+            msg.set_status(200, null);
 
             Json.Node root;
 
@@ -325,7 +324,7 @@ namespace pdfpc {
                     int slide_number = 0;
                     if (nparts < 2) {
                         root = this.error_data("Bad request");
-                        msg.status_code = 400;
+                        msg.set_status(400, null);
                     } else {
                         slide_number = int.parse(parts[1]);
                         if (nparts == 4 && query != null) {
@@ -345,14 +344,14 @@ namespace pdfpc {
                                 }
                             }
                             root = this.error_data("Rendering failed");
-                            msg.status_code = 500;
+                            msg.set_status(500, null);
                         } else {
                             root = this.slide_data(slide_number);
                         }
                     }
                 } catch (Error e) {
                     root = this.error_data(e.message);
-                    msg.status_code = 500;
+                    msg.set_status(500, null);
                 }
             } else if (path.has_prefix("/api/notes/")) {
                 try {
@@ -364,7 +363,7 @@ namespace pdfpc {
                     int slide_number = 0;
                     if (nparts < 2) {
                         root = this.error_data("Bad request");
-                        msg.status_code = 400;
+                        msg.set_status(400, null);
                     } else {
                         slide_number = int.parse(parts[1]);
                         if (nparts == 4) {
@@ -397,11 +396,11 @@ namespace pdfpc {
                                     }
                                 }
                                 root = this.error_data("Rendering failed");
-                                msg.status_code = 500;
+                                msg.set_status(500, null);
                                 break;
                             default:
                                 root = this.error_data("Bad request");
-                                msg.status_code = 400;
+                                msg.set_status(400, null);
                                 break;
                             }
                         } else {
@@ -410,10 +409,10 @@ namespace pdfpc {
                     }
                 } catch (Error e) {
                     root = this.error_data(e.message);
-                    msg.status_code = 500;
+                    msg.set_status(500, null);
                 }
-            } else if (path == "/api/control" && msg.method == "PUT") {
-                var body = msg.request_body;
+            } else if (path == "/api/control" && msg.get_method() == "PUT") {
+                var body = msg.get_request_body();
                 Json.Parser parser = new Json.Parser();
                 try {
                     parser.load_from_data((string) body.data,
@@ -450,19 +449,19 @@ namespace pdfpc {
                             }
                         } else {
                             root = this.error_data("Action not defined");
-                            msg.status_code = 400;
+                            msg.set_status(400, null);
                         }
                     } else {
                         root = this.error_data("Invalid request");
-                        msg.status_code = 400;
+                        msg.set_status(400, null);
                     }
                 } catch (Error e) {
                     root = this.error_data(e.message);
-                    msg.status_code = 400;
+                    msg.set_status(400, null);
                 }
             } else {
                 root = this.error_data("Not found");
-                msg.status_code = 404;
+                msg.set_status(404, null);
             }
 
             if (root != null) {
@@ -531,9 +530,8 @@ namespace pdfpc {
             }
 
             // Perhaps optionally, the entire "/" path should be protected
-            var auth = new Soup.AuthDomainBasic(
-                Soup.AUTH_DOMAIN_REALM, "pdfpc REST service",
-                Soup.AUTH_DOMAIN_ADD_PATH, "/api");
+            var auth = new Soup.AuthDomainBasic("realm", "pdfpc REST service");
+            auth.add_path("/api");
             auth.set_auth_callback((domain, msg, username, password) => {
                     if (username == "pdfpc" &&
                         password == Options.rest_passwd) {
@@ -546,10 +544,10 @@ namespace pdfpc {
                 });
             auth.set_filter((domain, msg) => {
                     // Don't try to authenticate preflight CORS requests
-                    if (msg.method == "OPTIONS") {
+                    if (msg.get_method() == "OPTIONS") {
                         return false;
                     } else {
-                        var path = msg.uri.get_path();
+                        var path = msg.get_uri().get_path();
                         // Also, don't authenticate image or html "resources"
                         if (path.has_prefix("/api/slides") ||
                             path.has_prefix("/api/notes")) {
