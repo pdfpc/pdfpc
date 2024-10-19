@@ -32,6 +32,10 @@ if (MDVIEW OR REST)
     pkg_check_modules(MARKDOWN REQUIRED libmarkdown)
 endif ()
 
+if ("${MARKDOWN_VERSION}" VERSION_GREATER_EQUAL 3)
+    set(EXTRA_VALA_OPTIONS ${EXTRA_VALA_OPTIONS} -D MARKDOWN3)
+endif ()
+
 if (MDVIEW)
     pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.1)
     set(MDVIEW_PACKAGES webkit2gtk-4.1)
