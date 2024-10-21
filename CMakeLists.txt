@@ -1,5 +1,5 @@
-project("pdfpc" C)
 cmake_minimum_required(VERSION 3.7)
+project("pdfpc" C)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 
