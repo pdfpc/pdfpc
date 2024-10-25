@@ -379,7 +379,7 @@ namespace pdfpc {
 
                     // Assuming we're in the middle of the current slide
                     double expected_progress =
-                        (this.current_user_slide_number + 0.5)/this.user_n_slides;
+                        (this.current_user_slide_number + 0.5)/(this.metadata.get_end_user_slide() + 1);
 
                     int expected_time = (int) (duration*expected_progress);
 
