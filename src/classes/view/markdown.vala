@@ -29,11 +29,15 @@ namespace pdfpc.View {
             this.ucm = this.get_user_content_manager();
 
             string css_path;
+#if WIN
+            css_path = ResourceLocator.getResourcePath("css/notes.css");
+#else
             if (Options.no_install) {
                 css_path = Path.build_filename(Paths.SOURCE_PATH, "css/notes.css");
             } else {
                 css_path = Path.build_filename(Paths.SHARE_PATH, "css/notes.css");
             }
+#endif
 
             try {
                 File css_file = File.new_for_path(css_path);
