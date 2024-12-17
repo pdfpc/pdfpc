@@ -40,11 +40,11 @@ jobs:
         steps:
         - uses: actions/checkout@v3
 
-        - uses: actions/download-artifact@v4.1.7
+        - uses: actions/download-artifact@v4
           with:
               name: pdfpc-demo.pdf
 
-        - uses: actions/download-artifact@v4.1.7
+        - uses: actions/download-artifact@v4
           with:
               name: pdfpc-video-example.zip
 
@@ -89,13 +89,13 @@ jobs:
             cd demo/pdfpc-video-example && make
 
         - name: Save demo slides
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: pdfpc-demo.pdf
             path: demo/pdfpc-demo.pdf
 
         - name: Save video examples
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: pdfpc-video-example.zip
             path: demo/pdfpc-video-example/video-example.zip
