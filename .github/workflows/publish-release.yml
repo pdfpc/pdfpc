@@ -1,6 +1,7 @@
 name: Publish release
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - master
@@ -65,7 +66,7 @@ jobs:
         - name: Setup TexLive
           uses: teatimeguest/setup-texlive-action@v3
           with:
-            packages: >-
+            packages: |
                 scheme-basic
                 adjustbox
                 beamer
