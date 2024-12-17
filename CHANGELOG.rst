@@ -2,6 +2,14 @@
 pdfpc Changelog
 ===============
 
+Version 4.7.0
+=============
+
+*Released: December 2024*
+
+- Various bug fixes and improvements
+- Support for newer library dependencies
+
 Version 4.6.0
 =============
 
