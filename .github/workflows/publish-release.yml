@@ -48,7 +48,7 @@ jobs:
               name: pdfpc-video-example.zip
 
         - name: Release
-          uses: softprops/action-gh-release@v1
+          uses: softprops/action-gh-release@v2
           with:
               body: "Release of ${{ env.PDFPC_VERSION }}"
               files: |
@@ -63,7 +63,7 @@ jobs:
         - uses: actions/checkout@v3
 
         - name: Setup TexLive
-          uses: teatimeguest/setup-texlive-action@v2
+          uses: teatimeguest/setup-texlive-action@v3
           with:
             packages: >-
                 scheme-basic
