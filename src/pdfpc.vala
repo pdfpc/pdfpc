@@ -111,14 +111,14 @@ namespace pdfpc {
 #if REST
             {"rest-port", 'p', 0, OptionArg.INT,
                 ref Options.rest_port,
-                "REST port number [8088]", null},
+                "REST port number [8088]", "P"},
 #endif
             {"page", 'P', 0, OptionArg.INT,
                 ref page_hnum,
                 "Go to page number N directly after startup", "N"},
             {"page-transition", 'r', 0, OptionArg.STRING,
                 ref Options.default_transition,
-                "Set default page transition", "TYPE"},
+                "Set default page transition (type[:duration[:angle[:alignment[:direction]]]])", "TYPE"},
             {"pdfpc-location", 'R', 0, OptionArg.STRING,
                 ref Options.pdfpc_location,
                 "Full path location to a pdfpc file", "PATH"},
@@ -175,6 +175,7 @@ namespace pdfpc {
 
             var context = new OptionContext("<pdf-file>");
             context.add_main_entries(options, null);
+            context.set_summary("See man pages pdfpc(1) and pdfpcrc(5) for detailed explanations.");
 
             try {
                 context.parse(ref args);
