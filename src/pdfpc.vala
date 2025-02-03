@@ -144,7 +144,7 @@ namespace pdfpc {
 #endif
             {"windowed", 'w', 0, OptionArg.STRING,
                 ref Options.windowed,
-                "Run in the given windowed mode", "MODE"},
+                "Run in the given windowed mode (none|both|presentation|presenter)", "MODE"},
             {"wayland-workaround", 'W', 0, 0,
                 ref Options.wayland_workaround,
                 "Enable Wayland-specific workaround", null},
