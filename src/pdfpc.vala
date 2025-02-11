@@ -264,9 +264,10 @@ namespace pdfpc {
                     var monitor = display.get_monitor(i);
                     int sf = monitor.get_scale_factor();
                     var geo = monitor.get_geometry();
+                    var model = monitor.get_model();
                     GLib.print(" %d: %c %s \t[%dx%d+%d+%d@%dHz \tscale=%d%%]\n",
                         i, monitor.is_primary() ? '*':' ',
-                        monitor.get_model(),
+                        model == null ? "-":model,
                         geo.width*sf, geo.height*sf,
                         geo.x*sf, geo.y*sf,
                         (monitor.get_refresh_rate() + 500)/1000,
@@ -413,6 +414,17 @@ namespace pdfpc {
 
             int primary_monitor_num = 0, secondary_monitor_num = 0;
             int presenter_monitor = -1, presentation_monitor = -1;
+
+            // Check if the screen(s) are given by their index instead of model
+            if (Options.presenter_screen != null &&
+                Options.presenter_screen.length == 1) {
+                presenter_monitor = int.parse(Options.presenter_screen);
+            }
+            if (Options.presentation_screen != null &&
+                Options.presentation_screen.length == 1) {
+                presentation_monitor = int.parse(Options.presentation_screen);
+            }
+
             int n_monitors = display.get_n_monitors();
             for (int i = 0; i < n_monitors; i++) {
                 // First, try to satisfy user's preferences
@@ -440,13 +452,13 @@ namespace pdfpc {
 
             // Bail out if an explicitly requested monitor is not found
             if (Options.presenter_screen != null &&
-                presenter_monitor == -1) {
+                (presenter_monitor < 0 || presenter_monitor >= n_monitors)) {
                 GLib.printerr("Monitor \"%s\" not found\n",
                     Options.presenter_screen);
                 Process.exit(1);
             }
             if (Options.presentation_screen != null &&
-                presentation_monitor == -1) {
+                (presentation_monitor < 0 || presentation_monitor >= n_monitors)) {
                 GLib.printerr("Monitor \"%s\" not found\n",
                     Options.presentation_screen);
                 Process.exit(1);
