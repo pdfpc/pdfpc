@@ -48,6 +48,9 @@ jobs:
           with:
               name: pdfpc-video-example.zip
 
+        - name: Debug Display structure of downloaded files
+          run: ls -R
+
         - name: Release
           uses: softprops/action-gh-release@v2
           with:
@@ -56,6 +59,7 @@ jobs:
                   pdfpc-demo.pdf
                   pdfpc-video-example.zip
               tag_name: ${{ env.PDFPC_VERSION }}
+              fail_on_unmatched_files: true
 
     build-demo-assets:
         runs-on: ubuntu-latest
