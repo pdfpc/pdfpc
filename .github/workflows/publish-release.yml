@@ -33,7 +33,7 @@ jobs:
         needs: [extract-version, build-demo-assets]
 
         if: ${{ !endsWith(needs.extract-version.outputs.PDFPC_VERSION, 'pre') }}
-        
+
         env:
           PDFPC_VERSION: ${{ needs.extract-version.outputs.PDFPC_VERSION }}
 
@@ -47,9 +47,6 @@ jobs:
         - uses: actions/download-artifact@v4
           with:
               name: pdfpc-video-example.zip
-
-        - name: Debug Display structure of downloaded files
-          run: ls -R
 
         - name: Release
           uses: softprops/action-gh-release@v2
@@ -102,4 +99,4 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: pdfpc-video-example.zip
-            path: demo/pdfpc-video-example/video-example.zip
+            path: demo/pdfpc-video-example/pdfpc-video-example.zip
