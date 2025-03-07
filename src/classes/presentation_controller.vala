@@ -1868,7 +1868,8 @@ namespace pdfpc {
         protected void toggle_windowed() {
             if (this.presenter != null) {
                 this.presenter.toggle_windowed();
-            } else if (this.presentation != null) {
+            }
+            if (this.presentation != null) {
                 this.presentation.toggle_windowed();
             }
         }
