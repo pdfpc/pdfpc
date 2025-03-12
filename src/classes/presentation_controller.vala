@@ -130,9 +130,11 @@ namespace pdfpc {
         public ProgressStatus progress_status { get; protected set; }
 
         public void start_autoadvance_timer(int slide_number) {
-            double duration = this.metadata.get_slide_duration(slide_number);
-            if (duration < 0) {
-                return;
+            // cancel any pending page advance (e.g., if going backwards
+            // manually through a page with autoadvance)
+            if (this.autoadvance_timeout_id != 0) {
+                GLib.Source.remove(this.autoadvance_timeout_id);
+                this.autoadvance_timeout_id = 0;
             }
 
             // no autoadvance if paused/not started yet
@@ -140,9 +142,9 @@ namespace pdfpc {
                 return;
             }
 
-            if (this.autoadvance_timeout_id != 0) {
-                GLib.Source.remove(this.autoadvance_timeout_id);
-                this.autoadvance_timeout_id = 0;
+            double duration = this.metadata.get_slide_duration(slide_number);
+            if (duration < 0) {
+                return;
             }
 
             var next_slide = this.current_slide_number + 1;
