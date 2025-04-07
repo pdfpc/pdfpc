@@ -210,17 +210,21 @@ namespace pdfpc {
                 userProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
             string distCssPath;
+#if WIN
+            distCssPath = ResourceLocator.getResourcePath("css/pdfpc.css");
+#else
             if (Options.no_install) {
                 distCssPath = Path.build_filename(Paths.SOURCE_PATH, "css/pdfpc.css");
             } else {
                 distCssPath = Path.build_filename(Paths.SHARE_PATH, "css/pdfpc.css");
             }
+#endif
             var legacyUserCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
             var userCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpc.css");
 
             try {
                 // pdfpc.css in dist path is mandatory
-                if (GLib.FileUtils.test(distCssPath, (GLib.FileTest.IS_REGULAR))) {
+                if (distCssPath != null && GLib.FileUtils.test(distCssPath, (GLib.FileTest.IS_REGULAR))) {
                     globalProvider.load_from_path(distCssPath);
                 } else {
                     GLib.printerr("No CSS file found\n");
@@ -243,6 +247,9 @@ namespace pdfpc {
          * initializes the Gtk system.
          */
         public void run(string[] args) {
+#if WIN
+            Console.hideConsoleIfNotNeeded();
+#endif
 #if X11
             X.init_threads();
 #endif
@@ -285,6 +292,13 @@ namespace pdfpc {
             ConfigFileReader configFileReader = new ConfigFileReader();
 
             string systemConfig;
+#if WIN
+            if ((systemConfig = ResourceLocator.getResourcePath("etc/pdfpcrc")) == null){
+                if ((systemConfig = ResourceLocator.getResourcePath("rc/pdfpcrc")) == null) {
+                    GLib.printerr("system pdfpcrc could not be found");
+                }
+            }
+#else
             if (Options.no_install) {
                 systemConfig = Path.build_filename(Paths.SOURCE_PATH,
                     "rc/pdfpcrc");
@@ -292,7 +306,10 @@ namespace pdfpc {
                 systemConfig = Path.build_filename(Paths.CONF_PATH,
                     "pdfpcrc");
             }
-            configFileReader.readConfig(systemConfig);
+#endif
+            if (systemConfig != null) {
+                configFileReader.readConfig(systemConfig);
+            }
 
             // First, try the XDG config directory
             var userConfig =

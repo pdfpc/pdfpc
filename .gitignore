@@ -1,3 +1,6 @@
 .history
 .*.swp
 build/
+windows-setup/pdfpc_version.nsh
+windows-setup/dist
+windows-setup/pdfpc-setup.exe
