@@ -1251,8 +1251,10 @@ namespace pdfpc {
             add_action("cycleTimerMode", this.cycle_timer,
                 "Cycle the timer view");
 
-            add_action("windowed", this.toggle_windowed,
-                "Toggle the windowed state");
+            add_action_with_parameter("windowed", GLib.VariantType.STRING,
+                this.toggle_windowed,
+                "Toggle the windowed state (presenter, presentation)",
+                "screen");
 
             add_action("blank", this.fade_to_black,
                 "Blank the presentation screen");
@@ -1867,10 +1869,11 @@ namespace pdfpc {
             this.controllables_update();
         }
 
-        protected void toggle_windowed() {
-            if (this.presenter != null) {
+        protected void toggle_windowed(Variant? type) {
+            var typestr = type.get_string();
+            if (typestr == "presenter" && this.presenter != null) {
                 this.presenter.toggle_windowed();
-            } else if (this.presentation != null) {
+            } else if (typestr == "presentation" && this.presentation != null) {
                 this.presentation.toggle_windowed();
             }
         }

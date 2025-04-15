@@ -158,7 +158,7 @@ once.
 .TP
 .B presentation-interactive
 Let the presentation window react to user actions, similar to the presenter
-(bool, default is false). Note that if the presentation window is the only pdfpc
+(bool, default is true). Note that if the presentation window is the only pdfpc
 GUI (i.e., if run with \fB\-sS\fR), it will be interactive irrespective of this
 flag.
 .TP

@@ -61,7 +61,8 @@ bind C+q                quit
 bind C+r                reload
 
 # Presenter state
-bind w                  windowed
+bind w                  windowed presenter
+bind S+w                windowed presentation
 
 # Presentation state
 bind b                  blank
