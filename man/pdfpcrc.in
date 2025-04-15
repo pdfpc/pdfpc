@@ -63,6 +63,10 @@ Some permanent changes can be configured via the config file. The syntax is:
 The following option_name's are recognized:
 
 .TP
+.B auto-hide
+Automatically hide the presentation window when no pdfpc windows is
+active (bool, Default is false).
+.TP
 .B black-on-end
 Add an additional black slide at the end of the presentation (bool, Default is false).
 .TP
