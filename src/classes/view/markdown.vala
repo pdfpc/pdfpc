@@ -28,12 +28,7 @@ namespace pdfpc.View {
         public MarkdownView() {
             this.ucm = this.get_user_content_manager();
 
-            string css_path;
-            if (Options.no_install) {
-                css_path = Path.build_filename(Paths.SOURCE_PATH, "css/notes.css");
-            } else {
-                css_path = Path.build_filename(Paths.SHARE_PATH, "css/notes.css");
-            }
+            string css_path = Resources.resolve("css/notes.css");
 
             try {
                 File css_file = File.new_for_path(css_path);
