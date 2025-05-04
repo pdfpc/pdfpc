@@ -73,7 +73,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-link_directories(
+set(_link_directories 
     ${GOBJECT_LIBRARY_DIRS}
     ${GIO_LIBRARY_DIRS}
     ${GEE_LIBRARY_DIRS}
@@ -90,6 +90,8 @@ link_directories(
     ${SOUP_LIBRARY_DIRS}
     ${QRENCODE_LIBRARY_DIRS}
 )
+
+link_directories(${_link_directories})
 
 if(${WITH_X11})
     include_directories(${X11_INCLUDE_DIRS})
@@ -223,9 +225,100 @@ if(WIN32)
     set_property(SOURCE "${_windows_rc}" APPEND PROPERTY OBJECT_DEPENDS "${_windows_ico}")
 endif()
 
-install(TARGETS
-    pdfpc
-RUNTIME
-DESTINATION
-    bin
-)
+if(MINGW)
+    # Deployment of libraries for installation
+    list(REMOVE_DUPLICATES _link_directories) # there should only be one directory here
+    list(LENGTH _link_directories _len)
+    if(_len EQUAL 1)
+        # _link_directories is path/to/mingw64/lib
+        cmake_path(SET _mingw_dir NORMALIZE "${_link_directories}/..")
+    else()
+        if(PDFPC_MINGW_ROOT_DIR)
+            cmake_path(SET _mingw_dir NORMALIZE "${PDFPC_MINGW_ROOT_DIR}")
+        else()
+            message(FATAL_ERROR "The shared libraries come from different locations - set PDFPC_MINGW_ROOT_DIR")
+        endif()
+    endif()
+    set(_mingw_bin "${_mingw_dir}/bin")
+    set(_mingw_share "${_mingw_dir}/share")
+
+    # install gdbus.exe and gspawn-win64-helper*.exe
+    install(
+        PROGRAMS
+            "${_mingw_bin}/gdbus.exe"
+            "${_mingw_bin}/gspawn-win64-helper.exe"
+            "${_mingw_bin}/gspawn-win64-helper-console.exe"
+        DESTINATION
+            bin
+    )
+
+    # install mingw shared folders
+    install(
+        DIRECTORY
+            "${_mingw_share}/icons"
+            "${_mingw_share}/glib-2.0"
+            "${_mingw_share}/poppler"
+        DESTINATION
+            share
+    )
+    
+    # gdk-pixbuf
+    # some loaders (such as the svg loader) have additional dependencies
+    file(GLOB_RECURSE _additional_dlls "${_mingw_dir}/lib/gdk-pixbuf-2.0/**/*.dll")
+    file(GLOB_RECURSE _gst_dlls "${_mingw_dir}/lib/gstreamer-1.0/*.dll")
+    list(APPEND _additional_dlls ${_gst_dlls})
+    set(_install_tmpl [[
+        file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR _pixbuf_deps
+            PRE_INCLUDE_REGEXES "^lib"
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            DIRECTORIES "@_mingw_bin@"
+            MODULES @_additional_dlls@
+        )
+        foreach(_dep IN LISTS _pixbuf_deps)
+            file(INSTALL 
+                DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+                TYPE SHARED_LIBRARY
+                FILES ${_dep}
+                FOLLOW_SYMLINK_CHAIN
+            )
+        endforeach()
+    ]])
+    string(CONFIGURE "${_install_tmpl}" _install_code @ONLY)
+    install(CODE "${_install_code}")
+
+    install(
+        DIRECTORY
+            "${_mingw_dir}/lib/gdk-pixbuf-2.0"
+        DESTINATION
+            lib
+        PATTERN "*.a" EXCLUDE
+    )
+    install(
+        DIRECTORY
+            "${_mingw_dir}/lib/gstreamer-1.0"
+        DESTINATION
+            lib
+    )
+
+    # The actual executable
+    install(TARGETS
+            pdfpc
+        RUNTIME_DEPENDENCIES
+            PRE_INCLUDE_REGEXES "^lib"
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-" # System DLLs
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            DIRECTORIES "${_mingw_bin}"
+        RUNTIME
+        DESTINATION
+            bin
+    )
+else()
+    install(TARGETS
+            pdfpc
+        RUNTIME
+        DESTINATION
+            bin
+    )
+endif()
