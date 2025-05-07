@@ -105,14 +105,12 @@ namespace pdfpc.Window {
             var icon_theme = Gtk.IconTheme.get_default();
             // Fallback, if absent in the default icon theme
             icon_theme.append_search_path(Resources.resolve("icons"));
-#if !WIN32
             try {
                 this.icon = icon_theme.load_icon("pdfpc", 48, 0);
             } catch (Error e) {
                 GLib.printerr("Could not load application icon: %s\n",
                     e.message);
             }
-#endif
 
             if (!this.windowed) {
                 if (Options.move_on_mapped) {
