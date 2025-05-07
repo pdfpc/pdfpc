@@ -106,6 +106,10 @@ namespace pdfpc {
             cr.set_operator(Cairo.Operator.CLEAR);
             cr.paint();
 
+            this.paint_on_context(cr, surface.get_width(), surface.get_height());
+        }
+
+        public void paint_on_context(Cairo.Context cr, int width, int height) {
             // Default settings
             cr.set_operator(Cairo.Operator.OVER);
             cr.set_source_rgba(1, 0, 0, 1);
@@ -114,8 +118,6 @@ namespace pdfpc {
             cr.set_line_join(Cairo.LineJoin.ROUND);
 
             // Loop over commands and carry them out
-            int width = surface.get_width();
-            int height = surface.get_height();
             drawing_commands.foreach((dc) => {
                 if (dc.is_eraser) {
                     cr.set_operator(Cairo.Operator.CLEAR);
@@ -134,6 +136,27 @@ namespace pdfpc {
 
                 cr.stroke();
             });
+        }
+
+        public void occupied_rect(out double x1, out double y1, out double x2, out double y2) {
+            double min_x = 1.0, min_y = 1.0, max_x = 0.0, max_y = 0.0;
+
+            foreach (var dc in this.drawing_commands) {
+                if (dc.is_eraser) {
+                    continue;
+                }
+
+                // XXX: this isn't correct for all aspect ratios (because the line width isn't stretched)
+                min_x = Math.fmin(Math.fmin(dc.x1, dc.x2) - dc.lwidth, min_x);
+                min_y = Math.fmin(Math.fmin(dc.y1, dc.y2) - dc.lwidth, min_y);
+                max_x = Math.fmax(Math.fmax(dc.x1, dc.x2) + dc.lwidth, max_x);
+                max_y = Math.fmax(Math.fmax(dc.y1, dc.y2) + dc.lwidth, max_y);
+            }
+
+            x1 = Math.fmax(min_x, 0.0);
+            y1 = Math.fmax(min_y, 0.0);
+            x2 = Math.fmin(max_x, 1.0);
+            y2 = Math.fmin(max_y, 1.0);
         }
 
         public void undo() {

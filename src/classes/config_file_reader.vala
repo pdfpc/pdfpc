@@ -340,6 +340,9 @@ namespace pdfpc {
                     Options.rest_static_root = fields[2];
                     break;
 #endif
+                case "save-drawings-on-exit":
+                    Options.save_drawings_on_exit = Options.DrawingSaveOnExit.parse(fields[2]);
+                    break;
                 case "spotlight-opacity":
                     Options.spotlight_opacity = int.parse(fields[2]);
                     break;
