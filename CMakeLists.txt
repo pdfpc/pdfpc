@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.7...3.20)
-project("pdfpc" C)
+
+file(STRINGS src/pdfpc.version PDFPC_RELEASE_DATA)
+list(GET PDFPC_RELEASE_DATA 0 PDFPC_VERSION_STRING)
+list(GET PDFPC_RELEASE_DATA 1 PDFPC_VERSION_YEAR)
+string(REGEX MATCH "^v(.+)$" _version "${PDFPC_VERSION_STRING}")
+
+project("pdfpc" 
+    VERSION ${CMAKE_MATCH_1}
+    LANGUAGES C
+    HOMEPAGE_URL "https://pdfpc.github.io"
+)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 
