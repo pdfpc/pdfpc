@@ -209,12 +209,7 @@ namespace pdfpc {
             Gtk.StyleContext.add_provider_for_screen(Gdk.Display.get_default().get_default_screen(),
                 userProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
-            string distCssPath;
-            if (Options.no_install) {
-                distCssPath = Path.build_filename(Paths.SOURCE_PATH, "css/pdfpc.css");
-            } else {
-                distCssPath = Path.build_filename(Paths.SHARE_PATH, "css/pdfpc.css");
-            }
+            string distCssPath = Resources.resolve("css/pdfpc.css");
             var legacyUserCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc.css");
             var userCssPath = Path.build_filename(GLib.Environment.get_user_config_dir(), "pdfpc", "pdfpc.css");
 
@@ -285,14 +280,7 @@ namespace pdfpc {
 
             ConfigFileReader configFileReader = new ConfigFileReader();
 
-            string systemConfig;
-            if (Options.no_install) {
-                systemConfig = Path.build_filename(Paths.SOURCE_PATH,
-                    "rc/pdfpcrc");
-            } else {
-                systemConfig = Path.build_filename(Paths.CONF_PATH,
-                    "pdfpcrc");
-            }
+            string systemConfig = Resources.resolve_system_config();
             configFileReader.readConfig(systemConfig);
 
             // First, try the XDG config directory
@@ -587,6 +575,7 @@ namespace pdfpc {
          * Basic application entry point
          */
         public static int main (string[] args) {
+            Resources.init(args[0]);
             var application = new Application();
             application.run(args);
 

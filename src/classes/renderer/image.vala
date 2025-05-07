@@ -29,14 +29,7 @@ namespace pdfpc.Renderer {
             int width, int height) {
             // attempt to load from a local path (if the user hasn't installed)
             // if that fails, attempt to load from the global path
-            string load_icon_path;
-            if (Options.no_install) {
-                load_icon_path = Path.build_filename(Paths.SOURCE_PATH, "icons",
-                    filename);
-            } else {
-                load_icon_path = Path.build_filename(Paths.SHARE_PATH, "icons",
-                    filename);
-            }
+            string load_icon_path = Resources.resolve(Path.build_filename("icons", filename));
             File icon_file = File.new_for_path(load_icon_path);
 
             try {
