@@ -179,6 +179,25 @@ namespace pdfpc.Drawings {
             this.drawing_command_list.paint_in_surface(this.surface);
         }
 
+        public void store_all() {
+            if (this.surface != null) {
+                storage.store(this.current_slide, this.drawing_command_list);
+            }
+        }
+
+        public bool has_any() {
+            if (storage.has_any()) {
+                return true;
+            }
+
+            return this.surface != null && this.drawing_command_list.drawing_commands.length() != 0;
+        }
+
+        public void save(string path) {
+            this.store_all();
+            storage.save(path);
+        }
+
         /*
          * Switch to a user slide, based on its number; all slides in an
          * overlay set share the same drawing.

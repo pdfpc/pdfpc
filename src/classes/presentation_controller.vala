@@ -885,6 +885,27 @@ namespace pdfpc {
             }
         }
 
+        public void save_drawings() {
+            var chooser = new Gtk.FileChooserNative("Save Drawings", this.presenter, Gtk.FileChooserAction.SAVE, null, null);
+            chooser.set_do_overwrite_confirmation(true);
+            chooser.set_current_folder(GLib.Path.get_dirname(this.metadata.pdf_fname));
+
+            var filename = GLib.Path.get_basename(this.metadata.pdf_fname);
+            if (filename.has_suffix(".pdf")) {
+                filename = filename.slice(0, filename.length - 4);
+            }
+
+            filename = filename + "-annotated.pdf";
+            chooser.set_current_name(filename);
+
+            var res = chooser.run();
+            if (res != Gtk.ResponseType.ACCEPT) {
+                return;
+            }
+
+            this.pen_drawing.save(chooser.get_filename());
+        }
+
         private void init_pen_and_pointer() {
             this.pointer   = new PointerTool(false);
             this.spotlight = new PointerTool(true);
@@ -1175,6 +1196,34 @@ namespace pdfpc {
          * Inform metadata of quit, and then quit.
          */
         public void quit() {
+            // save drawings
+            switch (Options.save_drawings_on_exit) {
+            case pdfpc.Options.DrawingSaveOnExit.Always: {
+                if (this.pen_drawing.has_any()) {
+                    var base_name = this.metadata.pdf_fname;
+                    if (base_name.has_suffix(".pdf")) {
+                        base_name = base_name.substring(0, base_name.length - 4);
+                    }
+                    var now = new GLib.DateTime.now_local();
+                    var file = base_name + "-annotated-" + now.format("%FT%H-%M-%S") + ".pdf";
+                    this.pen_drawing.save(file);
+                }
+                break;
+            };
+            case pdfpc.Options.DrawingSaveOnExit.Ask: {
+                if (this.pen_drawing.has_any()) {
+                    var dialog = new Gtk.MessageDialog(null, Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, "Save drawings?");
+                    var res = dialog.run();
+                    if (res == Gtk.ResponseType.YES) {
+                        save_drawings();
+                    }
+                }
+                break;
+            }
+            case pdfpc.Options.DrawingSaveOnExit.Never:
+                break;
+            }
+
             this.metadata.quit();
             if (this.screensaver != null && this.screensaver_cookie != 0) {
                 try {
@@ -1300,6 +1349,8 @@ namespace pdfpc {
                 "Clear drawing on the current slide");
             add_action("toggleDrawings", this.toggle_drawings,
                 "Toggle all drawings on all slides");
+            add_action("saveDrawings", this.save_drawings,
+                "Save the current file with drawings");
 
             add_action("toggleToolbox", this.toggle_toolbox,
                 "Toggle the toolbox");
