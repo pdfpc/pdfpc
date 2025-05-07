@@ -1,3 +1,5 @@
 .history
 .*.swp
 build/
+CMakePresets.json
+CMakeUserPresets.json

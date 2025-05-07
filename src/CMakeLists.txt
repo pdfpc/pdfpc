@@ -73,7 +73,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-link_directories(
+set(_link_directories 
     ${GOBJECT_LIBRARY_DIRS}
     ${GIO_LIBRARY_DIRS}
     ${GEE_LIBRARY_DIRS}
@@ -91,15 +91,14 @@ link_directories(
     ${QRENCODE_LIBRARY_DIRS}
 )
 
+link_directories(${_link_directories})
+
 if(${WITH_X11})
     include_directories(${X11_INCLUDE_DIRS})
     link_directories(${X11_LIBRARY_DIRS})
     set(ADDITIONAL_LIBS ${X11_LIBRARIES})
 endif()
 
-file (STRINGS pdfpc.version PDFPC_RELEASE_DATA)
-list (GET PDFPC_RELEASE_DATA 0 PDFPC_VERSION_STRING)
-list (GET PDFPC_RELEASE_DATA 1 PDFPC_VERSION_YEAR)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/release.vala.in ${CMAKE_CURRENT_SOURCE_DIR}/release.vala)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_BINARY_DIR}/paths.vala)
@@ -133,19 +132,19 @@ endif ()
 include(CheckCCompilerFlag)
 check_c_compiler_flag(-Wdiscarded-qualifiers CC_HAS_DISCARDED_QUALIFIERS)
 if (CC_HAS_DISCARDED_QUALIFIERS)
-    add_definitions("-Wno-discarded-qualifiers")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-discarded-qualifiers")
 endif()
 check_c_compiler_flag(-Wincompatible-pointer-types CC_HAS_INCOMPATIBLE_POINTER_TYPES)
 if (CC_HAS_INCOMPATIBLE_POINTER_TYPES)
-    add_definitions("-Wno-incompatible-pointer-types")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-incompatible-pointer-types")
 endif()
 check_c_compiler_flag(-Wdeprecated-declarations CC_HAS_DEPRECATED_DECLARATIONS)
 if (CC_HAS_DEPRECATED_DECLARATIONS)
-    add_definitions("-Wno-deprecated-declarations")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 check_c_compiler_flag(-Wimplicit-function-declaration CC_HAS_IMPLICIT_FUNCTION_DECLARATION)
 if (CC_HAS_IMPLICIT_FUNCTION_DECLARATION)
-    add_definitions("-Wno-implicit-function-declaration")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
 endif()
 
 if(WIN32)
@@ -203,9 +202,102 @@ target_link_libraries(pdfpc
     ${ADDITIONAL_LIBS}
 )
 
-install(TARGETS
-    pdfpc
-RUNTIME
-DESTINATION
-    bin
-)
+if(WIN32)
+    # Resources
+    if(NOT PROJECT_VERSION_TWEAK)
+        # Windows supports {major}.{minor}.{patch}.{tweak}
+        set(PROJECT_VERSION_TWEAK 0)
+    endif()
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/../icons/windows.rc.in" "${CMAKE_BINARY_DIR}/resources/windows.rc" @ONLY)
+    target_sources(pdfpc PRIVATE "${CMAKE_BINARY_DIR}/resources/windows.rc")
+endif()
+
+if(MINGW)
+    # Deployment of libraries for installation
+    list(REMOVE_DUPLICATES _link_directories) # there should only be one directory here
+    list(LENGTH _link_directories _len)
+    if(_len EQUAL 1)
+        # _link_directories is path/to/mingw64/lib
+        cmake_path(SET _mingw_dir NORMALIZE "${_link_directories}/..")
+    else()
+        if(PDFPC_MINGW_ROOT_DIR)
+            cmake_path(SET _mingw_dir NORMALIZE "${PDFPC_MINGW_ROOT_DIR}")
+        else()
+            message(FATAL_ERROR "The shared libraries come from different locations - set PDFPC_MINGW_ROOT_DIR")
+        endif()
+    endif()
+    set(_mingw_bin "${_mingw_dir}/bin")
+    set(_mingw_share "${_mingw_dir}/share")
+
+    # install gdbus.exe and gspawn-win64-helper*.exe
+    install(
+        PROGRAMS
+            "${_mingw_bin}/gdbus.exe"
+            "${_mingw_bin}/gspawn-win64-helper.exe"
+            "${_mingw_bin}/gspawn-win64-helper-console.exe"
+        DESTINATION
+            bin
+    )
+
+    # install mingw shared folders
+    install(
+        DIRECTORY
+            "${_mingw_share}/icons"
+            "${_mingw_share}/glib-2.0"
+            "${_mingw_share}/poppler"
+        DESTINATION
+            share
+    )
+    
+    # gdk-pixbuf
+    # some loaders (such as the svg loader) have additional dependencies
+    file(GLOB_RECURSE _pixbuf_modules "${_mingw_dir}/lib/gdk-pixbuf-2.0/**/*.dll")
+    set(_install_tmpl [[
+        file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR _pixbuf_deps
+            PRE_INCLUDE_REGEXES "^lib"
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            DIRECTORIES "@_mingw_bin@"
+            MODULES @_pixbuf_modules@
+        )
+        foreach(_dep IN LISTS _pixbuf_deps)
+            file(INSTALL 
+                DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+                TYPE SHARED_LIBRARY
+                FILES ${_dep}
+                FOLLOW_SYMLINK_CHAIN
+            )
+        endforeach()
+    ]])
+    string(CONFIGURE "${_install_tmpl}" _install_code @ONLY)
+    install(CODE "${_install_code}")
+
+    install(
+        DIRECTORY
+            "${_mingw_dir}/lib/gdk-pixbuf-2.0"
+        DESTINATION
+            lib
+        PATTERN "*.a" EXCLUDE
+    )
+
+    # The actual executable
+    install(TARGETS
+            pdfpc
+        RUNTIME_DEPENDENCIES
+            PRE_INCLUDE_REGEXES "^lib"
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-" # System DLLs
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            DIRECTORIES "${_mingw_bin}"
+        RUNTIME
+        DESTINATION
+            bin
+    )
+else()
+    install(TARGETS
+            pdfpc
+        RUNTIME
+        DESTINATION
+            bin
+    )
+endif()
