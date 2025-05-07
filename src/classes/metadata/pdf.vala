@@ -894,6 +894,27 @@ namespace pdfpc.Metadata {
         }
 
         /**
+         * Check whether two page labels refer to different pages.
+         *
+         * It will only compare the parts before any "-" in the page labels (if present).
+         * This means that "2", "2-3" and "2-4" are all considered to NOT differ.
+         */
+        private bool page_labels_differ(string? previous, string current) {
+            if (previous == null) {
+                return true;
+            }
+            int previous_end = previous.index_of("-");
+            if (previous_end == -1) {
+                previous_end = previous.length;
+            }
+            int current_end = current.index_of("-");
+            if (current_end == -1) {
+                current_end = current.length;
+            }
+            return previous[:previous_end] != current[:current_end];
+        }
+
+        /**
          * Fill the slide notes from pdf text annotations.
          */
         private void notes_from_document() {
@@ -1132,7 +1153,7 @@ namespace pdfpc.Metadata {
                     // Auto-detect which pages to skip, but respect overlays
                     // forcefully set by the user
                     string this_label = page.label;
-                    if (this_label != previous_label && !page.forced_overlay) {
+                    if (this.page_labels_differ(previous_label, this_label) && !page.forced_overlay) {
                         user_slide++;
                         previous_label = this_label;
                     }
