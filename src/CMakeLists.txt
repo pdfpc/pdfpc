@@ -97,9 +97,6 @@ if(${WITH_X11})
     set(ADDITIONAL_LIBS ${X11_LIBRARIES})
 endif()
 
-file (STRINGS pdfpc.version PDFPC_RELEASE_DATA)
-list (GET PDFPC_RELEASE_DATA 0 PDFPC_VERSION_STRING)
-list (GET PDFPC_RELEASE_DATA 1 PDFPC_VERSION_YEAR)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/release.vala.in ${CMAKE_CURRENT_SOURCE_DIR}/release.vala)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/paths.in ${CMAKE_CURRENT_BINARY_DIR}/paths.vala)
@@ -133,19 +130,19 @@ endif ()
 include(CheckCCompilerFlag)
 check_c_compiler_flag(-Wdiscarded-qualifiers CC_HAS_DISCARDED_QUALIFIERS)
 if (CC_HAS_DISCARDED_QUALIFIERS)
-    add_definitions("-Wno-discarded-qualifiers")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-discarded-qualifiers")
 endif()
 check_c_compiler_flag(-Wincompatible-pointer-types CC_HAS_INCOMPATIBLE_POINTER_TYPES)
 if (CC_HAS_INCOMPATIBLE_POINTER_TYPES)
-    add_definitions("-Wno-incompatible-pointer-types")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-incompatible-pointer-types")
 endif()
 check_c_compiler_flag(-Wdeprecated-declarations CC_HAS_DEPRECATED_DECLARATIONS)
 if (CC_HAS_DEPRECATED_DECLARATIONS)
-    add_definitions("-Wno-deprecated-declarations")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 check_c_compiler_flag(-Wimplicit-function-declaration CC_HAS_IMPLICIT_FUNCTION_DECLARATION)
 if (CC_HAS_IMPLICIT_FUNCTION_DECLARATION)
-    add_definitions("-Wno-implicit-function-declaration")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
 endif()
 
 if(WIN32)
@@ -202,6 +199,16 @@ target_link_libraries(pdfpc
     ${GSTVIDEO_LIBRARIES}
     ${ADDITIONAL_LIBS}
 )
+
+if(WIN32)
+    # Resources
+    if(NOT PROJECT_VERSION_TWEAK)
+        # Windows supports {major}.{minor}.{patch}.{tweak}
+        set(PROJECT_VERSION_TWEAK 0)
+    endif()
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/../icons/windows.rc.in" "${CMAKE_BINARY_DIR}/resources/windows.rc" @ONLY)
+    target_sources(pdfpc PRIVATE "${CMAKE_BINARY_DIR}/resources/windows.rc")
+endif()
 
 install(TARGETS
     pdfpc
