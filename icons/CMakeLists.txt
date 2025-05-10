@@ -1,4 +1,5 @@
 install(FILES
+    pdfpc.svg
     blank.svg
     hidden.svg
     snow.svg
