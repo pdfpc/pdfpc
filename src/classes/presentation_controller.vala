@@ -885,7 +885,7 @@ namespace pdfpc {
             }
         }
 
-        public void save_drawings() {
+        public void export_drawings() {
             var chooser = new Gtk.FileChooserNative("Save Drawings", this.presenter, Gtk.FileChooserAction.SAVE, null, null);
             chooser.set_do_overwrite_confirmation(true);
             chooser.set_current_folder(GLib.Path.get_dirname(this.metadata.pdf_fname));
@@ -903,7 +903,7 @@ namespace pdfpc {
                 return;
             }
 
-            this.pen_drawing.save(chooser.get_filename());
+            this.pen_drawing.export(chooser.get_filename());
         }
 
         private void init_pen_and_pointer() {
@@ -1197,6 +1197,7 @@ namespace pdfpc {
          */
         public void quit() {
             // save drawings
+            this.pen_drawing.store_all();
             switch (Options.save_drawings_on_exit) {
             case pdfpc.Options.DrawingSaveOnExit.Always: {
                 if (this.pen_drawing.has_any()) {
@@ -1206,7 +1207,7 @@ namespace pdfpc {
                     }
                     var now = new GLib.DateTime.now_local();
                     var file = base_name + "-annotated-" + now.format("%FT%H-%M-%S") + ".pdf";
-                    this.pen_drawing.save(file);
+                    this.pen_drawing.export(file);
                 }
                 break;
             };
@@ -1215,7 +1216,7 @@ namespace pdfpc {
                     var dialog = new Gtk.MessageDialog(null, Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, "Save drawings?");
                     var res = dialog.run();
                     if (res == Gtk.ResponseType.YES) {
-                        save_drawings();
+                        export_drawings();
                     }
                 }
                 break;
@@ -1349,7 +1350,7 @@ namespace pdfpc {
                 "Clear drawing on the current slide");
             add_action("toggleDrawings", this.toggle_drawings,
                 "Toggle all drawings on all slides");
-            add_action("saveDrawings", this.save_drawings,
+            add_action("saveDrawings", this.export_drawings,
                 "Save the current file with drawings");
 
             add_action("toggleToolbox", this.toggle_toolbox,

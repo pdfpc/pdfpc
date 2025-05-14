@@ -159,6 +159,127 @@ namespace pdfpc {
             y2 = Math.fmin(max_y, 1.0);
         }
 
+        public void serialize(Json.Builder builder) {
+            if (this.drawing_commands.is_empty()) {
+                return;
+            }
+
+            var sb = new StringBuilder();
+            size_t i = 0;
+            foreach (var dc in this.drawing_commands) {
+                if (dc.new_path) {
+                    if (i != 0) {
+                        sb.append_c(' ');
+                        sb.append(dc.x2.to_string());
+                        sb.append_c(' ');
+                        sb.append(dc.y2.to_string());
+                        sb.append_c(' ');
+                        sb.append(dc.lwidth.to_string());
+                        builder.add_string_value(sb.free_and_steal());
+                        sb = new StringBuilder();
+                        builder.end_object();
+                    }
+                    builder.begin_object();
+                    builder.set_member_name("is_eraser");
+                    builder.add_boolean_value(dc.is_eraser);
+                    builder.set_member_name("red");
+                    builder.add_double_value(dc.red);
+                    builder.set_member_name("green");
+                    builder.add_double_value(dc.green);
+                    builder.set_member_name("blue");
+                    builder.add_double_value(dc.blue);
+                    builder.set_member_name("alpha");
+                    builder.add_double_value(dc.alpha);
+                    builder.set_member_name("path");
+                } else {
+                    sb.append_c(' ');
+                }
+                sb.append(dc.x1.to_string());
+                sb.append_c(' ');
+                sb.append(dc.y1.to_string());
+                sb.append_c(' ');
+                sb.append(dc.lwidth.to_string());
+                i++;
+            }
+
+            unowned var last = this.drawing_commands.last().data;
+            sb.append_c(' ');
+            sb.append(last.x2.to_string());
+            sb.append_c(' ');
+            sb.append(last.y2.to_string());
+            sb.append_c(' ');
+            sb.append(last.lwidth.to_string());
+            builder.add_string_value(sb.free_and_steal());
+            builder.end_object();
+        }
+
+        public void deserialize(Json.Array content) {
+            for (uint i = 0; i < content.get_length(); i++) {
+                unowned var path = content.get_object_element(i);
+                var is_eraser = path.get_boolean_member("is_eraser");
+                var red = path.get_double_member("red");
+                var green = path.get_double_member("green");
+                var blue = path.get_double_member("blue");
+                var alpha = path.get_double_member("alpha");
+                unowned var str = path.get_string_member("path");
+                if (str.length < 5) {
+                    continue;
+                }
+                
+                bool initial = true;
+                while (str.data[0] != '\0') {
+                    unowned string end;
+                    double x1 = 0.0;
+                    double y1 = 0.0;
+                    double lwidth = 0.0;
+                    // A point is defined like "{x1} {x2} {lwidth}" with a 
+                    // space or null terminator afterwards.
+                    double.try_parse(str, out x1, out end);
+                    if (str == end) {
+                        break;
+                    }
+                    str = end.offset(1);
+                    double.try_parse(str, out y1, out end);
+                    if (str == end) {
+                        break;
+                    }
+                    str = end.offset(1);
+                    double.try_parse(str, out lwidth, out end);
+                    if (str == end) {
+                        break;
+                    }
+                    if (end.data[0] != '\0') {
+                        str = end.offset(1);
+                    }
+
+                    if (!initial) {
+                        unowned var last = this.drawing_commands.last().data;
+                        last.x2 = x1;
+                        last.y2 = y1;
+                    }
+                    this.drawing_commands.append(DrawingCommand() {
+                        new_path = initial,
+                        is_eraser = is_eraser,
+                        red = red,
+                        green = green,
+                        blue = blue,
+                        alpha = alpha,
+                        x1 = x1,
+                        y1 = y1,
+                        lwidth = lwidth
+                    });
+
+                    initial = false;
+                }
+
+                // The last point we receive in a path only sets {x,y}2 but
+                // doesn't define a new command.
+                if (this.drawing_commands.length() >= 2) {
+                    this.drawing_commands.remove_link(this.drawing_commands.last());
+                }
+            }
+        }
+
         public void undo() {
             // pop commands from the end of the drawing_command list
             // and put them on the redo list until a new_path is found.

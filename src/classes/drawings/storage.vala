@@ -62,9 +62,24 @@ namespace pdfpc.Drawings.Storage {
         public abstract bool has_any();
 
         /**
-         * Save the drawings to `path`.
+         * Does this storage contain any drawing on this `page`?
          */
-        public abstract void save(string path);
+        public abstract bool has_any_on(int page);
+
+        /**
+         * Export the drawings as a PDF to `path`.
+         */
+        public abstract void export(string path);
+
+        /**
+         * Serialize the drawings on `page`.
+         */
+        public abstract void serialize(int page, Json.Builder builder);
+
+        /**
+         * Deserialize the drawings on `page`.
+         */
+        public abstract void deserialize(int page, Json.Array content);
     }
 
     public class MemoryUncompressed : Drawings.Storage.Base {
@@ -99,16 +114,21 @@ namespace pdfpc.Drawings.Storage {
             drawing_commands_storage = new pdfpc.DrawingCommandList[this.metadata.get_slide_count()];
         }
 
+        public override bool has_any_on(int page) {
+            return this.drawing_commands_storage[page] != null &&
+                   this.drawing_commands_storage[page].drawing_commands.length() != 0;
+        }
+
         public override bool has_any() {
             for (int i = 0; i < this.metadata.get_slide_count(); i++) {
-                if (this.drawing_commands_storage[i] != null && this.drawing_commands_storage[i].drawing_commands.length() != 0) {
+                if (this.has_any_on(i)) {
                     return true;
                 }
             }
             return false;
         }
 
-        public override void save(string out_file) {
+        public override void export(string out_file) {
             var surface = new Cairo.PdfSurface(out_file, 0, 0);
             var cr = new Cairo.Context(surface);
     
@@ -127,7 +147,7 @@ namespace pdfpc.Drawings.Storage {
                 surface.set_size(width_pt, height_pt);
                 page.render_for_printing(cr);
 
-                if (this.drawing_commands_storage[i] != null && this.drawing_commands_storage[i].drawing_commands.length() != 0) {
+                if (this.has_any_on(i)) {
                     double factor = 2; // what's the correct factor here?
                     int base_width = (int)(width_pt * factor);
                     int base_height = (int)(height_pt * factor);
@@ -157,6 +177,21 @@ namespace pdfpc.Drawings.Storage {
 
                 cr.show_page();
             }
+        }
+
+        public override void serialize(int page, Json.Builder builder) {
+            if (this.has_any_on(page)) {
+                this.drawing_commands_storage[page].serialize(builder);
+            }
+        }
+
+        public override void deserialize(int page, Json.Array content) {
+            if (content.get_length() == 0) {
+                return;
+            }
+            var l = new DrawingCommandList();
+            l.deserialize(content);
+            this.drawing_commands_storage[page] = l;
         }
     }
 
