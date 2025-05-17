@@ -110,6 +110,7 @@ bind C                  customize
 # Drawings
 bind c                  clearDrawing
 bind d                  toggleDrawings
+bind C+s                saveDrawings
 
 # Pen colors
 # Can be set by

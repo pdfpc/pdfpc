@@ -186,6 +186,12 @@ namespace pdfpc.Metadata {
             get; protected set;
         }
 
+        /**
+         * Drawings saved from the last session (page -> drawings).
+         * Cleared by `apply_saved_drawings()`.
+         */
+        private GLib.HashTable<int, Json.Array>? saved_drawings = null;
+
         // END .pdfpc meta
 
         protected PageMeta? get_page_meta(int slide_number) {
@@ -256,6 +262,17 @@ namespace pdfpc.Metadata {
             }
         }
 
+        public void apply_saved_drawings() {
+            if (this.saved_drawings == null) {
+                return;
+            }
+
+            this.saved_drawings.for_each((slide_number, drawing) => {
+                this.controller.pen_drawing.deserialize(slide_number, drawing);
+            });
+            this.saved_drawings = null;
+        }
+
         /**
          * Save the metadata to disk
          */
@@ -323,7 +340,8 @@ namespace pdfpc.Metadata {
                 if (page.forced_overlay || page.hidden ||
                     (page.note != null    &&
                      !page.note.is_native &&
-                     page.note.note_text != null)) {
+                     page.note.note_text != null) ||
+                    controller.pen_drawing.has_any_on(idx)) {
 
                     builder.begin_object();
                     builder.set_member_name("idx");
@@ -346,6 +364,13 @@ namespace pdfpc.Metadata {
                         builder.set_member_name("note");
                         builder.add_string_value(page.note.note_text);
                     }
+                    if (controller.pen_drawing.has_any_on(idx)) {
+                        builder.set_member_name("drawings");
+                        builder.begin_array();
+                        controller.pen_drawing.serialize(idx, builder);
+                        builder.end_array();
+                    }
+                    
                     builder.end_object();
                 }
 
@@ -381,6 +406,7 @@ namespace pdfpc.Metadata {
             string page_label = "", note = "";
             int idx = -1, overlay = 0, slide_number = -1;
             bool forced_overlay = false, hidden = false;
+            unowned Json.Array? drawing_arr = null;
             foreach (unowned string name in obj.get_members()) {
                 unowned Json.Node item = obj.get_member(name);
                 switch (name) {
@@ -402,6 +428,12 @@ namespace pdfpc.Metadata {
                 case "note":
 		    note = item.get_string();
 		    break;
+                case "drawings":
+                    if (this.saved_drawings == null) {
+                        this.saved_drawings = new GLib.HashTable<int, Json.Array>(null, null);
+                    }
+                    drawing_arr = item.get_array();
+                    break;
 		default:
                     GLib.printerr("Unknown page item \"%s\"\n", name);
 		    break;
@@ -440,6 +472,9 @@ namespace pdfpc.Metadata {
             }
             if (note != "") {
                 this.set_note(note, slide_number);
+            }
+            if (drawing_arr != null) {
+                this.saved_drawings.insert(slide_number, drawing_arr);
             }
         }
 
@@ -887,7 +922,7 @@ namespace pdfpc.Metadata {
          * Called on quit
          */
         public void quit() {
-            if (this.is_ready && this.dirty_state) {
+            if (this.is_ready && (this.dirty_state || this.controller.pen_drawing.has_any())) {
                 this.save_to_disk();
             }
             this.deactivate_mappings();
