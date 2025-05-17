@@ -43,9 +43,26 @@ jobs:
           mingw-w64-x86_64-qrencode
           mingw-w64-x86_64-discount
           mingw-w64-x86_64-imagemagick
+          mingw-w64-x86_64-gst-plugins-good
+          mingw-w64-x86_64-gst-plugin-gtk
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MAKE_PROGRAM=ninja -DMDVIEW=OFF
 
     - name: Build
       run: cd build && ninja
+
+    - name: Package
+      working-directory: build
+      shell: powershell
+      run: |
+        cpack -G NSIS
+        cpack -G 7Z
+        rm -Recurse -Force packaged/_CPack_Packages
+
+    - name: Upload Packages
+      uses: actions/upload-artifact@v4
+      with:
+        # this will upload _one_ ZIP file
+        name: packages
+        path: build/packaged/*
