@@ -42,6 +42,7 @@ jobs:
           mingw-w64-x86_64-libsoup3
           mingw-w64-x86_64-qrencode
           mingw-w64-x86_64-discount
+          mingw-w64-x86_64-imagemagick
 
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_MAKE_PROGRAM=ninja -DMDVIEW=OFF
