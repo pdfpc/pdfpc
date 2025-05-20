@@ -448,10 +448,7 @@ namespace pdfpc.Window {
          */
         public Presenter(PresentationController controller,
             int screen_num, bool windowed) {
-            base(controller, true, screen_num, windowed);
-
-            this.title = "pdfpc - presenter (%s)".
-                printf(controller.metadata.get_title());
+            base(controller, true, true, screen_num, windowed);
 
             this.controller.reload_request.connect(this.on_reload);
             this.controller.update_request.connect(this.update);
