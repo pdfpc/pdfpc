@@ -397,6 +397,7 @@ namespace pdfpc {
 
             var metadata = new Metadata.Pdf(pdfFilename);
             this.controller.metadata = metadata;
+            metadata.apply_saved_drawings();
 
             set_styling();
 
