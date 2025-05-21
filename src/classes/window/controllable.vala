@@ -48,9 +48,14 @@ namespace pdfpc.Window {
         }
 
         /**
-         * Whether the user directly interacts with this window
+         * Whether the user can directly interact with this window
          */
         public bool interactive { get; protected set; }
+
+        /**
+         * Whether this is the presenter window
+         */
+        public bool is_presenter { get; protected set; }
 
         /**
          * Drawing area for pointer mode
@@ -100,13 +105,18 @@ namespace pdfpc.Window {
          * Base constructor instantiating a new controllable window
          */
         public ControllableWindow(PresentationController controller,
-            bool interactive, int monitor_num, bool windowed,
+            bool interactive, bool is_presenter, int monitor_num, bool windowed,
             int width = -1, int height = -1) {
 
             base(monitor_num, windowed, width, height);
             this.controller = controller;
 
+            this.is_presenter = is_presenter;
             this.interactive = interactive;
+
+            this.title = "pdfpc - %s (%s)".
+                printf(is_presenter ? "presenter":"presentation",
+                    controller.metadata.get_title());
 
             this.overlay_layout = new Gtk.Overlay();
 

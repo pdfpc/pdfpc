@@ -766,7 +766,7 @@ namespace pdfpc {
                 Gst.Element queue = Gst.ElementFactory.make("queue", @"queue$n");
                 bin.add_many(queue, sink);
                 tee.link(queue);
-                if (conf.window.interactive) {
+                if (conf.window.is_presenter) {
                     Gst.Element ad_element = this.add_video_control(queue, bin,
                         conf.rect);
                     ad_element.link(sink);
@@ -777,7 +777,7 @@ namespace pdfpc {
 
                 // mark the video widget on the "frozen" presentation screen
                 // with a custom flag
-                if (!conf.window.interactive && controller.frozen) {
+                if (!conf.window.is_presenter && controller.frozen) {
                     video_area.set_data("pdfpc_frozen", true);
                 }
 
@@ -792,7 +792,7 @@ namespace pdfpc {
 
                         // Update the rectangle
                         conf.rect = rect;
-                        if (window.interactive) {
+                        if (window.is_presenter) {
                             this.rect = rect;
                             this.scalex = (double) this.video_w/rect.width;
                             this.scaley = (double) this.video_h/rect.height;
