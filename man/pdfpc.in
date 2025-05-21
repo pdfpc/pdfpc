@@ -56,6 +56,10 @@ Disable auto detection of overlay groups. (Default: enabled)
 .BI "\-h, \-\-help"
 Show this help
 .TP
+.BI "\-H, \-\-auto-hide"
+Automatically hide the presentation window when no pdfpc window is
+active.
+.TP
 .BI "\-l, \-\-last\-minutes"=N
 In the old timer mode (see \fBTimer\fR below), defines
 time in minutes before the end of the talk when the timer changes its color.
