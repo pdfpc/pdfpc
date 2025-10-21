@@ -413,8 +413,7 @@ namespace pdfpc.Metadata {
                 // first, try fast access by index
                 var page = this.get_page_meta(idx);
                 if (page != null &&
-                    page.label == page_label &&
-                    slide_get_overlay(idx) == overlay) {
+                    page.label == page_label) {
                     slide_number = idx;
                 } else {
                     for (int i = 0; i < this.page_count; i++) {
