@@ -139,6 +139,12 @@ namespace pdfpc {
         public static bool disable_tooltips = false;
 
         /**
+         * Config option to automatically hide presentation window if
+         * no pdfpc window is active.
+         */
+        public static bool auto_hide = false;
+
+        /**
          * Commandline option to disable the auto detection of overlay slides
          */
         public static bool disable_auto_grouping = false;
