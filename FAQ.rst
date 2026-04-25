@@ -69,3 +69,15 @@ pdfpc in a dimensioned window such as::
 
 In this way we can see the tabs for presentation and presenter views, and manually drag them
 to the screens we desire.
+
+Notes are not shown
+===================
+
+If notes are not shown and appear only in editing mode (upon pressing
+``Ctrl + n``), you may have experienced WebKit bug.  As a workaround, try
+setting the ``WEBKIT_DISABLE_DMABUF_RENDERER`` environment variable, e.g.::
+
+    WEBKIT_DISABLE_DMABUF_RENDERER=1 pdfpc presentation.pdf
+
+For more information about the issue, see `Issue #718
+<https://github.com/pdfpc/pdfpc/issues/718>`_.

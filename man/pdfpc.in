@@ -36,7 +36,7 @@ List action bindings defined
 Interpret the string as a pdfpcrc(5) statement. Multiple statements can be
 given.
 .TP
-.BI "\-C, \-\-time\-of\-day
+.BI "\-C, \-\-time\-of\-day"
 Display the time of the day
 .TP
 .BI "\-d, \-\-duration"=N
@@ -609,14 +609,20 @@ listed by \fB--list-actions\fR. It is also possible to control pdfpc from the
 command line (and write shell scripts) using the \fBdbus-send\fR(1) utility. For
 example, to advance to the next slide, run
 
-dbus-send --type=method_call --session --dest=io.github.pdfpc
- /io/github/pdfpc io.github.pdfpc.TriggerAction string:next
+.RS
+$ dbus-send --type=method_call --session \\
+    --dest=io.github.pdfpc /io/github/pdfpc \\
+    io.github.pdfpc.TriggerAction string:next
+.RE
 
 For actions that require an argument, use \fBTriggerActionArg\fR, e.g.,
 
-dbus-send --type=method_call --session --dest=io.github.pdfpc
- /io/github/pdfpc io.github.pdfpc.TriggerActionArg string:switchMode
- string:pointer
+.RS
+$ dbus-send --type=method_call --session \\
+    --dest=io.github.pdfpc /io/github/pdfpc \\
+    io.github.pdfpc.TriggerActionArg \\
+    string:switchMode string:pointer
+.RE
 
 In addition to \fBTriggerAction*\fR, the pdfpc DBus interface exposes
 the \fBGetNotes\fR method, three properties (\fBNumberOfOverlays\fR,
@@ -645,6 +651,9 @@ $ texdoc pdfpc
 .RE
 
 .SH BUGS
+.PP
+Some known bugs and workarounds are listed in
+.URL https://github.com/pdfpc/pdfpc/blob/master/FAQ.rst "the FAQ" .
 
 .PP
 Bugs can be reported at
