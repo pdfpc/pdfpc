@@ -22,6 +22,10 @@
 
 namespace pdfpc {
     public class Release {
+        public static string app_name() {
+            return "pdfpc ${PDFPC_VERSION_STRING}";
+        }
+
         public static void print_version() {
             GLib.print("pdfpc ${PDFPC_VERSION_STRING}\n"
                         + "Copyright (C) 2010-${PDFPC_VERSION_YEAR} see CONTRIBUTORS\n\n"

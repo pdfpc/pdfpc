@@ -885,6 +885,34 @@ namespace pdfpc {
             }
         }
 
+        public void apply_saved_drawings() {
+            if (metadata.apply_saved_drawings()) {
+                pen_drawing_present = true;
+                hide_or_show_pen_surfaces();
+            }
+        }
+
+        public void export_drawings() {
+            var chooser = new Gtk.FileChooserNative("Save Drawings", this.presenter, Gtk.FileChooserAction.SAVE, null, null);
+            chooser.set_do_overwrite_confirmation(true);
+            chooser.set_current_folder(GLib.Path.get_dirname(this.metadata.pdf_fname));
+
+            var filename = GLib.Path.get_basename(this.metadata.pdf_fname);
+            if (filename.has_suffix(".pdf")) {
+                filename = filename.slice(0, filename.length - 4);
+            }
+
+            filename = filename + "-annotated.pdf";
+            chooser.set_current_name(filename);
+
+            var res = chooser.run();
+            if (res != Gtk.ResponseType.ACCEPT) {
+                return;
+            }
+
+            this.pen_drawing.export(chooser.get_filename());
+        }
+
         private void init_pen_and_pointer() {
             this.pointer   = new PointerTool(false);
             this.spotlight = new PointerTool(true);
@@ -950,6 +978,8 @@ namespace pdfpc {
         public double pointer_x;
         public double pointer_y;
 
+        private bool anything_painted = false;
+
         private void queue_pointer_surface_draws() {
             if (presenter != null) {
                 presenter.pointer_drawing_surface.queue_draw();
@@ -966,6 +996,7 @@ namespace pdfpc {
             // restart the pointer timeout timer
             this.restart_pointer_timer();
             this.pointer_hidden = false;
+            this.anything_painted = true;
 
             move_pen(pointer_x, pointer_y);
 
@@ -1175,6 +1206,25 @@ namespace pdfpc {
          * Inform metadata of quit, and then quit.
          */
         public void quit() {
+            // save drawings
+            this.pen_drawing.store_all();
+            switch (Options.save_drawings_on_exit) {
+            case pdfpc.Options.DrawingSaveOnExit.Always: {
+                if (this.pen_drawing.has_any() && this.anything_painted) {
+                    var base_name = this.metadata.pdf_fname;
+                    if (base_name.has_suffix(".pdf")) {
+                        base_name = base_name.substring(0, base_name.length - 4);
+                    }
+                    var now = new GLib.DateTime.now_local();
+                    var file = base_name + "-annotated-" + now.format("%FT%H-%M-%S") + ".pdf";
+                    this.pen_drawing.export(file);
+                }
+                break;
+            };
+            case pdfpc.Options.DrawingSaveOnExit.Never:
+                break;
+            }
+
             this.metadata.quit();
             if (this.screensaver != null && this.screensaver_cookie != 0) {
                 try {
@@ -1300,6 +1350,8 @@ namespace pdfpc {
                 "Clear drawing on the current slide");
             add_action("toggleDrawings", this.toggle_drawings,
                 "Toggle all drawings on all slides");
+            add_action("saveDrawings", this.export_drawings,
+                "Save the current file with drawings");
 
             add_action("toggleToolbox", this.toggle_toolbox,
                 "Toggle the toolbox");

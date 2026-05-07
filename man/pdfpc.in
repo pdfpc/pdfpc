@@ -311,6 +311,9 @@ Select previous slide
 .TP
 .B Cursor right / Page down
 Select next slide
+.TP
+.B Ctrl + s
+Save drawings to PDF.
 
 .P
 See \fBpdfpcrc\fR(5) if you want to customize the key or mouse bindings. Please
@@ -538,8 +541,10 @@ different color, it shades the background.
 It is possible to turn on a mode which allows drawing over slides with the mouse
 cursor or a connected tablet.  When drawing mode is enabled, drawings can be made on
 the presenter screen. A separate drawing will be kept in memory for each slide
-(based on user slide numbers, so consolidating overlay slides). Drawings are presently not
-saved between sessions.
+(based on user slide numbers, so consolidating overlay slides). Drawings can be
+saved between sessions in the associated .pdfpc file. Enable this with \fBpersist-drawings\fR
+in your \fBpdfpcrc\fR(5). Drawings can also be exported to a PDF with \[aq]Ctrl + s\[aq].
+This opens a file dialog to save the annotated PDF.
 
 In the drawing mode, there are two drawing tools, a pen and an eraser. An indicator in the
 bottom-left corner of the presenter screen will indicate which is active. When in the pen mode,

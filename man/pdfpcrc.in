@@ -137,6 +137,9 @@ next slide view instead of the last slide of that group (bool, Default is false)
 .B overview-min-size
 Minimum width for the overview miniatures, in pixels (int, Default is 150).
 .TP
+.B persist-drawings
+Save the drawings to the associated .pdfpc file as JSON (bool, Default is false).
+.TP
 .B pointer-color
 Set the pointer color. Can be a literal color name or a #rrggbb representation
 (default is red).
@@ -182,6 +185,11 @@ generated one is used).
 Root path to serve static HTML content. If begins with "/", it is interpreted as
 the absolute path; otherwise, relative to @CMAKE_INSTALL_PREFIX@/share/pdfpc
 (string, Default is "www").
+.TP
+.B save-drawings-on-exit
+When closing pdfpc, save the drawings next to the PDF. They will be saved as
+"{pdf-name}-annotated-{date}.pdf" if enabled (string enum, one of "always",
+"never", Default is "never").
 .TP
 .B spotlight-opacity
 Set opacity of the area outside of the spotlight, in percent (int, default is

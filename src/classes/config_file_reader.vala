@@ -293,6 +293,9 @@ namespace pdfpc {
                 case "overview-min-size":
                     Options.min_overview_width = int.parse(fields[2]);
                     break;
+                case "persist-drawings":
+                    Options.persist_drawings = bool.parse(fields[2]);
+                    break;
                 case "pointer-color":
                     Options.pointer_color = fields[2];
                     break;
@@ -340,6 +343,9 @@ namespace pdfpc {
                     Options.rest_static_root = fields[2];
                     break;
 #endif
+                case "save-drawings-on-exit":
+                    Options.save_drawings_on_exit = Options.DrawingSaveOnExit.parse(fields[2]);
+                    break;
                 case "spotlight-opacity":
                     Options.spotlight_opacity = int.parse(fields[2]);
                     break;

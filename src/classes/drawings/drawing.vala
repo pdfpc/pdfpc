@@ -179,6 +179,65 @@ namespace pdfpc.Drawings {
             this.drawing_command_list.paint_in_surface(this.surface);
         }
 
+        public void store_all() {
+            if (this.surface != null) {
+                storage.store(this.current_slide, this.drawing_command_list);
+            }
+        }
+
+        /**
+         * Are there any slides with drawings?
+         */
+        public bool has_any() {
+            if (storage.has_any()) {
+                return true;
+            }
+
+            return this.surface != null && this.drawing_command_list.drawing_commands.length() != 0;
+        }
+
+        /**
+         * Does `page` have a drawing?
+         */
+        public bool has_any_on(int page) {
+            return storage.has_any_on(page);
+        }
+
+        /**
+         * Serialize the drawings on `page` into an array.
+         * Assumes that `builder` is currently building an array.
+         */
+        public void serialize(int page, Json.Builder builder) {
+            if (this.current_slide == page) {
+                this.store_all();
+            }
+            storage.serialize(page, builder);
+        }
+
+        /**
+         * Deserialize the drawings on `page`.
+         */
+        public void deserialize(int page, Json.Array content) {
+            this.storage.deserialize(page, content);
+            if (this.current_slide == page) {
+                this.drawing_command_list = storage.retrieve(page);
+                if (this.drawing_command_list == null) {
+                    this.drawing_command_list = new DrawingCommandList();
+                }
+                set_new_surface();
+                this.drawing_command_list.paint_in_surface(this.surface);
+                this.current_slide = page;
+            }
+        }
+
+        /**
+         * Export all drawings to a PDF at `path`.
+         */
+        public void export(string path) {
+            this.store_all();
+            storage.export(path);
+        }
+
         /*
          * Switch to a user slide, based on its number; all slides in an
          * overlay set share the same drawing.

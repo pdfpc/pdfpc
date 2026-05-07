@@ -412,5 +412,36 @@ namespace pdfpc {
          */
         public static bool toolbox_shown = false;
         public static bool toolbox_minimized = false;
+
+        public enum DrawingSaveOnExit {
+            Always,
+            Never;
+
+            public static DrawingSaveOnExit parse(string? mode) {
+                if (mode == null) {
+                    return Never;
+                }
+
+                switch (mode.down()) {
+                    case "always":
+                        return Always;
+                    case "never":
+                        return Never;
+                    default:
+                        return Never;
+                }
+            }
+        }
+
+        /**
+         * When exiting the application, automatically save the drawings 
+         * next to the PDF.
+         */
+        public static DrawingSaveOnExit save_drawings_on_exit = DrawingSaveOnExit.Never;
+
+        /**
+         * Remember the drawings between sessions in JSON metadata.
+         */
+        public static bool persist_drawings = false;
     }
 }

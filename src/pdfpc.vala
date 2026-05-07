@@ -491,6 +491,8 @@ namespace pdfpc {
                 this.controller.presentation.show_all();
             }
 
+            this.controller.apply_saved_drawings();
+
             if (page_hnum >= 1 &&
                 page_hnum <= metadata.get_end_user_slide() + 1) {
                 int u = metadata.user_slide_to_real_slide(page_hnum - 1,
