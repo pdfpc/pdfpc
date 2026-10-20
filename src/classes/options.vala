@@ -280,6 +280,11 @@ namespace pdfpc {
         public static bool auto_srt = false;
 
         /**
+         * Show the first frame of screen-annotation videos before playback
+         */
+        public static bool video_poster = false;
+
+        /**
          * Location of a non-default, user-chosen .pdfpc file
          */
         public static string? pdfpc_location = null;

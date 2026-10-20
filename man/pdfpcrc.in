@@ -116,6 +116,11 @@ Try loading video subtitle files automatically. For each video media, pdfpc will
 append ".srt" to the media URI and attempt to load a subtitle file (in the SRT
 format) from that location (bool, Default is false).
 .TP
+.BI enable-video-poster
+Show the first frame (or the frame at the start time) of screen-annotation
+videos, e.g. those exported by LibreOffice Impress, while they are not playing,
+instead of the placeholder drawn in the PDF (bool, Default is false).
+.TP
 .B final-slide
 Show the final slide of an overlay group instead of the next slide. If the
 user reaches the last slide of the overlay group the next slide will be shown

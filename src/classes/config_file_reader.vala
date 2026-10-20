@@ -275,6 +275,9 @@ namespace pdfpc {
                 case "enable-auto-srt-load":
                     Options.auto_srt = bool.parse(fields[2]);
                     break;
+                case "enable-video-poster":
+                    Options.video_poster = bool.parse(fields[2]);
+                    break;
                 case "final-slide":
                     Options.final_slide_overlay = bool.parse(fields[2]);
                     break;

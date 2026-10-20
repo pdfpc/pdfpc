@@ -367,6 +367,7 @@ namespace pdfpc {
                     uri = filename_to_uri(file, controller.get_pdf_fname());
                     temp = false;
                 }
+                options.poster = Options.video_poster;
                 break;
 
             case Poppler.AnnotType.MOVIE:
