@@ -333,12 +333,33 @@ namespace pdfpc {
 
             switch (annot.get_annot_type()) {
             case Poppler.AnnotType.SCREEN:
-                if (!("video" in annot.get_contents())) {
+                Poppler.Action action = ((Poppler.AnnotScreen) annot).get_action();
+                if (action == null || action.type != Poppler.ActionType.RENDITION) {
+                    return null;
+                }
+                Poppler.Media movie = (Poppler.Media) action.movie.movie;
+                if (movie == null) {
                     return null;
                 }
 
-                Poppler.Action action = ((Poppler.AnnotScreen) annot).get_action();
-                Poppler.Media movie = (Poppler.Media) action.movie.movie;
+                // Decide whether this is a video. Not every producer sets the
+                // annotation contents (e.g. LibreOffice Impress doesn't), and
+                // the MIME type may be generic (Impress can write
+                // application/vnd.sun.star.media), so also try the file name.
+                string? contents = annot.get_contents();
+                string? mime = movie.get_mime_type();
+                string? media_fname = movie.is_embedded() ? null : movie.get_filename();
+                bool is_video = (contents != null && "video" in contents) ||
+                                (mime != null && "video" in mime);
+                if (!is_video && media_fname != null) {
+                    bool uncertain;
+                    string ctype = GLib.ContentType.guess(media_fname, null, out uncertain);
+                    is_video = "video" in ctype ||
+                               "video" in GLib.ContentType.get_mime_type(ctype);
+                }
+                if (!is_video) {
+                    return null;
+                }
 
                 if (movie.is_embedded()) {
                     string tmp_fn;
