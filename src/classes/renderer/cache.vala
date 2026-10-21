@@ -39,6 +39,12 @@ namespace pdfpc.Renderer {
         protected uint timeout_id = 0;
 
         /**
+         * Incremented on every invalidation, so that surfaces rendered from
+         * an outdated document can be recognized
+         */
+        public int generation { get; protected set; default = 0; }
+
+        /**
          * Initialize the cache store and launch a periodic cleaning
          */
         public Cache() {
@@ -51,45 +57,73 @@ namespace pdfpc.Renderer {
         }
 
         /**
+         * Whether a page of the given size is stored compressed
+         */
+        public static bool is_compressed_size(int width, int height) {
+            uint size = 3*width*height;
+            return size/1024 > Options.cache_max_usize;
+        }
+
+        /**
+         * Compress a surface (as PNG); returns null on failure
+         */
+        public static uint8[]? compress(Cairo.ImageSurface surface) {
+            Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface,
+                0, 0, surface.get_width(), surface.get_height());
+            try {
+                uint8[] data;
+                pixbuf.save_to_buffer(out data,
+                    "png", "compression", "1", null);
+                return data;
+            } catch (Error e) {
+                GLib.printerr("PNG generation failed: %s\n", e.message);
+                return null;
+            }
+        }
+
+        /**
          * Store a surface in the cache using the (index, width, height) tuple
-         * as identifier; also keep the time it took to render
+         * as identifier; also keep the time it took to render.
+         *
+         * Large surfaces are stored compressed; png_data is used if given
+         * (e.g., compressed by the render helper already).
          */
         public void store(CachedPageProps props, Cairo.ImageSurface surface,
-            bool permanent) {
-            CachedPage page = this.storage.get(props);
-            if (page == null) {
-                page = new CachedPage();
-            }
-
+            bool permanent, GLib.Bytes? png_data = null) {
+            var page = new CachedPage();
             page.permanent = permanent;
             page.atime = GLib.get_monotonic_time();
+            page.surface = surface;
 
-            // Store large images in the compressed (PNG) form
-            uint size = 3*props.width*props.height;
-            if (size/1024 > Options.cache_max_usize) {
-                Gdk.Pixbuf pixbuf = Gdk.pixbuf_get_from_surface(surface,
-                    0, 0, surface.get_width(), surface.get_height());
-                try {
-                    pixbuf.save_to_buffer(out page.png_data,
-                        "png", "compression", "1", null);
+            if (is_compressed_size((int) props.width, (int) props.height)) {
+                GLib.Bytes? png = png_data;
+                if (png == null) {
+                    var data = compress(surface);
+                    if (data != null) {
+                        png = new GLib.Bytes.take((owned) data);
+                    }
+                }
+                // Otherwise, store the uncompressed image
+                if (png != null) {
+                    page.png_data = png;
                     page.surface = null;
                     if (Options.cache_debug) {
                         printerr("Compression ratio of [%u] (%ux%u) = %g\n",
                             props.index, props.width, props.height,
-                                (double) size/page.png_data.length);
+                            3.0*props.width*props.height/png.length);
                     }
-                } catch (Error e) {
-                    GLib.printerr("PNG generation failed for slide %u: %s\n",
-                        props.index, e.message);
-                    // Store the uncompressed image
-                    page.surface = surface;
-                    page.png_data = null;
                 }
-            } else {
-                page.surface = surface;
-                page.png_data = null;
             }
+
             this.storage.set(props, page);
+        }
+
+        /**
+         * Check whether an item with the given (index, width, height) tuple
+         * is available, without decompressing it
+         */
+        public bool contains(CachedPageProps props) {
+            return this.storage.has_key(props);
         }
 
         /**
@@ -100,42 +134,96 @@ namespace pdfpc.Renderer {
          */
         public Cairo.ImageSurface? retrieve(CachedPageProps props) {
             CachedPage page = this.storage.get(props);
-
-            if (page != null) {
-                page.atime = GLib.get_monotonic_time();
-                if (page.surface != null) {
-                    return page.surface;
-                } else {
-                    var loader = new Gdk.PixbufLoader();
-                    try {
-                        loader.write(page.png_data);
-                        loader.close();
-                    } catch (Error e) {
-                        GLib.printerr("PNG loader failed for slide %u: %s\n",
-                            props.index, e.message);
-                        return null;
-                    }
-                    var pixbuf = loader.get_pixbuf();
-                    Cairo.ImageSurface surface =
-                        new Cairo.ImageSurface(Cairo.Format.ARGB32,
-                        pixbuf.get_width(), pixbuf.get_height());
-
-                    Cairo.Context cr = new Cairo.Context(surface);
-                    Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-                    cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
-                    cr.fill();
-
-                    return surface;
-                }
-            } else {
+            if (page == null) {
                 return null;
             }
+
+            page.atime = GLib.get_monotonic_time();
+            return this.unpack(page, props.index);
+        }
+
+        /**
+         * Retrieve a stored surface of the given slide in another size of
+         * the same aspect ratio, to be scaled and shown while the slide is
+         * rendered at the proper size. Prefers the smallest one not smaller
+         * than requested, otherwise the largest one. Compressed ones are
+         * not considered, decompressing could take longer than rendering.
+         * Returns null if there is none.
+         */
+        public Cairo.ImageSurface? retrieve_any_size(uint index,
+            bool notes_area, int width, int height) {
+            CachedPage best = null;
+            uint best_width = 0;
+            var it = this.storage.map_iterator();
+            while (it.next()) {
+                var props = it.get_key();
+                if (props.index != index || props.notes_area != notes_area ||
+                    it.get_value().surface == null) {
+                    continue;
+                }
+
+                // Same aspect ratio within 1%
+                double ratio = (double) props.width/props.height;
+                double target_ratio = (double) width/height;
+                if ((ratio - target_ratio).abs() > 0.01*target_ratio) {
+                    continue;
+                }
+
+                bool better;
+                if (best == null) {
+                    better = true;
+                } else if (best_width >= width) {
+                    better = props.width >= width && props.width < best_width;
+                } else {
+                    better = props.width > best_width;
+                }
+                if (better) {
+                    best = it.get_value();
+                    best_width = props.width;
+                }
+            }
+
+            if (best == null) {
+                return null;
+            }
+            return best.surface;
+        }
+
+        /**
+         * Return the surface of a cached page, decompressing it if needed
+         */
+        protected Cairo.ImageSurface? unpack(CachedPage page, uint index) {
+            if (page.surface != null) {
+                return page.surface;
+            }
+
+            var loader = new Gdk.PixbufLoader();
+            try {
+                loader.write_bytes(page.png_data);
+                loader.close();
+            } catch (Error e) {
+                GLib.printerr("PNG loader failed for slide %u: %s\n",
+                    index, e.message);
+                return null;
+            }
+            var pixbuf = loader.get_pixbuf();
+            Cairo.ImageSurface surface =
+                new Cairo.ImageSurface(Cairo.Format.ARGB32,
+                pixbuf.get_width(), pixbuf.get_height());
+
+            Cairo.Context cr = new Cairo.Context(surface);
+            Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+            cr.rectangle(0, 0, pixbuf.get_width(), pixbuf.get_height());
+            cr.fill();
+
+            return surface;
         }
 
         /**
          * Invalidate the whole cache (if the document is reloaded/changed)
          */
         public void invalidate() {
+            this.generation++;
             this.storage.clear();
         }
 
@@ -200,7 +288,7 @@ namespace pdfpc.Renderer {
         /**
          * The compressed image data (PNG)
          */
-        public uint8[]? png_data = null;
+        public GLib.Bytes? png_data = null;
 
         /**
          * Whether to keep it permanently

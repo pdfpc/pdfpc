@@ -575,6 +575,12 @@ namespace pdfpc {
          * Basic application entry point
          */
         public static int main (string[] args) {
+            // Started as render helper by Renderer.Helper
+            if (args.length == 4 && args[1] == Renderer.Helper.FLAG) {
+                return Renderer.Helper.serve(args[2], args[3]);
+            }
+            Renderer.Helper.init(args[0]);
+
             Resources.init(args[0]);
             var application = new Application();
             application.run(args);

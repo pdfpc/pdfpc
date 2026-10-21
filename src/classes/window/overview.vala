@@ -325,6 +325,11 @@ namespace pdfpc.Window {
         public int slide_width { get; set; }
         public int slide_height { get; set; }
 
+        /**
+         * Thumbnails being rendered in the background, as "slide:WxH"
+         */
+        protected Gee.HashSet<string> pending = new Gee.HashSet<string>();
+
         public override void get_size(Gtk.Widget widget, Gdk.Rectangle? cell_area,
                                       out int x_offset, out int y_offset,
                                       out int width, out int height) {
@@ -340,15 +345,29 @@ namespace pdfpc.Window {
             var renderer = this.metadata.renderer;
             Cairo.ImageSurface slide_to_fill = null;
 
-            slide_to_fill = null;
-            try {
-                var real_slide_id =
-                    metadata.user_slide_to_real_slide(this.slide_id, true);
-                slide_to_fill = renderer.render(real_slide_id,
-                    false, slide_width, slide_height,
-                    true, true);
-            } catch (Renderer.RenderError e) {
-                ;
+            var real_slide_id =
+                metadata.user_slide_to_real_slide(this.slide_id, true);
+            slide_to_fill = renderer.lookup(real_slide_id, false,
+                slide_width, slide_height);
+            if (slide_to_fill == null) {
+                // Render in the background and redraw once available
+                var key = @"$real_slide_id:$(slide_width)x$(slide_height)";
+                if (!this.pending.contains(key)) {
+                    try {
+                        renderer.request(real_slide_id, false,
+                            slide_width, slide_height,
+                            Renderer.Priority.NORMAL, null,
+                            (surface) => {
+                                this.pending.remove(key);
+                                if (surface != null) {
+                                    widget.queue_draw();
+                                }
+                            }, true);
+                        this.pending.add(key);
+                    } catch (Renderer.RenderError e) {
+                        ;
+                    }
+                }
             }
             // nothing to show
             if (slide_to_fill == null) {

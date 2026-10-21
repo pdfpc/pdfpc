@@ -515,6 +515,10 @@ namespace pdfpc.Window {
             this.notes_stack.add_named(this.mdview, "mdview");
 #endif
             this.notes_stack.homogeneous = true;
+            // Scrolling over the notes may scroll the notes themselves, but
+            // must never bubble up to the window and change slides
+            this.notes_stack.add_events(Gdk.EventMask.SCROLL_MASK);
+            this.notes_stack.scroll_event.connect(() => true);
 
             var meta_font_size = this.metadata.get_font_size();
             this.apply_font_size(meta_font_size);
